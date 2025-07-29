@@ -1,0 +1,37 @@
+{
+  "name": "digitalstars/php-mtproto-client",
+  "description": "PHP client library for the Telegram MTProto API",
+  "license": "MIT",
+  "type": "library",
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "homepage": "https://github.com/digitalstars/php-mtproto-client",
+  "keywords": [
+    "php",
+    "telegram",
+    "mtproto",
+    "api",
+    "telegram-api",
+    "protocol",
+    "library",
+    "wrapper",
+    "sdk",
+    "client",
+    "userbot",
+    "authorization"
+  ],
+  "require": {
+    "php": ">=8.2",
+    "brick/math": "^0.13",
+    "ext-openssl": "*",
+    "ext-sockets": "*"
+  },
+  "suggest": {
+    "ext-ffi": "Для максимальной производительности при создании ключа авторизации (использует скомпилированный C++ модуль)."
+  },
+  "autoload": {
+    "psr-4": {
+      "DigitalStars\\MtprotoClient\\": "src/"
+    }
+  }
+}
