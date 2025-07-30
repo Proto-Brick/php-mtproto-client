@@ -20,6 +20,8 @@ class TcpTransport implements Transport
             throw new TransportException('Socket connection failed: '. socket_strerror(socket_last_error()));
         }
         socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, ["sec" => 5, "usec" => 0]);
+        // Отправляем заголовок Intermediate транспорта один раз
+        socket_write($this->socket, hex2bin('eeeeeeee'), 4);
         echo "Connected to {$this->settings->server_address}:{$this->settings->server_port}\n";
     }
 
@@ -28,14 +30,8 @@ class TcpTransport implements Transport
         if ($this->socket === null) {
             throw new TransportException("Socket is not connected.");
         }
-
-        // Для Intermediate транспорта сервер ожидает пакет в формате:
-        // [4 байта заголовка 0xeeeeeeee] [4 байта длины] [данные]
-
-        $header = hex2bin('eeeeeeee');
-        $packet = $header . pack('V', strlen($payload)) . $payload;
-
-        echo "DEBUG: Sending " . strlen($packet) . " bytes: " . bin2hex($packet) . "\n";
+        $packet = pack('V', strlen($payload)) . $payload;
+//        echo "DEBUG: Sending " . strlen($packet) . " bytes: " . bin2hex($packet) . "\n";
         if (socket_write($this->socket, $packet, strlen($packet)) === false) {
             throw new TransportException('Failed to send data: ' . socket_strerror(socket_last_error($this->socket)));
         }
@@ -46,34 +42,16 @@ class TcpTransport implements Transport
         if ($this->socket === null) {
             throw new TransportException("Socket is not connected.");
         }
-
-        // Сначала читаем 4 байта заголовка. Для Intermediate ответа он тоже должен быть eeeeeeee
-        // Но сервер на незашифрованные сообщения может его не присылать, а сразу слать длину.
-        // Поэтому мы читаем 4 байта и проверяем.
-        $header_or_length = socket_read($this->socket, 4);
-        if ($header_or_length === false || strlen($header_or_length) < 4) {
+        $length_bytes = socket_read($this->socket, 4);
+        if ($length_bytes === false || strlen($length_bytes) < 4) {
             $errorCode = socket_last_error($this->socket);
             throw new TransportException("Failed to read response header/length from socket: " . socket_strerror($errorCode), $errorCode);
         }
-
-        // Если это заголовок, читаем еще 4 байта длины.
-        // ВАЖНО: На незашифрованные запросы сервер отвечает БЕЗ заголовка 0xeeeeeeee
-        // Он сразу присылает длину. Поэтому ваш текущий receive() был правильным для этого шага.
-        // Оставим его как есть, он корректен для первого шага.
-        // Исправление в send() - это главное.
-        $length_bytes = $header_or_length;
-
-        // Длина в ответе Intermediate кодируется в Little-Endian ('V')
         $lengthData = unpack('V', $length_bytes);
         $length = $lengthData[1];
-
-        // Проверяем на адекватность длины.
-        // resPQ обычно около 150-200 байт.
         if ($length > 4096 || $length <= 0) {
             throw new TransportException("Invalid length received from server: {$length}. Raw bytes: " . bin2hex($length_bytes));
         }
-
-        // Теперь читаем ровно столько байт, сколько указано в длине.
         $response = '';
         $remaining = $length;
         while ($remaining > 0) {
@@ -85,9 +63,7 @@ class TcpTransport implements Transport
             $response .= $chunk;
             $remaining -= strlen($chunk);
         }
-        // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
-
-        echo "DEBUG: Received " . strlen($response) . " bytes (payload only): " . bin2hex($response) . "\n";
+        //echo "DEBUG: Received " . strlen($response) . " bytes (payload only): " . bin2hex($response) . "\n";
         return $response;
     }
 

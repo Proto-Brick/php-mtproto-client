@@ -125,7 +125,6 @@ class Factorizer
         // Если FFI успешно инициализирован, используем его
         if (self::$ffi !== null) {
             $p_val = self::$ffi->factorizeFFI($pq->__toString());
-            echo "DEBUG: FFI функция вернула: " . var_export($p_val, true) . "\n";
             return self::checkAndReturnFactors($pq, $p_val);
         }
 
@@ -175,61 +174,6 @@ class Factorizer
 
         return self::checkAndReturnFactors($pq, trim($output));
     }
-
-    // На удивление рабочее решение, но 40с на рабочем ноуте на WSL
-    // На винде еще в разы дольше
-    /* private static function tryPurePhp(BigInteger $pq): ?array
-    {
-        if ($pq->isEven()) {
-            return self::checkAndReturnFactors($pq, 2);
-        }
-
-        $one = BigInteger::one();
-        $y = BigInteger::of(2);
-        $c = BigInteger::of(1);
-        $m = BigInteger::of(100);
-
-        $g = $one;
-        $r = $one;
-        $q = $one;
-
-        $max_iterations = 50; // Ограничение, чтобы не уйти в бесконечный цикл
-        $i = 0;
-
-        while ($g->isEqualTo($one) && $i++ < $max_iterations) {
-            $x = $y;
-            for ($j = 0; $j < (int)$r->toBase(10); $j++) {
-                $y = $y->multipliedBy($y)->plus($c)->remainder($pq);
-            }
-            $k = 0;
-            while ($k < (int)$r->toBase(10) && $g->isEqualTo($one)) {
-                $ys = $y;
-                $limit = min((int)$m->toBase(10), (int)$r->minus($k)->toBase(10));
-                for ($j = 0; $j < $limit; $j++) {
-                    $y = $y->multipliedBy($y)->plus($c)->remainder($pq);
-                    $q = $q->multipliedBy($x->minus($y)->abs())->remainder($pq);
-                }
-                $g = self::gcd($q, $pq);
-                $k += (int)$m->toBase(10);
-            }
-            $r = $r->multipliedBy(2);
-        }
-
-        if ($g->isEqualTo($pq)) {
-            $g = $one;
-            while ($g->isEqualTo($one)) {
-                $ys = $ys->multipliedBy($ys)->plus($c)->remainder($pq);
-                $g = self::gcd($x->minus($ys)->abs(), $pq);
-            }
-        }
-
-        return self::checkAndReturnFactors($pq, $g->toBase(10));
-    }
-
-    private static function gcd(BigInteger $a, BigInteger $b): BigInteger
-    {
-        return $b->isZero() ? $a : self::gcd($b, $a->remainder($b));
-    } */
 
     private static function tryRemoteService(BigInteger $pq): ?array
     {

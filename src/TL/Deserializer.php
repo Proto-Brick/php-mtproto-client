@@ -7,21 +7,32 @@ class Deserializer
     {
         $value_bin = substr($stream, 0, 4);
         $stream = substr($stream, 4);
-        return unpack('V', $value_bin)[1];
+        return unpack('V', $value_bin)[1]; // Распаковка как 32-bit беззнаковый little-endian integer.
     }
 
     public function int64(string &$stream): string
     {
         $value_bin = substr($stream, 0, 8);
         $stream = substr($stream, 8);
-        return strrev($value_bin);
+        return strrev($value_bin); // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
+        //return unpack('q', $value_bin)[1]; // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
     }
 
     public function int128(string &$stream): string
     {
         $value_bin = substr($stream, 0, 16);
         $stream = substr($stream, 16);
-        return strrev($value_bin);
+        return strrev($value_bin); // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
+    }
+
+    /**
+     * НОВЫЙ МЕТОД: Читает 16 "сырых" байт и возвращает их как есть.
+     */
+    public function raw128(string &$payload): string
+    {
+        $value = substr($payload, 0, 16);
+        $payload = substr($payload, 16);
+        return $value; // Без strrev!
     }
 
     public function bytes(string &$stream): string
@@ -57,8 +68,8 @@ class Deserializer
             throw new \Exception("Expected resPQ constructor, but got " . dechex($constructor));
         }
 
-        $nonce = $this->int128($stream);
-        $server_nonce = $this->int128($stream);
+        $nonce = $this->raw128($stream);
+        $server_nonce = $this->raw128($stream);
         $pq = $this->bytes($stream);
 
         $vector_constructor = $this->int32($stream);
@@ -80,14 +91,40 @@ class Deserializer
         ];
     }
 
+    /**
+     * Десериализует ответ server_DH_params_ok.
+     * @param string $stream
+     * @return array
+     * @throws \Exception
+     */
+    public function deserializeServerDhParamsOk(string &$stream): array
+    {
+        $constructor = $this->int32($stream);
+        // Конструктор для server_DH_params_ok = 0xd0e8075c
+        if ($constructor !== 0xd0e8075c) {
+            throw new \Exception("Expected server_DH_params_ok constructor, but got " . dechex($constructor));
+        }
+
+        // Читаем поля в том порядке, в котором они идут в схеме
+        $nonce = $this->raw128($stream);
+        $server_nonce = $this->raw128($stream);
+        $encrypted_answer = $this->bytes($stream);
+
+        return [
+            'nonce' => $nonce,
+            'server_nonce' => $server_nonce,
+            'encrypted_answer' => $encrypted_answer,
+        ];
+    }
+
     public function deserializeServerDhInnerData(string &$stream): array
     {
         $constructor = $this->int32($stream);
         if ($constructor !== 0xb5890dba) {
             throw new \Exception("Invalid constructor in DH answer: " . dechex($constructor));
         }
-        $nonce = $this->int128($stream);
-        $server_nonce = $this->int128($stream);
+        $nonce = $this->raw128($stream);
+        $server_nonce = $this->raw128($stream);
         $g = $this->int32($stream);
         $dh_prime = $this->bytes($stream);
         $g_a = $this->bytes($stream);

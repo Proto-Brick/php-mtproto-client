@@ -1,13 +1,17 @@
 <?php
+
 declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\Auth;
 
 use DigitalStars\MtprotoClient\Crypto\Aes;
+use DigitalStars\MtprotoClient\Crypto\Ige;
 use DigitalStars\MtprotoClient\Crypto\Rsa;
 use DigitalStars\MtprotoClient\Domain\Factorizer;
+use DigitalStars\MtprotoClient\Exception\FactorizationException;
 use DigitalStars\MtprotoClient\MessagePacker;
 use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\Transport\Transport;
 use Brick\Math\BigInteger;
@@ -39,7 +43,12 @@ class AuthKeyCreator
 
         // Шаг 2: Факторизация pq
         $pq = BigInteger::fromBytes($resPQData['pq'], false);
-        list($p_val, $q_val) = Factorizer::factorize($pq);
+        [$p_val, $q_val] = Factorizer::factorize($pq);
+
+        if (!$pq->isEqualTo($p_val->multipliedBy($q_val))) {
+            throw new FactorizationException("Factorization failed: p * q does not equal original pq.");
+        }
+
         $p = $p_val->toBytes(false); // false для big-endian
         $q = $q_val->toBytes(false);
         echo "Step 2 (factorization): OK (p=$p_val, q=$q_val)\n";
@@ -56,43 +65,60 @@ class AuthKeyCreator
     }
 
     /**
-     * Шаг 1: Отправка запроса req_pq_multi и получение ResPQ.
+     * Выполняет Шаг 1: Запрос PQ.
+     *
+     * Эта функция инициирует процесс создания ключа авторизации. Она отправляет на сервер
+     * TL-объект `req_pq_multi`, содержащий уникальный 128-битный nonce. В ответ сервер
+     * присылает `resPQ`, который содержит, среди прочего, `server_nonce` и число `pq`.
+     *
+     * @return array Десериализованный ответ `resPQ`, дополненный ключом `original_nonce` для использования в последующих шагах.
+     * @throws \RuntimeException В случае ошибок транспорта, несоответствия `auth_key_id` или `nonce`.
+     * @see https://core.telegram.org/mtproto/auth_key#1-dh-key-exchange
      */
     private function sendReqPq(): array
     {
+        // 1. Клиент генерирует случайный 128-битный nonce (16 байт).
+        // Этот nonce будет использован для проверки того, что ответ сервера соответствует именно этому запросу.
         $nonce = random_bytes(16);
 
-        // payload - это чистый TL-объект. Правильно.
-        $payload = $this->serializer->int32(0xbe7e8ef1) . $this->serializer->int128($nonce);
+        // 2. Сериализуем TL-объект `req_pq_multi`. Это "внутренняя" полезная нагрузка сообщения.
+        $payload = $this->serializer->int32(Constructors::REQ_PQ_MULTI) . $this->serializer->raw128($nonce);
 
-        // MessagePacker теперь вернет [длина=40][MTProto-пакет_40_байт]
+        // 3. Упаковываем TL-объект в незашифрованный MTProto-контейнер.
+        // Структура контейнера: [auth_key_id (8 байт) = 0] [msg_id (8 байт)] [message_length (4 байта)] [payload]
         $request = $this->messagePacker->packUnencrypted($payload);
+
+        // 4. Отправляем полный пакет через транспорт.
         $this->transport->send($request);
 
-        // Transport получит [длина=100][MTProto-пакет_100_байт] и вернет только MTProto-пакет
+        // 5. Получаем бинарный ответ от сервера.
         $rawResponse = $this->transport->receive();
 
-        // unpackUnencrypted просто вернет пакет как есть. Правильно.
+        // 6. Распаковываем MTProto-контейнер. На этом этапе `unpackUnencrypted` просто возвращает сырой MTProto-пакет.
         $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
 
-        // Проверяем auth_key_id. Это важно.
+        // 7. Проводим базовую валидацию ответа. `auth_key_id` для незашифрованных сообщений всегда должен быть равен 0.
         $auth_key_id = substr($responsePayload, 0, 8);
         if ($auth_key_id !== pack('P', 0)) {
             throw new \RuntimeException("Invalid auth_key_id in response. Expected 0, got " . bin2hex($auth_key_id));
         }
 
-        // Отрезаем MTProto-конверт. Правильно.
+        // 8. Извлекаем "внутреннюю" часть - сам TL-объект `resPQ`.
+        // Для этого пропускаем заголовок MTProto-контейнера: [auth_key_id (8)] + [msg_id (8)] + [length (4)] = 20 байт.
         $tlObjectPayload = substr($responsePayload, 20);
 
-        echo "DEBUG: Payload for Deserializer: " . bin2hex($tlObjectPayload) . "\n";
-
+        // 9. Десериализуем TL-объект `resPQ` в PHP-массив.
         $deserialized = $this->deserializer->deserializeResPQ($tlObjectPayload);
 
+        // 10. Финальная проверка безопасности: nonce в ответе должен совпадать с тем, что мы отправили.
+        // Это защищает от атак повторного воспроизведения (replay attacks).
         if ($deserialized['nonce'] !== $nonce) {
-            throw new \RuntimeException("Nonce mismatch in resPQ response.");
+            throw new \RuntimeException("Nonce mismatch in resPQ response. Possible replay attack.");
         }
 
+        // 11. Сохраняем наш оригинальный nonce в результате, так как он понадобится для Шага 3.
         $deserialized['original_nonce'] = $nonce;
+
         return $deserialized;
     }
 
@@ -104,19 +130,12 @@ class AuthKeyCreator
         $publicKeyPem = null;
         $foundFingerprint = null;
 
-        echo "\n--- DEBUG: Server Fingerprints ---\n";
-        echo "Server sent " . count($resPQData['fingerprints']) . " fingerprints:\n";
-        foreach ($resPQData['fingerprints'] as $fp) {
-            echo "- " . bin2hex($fp) . "\n";
-        }
-        echo "-----------------------------------\n\n";
-
         foreach ($resPQData['fingerprints'] as $fingerprint) {
             $key = $this->rsa->findKeyByFingerprint($fingerprint);
             if ($key !== null) {
                 $publicKeyPem = $key;
                 $foundFingerprint = $fingerprint;
-                break; // Нашли совпадение, выходим из цикла
+                break;
             }
         }
 
@@ -127,35 +146,30 @@ class AuthKeyCreator
 
         $newNonce = random_bytes(32);
 
+        $pq_big = $resPQData['pq'];
+
         // Сборка p_q_inner_data
         $innerDataPayload =
-            $this->serializer->int32(0xa9f55f95)
-            . $this->serializer->bytes($resPQData['pq'])
+            $this->serializer->int32(Constructors::P_Q_INNER_DATA_DC)
+            . $this->serializer->bytes($pq_big)
             . $this->serializer->bytes($p)
             . $this->serializer->bytes($q)
-            . $this->serializer->int128($resPQData['original_nonce'])
-            . $this->serializer->int128($resPQData['server_nonce'])
-            . $this->serializer->int256($newNonce)
-            // -----------------------------------------------------------------
+            . $this->serializer->raw128($resPQData['original_nonce'])
+            . $this->serializer->raw128($resPQData['server_nonce'])
+            . $this->serializer->raw256($newNonce)
             . $this->serializer->int32(2);
-
-        // --- ДОБАВЬТЕ ЭТОТ БЛОК ---
-        echo "\n--- DEBUG: p_q_inner_data ---\n";
-        echo "p_q_inner_data (len=" . strlen($innerDataPayload) . "): " . bin2hex($innerDataPayload) . "\n";
-        echo "---------------------------\n";
-        // --- КОНЕЦ БЛОКА ---
 
         // Шифрование inner_data
         $encryptedInnerData = $this->rsa->encryptPqInnerData($innerDataPayload, $publicKeyPem);
 
         // Сборка и отправка req_DH_params
         $payload =
-            $this->serializer->int32(0xd712e4be) // req_DH_params
-            . $this->serializer->int128($resPQData['nonce'])
-            . $this->serializer->int128($resPQData['server_nonce'])
+            $this->serializer->int32(Constructors::REQ_DH_PARAMS)
+            . $this->serializer->raw128($resPQData['nonce'])
+            . $this->serializer->raw128($resPQData['server_nonce'])
             . $this->serializer->bytes($p)
             . $this->serializer->bytes($q)
-            . $foundFingerprint // fingerprint это уже 8-байтовая бинарная строка (long)
+            . strrev($foundFingerprint)
             . $this->serializer->bytes($encryptedInnerData);
 
         $request = $this->messagePacker->packUnencrypted($payload);
@@ -166,44 +180,97 @@ class AuthKeyCreator
         // Снова пропускаем заголовок
         $responsePayload = substr($responsePayload, 20);
 
-        // Десериализация ответа (Server_DH_Params)
-        $constructor = $this->deserializer->int32($responsePayload);
-        if ($constructor !== 0xd0e8075c) { // server_DH_params_ok
-            throw new \RuntimeException("Server_DH_Params failed. Got constructor " . dechex($constructor));
-        }
+        $serverDhData = $this->deserializer->deserializeServerDhParamsOk($responsePayload);
 
-        if ($this->deserializer->int128($responsePayload) !== $resPQData['nonce']) {
+        if ($serverDhData['nonce'] !== $resPQData['nonce']) {
             throw new \RuntimeException("Invalid nonce in Server_DH_Params response.");
         }
-        if ($this->deserializer->int128($responsePayload) !== $resPQData['server_nonce']) {
+        if ($serverDhData['server_nonce'] !== $resPQData['server_nonce']) {
             throw new \RuntimeException("Invalid server_nonce in Server_DH_Params response.");
         }
 
-        $encryptedAnswer = $this->deserializer->bytes($responsePayload);
-
-        return ['encrypted_answer' => $encryptedAnswer, 'new_nonce' => $newNonce];
+        return [
+            'encrypted_answer' => $serverDhData['encrypted_answer'],
+            'new_nonce' => $newNonce
+        ];
     }
 
-    private function sendSetClientDhParams(array $resPQData, array $serverDhParams): AuthKey
+    /**
+     * Выполняет Шаг 4: Установка DH-параметров клиента и получение AuthKey.
+     * Этот метод-оркестратор вызывает последовательность приватных методов для каждого под-этапа.
+     *
+     * @param array $resPQData Данные из ответа на req_pq (шаг 1).
+     * @param array $serverDhParams Данные из ответа на req_DH_params (шаг 3).
+     * @return AuthKey Готовый ключ авторизации.
+     * @throws \RuntimeException
+     */
+    public function sendSetClientDhParams(array $resPQData, array $serverDhParams): AuthKey
     {
-        // --- Этап 1: Расшифровка ответа сервера (server_DH_inner_data) ---
-        $tmp_aes_key = hash('sha256', $serverDhParams['new_nonce'] . $resPQData['server_nonce'], true);
-        $tmp_aes_iv = substr(hash('sha256', $resPQData['server_nonce'] . $serverDhParams['new_nonce'], true), 0, 16)
-            . substr(hash('sha256', $serverDhParams['new_nonce'] . $serverDhParams['new_nonce'], true), 0, 16);
+        // Этап 4.1: Вычисляем временные ключи и расшифровываем ответ сервера
+        $tempKeys = $this->_calculateTemporaryKeys($serverDhParams['new_nonce'], $resPQData['server_nonce']);
+        $dhInnerData = $this->_decryptAndValidateDhInnerData(
+            $serverDhParams['encrypted_answer'],
+            $tempKeys,
+            $resPQData
+        );
 
-        $decryptedAnswer = openssl_decrypt($serverDhParams['encrypted_answer'], 'aes-256-ige', $tmp_aes_key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $tmp_aes_iv);
-        if ($decryptedAnswer === false) {
+        print 'step 4.1 (decryptDhInnerData): OK' . PHP_EOL;
+
+        // Этап 4.2: Выполняем вычисления Диффи-Хеллмана на стороне клиента
+        $clientDhResult = $this->_generateClientDhData($dhInnerData);
+        $authKey = $clientDhResult['authKey'];
+        $gb_bytes = $clientDhResult['gb_bytes'];
+
+        print 'step 4.2 (generateClientDhData): OK' . PHP_EOL;
+
+        // Этап 4.3: Формируем, шифруем и отправляем наш финальный запрос
+        $rawFinalResponse = $this->_encryptAndSendFinalRequest($gb_bytes, $resPQData, $tempKeys);
+
+        print 'step 4.3 (encryptAndSendFinalRequest): OK' . PHP_EOL;
+
+        // Этап 4.4: Парсим и валидируем финальный ответ от сервера
+        $this->_parseAndValidateFinalResponse($rawFinalResponse, $authKey, $resPQData, $serverDhParams['new_nonce']);
+
+        print 'step 4.4 (parseAndValidateFinalResponse): OK' . PHP_EOL;
+
+        // Этап 4.5: Все проверки пройдены, возвращаем ключ
+        return $authKey;
+    }
+
+    /**
+     * Этап 4.1.1: Вычисляет временные tmp_aes_key и tmp_aes_iv.
+     * Эти ключи используются для шифрования на промежуточных шагах обмена DH.
+     */
+    private function _calculateTemporaryKeys(string $newNonce, string $serverNonce): array
+    {
+        $tmp_aes_key = hash('sha1', $newNonce . $serverNonce, true) .
+            substr(hash('sha1', $serverNonce . $newNonce, true), 0, 12);
+
+        $tmp_aes_iv = substr(hash('sha1', $serverNonce . $newNonce, true), 12, 8) .
+            hash('sha1', $newNonce . $newNonce, true) .
+            substr($newNonce, 0, 4);
+
+        return ['key' => $tmp_aes_key, 'iv' => $tmp_aes_iv];
+    }
+
+    /**
+     * Этап 4.1.2: Расшифровывает, валидирует и парсит server_DH_inner_data.
+     */
+    private function _decryptAndValidateDhInnerData(string $encryptedAnswer, array $tempKeys, array $resPQData): array
+    {
+        // Используем фабрику Ige для выбора наилучшего метода расшифровки (OpenSSL или Phpseclib)
+        $ige = Ige::create($tempKeys['key'], $tempKeys['iv']);
+        $decryptedAnswer = $ige->decrypt($encryptedAnswer);
+        if ($decryptedAnswer === false || $decryptedAnswer === '') {
             throw new \RuntimeException("Failed to decrypt server_DH_inner_data.");
         }
 
-        // --- Этап 2: Валидация хэша и парсинг server_DH_inner_data ---
-        // В MTProto 1.0 хэш был SHA1 (20 байт). В 2.0 это SHA256 (32 байта).
-        // Спецификация обмена ключами немного отстает, и серверы могут по-прежнему использовать SHA1.
-        // Начнем с проверки SHA1, так как это самый частый случай на этом этапе.
+        // Валидация хэша
         $answerHash = substr($decryptedAnswer, 0, 20);
         $innerDataWithPadding = substr($decryptedAnswer, 20);
-        $streamForParsing = $innerDataWithPadding;
 
+        // Десериализуем, чтобы узнать фактическую длину данных без паддинга
+        $streamForParsing = $innerDataWithPadding;
         $dhInnerData = $this->deserializer->deserializeServerDhInnerData($streamForParsing);
         $actualDataLength = strlen($innerDataWithPadding) - strlen($streamForParsing);
         $actualData = substr($innerDataWithPadding, 0, $actualDataLength);
@@ -212,74 +279,129 @@ class AuthKeyCreator
             throw new \RuntimeException("SHA1 hash mismatch in server_DH_inner_data.");
         }
 
-        // --- Этап 3: Проверки безопасности и извлечение данных ---
-        if ($dhInnerData['nonce'] !== $resPQData['nonce']) throw new \RuntimeException("Nonce mismatch in decrypted DH answer.");
-        if ($dhInnerData['server_nonce'] !== $resPQData['server_nonce']) throw new \RuntimeException("Server nonce mismatch in decrypted DH answer.");
+        // Проверка nonce
+        if ($dhInnerData['nonce'] !== $resPQData['nonce']) {
+            throw new \RuntimeException("Nonce mismatch in decrypted DH answer.");
+        }
+        if ($dhInnerData['server_nonce'] !== $resPQData['server_nonce']) {
+            throw new \RuntimeException("Server nonce mismatch in decrypted DH answer.");
+        }
 
-        $g = $dhInnerData['g'];
-        $dh_prime_bytes = $dhInnerData['dh_prime'];
-        $g_a_bytes = $dhInnerData['g_a'];
-        $dh_prime = BigInteger::fromBytes($dh_prime_bytes, false);
-        $g_a = BigInteger::fromBytes($g_a_bytes, false);
+        // TODO: Здесь рекомендуется добавить проверку dh_prime на безопасность, как описано в документации Telegram
 
-        // --- Этап 4: Вычисления по протоколу Диффи-Хеллмана ---
+        return $dhInnerData;
+    }
+
+    /**
+     * Этап 4.2: Выполняет вычисления Диффи-Хеллмана и генерирует AuthKey.
+     */
+    private function _generateClientDhData(array $dhInnerData): array
+    {
+        $dh_prime = BigInteger::fromBytes($dhInnerData['dh_prime'], false);
+        $g_a = BigInteger::fromBytes($dhInnerData['g_a'], false);
+        $g = BigInteger::of($dhInnerData['g']);
+
         $b = random_bytes(256);
         $b_bi = BigInteger::fromBytes($b, false);
-        $g_bi = BigInteger::of($g);
-        $auth_key_bi = $g_a->modPow($b_bi, $dh_prime);
-        $authKeyBytes = str_pad($auth_key_bi->toBytes(false), 256, "\0", STR_PAD_LEFT);
-        $g_b_bytes = $g_bi->modPow($b_bi, $dh_prime)->toBytes(false);
 
-        // --- Этап 5: Формирование и шифрование нашего ответа (client_DH_inner_data) ---
+        // Вычисляем g_b
+        $gb_bi = $g->modPow($b_bi, $dh_prime);
+        $gb_bytes = str_pad($gb_bi->toBytes(false), 256, "\0", STR_PAD_LEFT);
+
+        // Вычисляем ключ авторизации
+        $authKey_bi = $g_a->modPow($b_bi, $dh_prime);
+        $authKeyBytes = str_pad($authKey_bi->toBytes(false), 256, "\0", STR_PAD_LEFT);
+
+        return [
+            'authKey' => new AuthKey($authKeyBytes),
+            'gb_bytes' => $gb_bytes,
+        ];
+    }
+
+    /**
+     * Этап 4.3: Создает, шифрует и отправляет финальный запрос set_client_DH_params.
+     */
+    private function _encryptAndSendFinalRequest(string $gb_bytes, array $resPQData, array $tempKeys): string
+    {
+        // Формируем client_DH_inner_data
         $clientInnerDataPayload =
-            $this->serializer->int32(0x6643b654)
-            . $this->serializer->int128($resPQData['nonce'])
-            . $this->serializer->int128($resPQData['server_nonce'])
-            . $this->serializer->int64(0)
-            . $this->serializer->bytes($g_b_bytes);
+            $this->serializer->int32(0x6643b654) // client_DH_inner_data constructor ID
+            . $this->serializer->raw128($resPQData['nonce'])
+            . $this->serializer->raw128($resPQData['server_nonce'])
+            . $this->serializer->int64(0) // retry_id
+            . $this->serializer->bytes($gb_bytes);
 
-        // Здесь тоже используется SHA1, согласно документации на этот шаг.
+        // Добавляем SHA1 хэш и паддинг
         $clientDataWithHash = hash('sha1', $clientInnerDataPayload, true) . $clientInnerDataPayload;
         $paddingLength = 16 - (strlen($clientDataWithHash) % 16);
+        if ($paddingLength < 12) {
+            $paddingLength += 16;
+        }
         $paddedClientData = $clientDataWithHash . random_bytes($paddingLength);
 
-        $encryptedClientInnerData = openssl_encrypt($paddedClientData, 'aes-256-ige', $tmp_aes_key, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $tmp_aes_iv);
+        // Шифруем данные
+        $ige = Ige::create($tempKeys['key'], $tempKeys['iv']);
+        $encryptedClientInnerData = $ige->encrypt($paddedClientData);
 
-        // --- Этап 6: Отправка финального запроса (set_client_DH_params) ---
+        // Формируем и отправляем финальный запрос
         $finalPayload =
-            $this->serializer->int32(0xf5045f1f)
-            . $this->serializer->int128($resPQData['nonce'])
-            . $this->serializer->int128($resPQData['server_nonce'])
+            $this->serializer->int32(0xf5045f1f) // set_client_DH_params constructor ID
+            . $this->serializer->raw128($resPQData['nonce'])
+            . $this->serializer->raw128($resPQData['server_nonce'])
             . $this->serializer->bytes($encryptedClientInnerData);
+
         $request = $this->messagePacker->packUnencrypted($finalPayload);
         $this->transport->send($request);
 
-        // --- Этап 7: Получение и парсинг финального ответа сервера ---
-        $rawResponse = $this->transport->receive();
+        return $this->transport->receive();
+    }
+
+    /**
+     * Этап 4.4: Парсит и валидирует финальный ответ от сервера (dh_gen_ok/fail/retry).
+     */
+    private function _parseAndValidateFinalResponse(
+        string $rawResponse,
+        AuthKey $authKey,
+        array $resPQData,
+        string $newNonce
+    ): void {
         $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
-        $responsePayload = substr($responsePayload, 20);
+        $responsePayload = substr($responsePayload, 20); // Пропускаем заголовок
+
         $finalConstructor = $this->deserializer->int32($responsePayload);
 
-        if ($finalConstructor !== 0x3bcbf734) { // dh_gen_ok
-            throw new \RuntimeException("DH key exchange failed. Final response constructor: " . dechex($finalConstructor));
+        // Проверяем статус ответа
+        if ($finalConstructor === Constructors::DH_GEN_FAIL) {
+            throw new \RuntimeException("DH key exchange failed: server returned dh_gen_fail.");
         }
-        if ($this->deserializer->int128($responsePayload) !== $resPQData['nonce']) throw new \RuntimeException("Final nonce mismatch.");
-        if ($this->deserializer->int128($responsePayload) !== $resPQData['server_nonce']) throw new \RuntimeException("Final server nonce mismatch.");
+        if ($finalConstructor === Constructors::DH_GEN_RETRY) {
+            throw new \RuntimeException(
+                "DH key exchange failed: server returned dh_gen_retry. (Logic for retry is not implemented)."
+            );
+        }
+        if ($finalConstructor !== Constructors::DH_GEN_OK) {
+            throw new \RuntimeException(
+                "DH key exchange failed. Final response constructor: " . dechex($finalConstructor)
+            );
+        }
 
-        $new_nonce_hash1_from_server = $this->deserializer->int128($responsePayload);
+        // Валидируем nonce
+        if ($this->deserializer->raw128($responsePayload) !== $resPQData['nonce']) {
+            throw new \RuntimeException("Final nonce mismatch.");
+        }
+        if ($this->deserializer->raw128($responsePayload) !== $resPQData['server_nonce']) {
+            throw new \RuntimeException("Final server nonce mismatch.");
+        }
 
-        // --- Этап 8: Финальная валидация (проверка new_nonce_hash1) ---
-        // Важно: на этом последнем шаге используется SHA1 от auth_key, даже в MTProto 2.0
-        $auth_key_hash_full = hash('sha1', $authKeyBytes, true); // <--- ИСПРАВЛЕНИЕ ЗДЕСЬ
-        $auth_key_aux_hash = substr($auth_key_hash_full, 0, 8);
-        $dataForHash = $serverDhParams['new_nonce'] . "\x01" . $auth_key_aux_hash;
+        $new_nonce_hash1_from_server = $this->deserializer->raw128($responsePayload);
+
+        // Финальная и самая важная проверка new_nonce_hash
+        $auth_key_aux_hash = substr(hash('sha1', $authKey->key, true), 0, 8);
+        $dataForHash = $newNonce . "\x01" . $auth_key_aux_hash;
         $new_nonce_hash1_calculated = substr(hash('sha1', $dataForHash, true), -16);
 
         if ($new_nonce_hash1_from_server !== $new_nonce_hash1_calculated) {
             throw new \RuntimeException("Final new_nonce_hash check failed. Possible MITM attack?");
         }
-
-        // --- Этап 9: Все проверки пройдены, возвращаем ключ ---
-        return new AuthKey($authKeyBytes);
     }
 }

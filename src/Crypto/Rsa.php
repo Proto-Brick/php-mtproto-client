@@ -31,7 +31,7 @@ class Rsa
     {
 
         // --- ДОБАВЬТЕ ЭТОТ ОТЛАДОЧНЫЙ БЛОК ---
-        echo "DEBUG: Rsa::findKeyByFingerprint is searching for: " . bin2hex($fingerprint) . "\n";
+        //echo "DEBUG: Rsa::findKeyByFingerprint is searching for: " . bin2hex($fingerprint) . "\n";
         // --- КОНЕЦ ОТЛАДОЧНОГО БЛОКА ---
 
         // Убрал отладочный вывод для чистоты
@@ -80,58 +80,38 @@ class Rsa
         return $prefix . $value . str_repeat("\x00", $paddingLen);
     }
 
+
     public function encryptPqInnerData(string $data, string $publicKeyPem): string
     {
-        // Реализация RSA_PAD для MTProto 2.0
-        // Извлекаем модуль 'n' из публичного ключа для сравнения
         $details = openssl_pkey_get_details(openssl_pkey_get_public($publicKeyPem));
         if (!$details || !isset($details['rsa']['n'])) {
             throw new \RuntimeException("Could not get RSA key details.");
         }
-        $modulus_n = BigInteger::fromBytes($details['rsa']['n'], false); // false = big-endian
+        $modulus_n = BigInteger::fromBytes($details['rsa']['n'], false);
 
-        // --- НАЧАЛО ЦИКЛА ПРОВЕРКИ ---
         while (true) {
-            // 1. Дополняем данные до 192 байт
-            if (strlen($data) > 192) {
-                throw new \InvalidArgumentException("Data for RSA_PAD must not exceed 192 bytes.");
+            if (strlen($data) > 144) { // Официальная документация указывает на 192, но примеры показывают, что данные обычно короче
+                throw new \InvalidArgumentException("Data for RSA_PAD must not exceed 144 bytes for this step.");
             }
             $data_with_padding = $data . random_bytes(192 - strlen($data));
 
-            // 2. Реверсируем байты
             $data_pad_reversed = strrev($data_with_padding);
-
-            // 3. Генерируем временный ключ
             $temp_key = random_bytes(32);
-
-            // 4. Формируем 224-байтный блок для AES-шифрования
             $data_with_hash = $data_pad_reversed . hash('sha256', $temp_key . $data_with_padding, true);
 
-            // 5. Шифруем AES-256-IGE с нулевым вектором инициализации (IV)
             $ige = Ige::create($temp_key, str_repeat("\0", 32));
             $aes_encrypted = $ige->encrypt($data_with_hash);
 
-            // 6. Модифицируем temp_key
             $temp_key_xor = $temp_key ^ hash('sha256', $aes_encrypted, true);
-
-            // 7. Собираем 256-байтный блок (32 байта ключа + 224 байта данных)
             $key_aes_encrypted = $temp_key_xor . $aes_encrypted;
 
-            // --- ДОБАВЛЕНА ПРОВЕРКА ---
-            // Сравниваем наше число с модулем. Если оно меньше, выходим из цикла.
             if (BigInteger::fromBytes($key_aes_encrypted, false)->isLessThan($modulus_n)) {
                 break;
             }
-            // В противном случае, цикл начнется заново с новым random temp_key
-            echo "DEBUG: key_aes_encrypted >= modulus, retrying...\n";
         }
-        // --- КОНЕЦ ЦИКЛА ПРОВЕРКИ ---
 
-
-        // 8. Финальное RSA-шифрование (теперь оно гарантированно сработает)
         $encryptedData = '';
         if (!openssl_public_encrypt($key_aes_encrypted, $encryptedData, $publicKeyPem, OPENSSL_NO_PADDING)) {
-            // Эта ошибка теперь не должна возникать, но оставим проверку для надежности
             throw new \RuntimeException("Failed to encrypt with RSA: " . openssl_error_string());
         }
 
