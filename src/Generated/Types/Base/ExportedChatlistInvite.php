@@ -1,0 +1,54 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/type/exportedChatlistInvite
+ */
+final class ExportedChatlistInvite extends AbstractExportedChatlistInvite
+{
+    public const CONSTRUCTOR_ID = 206668204;
+    
+    public string $_ = 'exportedChatlistInvite';
+    
+    /**
+     * @param string $title
+     * @param string $url
+     * @param list<AbstractPeer> $peers
+     */
+    public function __construct(
+        public readonly string $title,
+        public readonly string $url,
+        public readonly array $peers
+    ) {}
+    
+    public function serialize(Serializer $serializer): string
+    {
+        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        $buffer .= $serializer->int32($flags);
+
+        $buffer .= $serializer->bytes($this->title);
+        $buffer .= $serializer->bytes($this->url);
+        $buffer .= $serializer->vectorOfObjects($this->peers);
+        return $buffer;
+    }
+
+    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    {
+        $deserializer->int32($stream); // Constructor ID is consumed here.
+        $flags = $deserializer->int32($stream);
+
+        $title = $deserializer->bytes($stream);
+        $url = $deserializer->bytes($stream);
+        $peers = $deserializer->vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
+            return new self(
+            $title,
+            $url,
+            $peers
+        );
+    }
+}

@@ -1,0 +1,82 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputGeoPoint;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/method/channels.createChannel
+ */
+final class CreateChannelRequest extends TlObject
+{
+    public const CONSTRUCTOR_ID = 2432722695;
+    
+    public string $_ = 'channels.createChannel';
+    
+    public function getMethodName(): string
+    {
+        return 'channels.createChannel';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return AbstractUpdates::class;
+    }
+    /**
+     * @param string $title
+     * @param string $about
+     * @param bool|null $broadcast
+     * @param bool|null $megagroup
+     * @param bool|null $forImport
+     * @param bool|null $forum
+     * @param AbstractInputGeoPoint|null $geoPoint
+     * @param string|null $address
+     * @param int|null $ttlPeriod
+     */
+    public function __construct(
+        public readonly string $title,
+        public readonly string $about,
+        public readonly ?bool $broadcast = null,
+        public readonly ?bool $megagroup = null,
+        public readonly ?bool $forImport = null,
+        public readonly ?bool $forum = null,
+        public readonly ?AbstractInputGeoPoint $geoPoint = null,
+        public readonly ?string $address = null,
+        public readonly ?int $ttlPeriod = null
+    ) {}
+    
+    public function serialize(Serializer $serializer): string
+    {
+        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->broadcast) $flags |= (1 << 0);
+        if ($this->megagroup) $flags |= (1 << 1);
+        if ($this->forImport) $flags |= (1 << 3);
+        if ($this->forum) $flags |= (1 << 5);
+        if ($this->geoPoint !== null) $flags |= (1 << 2);
+        if ($this->address !== null) $flags |= (1 << 2);
+        if ($this->ttlPeriod !== null) $flags |= (1 << 4);
+        $buffer .= $serializer->int32($flags);
+
+        $buffer .= $serializer->bytes($this->title);
+        $buffer .= $serializer->bytes($this->about);
+        if ($flags & (1 << 2)) {
+            $buffer .= $this->geoPoint->serialize($serializer);
+        }
+        if ($flags & (1 << 2)) {
+            $buffer .= $serializer->bytes($this->address);
+        }
+        if ($flags & (1 << 4)) {
+            $buffer .= $serializer->int32($this->ttlPeriod);
+        }
+        return $buffer;
+    }
+
+    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    {
+        throw new \LogicException('Request objects are not deserializable');
+    }
+}

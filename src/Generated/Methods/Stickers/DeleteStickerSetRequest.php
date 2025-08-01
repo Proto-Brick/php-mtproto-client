@@ -1,0 +1,45 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Methods\Stickers;
+
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputStickerSet;
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/method/stickers.deleteStickerSet
+ */
+final class DeleteStickerSetRequest extends TlObject
+{
+    public const CONSTRUCTOR_ID = 2272281492;
+    
+    public string $_ = 'stickers.deleteStickerSet';
+    
+    public function getMethodName(): string
+    {
+        return 'stickers.deleteStickerSet';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return 'bool';
+    }
+    /**
+     * @param AbstractInputStickerSet $stickerset
+     */
+    public function __construct(
+        public readonly AbstractInputStickerSet $stickerset
+    ) {}
+    
+    public function serialize(Serializer $serializer): string
+    {
+        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->stickerset->serialize($serializer);
+        return $buffer;
+    }
+
+    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    {
+        throw new \LogicException('Request objects are not deserializable');
+    }
+}

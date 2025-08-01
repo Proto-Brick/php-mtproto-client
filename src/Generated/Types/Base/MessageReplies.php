@@ -1,0 +1,86 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/type/messageReplies
+ */
+final class MessageReplies extends AbstractMessageReplies
+{
+    public const CONSTRUCTOR_ID = 2211844034;
+    
+    public string $_ = 'messageReplies';
+    
+    /**
+     * @param int $replies
+     * @param int $repliesPts
+     * @param bool|null $comments
+     * @param list<AbstractPeer>|null $recentRepliers
+     * @param int|null $channelId
+     * @param int|null $maxId
+     * @param int|null $readMaxId
+     */
+    public function __construct(
+        public readonly int $replies,
+        public readonly int $repliesPts,
+        public readonly ?bool $comments = null,
+        public readonly ?array $recentRepliers = null,
+        public readonly ?int $channelId = null,
+        public readonly ?int $maxId = null,
+        public readonly ?int $readMaxId = null
+    ) {}
+    
+    public function serialize(Serializer $serializer): string
+    {
+        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->comments) $flags |= (1 << 0);
+        if ($this->recentRepliers !== null) $flags |= (1 << 1);
+        if ($this->channelId !== null) $flags |= (1 << 0);
+        if ($this->maxId !== null) $flags |= (1 << 2);
+        if ($this->readMaxId !== null) $flags |= (1 << 3);
+        $buffer .= $serializer->int32($flags);
+
+        $buffer .= $serializer->int32($this->replies);
+        $buffer .= $serializer->int32($this->repliesPts);
+        if ($flags & (1 << 1)) {
+            $buffer .= $serializer->vectorOfObjects($this->recentRepliers);
+        }
+        if ($flags & (1 << 0)) {
+            $buffer .= $serializer->int64($this->channelId);
+        }
+        if ($flags & (1 << 2)) {
+            $buffer .= $serializer->int32($this->maxId);
+        }
+        if ($flags & (1 << 3)) {
+            $buffer .= $serializer->int32($this->readMaxId);
+        }
+        return $buffer;
+    }
+
+    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    {
+        $deserializer->int32($stream); // Constructor ID is consumed here.
+        $flags = $deserializer->int32($stream);
+
+        $comments = ($flags & (1 << 0)) ? true : null;
+        $replies = $deserializer->int32($stream);
+        $repliesPts = $deserializer->int32($stream);
+        $recentRepliers = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']) : null;
+        $channelId = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
+        $maxId = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
+        $readMaxId = ($flags & (1 << 3)) ? $deserializer->int32($stream) : null;
+            return new self(
+            $replies,
+            $repliesPts,
+            $comments,
+            $recentRepliers,
+            $channelId,
+            $maxId,
+            $readMaxId
+        );
+    }
+}

@@ -1,0 +1,45 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Methods\Smsjobs;
+
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractSmsJob;
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/method/smsjobs.getSmsJob
+ */
+final class GetSmsJobRequest extends TlObject
+{
+    public const CONSTRUCTOR_ID = 2005766191;
+    
+    public string $_ = 'smsjobs.getSmsJob';
+    
+    public function getMethodName(): string
+    {
+        return 'smsjobs.getSmsJob';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return AbstractSmsJob::class;
+    }
+    /**
+     * @param string $jobId
+     */
+    public function __construct(
+        public readonly string $jobId
+    ) {}
+    
+    public function serialize(Serializer $serializer): string
+    {
+        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer .= $serializer->bytes($this->jobId);
+        return $buffer;
+    }
+
+    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    {
+        throw new \LogicException('Request objects are not deserializable');
+    }
+}

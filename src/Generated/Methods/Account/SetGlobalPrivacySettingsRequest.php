@@ -1,0 +1,45 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractGlobalPrivacySettings;
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/method/account.setGlobalPrivacySettings
+ */
+final class SetGlobalPrivacySettingsRequest extends TlObject
+{
+    public const CONSTRUCTOR_ID = 517647042;
+    
+    public string $_ = 'account.setGlobalPrivacySettings';
+    
+    public function getMethodName(): string
+    {
+        return 'account.setGlobalPrivacySettings';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return AbstractGlobalPrivacySettings::class;
+    }
+    /**
+     * @param AbstractGlobalPrivacySettings $settings
+     */
+    public function __construct(
+        public readonly AbstractGlobalPrivacySettings $settings
+    ) {}
+    
+    public function serialize(Serializer $serializer): string
+    {
+        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->settings->serialize($serializer);
+        return $buffer;
+    }
+
+    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    {
+        throw new \LogicException('Request objects are not deserializable');
+    }
+}
