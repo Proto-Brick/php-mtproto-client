@@ -1,5 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace DigitalStars\MtprotoClient\Auth\Storage;
+
 use DigitalStars\MtprotoClient\Auth\AuthKey;
 
 class FileAuthKeyStorage implements AuthKeyStorage

@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\Exception;
 
@@ -9,8 +11,8 @@ class RpcErrorException extends \Exception
 {
     public function __construct(
         public readonly int $errorCode,
-        public readonly string $errorMessage
+        public readonly string $errorMessage,
     ) {
-        parent::__construct(sprintf('%s (%d)', $errorMessage, $errorCode));
+        parent::__construct(\sprintf('%s (%d)', $errorMessage, $errorCode));
     }
 }

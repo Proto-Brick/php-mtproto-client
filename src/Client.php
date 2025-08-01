@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace DigitalStars\MtprotoClient;
 
 use DigitalStars\MtprotoClient\Auth\AuthKey;
@@ -15,7 +18,6 @@ use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
 use DigitalStars\MtprotoClient\Transport\Transport;
 use Exception;
-use phpseclib3\Math\BigInteger\Engines\PHP;
 
 class Client
 {
@@ -32,7 +34,7 @@ class Client
         private readonly AuthKeyCreator $authKeyCreator,
         private readonly MessagePacker $messagePacker,
         private readonly Deserializer $deserializer,
-        private readonly Serializer $serializer
+        private readonly Serializer $serializer,
     ) {}
 
     public function connect(): void
@@ -73,7 +75,7 @@ class Client
         $msgId = $this->sendRequest($request);
         $this->pendingRequests[$msgId] = $request;
 
-        print 'Pending msg_id: '.$msgId.PHP_EOL;
+        print 'Pending msg_id: ' . $msgId . PHP_EOL;
 
         $timeout = 15;
         $startTime = time();
@@ -91,7 +93,7 @@ class Client
                 } else {
                     $msgId = $this->sendRequest($request);
                     // 0c209c4778028c68
-                    print 'Pending msg_id (внутри): '.$msgId.PHP_EOL;
+                    print 'Pending msg_id (внутри): ' . $msgId . PHP_EOL;
                     // 0cf025b0ad038c68 100007ccae038c68
                     $this->pendingRequests[$msgId] = $request;
                     echo "INFO: Bad server salt received. Resending request with a NEW msg_id...\n";
@@ -138,7 +140,7 @@ class Client
             return null;
         }
 
-        if (strlen($rawEncryptedResponse) === 4) {
+        if (\strlen($rawEncryptedResponse) === 4) {
             $errorCode = unpack('l', $rawEncryptedResponse)[1]; // Распаковываем как знаковое
             if ($errorCode < 0) {
                 if ($errorCode === -404) {
@@ -197,7 +199,7 @@ class Client
         $constructorHex = dechex($constructorId);
 
         echo "\n--- [ handleSingleMessage ] ---\n";
-        echo "Processing message body (len=" . strlen($originalMessageBodyForDebug) . ")...\n";
+        echo "Processing message body (len=" . \strlen($originalMessageBodyForDebug) . ")...\n";
         echo "Detected constructor: 0x{$constructorHex}\n";
 
         switch ($constructorId) {
@@ -236,10 +238,47 @@ class Client
 
                 $this->session->save($this->authKey);
 
-                $responseClass = $request->getResponseClass();
-                echo "Decision: DESERIALIZE into {$responseClass} and return object.\n";
+                $responseClassOrType = $request->getResponseClass();
+                echo "Decision: Processing response for {$responseClassOrType}...\n";
+
+                // Проверяем, является ли ответ именем класса или строкой-примитивом
+                if (class_exists($responseClassOrType)) {
+                    // Это класс, десериализуем как объект
+                    echo "  > Type: Object. Deserializing...\n";
+                    echo "-----------------------------\n";
+                    return $responseClassOrType::deserialize($this->deserializer, $resultPayload);
+                }
+
+                // Это примитивный тип, используем специальный десериализатор
+                echo "  > Type: Primitive. Deserializing...\n";
                 echo "-----------------------------\n";
-                return $responseClass::deserialize($this->deserializer, $resultPayload);
+                switch ($responseClassOrType) {
+                    case 'bool':
+                        // Bool в TL - это конструктор boolTrue или boolFalse
+                        $constructorId = $this->deserializer->int32($resultPayload);
+                        if ($constructorId === 0x997275b5) { // boolTrue
+                            return true;
+                        }
+                        if ($constructorId === 0xbc799737) { // boolFalse
+                            return false;
+                        }
+                        throw new \Exception("Expected bool, but got constructor " . dechex($constructorId));
+
+                    case 'int':
+                        // Ответы типа Vector<int> или просто int
+                        $constructorId = $this->deserializer->peekInt32($resultPayload);
+                        if ($constructorId === 0x1cb5c415) { // Vector
+                            return $this->deserializer->vectorOfInts($resultPayload);
+                        }
+                        // Если это просто int, его нужно как-то обработать.
+                        // Пока предположим, что API не возвращает голый int.
+                        // Если возвращает, нужно будет добавить логику.
+                        throw new \Exception("Plain int response is not yet supported.");
+
+                        // Можно добавить обработку для других примитивов (string, array) если понадобится
+                    default:
+                        throw new \Exception("Unsupported primitive response type: {$responseClassOrType}");
+                }
 
             case 0xedab447b: // bad_server_salt
                 echo "Type: bad_server_salt\n";
@@ -252,7 +291,7 @@ class Client
                 echo "  > New server salt received: " . $salt_data['new_server_salt'] . "\n";
                 echo "Decision: THROW ResendRequiredException.\n";
                 echo "-----------------------------\n";
-                throw new ResendRequiredException((string)$badMsgIdHex);
+                throw new ResendRequiredException((string) $badMsgIdHex);
 
             case 0x9ec20908: // new_session_created
                 echo "Type: new_session_created\n";
@@ -267,7 +306,7 @@ class Client
                 echo "Decision: THROW ResendRequiredException (for 'new_session_created').\n";
                 echo "-----------------------------\n";
 
-//                $this->pendingRequests = []; <-- НЕПРАВИЛЬНО, new_session_created не значит, что ответ на текущий запрос не прилет
+                //                $this->pendingRequests = []; <-- НЕПРАВИЛЬНО, new_session_created не значит, что ответ на текущий запрос не прилет
                 throw new ResendRequiredException('new_session_created');
 
             case 0xa7eff811: // bad_msg_notification

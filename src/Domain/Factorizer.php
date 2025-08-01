@@ -1,10 +1,11 @@
 <?php
+
 namespace DigitalStars\MtprotoClient\Domain;
 
-use Exception;
-use phpseclib3\Math\BigInteger;
 use DigitalStars\MtprotoClient\Exception\FactorizationException;
+use Exception;
 use FFI;
+use phpseclib3\Math\BigInteger;
 use Throwable;
 
 class Factorizer
@@ -47,14 +48,14 @@ class Factorizer
         $suggestions = [];
 
         // --- Диагностика FFI ---
-        if (!extension_loaded("ffi")) {
+        if (!\extension_loaded("ffi")) {
             $php_version = PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION;
             if (PHP_OS_FAMILY === 'Linux') {
                 $suggestions[] = "Установите PHP-расширение FFI: `sudo apt install php{$php_version}-ffi` (для Debian/Ubuntu).";
             } else {
                 $suggestions[] = "Включите расширение FFI в вашем php.ini (раскомментируйте `extension=ffi`).";
             }
-        } elseif (!in_array(ini_get('ffi.enable'), ['true', '1', 'On'], true)) {
+        } elseif (!\in_array(\ini_get('ffi.enable'), ['true', '1', 'On'], true)) {
             $ini_path = php_ini_loaded_file() ?: 'вашем php.ini';
             $suggestions[] = "Включите FFI в '{$ini_path}', установив `ffi.enable = 1`.";
         }
@@ -75,7 +76,7 @@ class Factorizer
             $message .= "- {$suggestion}\n";
         }
 
-        return $message."\n";
+        return $message . "\n";
     }
 
     /**
@@ -86,19 +87,19 @@ class Factorizer
         // Инициализируем FFI только один раз
         if (!self::$ffiAttempted) {
             self::$ffiAttempted = true;
-            if (extension_loaded("ffi")) {
+            if (\extension_loaded("ffi")) {
                 // Пытаемся включить FFI, если он выключен
-                if (!in_array(ini_get('ffi.enable'), ['true', '1', 'On'], true)) {
+                if (!\in_array(\ini_get('ffi.enable'), ['true', '1', 'On'], true)) {
                     @ini_set('ffi.enable', 'On');
                 }
 
-                if (in_array(ini_get('ffi.enable'), ['true', '1', 'On'], true)) {
+                if (\in_array(\ini_get('ffi.enable'), ['true', '1', 'On'], true)) {
                     // Определяем сигнатуру нашей C++ функции
                     $header = "int64_t factorizeFFI(const char* number_str);";
                     $library_path = null;
 
                     if (PHP_OS_FAMILY === 'Windows') {
-                        $library_path = dirname(__DIR__) . '/cpp/primemodule.dll';
+                        $library_path = \dirname(__DIR__) . '/cpp/primemodule.dll';
 
                         // ВАШ ХАК для путей с не-ASCII символами на Windows
                         if ($library_path && preg_match('/[^\x20-\x7E]/', $library_path)) {
@@ -109,7 +110,7 @@ class Factorizer
                         }
 
                     } elseif (PHP_OS_FAMILY === 'Linux') {
-                        $library_path = dirname(__DIR__) . '/cpp/libprimemodule.so';
+                        $library_path = \dirname(__DIR__) . '/cpp/libprimemodule.so';
                     }
 
                     if ($library_path && file_exists($library_path)) {
@@ -135,7 +136,7 @@ class Factorizer
 
     private static function tryFactorCommand(BigInteger $pq): ?array
     {
-        if (PHP_OS_FAMILY === 'Windows' || !function_exists('shell_exec')) {
+        if (PHP_OS_FAMILY === 'Windows' || !\function_exists('shell_exec')) {
             return null;
         }
         // escapeshellarg для безопасности
@@ -148,7 +149,7 @@ class Factorizer
 
         // "factor" выводит: "12345: 3 5 823"
         $parts = explode(' ', trim($output));
-        if (count($parts) !== 3) { // Ожидаем два простых сомножителя
+        if (\count($parts) !== 3) { // Ожидаем два простых сомножителя
             return null;
         }
 

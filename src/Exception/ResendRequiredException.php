@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace DigitalStars\MtprotoClient\Exception;
 
 /**
@@ -6,6 +9,4 @@ namespace DigitalStars\MtprotoClient\Exception;
  * (например, new_session_created или bad_server_salt),
  * которое требует переотправки исходного запроса.
  */
-class ResendRequiredException extends \Exception
-{
-}
+class ResendRequiredException extends \Exception {}

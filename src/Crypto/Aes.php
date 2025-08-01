@@ -1,6 +1,9 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\Crypto;
+
 use DigitalStars\MtprotoClient\Auth\AuthKey;
 
 class Aes

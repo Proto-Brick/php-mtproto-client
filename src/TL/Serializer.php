@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace DigitalStars\MtprotoClient\TL;
 
 class Serializer
@@ -17,7 +20,7 @@ class Serializer
 
     public function int128(string $value): string
     {
-        if (strlen($value) !== 16) {
+        if (\strlen($value) !== 16) {
             throw new \InvalidArgumentException("int128 must be 16 bytes.");
         }
         // Преобразует Big-Endian (внутренний формат PHP) в Little-Endian (сетевой формат MTProto).
@@ -26,7 +29,7 @@ class Serializer
 
     public function int256(string $value): string
     {
-        if (strlen($value) !== 32) {
+        if (\strlen($value) !== 32) {
             throw new \InvalidArgumentException("int256 must be 32 bytes.");
         }
         // Преобразует Big-Endian (внутренний формат PHP) в Little-Endian (сетевой формат MTProto).
@@ -40,7 +43,7 @@ class Serializer
      */
     public function raw128(string $value): string
     {
-        if (strlen($value) !== 16) {
+        if (\strlen($value) !== 16) {
             throw new \InvalidArgumentException("raw128 must be 16 bytes.");
         }
         return $value;
@@ -53,7 +56,7 @@ class Serializer
      */
     public function raw256(string $value): string
     {
-        if (strlen($value) !== 32) {
+        if (\strlen($value) !== 32) {
             throw new \InvalidArgumentException("raw256 must be 32 bytes.");
         }
         return $value;
@@ -61,9 +64,9 @@ class Serializer
 
     public function bytes(string $value): string
     {
-        $len = strlen($value);
+        $len = \strlen($value);
         if ($len <= 253) {
-            $prefix = chr($len);
+            $prefix = \chr($len);
             $paddingLen = (4 - (($len + 1) % 4)) % 4; // Выравнивание для len (1 байт) + data
         } else {
             $prefix = "\xfe" . substr(pack('V', $len), 0, 3); // Маркер 0xFE + 3 байта длины
@@ -80,7 +83,7 @@ class Serializer
         }
 
         $buffer = $this->int32(0x1cb5c415);
-        $buffer .= $this->int32(count($items));
+        $buffer .= $this->int32(\count($items));
 
         foreach ($items as $item) {
             // $this - это сам объект Serializer, который мы передаем в метод serialize элемента
@@ -92,22 +95,28 @@ class Serializer
 
     public function vectorOfInts(array $items): string
     {
-        $buffer = $this->int32(0x1cb5c415) . $this->int32(count($items));
-        foreach ($items as $item) { $buffer .= $this->int32($item); }
+        $buffer = $this->int32(0x1cb5c415) . $this->int32(\count($items));
+        foreach ($items as $item) {
+            $buffer .= $this->int32($item);
+        }
         return $buffer;
     }
 
     public function vectorOfLongs(array $items): string
     {
-        $buffer = $this->int32(0x1cb5c415) . $this->int32(count($items));
-        foreach ($items as $item) { $buffer .= $this->int64($item); }
+        $buffer = $this->int32(0x1cb5c415) . $this->int32(\count($items));
+        foreach ($items as $item) {
+            $buffer .= $this->int64($item);
+        }
         return $buffer;
     }
 
     public function vectorOfStrings(array $items): string
     {
-        $buffer = $this->int32(0x1cb5c415) . $this->int32(count($items));
-        foreach ($items as $item) { $buffer .= $this->bytes($item); } // string и bytes сериализуются одинаково
+        $buffer = $this->int32(0x1cb5c415) . $this->int32(\count($items));
+        foreach ($items as $item) {
+            $buffer .= $this->bytes($item);
+        } // string и bytes сериализуются одинаково
         return $buffer;
     }
 

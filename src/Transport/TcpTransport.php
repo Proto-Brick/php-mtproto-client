@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace DigitalStars\MtprotoClient\Transport;
 
 use DigitalStars\MtprotoClient\Exception\AuthKeyNotFoundOnServerErrorException;
@@ -27,7 +30,7 @@ class TcpTransport implements Transport
             throw new TransportException('Socket creation failed: ' . socket_strerror(socket_last_error()));
         }
         if (!socket_connect($this->socket, $this->settings->server_address, $this->settings->server_port)) {
-            throw new TransportException('Socket connection failed: '. socket_strerror(socket_last_error()));
+            throw new TransportException('Socket connection failed: ' . socket_strerror(socket_last_error()));
         }
         socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, ["sec" => 15, "usec" => 0]);
         // Отправляем заголовок Intermediate транспорта один раз
@@ -40,9 +43,9 @@ class TcpTransport implements Transport
         if ($this->socket === null) {
             throw new TransportException("Socket is not connected.");
         }
-        $packet = pack('V', strlen($payload)) . $payload;
-//        echo "DEBUG: Sending " . strlen($packet) . " bytes: " . bin2hex($packet) . "\n";
-        if (socket_write($this->socket, $packet, strlen($packet)) === false) {
+        $packet = pack('V', \strlen($payload)) . $payload;
+        //        echo "DEBUG: Sending " . strlen($packet) . " bytes: " . bin2hex($packet) . "\n";
+        if (socket_write($this->socket, $packet, \strlen($packet)) === false) {
             throw new TransportException('Failed to send data: ' . socket_strerror(socket_last_error($this->socket)));
         }
     }
@@ -55,7 +58,7 @@ class TcpTransport implements Transport
 
         // 1. Читаем первые 4 байта, как и раньше.
         $prefix_bytes = socket_read($this->socket, 4);
-        if ($prefix_bytes === false || strlen($prefix_bytes) < 4) {
+        if ($prefix_bytes === false || \strlen($prefix_bytes) < 4) {
             $errorCode = socket_last_error($this->socket);
             throw new TransportException("Failed to read response prefix from socket: " . socket_strerror($errorCode), $errorCode);
         }
@@ -72,7 +75,7 @@ class TcpTransport implements Transport
                 // Это ошибка AUTH_KEY_NOT_FOUND. Бросаем кастомное исключение,
                 // чтобы на верхнем уровне можно было правильно среагировать.
                 throw new AuthKeyNotFoundOnServerErrorException( // Убедитесь, что создали этот класс исключения
-                    "Server returned transport error -404 (AUTH_KEY_NOT_FOUND). The auth key is unknown to the server for this connection."
+                    "Server returned transport error -404 (AUTH_KEY_NOT_FOUND). The auth key is unknown to the server for this connection.",
                 );
             }
             // Другие возможные отрицательные коды
@@ -102,7 +105,7 @@ class TcpTransport implements Transport
                 throw new TransportException("Failed to read message body from socket: " . socket_strerror($errorCode), $errorCode);
             }
             $response .= $chunk;
-            $remaining -= strlen($chunk);
+            $remaining -= \strlen($chunk);
         }
 
         return $response;

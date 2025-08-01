@@ -1,13 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\Session\Storage;
 
 class FileSessionStorage implements SessionStorage
 {
-    public function __construct(private readonly string $storageDir)
-    {
-    }
+    public function __construct(private readonly string $storageDir) {}
 
     private function getFilePath(string $authKeyId): string
     {
@@ -42,7 +41,7 @@ class FileSessionStorage implements SessionStorage
     public function setFor(string $authKeyId, array $data): void
     {
         $path = $this->getFilePath($authKeyId);
-        if (isset($data['id']) && is_string($data['id'])) {
+        if (isset($data['id']) && \is_string($data['id'])) {
             $data['id'] = bin2hex($data['id']);
         }
 

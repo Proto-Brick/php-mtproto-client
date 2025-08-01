@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace DigitalStars\MtprotoClient\Session;
 
 use DigitalStars\MtprotoClient\Auth\AuthKey;
@@ -47,7 +50,7 @@ class Session
             return;
         }
 
-        print 'Соль сохраняем: '.$this->serverSalt.PHP_EOL;
+        print 'Соль сохраняем: ' . $this->serverSalt . PHP_EOL;
 
         $this->storage->setFor($authKey->id, [
             'id' => $this->id,
@@ -75,9 +78,9 @@ class Session
         // Применяем смещение времени для синхронизации с сервером
         $time = microtime(true) + $this->timeOffset;
 
-        $sec = (int)$time;
+        $sec = (int) $time;
         // Используем 20 бит для микросекунд, чтобы осталось место для счетчика
-        $usec = (int)(($time - $sec) * (2**20));
+        $usec = (int) (($time - $sec) * (2 ** 20));
 
         // 64-битное число:
         // [ 32 бита: секунды ] [ 20 бит: микросекунды ] [ 10 бит: счетчик ] [ 2 бита: 00 ]
@@ -106,7 +109,16 @@ class Session
         return $this->sequence * 2;
     }
 
-    public function getId(): ?string { return $this->id; }
-    public function getServerSalt(): ?int { return $this->serverSalt; }
-    public function setServerSalt(int $salt): void { $this->serverSalt = $salt; }
+    public function getId(): ?string
+    {
+        return $this->id;
+    }
+    public function getServerSalt(): ?int
+    {
+        return $this->serverSalt;
+    }
+    public function setServerSalt(int $salt): void
+    {
+        $this->serverSalt = $salt;
+    }
 }

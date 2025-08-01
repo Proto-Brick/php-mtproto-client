@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\TL;
 
@@ -32,5 +34,5 @@ abstract class TlObject implements TlObjectInterface, Serializable
     /**
      * @return static
      */
-    abstract public static function deserialize(Deserializer $deserializer, string &$payload): static;
+    abstract public static function deserialize(Deserializer $deserializer, string &$stream): static;
 }

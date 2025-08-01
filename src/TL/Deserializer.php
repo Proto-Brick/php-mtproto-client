@@ -1,19 +1,14 @@
 <?php
+
 declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\TL;
-
-use DigitalStars\MtprotoClient\Exception\ResendRequiredException;
-use DigitalStars\MtprotoClient\Exception\RpcErrorException;
-use DigitalStars\MtprotoClient\Session\Session;
-use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
-use Exception;
 
 class Deserializer
 {
     public function peekInt32(string $stream): int
     {
-        if (strlen($stream) < 4) {
+        if (\strlen($stream) < 4) {
             throw new \Exception("Not enough data to peek int32");
         }
         return unpack('V', substr($stream, 0, 4))[1];
@@ -41,6 +36,13 @@ class Deserializer
         return strrev($value_bin); // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
     }
 
+    public function double(string &$stream): float
+    {
+        $value_bin = substr($stream, 0, 8);
+        $stream = substr($stream, 8);
+        return unpack('d', $value_bin)[1];
+    }
+
     /**
      * НОВЫЙ МЕТОД: Читает 16 "сырых" байт и возвращает их как есть.
      */
@@ -53,7 +55,7 @@ class Deserializer
 
     public function bytes(string &$stream): string
     {
-        $firstByte = ord($stream[0]);
+        $firstByte = \ord($stream[0]);
         $stream = substr($stream, 1);
 
         if ($firstByte <= 253) {
@@ -105,28 +107,40 @@ class Deserializer
 
     public function vectorOfInts(string &$payload): array
     {
-        if ($this->int32($payload) !== 0x1cb5c415) throw new \Exception('Invalid vector constructor for Vector<int>');
+        if ($this->int32($payload) !== 0x1cb5c415) {
+            throw new \Exception('Invalid vector constructor for Vector<int>');
+        }
         $count = $this->int32($payload);
         $result = [];
-        for ($i = 0; $i < $count; $i++) { $result[] = $this->int32($payload); }
+        for ($i = 0; $i < $count; $i++) {
+            $result[] = $this->int32($payload);
+        }
         return $result;
     }
 
     public function vectorOfLongs(string &$payload): array
     {
-        if ($this->int32($payload) !== 0x1cb5c415) throw new \Exception('Invalid vector constructor for Vector<long>');
+        if ($this->int32($payload) !== 0x1cb5c415) {
+            throw new \Exception('Invalid vector constructor for Vector<long>');
+        }
         $count = $this->int32($payload);
         $result = [];
-        for ($i = 0; $i < $count; $i++) { $result[] = $this->int64($payload); }
+        for ($i = 0; $i < $count; $i++) {
+            $result[] = $this->int64($payload);
+        }
         return $result;
     }
 
     public function vectorOfStrings(string &$payload): array
     {
-        if ($this->int32($payload) !== 0x1cb5c415) throw new \Exception('Invalid vector constructor for Vector<string>');
+        if ($this->int32($payload) !== 0x1cb5c415) {
+            throw new \Exception('Invalid vector constructor for Vector<string>');
+        }
         $count = $this->int32($payload);
         $result = [];
-        for ($i = 0; $i < $count; $i++) { $result[] = $this->bytes($payload); } // string и bytes десериализуются одинаково
+        for ($i = 0; $i < $count; $i++) {
+            $result[] = $this->bytes($payload);
+        } // string и bytes десериализуются одинаково
         return $result;
     }
 
@@ -145,8 +159,8 @@ class Deserializer
         if ($vector_constructor !== 0x1cb5c415) {
             throw new \Exception(
                 "Expected vector constructor, but got " . dechex($vector_constructor) . ". Stream state: " . bin2hex(
-                    $stream
-                )
+                    $stream,
+                ),
             );
         }
 
@@ -160,7 +174,7 @@ class Deserializer
             'nonce' => $nonce,
             'server_nonce' => $server_nonce,
             'pq' => $pq,
-            'fingerprints' => $fingerprints
+            'fingerprints' => $fingerprints,
         ];
     }
 
@@ -266,7 +280,7 @@ class Deserializer
             'ip_address' => $ip_address,
             'port' => $port,
             'secret' => $secret,
-            'flags' => $flags // Сохраняем флаги для отладки
+            'flags' => $flags, // Сохраняем флаги для отладки
         ];
     }
 
@@ -435,7 +449,7 @@ class Deserializer
             $seqno = $this->int32($stream);
             $length = $this->int32($stream);
 
-            if (strlen($stream) < $length) {
+            if (\strlen($stream) < $length) {
                 throw new \Exception("Not enough data in stream to read message of length {$length}.");
             }
 

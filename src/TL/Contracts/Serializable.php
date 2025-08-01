@@ -1,4 +1,5 @@
 <?php
+
 namespace DigitalStars\MtprotoClient\TL\Contracts;
 
 use DigitalStars\MtprotoClient\TL\Deserializer;
@@ -8,5 +9,5 @@ interface Serializable
 {
     public function serialize(Serializer $serializer): string;
 
-    public static function deserialize(Deserializer $deserializer, string &$payload): static;
+    public static function deserialize(Deserializer $deserializer, string &$stream): static;
 }

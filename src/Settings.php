@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient;
 
@@ -13,6 +15,6 @@ final readonly class Settings
         public string $api_hash,
         public string $server_address = '149.154.167.50',
         public int $server_port = 443,
-        public string $transport = 'Intermediate' // Пока используется только этот
+        public string $transport = 'Intermediate', // Пока используется только этот
     ) {}
 }

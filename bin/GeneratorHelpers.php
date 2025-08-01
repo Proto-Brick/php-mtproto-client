@@ -21,12 +21,16 @@ trait GeneratorHelpers
             $tlType = $matches[1];
         }
 
+        if ($special = $this->getSpecialTypeHandling($tlType)) {
+            return $special['php_type'];
+        }
+
         return match ($tlType) {
             'int', 'int32', 'long', 'int64' => 'int', // 32-битные числа - это int
             'int128', 'int256', 'string', 'bytes' => 'string', // 64-битные и больше - это бинарные строки
             'double' => 'float',
-            'bool', 'true' => 'bool',
-            'Object', 'JSONValue', 'DataJSON' => 'array',
+            'Bool', 'bool', 'true' => 'bool',
+            'Object' => 'array',
             '!X', 'X' => $this->escapeFqn(self::TL_OBJECT_FQN),
             default => $this->resolveCustomType($tlType),
         };
@@ -85,7 +89,7 @@ trait GeneratorHelpers
             'final',
             'for',
             'switch',
-            'abstract'
+            'abstract',
         ];
         if (in_array(strtolower($camelName), $reserved, true)) {
             return $camelName . '_';
@@ -107,8 +111,22 @@ trait GeneratorHelpers
     {
         return in_array(
             $type,
-            ['Vector t', 'X', '!X', 'true', 'Bool', 'Null', 'Error', 'int', 'long', 'double', 'string', 'bytes'],
-            true
+            [
+                'Vector t',
+                'X',
+                '!X',
+                'true',
+                'True',
+                'Bool',
+                'Null',
+                'Error',
+                'int',
+                'long',
+                'double',
+                'string',
+                'bytes',
+            ],
+            true,
         );
     }
 
@@ -124,7 +142,7 @@ trait GeneratorHelpers
             'invokeWithTakeout',
             'invokeWithGooglePlayIntegrity',
             'invokeWithApnsSecret',
-            'invokeWithBusinessConnection'
+            'invokeWithBusinessConnection',
         ];
     }
 
@@ -175,7 +193,9 @@ trait GeneratorHelpers
         $requiredParams = [];
         $optionalParams = [];
         foreach ($params as $param) {
-            if (in_array($param['name'], ['flags', 'flags2'], true)) continue;
+            if ($param['type'] === '#') {
+                continue;
+            }
 
             if (str_contains($param['type'], '?')) {
                 $optionalParams[] = $param;
@@ -231,28 +251,77 @@ trait GeneratorHelpers
         ];
     }
 
+    private function getSpecialTypeHandling(string $tlType): ?array
+    {
+        return match ($tlType) {
+            'DataJSON', 'JSONValue' => [
+                'php_type' => 'array',
+                'serialize_tpl' => '(new DataJSON(json_encode(%s)))->serialize($serializer)',
+                'deserialize_tpl' => 'json_decode((DataJSON::deserialize($deserializer, $stream))->data, true)',
+            ],
+            default => null,
+        };
+    }
+
     private function buildMethodSpecificContent(array $item): array
     {
         $useStatements = [];
-        $responseTypeFqn = $this->mapTlTypeToPhp($item['type']);
-        $responseType = basename(str_replace('\\', '/', $responseTypeFqn));
+        $tlResponseType = $item['type']; // Например, "Vector<WallPaper>" или "Bool" или "DataJSON"
 
-        if (str_contains($responseTypeFqn, '\\')) {
-            $useStatements[$this->escapeFqn($responseTypeFqn)] = true;
+        $responseClassExpr = '';
+
+        if ($special = $this->getSpecialTypeHandling($tlResponseType)) {
+            // Случай 1: Особый тип вроде DataJSON
+            $responseClassExpr = "'" . $special['php_type'] . "'";
+
+        } elseif (str_starts_with($tlResponseType, 'Vector<')) {
+            // Случай 2: Это вектор. Мы должны вернуть FQCN внутреннего типа.
+            // Клиент будет отвечать за вызов правильного десериализатора для векторов.
+            $innerType = substr($tlResponseType, 7, -1);
+            $phpInnerTypeFqn = $this->mapTlTypeToPhp($innerType);
+
+            // Проверяем, является ли внутренний тип примитивом
+            $isPrimitiveInner = in_array($phpInnerTypeFqn, ['bool', 'int', 'float', 'string'], true);
+            if ($isPrimitiveInner) {
+                // Если вектор примитивов, возвращаем специальную строку, например 'vector<int>'
+                $responseClassExpr = "'vector<{$phpInnerTypeFqn}>'";
+            } else {
+                // Если вектор объектов, возвращаем FQCN внутреннего класса
+                $responseTypeShort = basename(str_replace('\\', '/', $phpInnerTypeFqn));
+                $responseClassExpr = $responseTypeShort . '::class';
+                if (str_contains($phpInnerTypeFqn, '\\')) {
+                    $useStatements[$this->escapeFqn($phpInnerTypeFqn)] = true;
+                }
+            }
+
+        } else {
+            // Случай 3: Обычный TL-объект или примитив вроде Bool
+            $phpResponseType = $this->mapTlTypeToPhp($tlResponseType);
+            $isPrimitive = in_array($phpResponseType, ['bool', 'int', 'float', 'string'], true);
+
+            if ($isPrimitive) {
+                $responseClassExpr = "'" . $phpResponseType . "'";
+            } else {
+                $responseTypeShort = basename(str_replace('\\', '/', $phpResponseType));
+                $responseClassExpr = $responseTypeShort . '::class';
+                if (str_contains($phpResponseType, '\\')) {
+                    $useStatements[$this->escapeFqn($phpResponseType)] = true;
+                }
+            }
         }
 
         $content = <<<PHP
+    
+        public function getMethodName(): string
+        {
+            return '{$item['method']}';
+        }
         
-            public function getMethodName(): string
-            {
-                return '{$item['method']}';
-            }
-            
-            public function getResponseClass(): string
-            {
-                return {$responseType}::class;
-            }
-        PHP;
+        public function getResponseClass(): string
+        {
+            return {$responseClassExpr};
+        }
+    PHP;
 
         return ['content' => $content, 'useStatements' => $useStatements];
     }
@@ -264,7 +333,7 @@ trait GeneratorHelpers
         $constructorArgs = [];
 
         // --- ФАЗА 1: Генерация кода для ВСЕХ полей флагов ---
-        $flagDefinitions = array_filter($params, fn($p) => $p['type'] === '#');
+        $flagDefinitions = array_filter($params, static fn($p) => $p['type'] === '#');
 
         foreach ($flagDefinitions as $flagDef) {
             $flagsName = $this->sanitizeParamName($flagDef['name']);
@@ -285,7 +354,7 @@ trait GeneratorHelpers
             $serializeBody .= "        \$buffer .= \$serializer->int32(\${$flagsName});\n";
 
             // Десериализация: чтение этого поля флагов
-            $deserializeBody .= "        \${$flagsName} = \$deserializer->int32(\$payload);\n";
+            $deserializeBody .= "        \${$flagsName} = \$deserializer->int32(\$stream);\n";
         }
         if (!empty($flagDefinitions)) {
             $serializeBody .= "\n";
@@ -295,7 +364,9 @@ trait GeneratorHelpers
 
         // --- ФАЗА 2: ЕДИНЫЙ ЦИКЛ для всех остальных полей в их исходном порядке ---
         foreach ($params as $param) {
-            if ($param['type'] === '#') continue;
+            if ($param['type'] === '#') {
+                continue;
+            }
 
             $propertyName = $this->sanitizeParamName($param['name']);
             $constructorArgs[] = "\$" . $propertyName;
@@ -333,7 +404,7 @@ trait GeneratorHelpers
         ];
     }
 
-    private function buildSerializerMethods(array $item, bool $isConcreteOfAbstract, array $sortedPropertyNames): array
+    private function buildSerializerMethods(array $item, bool $isMethod, bool $isConcreteOfAbstract, array $sortedPropertyNames): array
     {
         $useStatements = [];
 
@@ -342,56 +413,54 @@ trait GeneratorHelpers
         $logic = $this->buildFlagsLogic($item['params'], $useStatements);
         $serializeBody .= $logic['serializeBody'];
 
-
         // --- Сборка тела метода deserialize() ---
         $deserializeBody = "";
-        if ($isConcreteOfAbstract) {
-            $deserializeBody = "        \$deserializer->int32(\$payload); // Constructor ID is consumed here.\n";
+        $constructorCall = "";
+
+        if ($isMethod) {
+            // --- Вариант 1: Это метод-запрос (Request) ---
+            // Его метод deserialize() должен просто бросать исключение.
+            $deserializeBody = "        throw new \LogicException('Request objects are not deserializable');";
+
         } else {
-            $deserializeBody = "        \$constructorId = \$deserializer->int32(\$payload);\n" .
-                "        if (\$constructorId !== self::CONSTRUCTOR_ID) {\n" .
-                "            throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex(\$constructorId)));\n" .
-                "        }\n\n";
-        }
-
-        $deserializeBody .= $logic['deserializeBody'];
-
-        // --- НАЧАЛО ИСПРАВЛЕНИЯ: Собираем аргументы для new self(...) ---
-        // $logic['constructorArgs'] содержит переменные в порядке десериализации (правильном для new self)
-        // Нам нужно сопоставить их с отсортированным порядком из сигнатуры __construct
-        $constructorArgsForCall = [];
-        if (!empty($sortedPropertyNames)) {
-            // Создаем ассоциативный массив: 'имяСвойства' => '$переменная'
-            $deserializedVars = [];
-            foreach ($logic['constructorArgs'] as $varNameWithDollar) {
-                // Убираем '$' и возможное '_' в конце
-                $propName = rtrim(ltrim($varNameWithDollar, '$'), '_');
-                // Ищем "оригинальное" имя свойства до sanitizeParamName, если нужно, но пока попробуем так
-                // Этот простой подход может сломаться, если sanitizeParamName сильно меняет имя, но для '_' должно сработать.
-                // Более надежный способ - переделать buildFlagsLogic, чтобы он возвращал ассоциативный массив. Но пока так.
-                $originalPropName = ltrim($varNameWithDollar, '$');
-                $deserializedVars[$originalPropName] = $varNameWithDollar;
+            // --- Вариант 2: Это тип-ответ (DTO) ---
+            if ($isConcreteOfAbstract) {
+                $deserializeBody = "        \$deserializer->int32(\$stream); // Constructor ID is consumed here.\n";
+            } else {
+                $deserializeBody = "        \$constructorId = \$deserializer->int32(\$stream);\n" .
+                    "        if (\$constructorId !== self::CONSTRUCTOR_ID) {\n" .
+                    "            throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex(\$constructorId)));\n" .
+                    "        }\n\n";
             }
+            $deserializeBody .= $logic['deserializeBody'];
 
-            // Теперь собираем аргументы в том порядке, в котором они в __construct
-            foreach($sortedPropertyNames as $propName) {
-                if (isset($deserializedVars[$propName])) {
-                    $constructorArgsForCall[] = $deserializedVars[$propName];
-                } else {
-                    // Это может случиться, если sanitizeParamName добавил `_`, а мы не угадали.
-                    // Пытаемся найти с `_`.
-                    if (isset($deserializedVars[$propName.'_'])) {
-                        $constructorArgsForCall[] = $deserializedVars[$propName.'_'];
+            // Собираем аргументы для new self(...) в правильном, отсортированном порядке
+            $constructorArgsForCall = [];
+            if (!empty($sortedPropertyNames)) {
+                $deserializedVars = [];
+                foreach ($logic['constructorArgs'] as $varNameWithDollar) {
+                    $propName = ltrim($varNameWithDollar, '$');
+                    $deserializedVars[$propName] = $varNameWithDollar;
+                }
+
+                foreach ($sortedPropertyNames as $propName) {
+                    // Обрабатываем возможное добавление `_` из-за зарезервированных слов
+                    $sanitizedPropName = $this->sanitizeParamName($propName);
+                    if (isset($deserializedVars[$sanitizedPropName])) {
+                        $constructorArgsForCall[] = $deserializedVars[$sanitizedPropName];
                     } else {
-                        throw new \Exception("Could not map property {$propName} for constructor call.");
+                        throw new \Exception("Could not map property '{$propName}' for constructor call.");
                     }
                 }
             }
+
+            $constructorCall = empty($constructorArgsForCall)
+                ? ''
+                : "\n            " . implode(",\n            ", $constructorArgsForCall) . "\n        ";
+
+            // Добавляем финальный return для DTO
+            $deserializeBody .= "\n            return new self({$constructorCall});";
         }
-
-        $constructorCall = empty($constructorArgsForCall) ? '' : "\n            " . implode(",\n            ", $constructorArgsForCall) . "\n        ";
-        // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
-
 
         // --- Сборка финального PHP-кода для обоих методов ---
         $content = <<<PHP
@@ -402,13 +471,9 @@ trait GeneratorHelpers
             return \$buffer;
         }
     
-        /**
-         * @return static
-         */
-        public static function deserialize(Deserializer \$deserializer, string &\$payload): static
+        public static function deserialize(Deserializer \$deserializer, string &\$stream): static
         {
     {$deserializeBody}
-            return new self({$constructorCall});
         }
     PHP;
 
@@ -417,6 +482,10 @@ trait GeneratorHelpers
 
     private function getSerializationCodeForType(string $varName, string $tlType): string
     {
+        if ($special = $this->getSpecialTypeHandling($tlType)) {
+            return sprintf($special['serialize_tpl'], $varName);
+        }
+
         $tlTypeLower = strtolower($tlType);
         switch ($tlTypeLower) {
             case 'int':
@@ -450,34 +519,41 @@ trait GeneratorHelpers
 
     private function getDeserializationCodeForType(string $tlType, array &$useStatements): string
     {
+        if ($special = $this->getSpecialTypeHandling($tlType)) {
+            if ($tlType === 'DataJSON' || $tlType === 'JSONValue') {
+                // Добавляем use, так как шаблон использует класс DataJSON
+                $useStatements['DigitalStars\\MtprotoClient\\Generated\\Types\\Base\\DataJSON'] = true;
+            }
+            return $special['deserialize_tpl'];
+        }
         $tlTypeLower = strtolower($tlType);
         switch ($tlTypeLower) {
             case 'int':
             case 'int32':
-                return "\$deserializer->int32(\$payload)";
+                return "\$deserializer->int32(\$stream)";
             case 'long':
             case 'int64':
-                return "\$deserializer->int64(\$payload)";
-            case 'int128': return "\$deserializer->int128(\$payload)";
-            case 'int256': return "\$deserializer->int256(\$payload)";
-            case 'double': return "unpack('d', substr(\$payload, 0, 8))[1]; \$payload = substr(\$payload, 8)";
+                return "\$deserializer->int64(\$stream)";
+            case 'int128': return "\$deserializer->int128(\$stream)";
+            case 'int256': return "\$deserializer->int256(\$stream)";
+            case 'double': return "\$deserializer->double(\$stream)";
             case 'string':
             case 'bytes':
-                return "\$deserializer->bytes(\$payload)";
+                return "\$deserializer->bytes(\$stream)";
             case 'bool':
-                return "(\$deserializer->int32(\$payload) === 0x997275b5)";
+                return "(\$deserializer->int32(\$stream) === 0x997275b5)";
             default:
                 if (str_starts_with($tlType, 'Vector<')) {
                     $innerType = substr($tlType, 7, -1);
 
                     if ($innerType === 'int') {
-                        return "\$deserializer->vectorOfInts(\$payload)";
+                        return "\$deserializer->vectorOfInts(\$stream)";
                     }
                     if ($innerType === 'long') {
-                        return "\$deserializer->vectorOfLongs(\$payload)";
+                        return "\$deserializer->vectorOfLongs(\$stream)";
                     }
                     if ($innerType === 'string' || $innerType === 'bytes') {
-                        return "\$deserializer->vectorOfStrings(\$payload)";
+                        return "\$deserializer->vectorOfStrings(\$stream)";
                     }
 
                     // Старая логика для векторов объектов
@@ -488,7 +564,7 @@ trait GeneratorHelpers
                     $fqcn = self::BASE_NAMESPACE . '\\Types\\' . ($ns ? $ns . '\\' : '') . $className;
                     $useStatements[$fqcn] = true;
                     $shortClass = $className;
-                    return "\$deserializer->vectorOfObjects(\$payload, [{$shortClass}::class, 'deserialize'])";
+                    return "\$deserializer->vectorOfObjects(\$stream, [{$shortClass}::class, 'deserialize'])";
                 }
 
                 // Этот код будет выполнен, если это не вектор, а обычный кастомный тип (updates.State и т.д.)
@@ -500,7 +576,7 @@ trait GeneratorHelpers
                 $useStatements[$fqcn] = true;
                 $shortClass = $className;
 
-                return "{$shortClass}::deserialize(\$deserializer, \$payload)";
+                return "{$shortClass}::deserialize(\$deserializer, \$stream)";
         }
     }
 
@@ -527,7 +603,7 @@ trait GeneratorHelpers
             }
 
             // Генерируем "руку" для match-выражения
-            $matchArms[] = "            {$callableClass}::CONSTRUCTOR_ID => {$callableClass}::deserialize(\$deserializer, \$payload),";
+            $matchArms[] = "            {$callableClass}::CONSTRUCTOR_ID => {$callableClass}::deserialize(\$deserializer, \$stream),";
         }
 
         // Добавляем default-ветку
@@ -540,10 +616,10 @@ trait GeneratorHelpers
         // правильно вывести тип после сложного match-выражения. Без этого они
         // могут ошибочно посчитать, что возвращаемый тип несовместим со static.
         $body = <<<PHP
-        public static function deserialize(Deserializer \$deserializer, string &\$payload): static
+        public static function deserialize(Deserializer \$deserializer, string &\$stream): static
         {
             // Peek at the constructor ID to determine the concrete type
-            \$constructorId = \$deserializer->peekInt32(\$payload);
+            \$constructorId = \$deserializer->peekInt32(\$stream);
             
             \$result = match (\$constructorId) {
     {$cases}

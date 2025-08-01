@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\Crypto;
@@ -11,7 +12,7 @@ final readonly class IgeOpenSsl
 {
     public function __construct(
         private string $key,
-        private string $iv
+        private string $iv,
     ) {}
 
     public function encrypt(string $plaintext): string

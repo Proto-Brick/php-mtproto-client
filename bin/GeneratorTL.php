@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/GeneratorHelpers.php';
@@ -77,7 +78,9 @@ class GeneratorTL
     {
         echo "Generating abstract base classes...\n";
         foreach (array_keys($this->abstractTypes) as $abstractType) {
-            if ($this->isBuiltInType($abstractType)) continue;
+            if ($this->isBuiltInType($abstractType)) {
+                continue;
+            }
 
             [$namespace, $className] = $this->getNamespaceAndClassName($abstractType);
             $abstractClassName = 'Abstract' . $className;
@@ -96,15 +99,33 @@ class GeneratorTL
         $isMethod = ($schemaKey === 'methods');
         $excluded = $isMethod ? $this->getExcludedMethods() : [];
 
+        if (!$isMethod) {
+            // Исключаем псевдо-конструкторы, для которых не нужно генерировать классы
+            $excluded[] = 'vector';
+            $excluded[] = 'true';
+            $excluded[] = 'null';
+            $excluded[] = 'false';
+            $excluded[] = 'error';
+            $excluded[] = 'boolFalse';
+            $excluded[] = 'boolTrue';
+
+        }
+
         foreach ($this->schema[$schemaKey] as $item) {
             $predicate_key = $isMethod ? 'method' : 'predicate';
-            if(!isset($item[$predicate_key])) continue;
+            if (!isset($item[$predicate_key])) {
+                continue;
+            }
 
             $predicate = $item[$predicate_key];
-            if (in_array($predicate, $excluded, true)) continue;
+            if (in_array($predicate, $excluded, true)) {
+                continue;
+            }
 
             [$namespace, $className] = $this->getNamespaceAndClassName($predicate);
-            if ($isMethod) $className .= 'Request';
+            if ($isMethod) {
+                $className .= 'Request';
+            }
 
             $fullNamespace = self::BASE_NAMESPACE . '\\' . $outputSubDir . ($namespace ? '\\' . $namespace : '');
             $filePath = self::OUTPUT_DIR . '/' . $outputSubDir . '/' . ($namespace ? $namespace . '/' : '') . $className . '.php';
@@ -159,7 +180,7 @@ class GeneratorTL
         }
 
         // --- Serializer/Deserializer content ---
-        $serializerData = $this->buildSerializerMethods($item, $isConcreteOfAbstract, $constructorData['sortedPropertyNames']);
+        $serializerData = $this->buildSerializerMethods($item, $isMethod, $isConcreteOfAbstract, $constructorData['sortedPropertyNames']);
         $serializerContent = $serializerData['content'];
         $useStatements = array_merge($useStatements, $serializerData['useStatements']);
 

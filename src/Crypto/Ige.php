@@ -33,8 +33,8 @@ final class Ige
     public static function isOpensslIgeSupported(): bool
     {
         if (self::$isOpensslSupported === null) {
-            self::$isOpensslSupported = function_exists('openssl_get_cipher_methods')
-                && in_array('aes-256-ige', openssl_get_cipher_methods(), true);
+            self::$isOpensslSupported = \function_exists('openssl_get_cipher_methods')
+                && \in_array('aes-256-ige', openssl_get_cipher_methods(), true);
         }
         return self::$isOpensslSupported;
     }

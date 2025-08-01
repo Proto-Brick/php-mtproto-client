@@ -1,4 +1,5 @@
 <?php
+
 namespace DigitalStars\MtprotoClient\TL\Contracts;
 
 interface TlObjectInterface

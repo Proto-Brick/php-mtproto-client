@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace DigitalStars\MtprotoClient;
 
 use DigitalStars\MtprotoClient\Auth\AuthKeyCreator;
@@ -41,7 +44,7 @@ class ClientFactory
             $authKeyCreator,
             $messagePacker,
             $deserializer,
-            $serializer
+            $serializer,
         );
     }
 }

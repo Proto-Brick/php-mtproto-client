@@ -1,4 +1,7 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
+
 namespace DigitalStars\MtprotoClient;
 
 use DigitalStars\MtprotoClient\Auth\AuthKey;
@@ -12,7 +15,7 @@ class MessagePacker
     public function __construct(
         private readonly Settings $settings,
         private readonly Session $session,
-        private readonly Aes $aes
+        private readonly Aes $aes,
     ) {}
 
     public function packUnencrypted(string $payload): string
@@ -21,7 +24,7 @@ class MessagePacker
         // Сборка MTProto-сообщения (auth_key_id=0, msg_id, length, payload)
         return pack('P', 0)
             . pack('q', $msgId)
-            . pack('V', strlen($payload))
+            . pack('V', \strlen($payload))
             . $payload;
     }
 
@@ -61,20 +64,20 @@ class MessagePacker
         $messageId = $overrideMsgId ?? $this->session->generateMessageId();
         $sequence = $this->session->generateSequence($isContentRelated);
 
-        print 'Отправляю соль: '.$salt.PHP_EOL;
-        print 'Отправляю ID сессии: '.bin2hex($sessionId).PHP_EOL;
+        print 'Отправляю соль: ' . $salt . PHP_EOL;
+        print 'Отправляю ID сессии: ' . bin2hex($sessionId) . PHP_EOL;
 
         // 3. Собираем внутреннюю, еще не зашифрованную часть пакета.
         $unpaddedPayload = pack('q', $salt)
             . $sessionId
             . pack('q', $messageId)
             . pack('V', $sequence)
-            . pack('V', strlen($payload))
+            . pack('V', \strlen($payload))
             . $payload;
 
         // 4. Добавляем случайную "набивку" (padding) по правилам MTProto 2.0.
         // Длина должна быть кратна 16, а сама набивка - не менее 12 байт.
-        $paddingLength = 12 + (16 - (strlen($unpaddedPayload) + 12) % 16) % 16;
+        $paddingLength = 12 + (16 - (\strlen($unpaddedPayload) + 12) % 16) % 16;
         $paddedPayload = $unpaddedPayload . random_bytes($paddingLength);
 
         // 5. Вычисляем ключ сообщения (msg_key) по правилам MTProto 2.0.
@@ -126,7 +129,7 @@ class MessagePacker
      */
     public function unpackEncrypted(string $rawResponse, AuthKey $authKey): array
     {
-        if (strlen($rawResponse) < 24) {
+        if (\strlen($rawResponse) < 24) {
             throw new TransportException("Received encrypted response is too short (less than 24 bytes).");
         }
         $authKeyId = substr($rawResponse, 0, 8);
@@ -152,7 +155,7 @@ class MessagePacker
         }
 
         // 5. Парсим внутренний заголовок расшифрованного сообщения.
-        if (strlen($decryptedPayload) < 32) {
+        if (\strlen($decryptedPayload) < 32) {
             throw new \RuntimeException("Decrypted payload is too short to contain a valid MTProto header.");
         }
         $serverSalt = substr($decryptedPayload, 0, 8);
@@ -165,7 +168,7 @@ class MessagePacker
         $messageBody = substr($decryptedPayload, 32, $messageLen);
 
         // 7. Проверяем, что длина тела соответствует заявленной.
-        if (strlen($messageBody) < $messageLen) {
+        if (\strlen($messageBody) < $messageLen) {
             throw new \RuntimeException("Actual message body length is less than specified in header.");
         }
 

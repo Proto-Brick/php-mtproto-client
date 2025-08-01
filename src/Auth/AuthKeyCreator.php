@@ -16,7 +16,6 @@ use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\Transport\Transport;
 use phpseclib3\Math\BigInteger;
-use RuntimeException;
 
 class AuthKeyCreator
 {
@@ -30,10 +29,8 @@ class AuthKeyCreator
         private readonly Rsa $rsa,
         private readonly MessagePacker $messagePacker,
         private readonly Aes $aes,
-        private readonly Session $session
-    )
-    {
-    }
+        private readonly Session $session,
+    ) {}
 
     /**
      * Выполняет полный цикл создания ключа авторизации (шаги 1-4).
@@ -195,7 +192,7 @@ class AuthKeyCreator
 
         return [
             'encrypted_answer' => $serverDhData['encrypted_answer'],
-            'new_nonce' => $newNonce
+            'new_nonce' => $newNonce,
         ];
     }
 
@@ -215,7 +212,7 @@ class AuthKeyCreator
         $dhInnerData = $this->_decryptAndValidateDhInnerData(
             $serverDhParams['encrypted_answer'],
             $tempKeys,
-            $resPQData
+            $resPQData,
         );
 
         $server_time = $dhInnerData['server_time'];
@@ -295,7 +292,7 @@ class AuthKeyCreator
         // Десериализуем, чтобы узнать фактическую длину данных без паддинга
         $streamForParsing = $innerDataWithPadding;
         $dhInnerData = $this->deserializer->deserializeServerDhInnerData($streamForParsing);
-        $actualDataLength = strlen($innerDataWithPadding) - strlen($streamForParsing);
+        $actualDataLength = \strlen($innerDataWithPadding) - \strlen($streamForParsing);
         $actualData = substr($innerDataWithPadding, 0, $actualDataLength);
 
         if (hash('sha1', $actualData, true) !== $answerHash) {
@@ -364,7 +361,7 @@ class AuthKeyCreator
 
         // Добавляем SHA1 хэш и паддинг
         $clientDataWithHash = hash('sha1', $clientInnerDataPayload, true) . $clientInnerDataPayload;
-        $paddingLength = 16 - (strlen($clientDataWithHash) % 16);
+        $paddingLength = 16 - (\strlen($clientDataWithHash) % 16);
         if ($paddingLength < 12) {
             $paddingLength += 16;
         }
@@ -394,7 +391,7 @@ class AuthKeyCreator
         string $rawResponse,
         AuthKey $authKey,
         array $resPQData,
-        string $newNonce
+        string $newNonce,
     ): void {
         $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
         $responsePayload = substr($responsePayload, 20); // Пропускаем заголовок
@@ -407,12 +404,12 @@ class AuthKeyCreator
         }
         if ($finalConstructor === Constructors::DH_GEN_RETRY) {
             throw new \RuntimeException(
-                "DH key exchange failed: server returned dh_gen_retry. (Logic for retry is not implemented)."
+                "DH key exchange failed: server returned dh_gen_retry. (Logic for retry is not implemented).",
             );
         }
         if ($finalConstructor !== Constructors::DH_GEN_OK) {
             throw new \RuntimeException(
-                "DH key exchange failed. Final response constructor: " . dechex($finalConstructor)
+                "DH key exchange failed. Final response constructor: " . dechex($finalConstructor),
             );
         }
 
