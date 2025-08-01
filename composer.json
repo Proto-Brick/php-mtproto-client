@@ -22,7 +22,6 @@
   ],
   "require": {
     "php-64bit": ">=8.2",
-    "brick/math": "^0.13",
     "ext-openssl": "*",
     "ext-sockets": "*",
     "phpseclib/phpseclib": "^3.0"

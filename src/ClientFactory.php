@@ -29,7 +29,9 @@ class ClientFactory
         $aes = new Aes();
         $session = new Session($sessionStorage);
         $messagePacker = new MessagePacker($settings, $session, $aes);
-        $authKeyCreator = new AuthKeyCreator($transport, $serializer, $deserializer, $rsa, $messagePacker, $aes);
+        $authKeyCreator = new AuthKeyCreator($transport, $serializer, $deserializer, $rsa, $messagePacker, $aes, $session);
+        $deserializer = new Deserializer();
+        $serializer = new Serializer();
 
         return new Client(
             $settings,
@@ -37,7 +39,9 @@ class ClientFactory
             $session,
             $transport,
             $authKeyCreator,
-            $messagePacker
+            $messagePacker,
+            $deserializer,
+            $serializer
         );
     }
 }

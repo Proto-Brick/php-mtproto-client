@@ -2,12 +2,35 @@
 
 namespace DigitalStars\MtprotoClient\TL;
 
+use DigitalStars\MtprotoClient\TL\Contracts\Serializable;
+use DigitalStars\MtprotoClient\TL\Contracts\TlObjectInterface;
+
 /**
  * Абстрактный базовый класс для всех генерируемых TL-объектов.
- * (На начальном этапе может быть пустым, но полезен для типизации).
  */
-abstract class TlObject
+abstract class TlObject implements TlObjectInterface, Serializable
 {
-    // В будущем сюда можно добавить общую логику,
-    // например, методы для сериализации/десериализации.
+    // --- НАЧАЛО ИЗМЕНЕНИЙ ---
+
+    // Метод getConstructorId() должен быть реализован в дочерних классах через константу
+    public function getConstructorId(): int
+    {
+        return static::CONSTRUCTOR_ID;
+    }
+
+    // Метод getPredicate() должен быть реализован в дочерних классах через свойство $_
+    public function getPredicate(): string
+    {
+        return $this->_;
+    }
+
+    // Объявляем абстрактные методы, чтобы удовлетворить интерфейс Serializable
+    // и заставить дочерние классы их реализовать.
+
+    abstract public function serialize(Serializer $serializer): string;
+
+    /**
+     * @return static
+     */
+    abstract public static function deserialize(Deserializer $deserializer, string &$payload): static;
 }

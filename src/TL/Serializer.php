@@ -71,4 +71,82 @@ class Serializer
         }
         return $prefix . $value . str_repeat("\x00", $paddingLen);
     }
+
+    public function vectorOfObjects(array $items): string
+    {
+        if (empty($items)) {
+            // ID вектора + 0 элементов
+            return $this->int32(0x1cb5c415) . $this->int32(0);
+        }
+
+        $buffer = $this->int32(0x1cb5c415);
+        $buffer .= $this->int32(count($items));
+
+        foreach ($items as $item) {
+            // $this - это сам объект Serializer, который мы передаем в метод serialize элемента
+            $buffer .= $item->serialize($this);
+        }
+
+        return $buffer;
+    }
+
+    public function vectorOfInts(array $items): string
+    {
+        $buffer = $this->int32(0x1cb5c415) . $this->int32(count($items));
+        foreach ($items as $item) { $buffer .= $this->int32($item); }
+        return $buffer;
+    }
+
+    public function vectorOfLongs(array $items): string
+    {
+        $buffer = $this->int32(0x1cb5c415) . $this->int32(count($items));
+        foreach ($items as $item) { $buffer .= $this->int64($item); }
+        return $buffer;
+    }
+
+    public function vectorOfStrings(array $items): string
+    {
+        $buffer = $this->int32(0x1cb5c415) . $this->int32(count($items));
+        foreach ($items as $item) { $buffer .= $this->bytes($item); } // string и bytes сериализуются одинаково
+        return $buffer;
+    }
+
+    /**
+     * Оборачивает RPC-запрос в initConnection и invokeWithLayer.
+     * @param string $query Бинарные данные RPC-запроса (например, help.getConfig).
+     * @return string Готовый для отправки бинарный payload.
+     */
+    public function wrapWithInitConnection(string $query, int $layer, int $apiId): string
+    {
+        // --- Конструкторы из официальной схемы ---
+        $invokeWithLayerConstructor = 0xda9b0d0d;
+        $initConnectionConstructor = 0xc1cd5ea9;
+
+        // --- Параметры для initConnection ---
+        $deviceModel = 'DigitalStars MTProto Client';
+        $systemVersion = 'Unknown OS';
+        $appVersion = '1.0.0';
+        $systemLangCode = 'en';
+        $langPack = ''; // Обычно пустой
+        $langCode = 'ru';
+
+        // Собираем initConnection
+        $initConnectionPayload = $this->int32($initConnectionConstructor)
+            . $this->int32(0) // flags, пока 0
+            . $this->int32($apiId)
+            . $this->bytes($deviceModel)
+            . $this->bytes($systemVersion)
+            . $this->bytes($appVersion)
+            . $this->bytes($systemLangCode)
+            . $this->bytes($langPack)
+            . $this->bytes($langCode)
+            . $query; // Вкладываем наш исходный запрос внутрь
+
+        // Оборачиваем все в invokeWithLayer
+        $finalPayload = $this->int32($invokeWithLayerConstructor)
+            . $this->int32($layer)
+            . $initConnectionPayload; // Вкладываем initConnection
+
+        return $finalPayload;
+    }
 }

@@ -29,6 +29,8 @@ final class Constructors
     public const RPC_ERROR = 0x2144ca19;
     public const MSG_CONTAINER = 0x73f1f8dc;
 
+    public const MSGS_ACK = 0x62d6b459;
+
     // --- Вектор (универсальный конструктор) ---
     public const VECTOR = 0x1cb5c415;
 }

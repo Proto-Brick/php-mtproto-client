@@ -8,7 +8,13 @@ class Session
 {
     private ?string $id = null;
     private int $sequence = 0;
-    private ?string $serverSalt = null;
+    private ?int $serverSalt = null;
+
+    private int $timeOffset = 0;
+
+    private int $msgIdCounter = 0;
+
+    public bool $isInitialized = false; // <-- ДОБАВЬТЕ ЭТО СВОЙСТВО
 
     public function __construct(private readonly SessionStorage $storage) {}
 
@@ -16,37 +22,78 @@ class Session
     {
         $data = $this->storage->getFor($authKey->id);
         if ($data) {
-            $this->id = $data['id'];
-            $this->sequence = $data['sequence'];
-            $this->serverSalt = $data['salt'];
+            $this->id = $data['id'] ?? null;
+            $this->sequence = $data['sequence'] ?? 0;
+            $this->serverSalt = $data['salt'] ?? null;
+            $this->isInitialized = false;
+            $this->timeOffset = $data['time_offset'] ?? 0;
+            $this->msgIdCounter = 0;
+            if ($this->id === null) {
+                $this->id = random_bytes(8);
+            }
         } else {
             $this->id = random_bytes(8);
+            $this->sequence = 0;
         }
     }
+
 
     public function save(AuthKey $authKey): void
     {
+        // Убедимся, что ID сессии и salt не null перед сохранением
+        if ($this->id === null || $this->serverSalt === null) {
+            // Можно либо бросить исключение, либо просто не сохранять неполную сессию
+            // echo "Warning: Attempted to save an incomplete session.\n";
+            return;
+        }
+
+        print 'Соль сохраняем: '.$this->serverSalt.PHP_EOL;
+
         $this->storage->setFor($authKey->id, [
             'id' => $this->id,
             'sequence' => $this->sequence,
-            'salt' => $this->serverSalt,
+            'salt' => $this->serverSalt, // Эта строка у вас уже есть, она правильная
+            'time_offset' => $this->timeOffset,     // <-- ДОБАВЬТЕ ЭТО ПОЛЕ
         ]);
     }
 
-    public function generateMessageId(): string
+    public function setTimeOffset(int $offset): void
     {
-        if (PHP_INT_SIZE < 8) {
-            throw new \RuntimeException("This simple msg_id implementation works only on 64-bit systems.");
+        if ($this->timeOffset !== $offset) {
+            $this->timeOffset = $offset;
+            echo "INFO: Time offset updated to {$this->timeOffset} seconds.\n";
         }
-        $time = microtime(true);
-        $timestamp = (int)$time;
+    }
 
-        static $msg_id_counter = 0;
-        $msg_id_counter++;
+    public function resetSequence(): void
+    {
+        $this->sequence = 0;
+    }
 
-        $msgId = ($timestamp << 32) | ($msg_id_counter << 2);
+    public function generateMessageId(): int
+    {
+        // Применяем смещение времени для синхронизации с сервером
+        $time = microtime(true) + $this->timeOffset;
 
-        return pack('P', $msgId);
+        $sec = (int)$time;
+        // Используем 20 бит для микросекунд, чтобы осталось место для счетчика
+        $usec = (int)(($time - $sec) * (2**20));
+
+        // 64-битное число:
+        // [ 32 бита: секунды ] [ 20 бит: микросекунды ] [ 10 бит: счетчик ] [ 2 бита: 00 ]
+        $msgId = ($sec << 32) | ($usec << 12) | ($this->msgIdCounter << 2);
+
+        // Убеждаемся, что msg_id делится на 4
+        // (хотя сдвиг << 2 это уже гарантирует, это для надежности)
+        if ($msgId % 4 !== 0) {
+            $msgId += 4 - ($msgId % 4);
+        }
+
+        // Увеличиваем счетчик для следующего вызова
+        $this->msgIdCounter++;
+
+        // 'q' - 64-bit signed little-endian
+        return $msgId;
     }
 
     public function generateSequence(bool $isContentRelated): int
@@ -60,6 +107,6 @@ class Session
     }
 
     public function getId(): ?string { return $this->id; }
-    public function getServerSalt(): ?string { return $this->serverSalt; }
-    public function setServerSalt(string $salt): void { $this->serverSalt = $salt; }
+    public function getServerSalt(): ?int { return $this->serverSalt; }
+    public function setServerSalt(int $salt): void { $this->serverSalt = $salt; }
 }

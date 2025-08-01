@@ -10,11 +10,13 @@ use DigitalStars\MtprotoClient\Crypto\Rsa;
 use DigitalStars\MtprotoClient\Domain\Factorizer;
 use DigitalStars\MtprotoClient\Exception\FactorizationException;
 use DigitalStars\MtprotoClient\MessagePacker;
+use DigitalStars\MtprotoClient\Session\Session;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\Transport\Transport;
-use Brick\Math\BigInteger;
+use phpseclib3\Math\BigInteger;
+use RuntimeException;
 
 class AuthKeyCreator
 {
@@ -27,7 +29,8 @@ class AuthKeyCreator
         private readonly Deserializer $deserializer,
         private readonly Rsa $rsa,
         private readonly MessagePacker $messagePacker,
-        private readonly Aes $aes // <-- НОВАЯ ЗАВИСИМОСТЬ
+        private readonly Aes $aes,
+        private readonly Session $session
     )
     {
     }
@@ -42,10 +45,10 @@ class AuthKeyCreator
         echo "Step 1 (req_pq): OK\n";
 
         // Шаг 2: Факторизация pq
-        $pq = BigInteger::fromBytes($resPQData['pq'], false);
+        $pq = new BigInteger($resPQData['pq'], 256);
         [$p_val, $q_val] = Factorizer::factorize($pq);
 
-        if (!$pq->isEqualTo($p_val->multipliedBy($q_val))) {
+        if (!$pq->equals($p_val->multiply($q_val))) {
             throw new FactorizationException("Factorization failed: p * q does not equal original pq.");
         }
 
@@ -128,13 +131,14 @@ class AuthKeyCreator
     private function sendReqDhParams(array $resPQData, string $p, string $q): array
     {
         $publicKeyPem = null;
-        $foundFingerprint = null;
+        $foundFingerprint_int = null;
 
+        var_dump($resPQData['fingerprints']);
         foreach ($resPQData['fingerprints'] as $fingerprint) {
             $key = $this->rsa->findKeyByFingerprint($fingerprint);
             if ($key !== null) {
                 $publicKeyPem = $key;
-                $foundFingerprint = $fingerprint;
+                $foundFingerprint_int = $fingerprint;
                 break;
             }
         }
@@ -169,7 +173,7 @@ class AuthKeyCreator
             . $this->serializer->raw128($resPQData['server_nonce'])
             . $this->serializer->bytes($p)
             . $this->serializer->bytes($q)
-            . strrev($foundFingerprint)
+            . $this->serializer->int64($foundFingerprint_int)
             . $this->serializer->bytes($encryptedInnerData);
 
         $request = $this->messagePacker->packUnencrypted($payload);
@@ -214,6 +218,12 @@ class AuthKeyCreator
             $resPQData
         );
 
+        $server_time = $dhInnerData['server_time'];
+        $local_time = time();
+        $time_offset = $server_time - $local_time;
+
+        $this->session->setTimeOffset($time_offset);
+
         print 'step 4.1 (decryptDhInnerData): OK' . PHP_EOL;
 
         // Этап 4.2: Выполняем вычисления Диффи-Хеллмана на стороне клиента
@@ -232,6 +242,19 @@ class AuthKeyCreator
         $this->_parseAndValidateFinalResponse($rawFinalResponse, $authKey, $resPQData, $serverDhParams['new_nonce']);
 
         print 'step 4.4 (parseAndValidateFinalResponse): OK' . PHP_EOL;
+
+        // 1. Извлекаем первые 8 байт (little-endian)
+        $new_nonce_part_le = substr($serverDhParams['new_nonce'], 0, 8);
+        $server_nonce_part_le = substr($resPQData['server_nonce'], 0, 8);
+
+        // 2. Распаковываем их в 64-битные числа (int)
+        $new_nonce_int = unpack('q', $new_nonce_part_le)[1];
+        $server_nonce_int = unpack('q', $server_nonce_part_le)[1];
+
+        // 3. Выполняем XOR над числами
+        $initialSalt_int = $new_nonce_int ^ $server_nonce_int;
+        $this->session->setServerSalt($initialSalt_int);
+        echo "Initial server_salt calculated and set.\n";
 
         // Этап 4.5: Все проверки пройдены, возвращаем ключ
         return $authKey;
@@ -287,7 +310,15 @@ class AuthKeyCreator
             throw new \RuntimeException("Server nonce mismatch in decrypted DH answer.");
         }
 
-        // TODO: Здесь рекомендуется добавить проверку dh_prime на безопасность, как описано в документации Telegram
+        $dh_prime_bi = new BigInteger($dhInnerData['dh_prime'], 256);
+        $g_a_bi = new BigInteger($dhInnerData['g_a'], 256);
+
+        // ЗАПУСКАЕМ ПОЛНУЮ ПРОВЕРКУ ПАРАМЕТРОВ DH
+        $this->_validateDhParameters($dh_prime_bi, $dhInnerData['g'], $g_a_bi);
+
+        // Добавляем объекты BigInteger в результат, чтобы не парсить их снова
+        $dhInnerData['dh_prime_bi'] = $dh_prime_bi;
+        $dhInnerData['g_a_bi'] = $g_a_bi;
 
         return $dhInnerData;
     }
@@ -297,12 +328,12 @@ class AuthKeyCreator
      */
     private function _generateClientDhData(array $dhInnerData): array
     {
-        $dh_prime = BigInteger::fromBytes($dhInnerData['dh_prime'], false);
-        $g_a = BigInteger::fromBytes($dhInnerData['g_a'], false);
-        $g = BigInteger::of($dhInnerData['g']);
+        $dh_prime = new BigInteger($dhInnerData['dh_prime'], 256);
+        $g_a = new BigInteger($dhInnerData['g_a'], 256);
+        $g = new BigInteger($dhInnerData['g']);
 
         $b = random_bytes(256);
-        $b_bi = BigInteger::fromBytes($b, false);
+        $b_bi = new BigInteger($b, 256);
 
         // Вычисляем g_b
         $gb_bi = $g->modPow($b_bi, $dh_prime);
@@ -402,6 +433,114 @@ class AuthKeyCreator
 
         if ($new_nonce_hash1_from_server !== $new_nonce_hash1_calculated) {
             throw new \RuntimeException("Final new_nonce_hash check failed. Possible MITM attack?");
+        }
+    }
+
+    /**
+     * Выполняет полную проверку параметров Диффи-Хеллмана, полученных от сервера.
+     * Реализует требования безопасности, описанные в документации MTProto.
+     * Использует синтаксис phpseclib\Math\BigInteger.
+     *
+     * @see https://core.telegram.org/mtproto/auth_key#presenting-proof-of-work-server-authentication (пункт 6)
+     *
+     * @param BigInteger $dh_prime Модуль p, полученный от сервера.
+     * @param int        $g        Генератор g, полученный от сервера.
+     * @param BigInteger $g_a      g^a mod p, полученный от сервера.
+     *
+     * @throws \RuntimeException Если какой-либо из параметров не проходит проверку безопасности.
+     */
+    private function _validateDhParameters(BigInteger $dh_prime, int $g, BigInteger $g_a): void
+    {
+        // 1. Проверяем, что dh_prime - это 2048-битное число (2^2047 <= p < 2^2048)
+        $bit_2047 = (new BigInteger(1))->bitwise_leftShift(2047);
+        $bit_2048 = (new BigInteger(1))->bitwise_leftShift(2048);
+        if ($dh_prime->compare($bit_2047) < 0 || $dh_prime->compare($bit_2048) >= 0) {
+            throw new \RuntimeException("DH prime security check failed: dh_prime is not a 2048-bit number.");
+        }
+
+        // 2. Проверяем, что dh_prime является простым числом (используя вероятностный тест)
+        if (!$dh_prime->isPrime()) {
+            throw new \RuntimeException("DH prime security check failed: dh_prime is not prime.");
+        }
+
+        // 3. Проверяем, что это "безопасное" простое число ((p-1)/2 тоже простое)
+        [, $remainder] = $dh_prime->subtract(new BigInteger(1))->divide(new BigInteger(2));
+        if (!$remainder->equals(new BigInteger(0))) {
+            // Эта проверка на случай, если dh_prime - это 2 (единственное четное простое число). В нашем случае это невозможно.
+            throw new \RuntimeException("DH prime security check failed: (p-1) is not even.");
+        }
+        [$p_minus_1_div_2] = $dh_prime->subtract(new BigInteger(1))->divide(new BigInteger(2));
+        if (!$p_minus_1_div_2->isPrime()) {
+            throw new \RuntimeException("DH prime security check failed: dh_prime is not a safe prime as (p-1)/2 is not prime.");
+        }
+
+        // 4. Проверяем генератор g и соответствующие ему условия для p
+        switch ($g) {
+            case 2:
+                if (!$dh_prime->divide(new BigInteger(8))[1]->equals(new BigInteger(7))) {
+                    throw new \RuntimeException("DH prime security check failed: g=2 requires p mod 8 = 7.");
+                }
+                break;
+            case 3:
+                if (!$dh_prime->divide(new BigInteger(3))[1]->equals(new BigInteger(2))) {
+                    throw new \RuntimeException("DH prime security check failed: g=3 requires p mod 3 = 2.");
+                }
+                break;
+            case 4:
+                // Для g=4 дополнительных проверок не требуется.
+                break;
+            case 5:
+                [, $mod5] = $dh_prime->divide(new BigInteger(5));
+                if (!$mod5->equals(new BigInteger(1)) && !$mod5->equals(new BigInteger(4))) {
+                    throw new \RuntimeException("DH prime security check failed: g=5 requires p mod 5 = 1 or 4.");
+                }
+                break;
+            case 6:
+                [, $mod24] = $dh_prime->divide(new BigInteger(24));
+                if (!$mod24->equals(new BigInteger(19)) && !$mod24->equals(new BigInteger(23))) {
+                    throw new \RuntimeException("DH prime security check failed: g=6 requires p mod 24 = 19 or 23.");
+                }
+                break;
+            case 7:
+                [, $mod7] = $dh_prime->divide(new BigInteger(7));
+                if (!$mod7->equals(new BigInteger(3)) && !$mod7->equals(new BigInteger(5)) && !$mod7->equals(new BigInteger(6))) {
+                    throw new \RuntimeException("DH prime security check failed: g=7 requires p mod 7 = 3, 5 or 6.");
+                }
+                break;
+            default:
+                throw new \RuntimeException("DH prime security check failed: Invalid generator g=$g. Must be one of {2,3,4,5,6,7}.");
+        }
+
+        // 5. Проверяем g_a на соответствие границам
+        $this->_validateDhValueBounds($g_a, $dh_prime);
+    }
+
+    /**
+     * Вспомогательный метод для проверки того, что значение (g_a или g_b) находится
+     * в безопасных границах: 1 < value < dh_prime - 1.
+     * Использует синтаксис phpseclib\Math\BigInteger.
+     *
+     * @param BigInteger $value    Значение для проверки (g_a или g_b).
+     * @param BigInteger $dh_prime Модуль p.
+     *
+     * @throws \RuntimeException Если значение выходит за допустимые границы.
+     */
+    private function _validateDhValueBounds(BigInteger $value, BigInteger $dh_prime): void
+    {
+        $one = new BigInteger(1);
+        $dh_prime_minus_1 = $dh_prime->subtract($one);
+
+        // Базовая проверка: 1 < value < dh_prime - 1
+        if ($value->compare($one) <= 0 || $value->compare($dh_prime_minus_1) >= 0) {
+            throw new \RuntimeException("DH security check failed: value is not in the valid range (1 < value < dh_prime - 1).");
+        }
+
+        // Рекомендованная более строгая проверка: 2^(2048-64) < value < dh_prime - 2^(2048-64)
+        $lowerBound = (new BigInteger(1))->bitwise_leftShift(2048 - 64);
+        $upperBound = $dh_prime->subtract($lowerBound);
+
+        if ($value->compare($lowerBound) < 0 || $value->compare($upperBound) > 0) {
+            throw new \RuntimeException("DH security check failed: value does not satisfy the recommended stricter bounds to prevent small subgroup attacks.");
         }
     }
 }

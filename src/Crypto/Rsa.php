@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace DigitalStars\MtprotoClient\Crypto;
-use Brick\Math\BigInteger;
-use phpseclib3\Crypt\AES;
+use phpseclib3\Math\BigInteger;
 
 class Rsa
 {
@@ -27,12 +26,8 @@ class Rsa
         '-----END RSA PUBLIC KEY-----',
     ];
 
-    public function findKeyByFingerprint(string $fingerprint): ?string
+    public function findKeyByFingerprint(int $fingerprint): ?string
     {
-
-        // --- ДОБАВЬТЕ ЭТОТ ОТЛАДОЧНЫЙ БЛОК ---
-        //echo "DEBUG: Rsa::findKeyByFingerprint is searching for: " . bin2hex($fingerprint) . "\n";
-        // --- КОНЕЦ ОТЛАДОЧНОГО БЛОКА ---
 
         // Убрал отладочный вывод для чистоты
         foreach (self::TELEGRAM_PUBLIC_KEYS as $keyIndex => $keyPem) {
@@ -55,9 +50,9 @@ class Rsa
 
             // Вычисляем SHA1 и берем последние 8 байт (64 младших бита)
             $fingerprint_part_be = substr(sha1($dataForHash, true), -8);
-            $calculatedFingerprint = strrev($fingerprint_part_be);
+            $calculatedFingerprint_int = unpack('q', $fingerprint_part_be)[1];
 
-            if ($calculatedFingerprint === $fingerprint) {
+            if ($calculatedFingerprint_int === $fingerprint) {
                 return $keyPem;
             }
         }
@@ -87,7 +82,7 @@ class Rsa
         if (!$details || !isset($details['rsa']['n'])) {
             throw new \RuntimeException("Could not get RSA key details.");
         }
-        $modulus_n = BigInteger::fromBytes($details['rsa']['n'], false);
+        $modulus_n = new BigInteger($details['rsa']['n'], 256);
 
         while (true) {
             if (strlen($data) > 144) { // Официальная документация указывает на 192, но примеры показывают, что данные обычно короче
@@ -105,7 +100,7 @@ class Rsa
             $temp_key_xor = $temp_key ^ hash('sha256', $aes_encrypted, true);
             $key_aes_encrypted = $temp_key_xor . $aes_encrypted;
 
-            if (BigInteger::fromBytes($key_aes_encrypted, false)->isLessThan($modulus_n)) {
+            if ((new BigInteger($key_aes_encrypted, 256))->compare($modulus_n) < 0) {
                 break;
             }
         }

@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\Crypto;
-
 use DigitalStars\MtprotoClient\Auth\AuthKey;
 
 class Aes
@@ -16,7 +15,7 @@ class Aes
     public function encrypt(string $payload, AuthKey $authKey, string $msgKey): string
     {
         [$aesKey, $aesIv] = $this->getAesKeyIv($authKey->key, $msgKey);
-        return openssl_encrypt($payload, 'aes-256-ige', $aesKey, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $aesIv);
+        return Ige::create($aesKey, $aesIv)->encrypt($payload);
     }
 
     /**
@@ -25,7 +24,7 @@ class Aes
     public function decrypt(string $encryptedPayload, AuthKey $authKey, string $msgKey): string
     {
         [$aesKey, $aesIv] = $this->getAesKeyIv($authKey->key, $msgKey, true); // `true` для ответа от сервера
-        return openssl_decrypt($encryptedPayload, 'aes-256-ige', $aesKey, OPENSSL_RAW_DATA | OPENSSL_NO_PADDING, $aesIv);
+        return Ige::create($aesKey, $aesIv)->decrypt($encryptedPayload);
     }
 
     /**

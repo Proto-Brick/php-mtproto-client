@@ -1,15 +1,15 @@
 <?php
-// File: src/MTProto/Factorizer.php
-
 namespace DigitalStars\MtprotoClient\Domain;
 
-use Brick\Math\BigInteger;
+use Exception;
+use phpseclib3\Math\BigInteger;
 use DigitalStars\MtprotoClient\Exception\FactorizationException;
 use FFI;
+use Throwable;
 
 class Factorizer
 {
-    private const REMOTE_FACTORIZER_URL = 'http://127.0.0.1:8000/factorize'; // URL вашего будущего микросервиса
+    private const REMOTE_FACTORIZER_URL = 'http://127.0.0.1:8000/factorize';
 
     private static ?FFI $ffi = null;
     private static bool $ffiAttempted = false;
@@ -20,6 +20,7 @@ class Factorizer
      *
      * @param BigInteger $pq Число для факторизации.
      * @return array|null Массив [p, q] или null.
+     * @throws FactorizationException
      */
     public static function factorize(BigInteger $pq): ?array
     {
@@ -114,7 +115,7 @@ class Factorizer
                     if ($library_path && file_exists($library_path)) {
                         try {
                             self::$ffi = FFI::cdef($header, $library_path);
-                        } catch (FFI\Exception $e) {
+                        } catch (FFI\Exception) {
                             self::$ffi = null;
                         }
                     }
@@ -134,7 +135,7 @@ class Factorizer
 
     private static function tryFactorCommand(BigInteger $pq): ?array
     {
-        if (stripos(PHP_OS, 'WIN') === 0 || !function_exists('shell_exec')) {
+        if (PHP_OS_FAMILY === 'Windows' || !function_exists('shell_exec')) {
             return null;
         }
         // escapeshellarg для безопасности
@@ -152,27 +153,6 @@ class Factorizer
         }
 
         return self::checkAndReturnFactors($pq, $parts[1]);
-    }
-
-    private static function tryPythonScript(BigInteger $pq): ?array
-    {
-        if (!function_exists('shell_exec')) {
-            return null;
-        }
-
-        $scriptPath = __DIR__ . '/../../prime_solver.py'; // Путь к скрипту
-        if (!file_exists($scriptPath)) {
-            return null;
-        }
-
-        $command = 'python3 ' . escapeshellarg($scriptPath) . ' ' . escapeshellarg($pq->__toString());
-        $output = shell_exec($command);
-
-        if (!$output || !is_numeric(trim($output))) {
-            return null;
-        }
-
-        return self::checkAndReturnFactors($pq, trim($output));
     }
 
     private static function tryRemoteService(BigInteger $pq): ?array
@@ -194,7 +174,7 @@ class Factorizer
             }
 
             return self::checkAndReturnFactors($pq, $json['p']);
-        } catch (\Throwable $e) {
+        } catch (Throwable) {
             return null;
         }
     }
@@ -209,17 +189,17 @@ class Factorizer
         }
 
         try {
-            $p = BigInteger::of($p_val);
-            if ($p->isGreaterThanOrEqualTo($pq)) {
+            $p = new BigInteger($p_val);
+            if ($p->compare($pq) >= 0) {
                 return null;
             } // Множитель не может быть >= числа
 
-            $q = $pq->dividedBy($p);
+            [$q] = $pq->divide($p);
 
-            if ($pq->isEqualTo($p->multipliedBy($q))) {
-                return $p->isLessThan($q) ? [$p, $q] : [$q, $p];
+            if ($pq->equals($p->multiply($q))) {
+                return $p->compare($q) < 0 ? [$p, $q] : [$q, $p];
             }
-        } catch (\Exception $e) {
+        } catch (Exception) {
             return null; // Ошибка преобразования в BigInteger
         }
 
