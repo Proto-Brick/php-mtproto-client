@@ -151,7 +151,7 @@ class Session
             $this->sequence++;
             return $seq;
         }
-        return $this->sequence * 2;
+        return $this->sequence * 2 - 2;
     }
 
     public function getId(): ?string

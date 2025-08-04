@@ -178,4 +178,44 @@ class MessagePacker
             'server_salt' => $serverSalt,
         ];
     }
+
+    /**
+     * Упаковывает несколько сообщений в msg_container.
+     *
+     * @param array<array{payload: string, is_content_related: bool, request_object?: TlObject}> $messages
+     * @return array{0: string, 1: int, 2: array<int>, 3: int|null}
+     *         [encrypted_packet, container_msg_id, inner_msg_ids, rpc_request_msg_id]
+     */
+    public function packContainer(array $messages, AuthKey $authKey): array
+    {
+        $containerPayload = $this->serializer->int32(Constructors::MSG_CONTAINER);
+        $containerPayload .= $this->serializer->int32(count($messages));
+
+        $rpcRequestMsgId = null;
+        $innerMsgIds = [];
+
+        foreach ($messages as $msg) {
+            $msgId = $this->session->generateMessageId();
+            $seqno = $this->session->generateSequence($msg['is_content_related']);
+
+            $innerMsgIds[] = $msgId;
+            if (isset($msg['request_object'])) {
+                $rpcRequestMsgId = $msgId;
+            }
+
+            $containerPayload .= pack('q', $msgId);
+            $containerPayload .= pack('V', $seqno);
+            $containerPayload .= pack('V', \strlen($msg['payload']));
+            $containerPayload .= $msg['payload'];
+
+//            if ($msg['is_content_related']) {
+//                $this->session->incrementSequence();
+//            }
+        }
+
+        // Упаковываем сам контейнер. Он НЕ контентный.
+        [$encryptedData, $containerMsgId, $seqno_main] = $this->packEncrypted($containerPayload, $authKey, null, false);
+
+        return [$encryptedData, $containerMsgId, $innerMsgIds, $rpcRequestMsgId, $seqno_main];
+    }
 }

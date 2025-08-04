@@ -74,7 +74,7 @@ class Client
         $maxAttempts = 3;
         $attemptTimeout = 10; // Таймаут на одну попытку
 
-        $this->sendAcksIfNeeded();
+//        $this->sendAcksIfNeeded();
 
         $currentMsgId = null;
 
@@ -85,7 +85,7 @@ class Client
             }
 
             // Отправляем запрос и запоминаем его ID
-            $currentMsgId = $this->sendRequest($request);
+            $currentMsgId = $this->sendPacket($request);
 
             $startTime = time();
             while (time() - $startTime < $attemptTimeout) {
@@ -97,7 +97,7 @@ class Client
                     // 1. Проверяем, пришел ли наш ответ
                     if ($result['response'] !== null) {
                         $responseType = is_object($result['response']) ? $result['response']->getPredicate() : gettype($result['response']);
-                        $this->sendAcksIfNeeded();
+//                        $this->sendAcksIfNeeded(); //отправка отдельных ack сразу после получения часто вызывает 33 ошибку
                         return $result['response'];
                     }
 
@@ -136,21 +136,43 @@ class Client
      * Собирает, шифрует и отправляет запрос.
      * @return string Бинарный msg_id отправленного сообщения.
      */
-    private function sendRequest(TlObject $request): int
+    private function sendPacket(TlObject $request): int
     {
-        $payload = $request->serialize($this->serializer);
+        $ackIds = $this->session->getAndClearAckQueue();
+        $mainRequestPayload = $request->serialize($this->serializer);
 
         if (!$this->session->isInitialized) {
             $layer = 195;
-            $payload = $this->serializer->wrapWithInitConnection($payload, $layer, $this->settings->api_id);
+            $mainRequestPayload = $this->serializer->wrapWithInitConnection($mainRequestPayload, $layer, $this->settings->api_id);
         }
 
-        [$encryptedRequest, $finalMsgId, $sequence] = $this->messagePacker->packEncrypted($payload, $this->authKey, null);
+        if (empty($ackIds)) {
+            // --- Сценарий 1: Нет ack'ов, отправляем один запрос ---
+            $isContentRelated = true;
+            [$encryptedRequest, $finalMsgId, $sequence] = $this->messagePacker->packEncrypted($mainRequestPayload, $this->authKey, null, $isContentRelated);
 
-        $this->pendingRequests[$finalMsgId] = $request; // Сохраняем запрос с его msg_id
+            $this->pendingRequests[$finalMsgId] = $request;
+            echo "[SEND] >> {$request->getPredicate()} (msg_id: {$finalMsgId}, seqno: $sequence)\n";
+            $this->transport->send($encryptedRequest);
+        } else {
+            // --- Сценарий 2: Есть ack'и, упаковываем в контейнер ---
+            $ackPayload = $this->serializer->serializeMsgsAck($ackIds);
 
-        echo "[SEND] >> {$request->getPredicate()} (msg_id: {$finalMsgId}, seqno: $sequence)\n";
-        $this->transport->send($encryptedRequest);
+            $messages = [
+                ['payload' => $ackPayload, 'is_content_related' => false],
+                ['payload' => $mainRequestPayload, 'is_content_related' => true, 'request_object' => $request]
+            ];
+
+            [$encryptedContainer, , , $rpcRequestMsgId, $seqno_main] = $this->messagePacker->packContainer($messages, $this->authKey);
+
+            echo "[SEND] >> Packing {$request->getPredicate()} with " . count($ackIds) . " ACKs into a container. (msg_id: {$rpcRequestMsgId}, seqno: $seqno_main)\n";
+
+            if ($rpcRequestMsgId === null) throw new \LogicException("Packer did not return RPC msg_id from container.");
+
+            $finalMsgId = $rpcRequestMsgId;
+            $this->pendingRequests[$finalMsgId] = $request;
+            $this->transport->send($encryptedContainer);
+        }
 
         $this->session->save($this->authKey);
 
