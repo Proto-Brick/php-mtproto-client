@@ -17,27 +17,47 @@ class Session
 
     private int $msgIdCounter = 0;
 
-    public bool $isInitialized = false; // <-- ДОБАВЬТЕ ЭТО СВОЙСТВО
+    public bool $isInitialized = false;
+
+    /** @var array<int, true> Очередь msg_id для отправки в msgs_ack. Используем ключи для уникальности. */
+    private array $ackQueue = [];
 
     public function __construct(private readonly SessionStorage $storage) {}
 
     public function start(AuthKey $authKey): void
     {
-        $data = $this->storage->getFor($authKey->id);
-        if ($data) {
-            $this->id = $data['id'] ?? null;
-            $this->sequence = $data['sequence'] ?? 0;
-            $this->serverSalt = $data['salt'] ?? null;
-            $this->isInitialized = false;
-            $this->timeOffset = $data['time_offset'] ?? 0;
-            $this->msgIdCounter = 0;
+        if ($this->serverSalt !== null) {
+            echo "[SESSION] Starting with pre-set salt. Skipping load from storage.\n";
             if ($this->id === null) {
                 $this->id = random_bytes(8);
             }
-        } else {
-            $this->id = random_bytes(8);
-            $this->sequence = 0;
+            $this->isInitialized = false;
+            return;
         }
+
+        $data = $this->storage->getFor($authKey->id);
+        if ($data && isset($data['id'])) {
+            $this->id = $data['id'];
+            $this->sequence = $data['sequence'] ?? 0;
+            $this->serverSalt = $data['salt'] ?? null;
+            $this->timeOffset = $data['time_offset'] ?? 0;
+            $this->isInitialized = false;
+            $this->msgIdCounter = 0;
+        } else {
+            $this->reset();
+        }
+    }
+
+    public function reset(): void
+    {
+        echo "[SESSION] Resetting session state completely.\n";
+        $this->id = random_bytes(8);
+        $this->sequence = 0;
+        $this->msgIdCounter = 0;
+        $this->isInitialized = false;
+        // serverSalt и timeOffset будут получены от сервера заново
+        $this->serverSalt = null;
+        $this->timeOffset = 0;
     }
 
 
@@ -50,7 +70,7 @@ class Session
             return;
         }
 
-        print 'Соль сохраняем: ' . $this->serverSalt . PHP_EOL;
+        //print 'Соль сохраняем: ' . $this->serverSalt . PHP_EOL;
 
         $this->storage->setFor($authKey->id, [
             'id' => $this->id,
@@ -60,12 +80,32 @@ class Session
         ]);
     }
 
+    public function addToAckQueue(int $msgId): void
+    {
+        $this->ackQueue[$msgId] = true;
+    }
+
+    public function getAndClearAckQueue(): array
+    {
+        if (empty($this->ackQueue)) {
+            return [];
+        }
+        // array_keys вернет все msg_id, которые мы накопили.
+        $queue = array_keys($this->ackQueue);
+        $this->ackQueue = [];
+        return $queue;
+    }
+
     public function setTimeOffset(int $offset): void
     {
         if ($this->timeOffset !== $offset) {
             $this->timeOffset = $offset;
-            echo "INFO: Time offset updated to {$this->timeOffset} seconds.\n";
         }
+    }
+
+    public function incrementSequence(): void
+    {
+        $this->sequence++;
     }
 
     public function resetSequence(): void

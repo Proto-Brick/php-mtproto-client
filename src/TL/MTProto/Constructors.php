@@ -35,4 +35,6 @@ final class Constructors
 
     // --- Вектор (универсальный конструктор) ---
     public const VECTOR = 0x1cb5c415;
+
+    public const GZIP_PACKED = 0x3072cfa1;
 }

@@ -8,14 +8,17 @@ use DigitalStars\MtprotoClient\Auth\AuthKey;
 use DigitalStars\MtprotoClient\Crypto\Aes;
 use DigitalStars\MtprotoClient\Exception\TransportException;
 use DigitalStars\MtprotoClient\Session\Session;
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
+use DigitalStars\MtprotoClient\TL\Serializer;
 use Random\RandomException;
 
 class MessagePacker
 {
     public function __construct(
-        private readonly Settings $settings,
         private readonly Session $session,
         private readonly Aes $aes,
+        private readonly Serializer $serializer,
     ) {}
 
     public function packUnencrypted(string $payload): string
@@ -52,20 +55,18 @@ class MessagePacker
      * @return array{0: string, 1: string} Массив, где [0] - полный зашифрованный пакет для отправки, [1] - бинарный msg_id, который был использован.
      * @throws \Exception
      */
-    public function packEncrypted(string $payload, AuthKey $authKey, ?int $overrideMsgId = null): array
+    public function packEncrypted(string $payload, AuthKey $authKey, ?int $overrideMsgId = null, bool $isContentRelated = true): array
     {
-        // 1. Получаем необходимые данные из сессии.
-        $salt = $this->session->getServerSalt() ?? throw new \LogicException("Server salt is not set");
+        // если соли нет, делаем заглушку, чтобы следующим запросом получить актуальную соль
+        $salt = $this->session->getServerSalt() ?? random_int(PHP_INT_MIN, PHP_INT_MAX);
         $sessionId = $this->session->getId() ?? throw new \LogicException("Session ID is not set");
 
         // 2. Генерируем ID и номер последовательности сообщения.
         // RPC-запросы всегда являются "контентными".
-        $isContentRelated = true;
         $messageId = $overrideMsgId ?? $this->session->generateMessageId();
         $sequence = $this->session->generateSequence($isContentRelated);
 
-        print 'Отправляю соль: ' . $salt . PHP_EOL;
-        print 'Отправляю ID сессии: ' . bin2hex($sessionId) . PHP_EOL;
+        echo "[SEND] >> seqno: {$sequence}\n";
 
         // 3. Собираем внутреннюю, еще не зашифрованную часть пакета.
         $unpaddedPayload = pack('q', $salt)
@@ -88,11 +89,9 @@ class MessagePacker
         // 6. Шифруем данные с помощью AES-256-IGE.
         $encryptedData = $this->aes->encrypt($paddedPayload, $authKey, $msgKey);
 
-        echo "[DEBUG] Sending with AuthKey_id: " . bin2hex($authKey->id) . "\n";
+        //echo "[DEBUG] Sending with AuthKey_id: " . bin2hex($authKey->id) . "\n";
         // 7. Собираем финальный пакет: ID ключа + ключ сообщения + зашифрованные данные.
         $finalPacket = $authKey->id . $msgKey . $encryptedData;
-
-        print 'sequence: ' . $sequence . PHP_EOL;
 
         // 8. Возвращаем и сам пакет, и msg_id, который был в него "зашит".
         return [$finalPacket, $messageId];

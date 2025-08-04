@@ -12,6 +12,22 @@ class GeneratorTL
 {
     use GeneratorHelpers;
 
+    /**
+     * @var array<string, int> A map of [predicate => constructor_id].
+     * This is a list of hardcoded exceptions for constructors where the CRC32 hash
+     * calculated from the TL schema definition does not match the constructor ID
+     * actually used in the MTProto protocol.
+     * This list is based on the official Telegram Desktop client's generator.
+     * @see https://github.com/telegramdesktop/tdesktop/blob/dev/Telegram/SourceFiles/codegen/scheme/codegen_scheme.py
+     */
+    private const TYPE_ID_EXCEPTIONS = [ //
+        // predicate => hardcoded_decimal_id
+        'channel' => 3364463788, // 0xc88974ac
+        'ipPortSecret' => 932734534, // 0x37982646
+        'accessPointRule' => 1182402143, // 0x4679b65f
+        'help.configSimple' => 1515795052, // 0x5a592a6c
+        'messageReplies' => 2172852325, // 0x81834865
+    ];
     private const API_SCHEMA_PATH = __DIR__ . '/../schema/mtproto_api.json';
     private const OUTPUT_DIR = __DIR__ . '/../src/Generated';
     private const BASE_NAMESPACE = 'DigitalStars\\MtprotoClient\\Generated';
@@ -97,19 +113,7 @@ class GeneratorTL
     {
         echo "Generating {$outputSubDir} classes...\n";
         $isMethod = ($schemaKey === 'methods');
-        $excluded = $isMethod ? $this->getExcludedMethods() : [];
-
-        if (!$isMethod) {
-            // Исключаем псевдо-конструкторы, для которых не нужно генерировать классы
-            $excluded[] = 'vector';
-            $excluded[] = 'true';
-            $excluded[] = 'null';
-            $excluded[] = 'false';
-            $excluded[] = 'error';
-            $excluded[] = 'boolFalse';
-            $excluded[] = 'boolTrue';
-
-        }
+        $excluded = $isMethod ? $this->getExcludedMethods() : $this->getExcludedConstructors();
 
         foreach ($this->schema[$schemaKey] as $item) {
             $predicate_key = $isMethod ? 'method' : 'predicate';
@@ -142,7 +146,9 @@ class GeneratorTL
         $parentType = $item['type'];
         $useStatements = [];
         $constructorId = $item['id'] ?? 'null';
-        if ($constructorId !== 'null') {
+        if (isset(self::TYPE_ID_EXCEPTIONS[$predicate])) {
+            $constructorId = self::TYPE_ID_EXCEPTIONS[$predicate];
+        } elseif ($constructorId !== 'null') {
             // Преобразуем строковое представление ID в integer
             $id_int = intval($constructorId);
 

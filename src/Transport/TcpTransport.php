@@ -67,7 +67,6 @@ class TcpTransport implements Transport
 
         // 2. Распаковываем как ЗНАКОВОЕ 32-битное число ('l') для проверки на ошибку.
         $prefix_as_signed_int = unpack('l', $prefix_bytes)[1];
-        var_dump($prefix_as_signed_int);
 
         // 3. Проверяем, не является ли это кодом транспортной ошибки.
         if ($prefix_as_signed_int < 0) {

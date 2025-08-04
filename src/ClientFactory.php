@@ -31,8 +31,8 @@ class ClientFactory
         $rsa = new Rsa();
         $aes = new Aes();
         $session = new Session($sessionStorage);
-        $messagePacker = new MessagePacker($settings, $session, $aes);
-        $authKeyCreator = new AuthKeyCreator($transport, $serializer, $deserializer, $rsa, $messagePacker, $aes, $session);
+        $messagePacker = new MessagePacker($session, $aes, $serializer);
+        $authKeyCreator = new AuthKeyCreator($transport, $serializer, $deserializer, $rsa, $messagePacker, $session);
         $deserializer = new Deserializer();
         $serializer = new Serializer();
 

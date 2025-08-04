@@ -20,7 +20,12 @@ use phpseclib3\Math\BigInteger;
 class AuthKeyCreator
 {
     /**
-     * @param Aes $aes Зависимость добавлена для шага 4 (расшифровка ответа DH)
+     * @param Transport $transport
+     * @param Serializer $serializer
+     * @param Deserializer $deserializer
+     * @param Rsa $rsa
+     * @param MessagePacker $messagePacker
+     * @param Session $session
      */
     public function __construct(
         private readonly Transport $transport,
@@ -28,7 +33,6 @@ class AuthKeyCreator
         private readonly Deserializer $deserializer,
         private readonly Rsa $rsa,
         private readonly MessagePacker $messagePacker,
-        private readonly Aes $aes,
         private readonly Session $session,
     ) {}
 
@@ -130,7 +134,6 @@ class AuthKeyCreator
         $publicKeyPem = null;
         $foundFingerprint_int = null;
 
-        var_dump($resPQData['fingerprints']);
         foreach ($resPQData['fingerprints'] as $fingerprint) {
             $key = $this->rsa->findKeyByFingerprint($fingerprint);
             if ($key !== null) {
@@ -219,8 +222,6 @@ class AuthKeyCreator
         $local_time = time();
         $time_offset = $server_time - $local_time;
 
-        $this->session->setTimeOffset($time_offset);
-
         print 'step 4.1 (decryptDhInnerData): OK' . PHP_EOL;
 
         // Этап 4.2: Выполняем вычисления Диффи-Хеллмана на стороне клиента
@@ -250,7 +251,10 @@ class AuthKeyCreator
 
         // 3. Выполняем XOR над числами
         $initialSalt_int = $new_nonce_int ^ $server_nonce_int;
+        $this->session->reset();
         $this->session->setServerSalt($initialSalt_int);
+        $this->session->setTimeOffset($time_offset);
+        $this->session->save($authKey);
         echo "Initial server_salt calculated and set.\n";
 
         // Этап 4.5: Все проверки пройдены, возвращаем ключ

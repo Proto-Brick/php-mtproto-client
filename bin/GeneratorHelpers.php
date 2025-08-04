@@ -107,26 +107,34 @@ trait GeneratorHelpers
         return ltrim($fqn, '\\');
     }
 
+    private function getExcludedConstructors(): array
+    {
+        return [
+            // Псевдо-конструкторы из API-схемы, которые не являются DTO
+            // и для которых не нужно генерировать PHP-классы.
+            'vector',
+            'boolTrue',
+            'boolFalse',
+            'null',
+            'true',
+            'error',
+        ];
+    }
+
     private function isBuiltInType(string $type): bool
     {
         return in_array(
             $type,
             [
-                'Vector t',
-                'X',
-                '!X',
-                'true',
-                'True',
-                'Bool',
-                'Null',
-                'Error',
-                'int',
-                'long',
-                'double',
-                'string',
-                'bytes',
+                // Псевдо-типы из tdesktop
+                'Int', 'Long', 'Double', 'String', 'Int128', 'Int256',
+
+                'Vector t', 'X', '!X', 'True', 'Bool', 'Null', 'Error',
+
+                // Примитивы
+                'int', 'long', 'double', 'string', 'bytes'
             ],
-            true,
+            true
         );
     }
 

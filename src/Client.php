@@ -8,8 +8,11 @@ use DigitalStars\MtprotoClient\Auth\AuthKey;
 use DigitalStars\MtprotoClient\Auth\AuthKeyCreator;
 use DigitalStars\MtprotoClient\Auth\Storage\AuthKeyStorage;
 use DigitalStars\MtprotoClient\Exception\AuthKeyNotFoundOnServerErrorException;
+use DigitalStars\MtprotoClient\Exception\MsgIdInvalidException;
 use DigitalStars\MtprotoClient\Exception\ResendRequiredException;
 use DigitalStars\MtprotoClient\Exception\RpcErrorException;
+use DigitalStars\MtprotoClient\Exception\SaltInvalidException;
+use DigitalStars\MtprotoClient\Exception\SeqNoInvalidException;
 use DigitalStars\MtprotoClient\Exception\TransportException;
 use DigitalStars\MtprotoClient\Session\Session;
 use DigitalStars\MtprotoClient\TL\Deserializer;
@@ -48,7 +51,6 @@ class Client
             $this->authKeyStorage->set($this->authKey);
             echo "New AuthKey created and saved.\n";
             $this->session->start($this->authKey);
-            $this->session->save($this->authKey);
             echo "Initial session created and saved.\n";
         } else {
             echo "AuthKey loaded from storage.\n";
@@ -60,55 +62,84 @@ class Client
      * Отправляет RPC-запрос и ждет ответа именно на него.
      *
      * @param TlObject $request Сгенерированный объект запроса
-     * @return TlObject Сгенерированный объект ответа
-     * @throws Exception
+     * @return TlObject|array|bool|string|int|null Сгенерированный объект ответа
      */
-    public function call(TlObject $request): TlObject
+    public function call(TlObject $request, int $totalTimeout = 30): TlObject|array|bool|string|int
     {
         if ($this->authKey === null) {
             throw new \LogicException("Not connected. Please call connect() first.");
         }
 
-        // Инициализируем список ожидающих msg_id
+        $attempt = 1;
+        $maxAttempts = 3;
+        $attemptTimeout = 10; // Таймаут на одну попытку
 
-        // Отправляем запрос и запоминаем его msg_id
-        $msgId = $this->sendRequest($request);
-        $this->pendingRequests[$msgId] = $request;
+        $this->sendAcksIfNeeded();
 
-        print 'Pending msg_id: ' . $msgId . PHP_EOL;
+        echo "[CALL] > {$request->getPredicate()}\n";
 
-        $timeout = 15;
-        $startTime = time();
-        while (time() - $startTime < $timeout) {
-            try {
-                $response = $this->readAndProcessResponse();
-                if ($response instanceof TlObject) {
-                    return $response;
-                }
-                usleep(100000); // Небольшая пауза, чтобы не грузить CPU
-            } catch (ResendRequiredException $e) {
-                $message = $e->getMessage();
-                if ($message === 'new_session_created') {
-                    echo "INFO: New session created. Resending request with a NEW msg_id...\n";
-                } else {
-                    $msgId = $this->sendRequest($request);
-                    // 0c209c4778028c68
-                    print 'Pending msg_id (внутри): ' . $msgId . PHP_EOL;
-                    // 0cf025b0ad038c68 100007ccae038c68
-                    $this->pendingRequests[$msgId] = $request;
-                    echo "INFO: Bad server salt received. Resending request with a NEW msg_id...\n";
+        $currentMsgId = null;
+
+        while ($attempt <= $maxAttempts) {
+            // Удаляем старый ID, если это повторная попытка
+            if ($currentMsgId) {
+                unset($this->pendingRequests[$currentMsgId]);
+            }
+
+            // Отправляем запрос и запоминаем его ID
+            $currentMsgId = $this->sendRequest($request);
+
+            $startTime = time();
+            while (time() - $startTime < $attemptTimeout) {
+                try {
+                    // `readAndProcessResponse` теперь не бросает ResendRequiredException,
+                    // а возвращает флаг. Но он МОЖЕТ бросить TransportException.
+                    $result = $this->readAndProcessResponse();
+
+                    // 1. Проверяем, пришел ли наш ответ
+                    if ($result['response'] !== null) {
+                        $responseType = is_object($result['response']) ? $result['response']->getPredicate() : gettype($result['response']);
+                        echo "[ OK ] < Response received: {$responseType}\n";
+                        $this->sendAcksIfNeeded();
+                        return $result['response'];
+                    }
+
+                    // 2. Проверяем, нужно ли переотправить запрос
+                    if ($result['resend_required']) {
+                        echo "[INFO] Resending request due to: {$result['resend_message']}\n";
+                        continue 2; // Переходим к следующей итерации внешнего цикла (новая попытка)
+                    }
+
+                    usleep(100000); // Ждем дальше
+
+                } catch (SaltInvalidException | MsgIdInvalidException $e) {
+                    // Ошибки, которые можно исправить переотправкой.
+                    echo "[INFO] Исправимая ошибка протокола. Повторная отправка... ({$e->getMessage()})\n";
+                    continue 2;
+                } catch (SeqNoInvalidException $e) {
+                    // Серьёзная ошибка, но всё же попробуем переотправить.
+                    echo "[WARN] Критическая рассинхронизация seqno. Попытка переотправки... ({$e->getMessage()})\n";
+                    // Здесь можно добавить логику полного сброса сессии, если ошибка повторится
+                    continue 2;
+                } catch (TransportException $e) {
+                    // Фатальные ошибки.
+                    echo "[FAIL] Запрос отклонён сервером: {$e->getMessage()}\n";
+                    throw $e;
                 }
             }
+
+            echo "[WARN] Attempt {$attempt} timed out. Retrying...\n";
+            $attempt++;
         }
 
-        throw new \Exception("Timeout waiting for response to request with msg_id " . $msgIdHex);
+        throw new \Exception("Request failed after {$maxAttempts} attempts for msg_id " . $currentMsgId);
     }
 
     /**
      * Собирает, шифрует и отправляет запрос.
      * @return string Бинарный msg_id отправленного сообщения.
      */
-    private function sendRequest(TlObject $request, ?int $msgId = null): int
+    private function sendRequest(TlObject $request): int
     {
         $payload = $request->serialize($this->serializer);
 
@@ -117,34 +148,49 @@ class Client
             $payload = $this->serializer->wrapWithInitConnection($payload, $layer, $this->settings->api_id);
         }
 
-        [$encryptedRequest, $finalMsgId] = $this->messagePacker->packEncrypted($payload, $this->authKey, $msgId);
+        [$encryptedRequest, $finalMsgId] = $this->messagePacker->packEncrypted($payload, $this->authKey, null);
 
         $this->pendingRequests[$finalMsgId] = $request; // Сохраняем запрос с его msg_id
 
+        echo "[SEND] >> {$request->getPredicate()} (msg_id: {$finalMsgId})\n";
         $this->transport->send($encryptedRequest);
+
+        $this->session->save($this->authKey);
 
         return $finalMsgId;
     }
 
     /**
-     * Читает один пакет из сети и обрабатывает его.
-     * @return TlObject|null Возвращает объект ответа, если это был RPC-ответ на наш запрос.
-     *                         Возвращает null, если это было обновление или сервисная информация.
-     * @throws ResendRequiredException
-     * @throws Exception
+     * Читает один пакет из сети, обрабатывает все вложенные сообщения.
+     * Не бросает исключения, связанные с логикой переотправки, а возвращает их в виде флагов.
+     *
+     * @return array{
+     *     response: TlObject|array|bool|string|int|null,
+     *     resend_required: bool,
+     *     resend_message: string
+     * }
+     * @throws TransportException | AuthKeyNotFoundOnServerErrorException
      */
-    private function readAndProcessResponse(): ?TlObject
+    private function readAndProcessResponse(): array
     {
-        $rawEncryptedResponse = $this->transport->receive();
-        if (empty($rawEncryptedResponse)) {
-            return null;
+        try {
+            $rawEncryptedResponse = $this->transport->receive();
+        } catch (TransportException $e) {
+            // Пробрасываем транспортные исключения, так как они фатальны для соединения
+            throw $e;
         }
 
+        if (empty($rawEncryptedResponse)) {
+            return ['response' => null, 'resend_required' => false, 'resend_message' => ''];
+        }
+
+        // Обработка 4-байтных транспортных ошибок (-404 и др.)
+        // Этот код был у тебя, но его лучше инкапсулировать здесь же.
         if (\strlen($rawEncryptedResponse) === 4) {
-            $errorCode = unpack('l', $rawEncryptedResponse)[1]; // Распаковываем как знаковое
+            $errorCode = unpack('l', $rawEncryptedResponse)[1];
             if ($errorCode < 0) {
                 if ($errorCode === -404) {
-                    throw new AuthKeyNotFoundOnServerErrorException("Server returned -404");
+                    throw new AuthKeyNotFoundOnServerErrorException("Server returned -404 (AUTH_KEY_NOT_FOUND)");
                 }
                 throw new TransportException("Transport error code: " . $errorCode);
             }
@@ -153,184 +199,197 @@ class Client
         $unpacked = $this->messagePacker->unpackEncrypted($rawEncryptedResponse, $this->authKey);
 
         if ($unpacked['session_id'] !== $this->session->getId()) {
+            // Это серьёзная проблема, которая не лечится переотправкой.
             throw new \RuntimeException("Session ID mismatch in response.");
         }
 
-        $serverTime = unpack('q', $unpacked['msg_id'])[1] >> 32;
-        $localTime = time();
-        $this->session->setTimeOffset($serverTime - $localTime);
+        $outer_msg_id = unpack('q', $unpacked['msg_id'])[1];
+        if ($unpacked['seq_no'] % 2 !== 0) {
+            $this->session->addToAckQueue($outer_msg_id);
+        }
+
+        // Обновляем смещение времени
+        $serverTime = (unpack('q', $unpacked['msg_id'])[1] >> 32);
+        $this->session->setTimeOffset($serverTime - time());
 
         $responsePayload = $unpacked['body'];
+        $peekConstructor = $this->deserializer->peekConstructor($responsePayload);
 
-        $peekConstructor = $this->deserializer->peekInt32($responsePayload);
+        // Обновляем соль, если это не bad_server_salt (он несёт новую соль внутри себя)
         if ($peekConstructor !== 0xedab447b) {
-            $salt = $this->deserializer->int32($unpacked['server_salt']);
+            $salt_bin = $unpacked['server_salt'];
+            $salt = $this->deserializer->int64($salt_bin);
             $this->session->setServerSalt($salt);
         }
 
-        $messagesToProcess = [];
+        $containerItems = [];
         if ($peekConstructor === Constructors::MSG_CONTAINER) {
-            $container = $this->deserializer->deserializeMessageContainer($responsePayload);
-            foreach ($container as $message) {
-                $messagesToProcess[] = $message['body'];
-            }
+            $containerItems = $this->deserializer->deserializeMessageContainer($responsePayload);
         } else {
-            $messagesToProcess[] = $responsePayload;
+            // Оборачиваем одиночное сообщение в ту же структуру, что и элементы контейнера
+            $containerItems[] = [
+                'body' => $responsePayload,
+                'msg_id' => $outer_msg_id,
+                'seqno' => $unpacked['seq_no']
+            ];
         }
 
         $finalResponse = null;
-        foreach ($messagesToProcess as $messageBody) {
-            $response = $this->handleSingleMessage($messageBody);
-            if ($response instanceof TlObject) {
-                $finalResponse = $response;
+        $resendRequired = false;
+        $resendMessage = '';
+        $rpcResponseFound = false;
+
+        // Теперь цикл всегда работает с одинаковой структурой item'а
+        foreach ($containerItems as $item) {
+            // Добавляем ack для вложенных контентных сообщений
+            if ($item['seqno'] % 2 !== 0 && $peekConstructor === Constructors::MSG_CONTAINER) {
+                $this->session->addToAckQueue($item['msg_id']);
+            }
+
+            $itemBody = $item['body']; // Передаем в обработчик только тело
+
+            try {
+                $response = $this->handleSingleMessage($itemBody);
+                if ($response !== null && !$rpcResponseFound) {
+                    $finalResponse = $response;
+                    $rpcResponseFound = true;
+                }
+            } catch (ResendRequiredException $e) {
+                $resendRequired = true;
+                $resendMessage = $e->getMessage();
+                break; // Если одно сообщение требует переотправки, прекращаем обработку пакета
             }
         }
 
-        return $finalResponse;
+        return [
+            'response' => $finalResponse,
+            'resend_required' => $resendRequired,
+            'resend_message' => $resendMessage,
+        ];
     }
 
     /**
      * Обрабатывает одно TL-сообщение (из контейнера или одиночное).
+     *
+     * @param string $messageBody
+     * @return TlObject|array|bool|string|int|null
+     * @throws ResendRequiredException
+     * @throws RpcErrorException
      */
-    private function handleSingleMessage(string &$messageBody): ?TlObject
+    private function handleSingleMessage(string &$messageBody): TlObject|array|bool|string|int|null
     {
-        $originalMessageBodyForDebug = $messageBody; // Сохраняем копию для лога
-        $constructorId = $this->deserializer->peekInt32($messageBody);
-        $constructorHex = dechex($constructorId);
-
-        echo "\n--- [ handleSingleMessage ] ---\n";
-        echo "Processing message body (len=" . \strlen($originalMessageBodyForDebug) . ")...\n";
-        echo "Detected constructor: 0x{$constructorHex}\n";
+        $constructorId = $this->deserializer->peekConstructor($messageBody);
 
         switch ($constructorId) {
             case Constructors::RPC_RESULT: // 0xf35c6d01
-                echo "Type: rpc_result\n";
                 $this->deserializer->int32($messageBody); // съедаем ID
                 $req_msg_id = $this->deserializer->int64($messageBody);
 
-
-                echo "  > req_msg_id: {$req_msg_id}\n";
-                echo "  > Pending requests: [" . implode(', ', array_keys($this->pendingRequests)) . "]\n";
-
-
                 if (!isset($this->pendingRequests[$req_msg_id])) {
-                    echo "Decision: UNKNOWN request. Ignoring.\n";
-                    echo "-----------------------------\n";
+                    echo "[WARN] << rpc_result for unknown msg_id: {$req_msg_id} (ignored)\n";
                     return null;
                 }
 
                 $request = $this->pendingRequests[$req_msg_id];
                 unset($this->pendingRequests[$req_msg_id]);
-                echo "  > Matched pending request: {$request->getPredicate()}\n";
+                echo "[RECV] << rpc_result for {$request->getPredicate()} (0x" . dechex($constructorId) . ")\n";
 
-                try {
-                    $resultPayload = $this->processRpcResultBody($messageBody);
-                } catch (\Exception $e) {
-                    echo "Decision: ERROR inside rpc_result. Rethrowing.\n";
-                    echo "-----------------------------\n";
-                    throw $e;
-                }
+                $resultPayload = $this->processRpcResultBody($messageBody);
 
                 if (!$this->session->isInitialized) {
                     $this->session->isInitialized = true;
-                    echo "  > Session marked as INITIALIZED.\n";
+                    echo "[INFO] Session initialized.\n";
                 }
-
                 $this->session->save($this->authKey);
 
                 $responseClassOrType = $request->getResponseClass();
-                echo "Decision: Processing response for {$responseClassOrType}...\n";
-
-                // Проверяем, является ли ответ именем класса или строкой-примитивом
                 if (class_exists($responseClassOrType)) {
-                    // Это класс, десериализуем как объект
-                    echo "  > Type: Object. Deserializing...\n";
-                    echo "-----------------------------\n";
                     return $responseClassOrType::deserialize($this->deserializer, $resultPayload);
                 }
 
-                // Это примитивный тип, используем специальный десериализатор
-                echo "  > Type: Primitive. Deserializing...\n";
-                echo "-----------------------------\n";
-                switch ($responseClassOrType) {
-                    case 'bool':
-                        // Bool в TL - это конструктор boolTrue или boolFalse
-                        $constructorId = $this->deserializer->int32($resultPayload);
-                        if ($constructorId === 0x997275b5) { // boolTrue
-                            return true;
-                        }
-                        if ($constructorId === 0xbc799737) { // boolFalse
-                            return false;
-                        }
-                        throw new \Exception("Expected bool, but got constructor " . dechex($constructorId));
-
-                    case 'int':
-                        // Ответы типа Vector<int> или просто int
-                        $constructorId = $this->deserializer->peekInt32($resultPayload);
-                        if ($constructorId === 0x1cb5c415) { // Vector
-                            return $this->deserializer->vectorOfInts($resultPayload);
-                        }
-                        // Если это просто int, его нужно как-то обработать.
-                        // Пока предположим, что API не возвращает голый int.
-                        // Если возвращает, нужно будет добавить логику.
-                        throw new \Exception("Plain int response is not yet supported.");
-
-                        // Можно добавить обработку для других примитивов (string, array) если понадобится
-                    default:
-                        throw new \Exception("Unsupported primitive response type: {$responseClassOrType}");
-                }
+                return match ($responseClassOrType) {
+                    'bool' => $this->deserializer->deserializeBool($resultPayload),
+                    'int' => $this->deserializer->int32($resultPayload),
+                    'long' => $this->deserializer->int64($resultPayload),
+                    'string' => $this->deserializer->bytes($resultPayload),
+                    'vector<int>' => $this->deserializer->vectorOfInts($resultPayload),
+                    'vector<long>' => $this->deserializer->vectorOfLongs($resultPayload),
+                    'vector<string>' => $this->deserializer->vectorOfStrings($resultPayload),
+                    default => throw new \Exception("Unsupported primitive response type: {$responseClassOrType}"),
+                };
 
             case 0xedab447b: // bad_server_salt
-                echo "Type: bad_server_salt\n";
+                echo "[RECV] << bad_server_salt (0xedab447b)\n";
                 $salt_data = $this->deserializer->deserializeBadServerSalt($messageBody);
                 $this->session->setServerSalt($salt_data['new_server_salt']);
-                $badMsgIdHex = $salt_data['bad_msg_id'];
                 $this->session->save($this->authKey);
 
-                echo "  > bad_msg_id: {$badMsgIdHex}\n";
-                echo "  > New server salt received: " . $salt_data['new_server_salt'] . "\n";
-                echo "Decision: THROW ResendRequiredException.\n";
-                echo "-----------------------------\n";
-                throw new ResendRequiredException((string) $badMsgIdHex);
+                echo "[INFO] Server salt updated to {$salt_data['new_server_salt']}.\n";
+                throw new ResendRequiredException('bad_server_salt');
 
             case 0x9ec20908: // new_session_created
-                echo "Type: new_session_created\n";
+                echo "[RECV] << new_session_created (0x9ec20908)\n";
                 $session_data = $this->deserializer->deserializeNewSessionCreated($messageBody);
-                //$this->session->resetSequence(); // Не сбрасывать! Это счетчик локальной сессии
                 $this->session->isInitialized = false;
                 $this->session->setServerSalt($session_data['server_salt']);
                 $this->session->save($this->authKey);
-
-                echo "  > New server salt received: " . $session_data['server_salt'] . "\n";
-                echo "  > Session marked as NOT INITIALIZED.\n";
-                echo "Decision: THROW ResendRequiredException (for 'new_session_created').\n";
-                echo "-----------------------------\n";
-
-                //                $this->pendingRequests = []; <-- НЕПРАВИЛЬНО, new_session_created не значит, что ответ на текущий запрос не прилет
-                throw new ResendRequiredException('new_session_created');
-
-            case 0xa7eff811: // bad_msg_notification
-                echo "Type: bad_msg_notification\n";
-                $this->deserializer->int32($messageBody);
-                $req_msg_id = $this->deserializer->int64($messageBody);
-                $bad_msg_seqno = $this->deserializer->int32($messageBody);
-                $error_code = $this->deserializer->int32($messageBody);
-                echo "  > bad_msg_id: " . $req_msg_id . "\n";
-                echo "  > error_code: " . $error_code . "\n";
-                echo "Decision: IGNORE.\n";
-                echo "-----------------------------\n";
+                echo "[INFO] New session created. Salt updated to {$session_data['server_salt']}.\n";
                 return null;
 
+            case 0xa7eff811: // bad_msg_notification
+                $this->deserializer->consumeConstructor($messageBody);
+                $bad_msg_id = $this->deserializer->int64($messageBody);
+                $bad_msg_seqno = $this->deserializer->int32($messageBody);
+                $error_code = $this->deserializer->int32($messageBody);
+
+                $request = $this->pendingRequests[$bad_msg_id] ?? null;
+                $requestName = $request?->getPredicate() ?? 'unknown_request';
+                if ($request) {
+                    unset($this->pendingRequests[$bad_msg_id]);
+                }
+
+                $logMessage = match ($error_code) {
+                    16 => "msg_id слишком низкий. Возможно, время на клиенте отстает.",
+                    17 => "msg_id слишком высокий. Возможно, время на клиенте спешит.",
+                    18 => "Некорректные два младших бита msg_id (должен делиться на 4).",
+                    19 => "msg_id контейнера совпадает с msg_id ранее полученного сообщения.",
+                    20 => "Сообщение слишком старое, невозможно проверить статус.",
+                    32 => "msg_seqno слишком низкий",
+                    33 => "msg_seqno слишком высокий",
+                    34 => "Ожидался чётный msg_seqno (для служебного сообщения), получен нечётный.",
+                    35 => "Ожидался нечётный msg_seqno (для контентного сообщения), получен чётный.",
+                    48 => "Некорректная соль сервера (получено через bad_msg_notification).",
+                    64 => "Сервер сообщил о невалидном контейнере.",
+                    default => "Неизвестный код ошибки: {$error_code}.",
+                };
+
+                echo "[RECV] << bad_msg_notification для msg_id {$bad_msg_id} (запрос: {$requestName}, ошибка {$error_code}: {$logMessage})\n";
+
+                if ($error_code === 32 || $error_code === 33) { // msg_seqno too low/high
+                    $old_salt = $this->session->getServerSalt();
+                    $this->session->reset();
+                    $this->session->setServerSalt($old_salt);
+                    $this->session->save($this->authKey);
+
+                    // Бросаем исключение, чтобы Client::call повторил попытку уже с новой сессией.
+                    throw new ResendRequiredException($logMessage);
+                }
+
+                // Выбор исключения для проброса наверх
+                match ($error_code) {
+                    16, 17 => throw new MsgIdInvalidException($logMessage, $error_code),
+                    18, 19, 20, 64 => throw new TransportException($logMessage, $error_code),
+                    32, 33, 34, 35 => throw new SeqNoInvalidException($logMessage, $error_code),
+                    48 => throw new SaltInvalidException($logMessage, $error_code),
+                    default => throw new TransportException($logMessage, $error_code),
+                };
+
             case Constructors::MSGS_ACK:
-                echo "Type: msgs_ack (acknowledgement)\n";
-                echo "Decision: IGNORE.\n";
-                echo "-----------------------------\n";
+                echo "[RECV] << msgs_ack (ignored)\n";
                 return null;
 
             default:
-                echo "Type: UNHANDLED\n";
-                echo "Decision: IGNORE.\n";
-                echo "-----------------------------\n";
+                echo "[RECV] << Unhandled message (0x" . dechex($constructorId) . ")\n";
                 return null;
         }
     }
@@ -343,7 +402,7 @@ class Client
     {
         $peekConstructor = $this->deserializer->peekInt32($stream);
 
-        if ($peekConstructor === 0x3072cfa1) { // gzip_packed
+        if ($peekConstructor === Constructors::GZIP_PACKED) {
             return $this->deserializer->deserializeGzipPacked($stream);
         }
 
@@ -356,5 +415,29 @@ class Client
 
         // Если не gzip и не ошибка, это наш объект
         return $stream;
+    }
+
+    private function sendAcksIfNeeded(): void
+    {
+        if ($this->authKey === null) return;
+
+        $ackIds = $this->session->getAndClearAckQueue();
+        if (empty($ackIds)) {
+            return;
+        }
+
+        echo "[ACK] >> Sending confirmation for " . count($ackIds) . " messages.\n";
+
+        $ackPayload = $this->serializer->serializeMsgsAck($ackIds);
+
+        // msgs_ack - это НЕ контентное сообщение
+        [$encryptedAck, $messageId] = $this->messagePacker->packEncrypted($ackPayload, $this->authKey, null, false);
+
+        $this->transport->send($encryptedAck);
+
+        echo "[SEND] >> {msgs_ack} (msg_id: {$messageId})\n";
+
+        // Сохраняем сессию, так как packEncrypted использует, но не инкрементирует sequence
+        $this->session->save($this->authKey);
     }
 }

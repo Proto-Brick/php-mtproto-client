@@ -14,6 +14,18 @@ class Deserializer
         return unpack('V', substr($stream, 0, 4))[1];
     }
 
+    public function deserializeBool(string &$payload): bool
+    {
+        $constructorId = $this->consumeConstructor($payload);
+        if ($constructorId === 0x997275b5) { // boolTrue
+            return true;
+        }
+        if ($constructorId === 0xbc799737) { // boolFalse
+            return false;
+        }
+        throw new \Exception("Expected bool, but got constructor " . dechex($constructorId));
+    }
+
     public function int32(string &$stream): int
     {
         $value_bin = substr($stream, 0, 4);
@@ -79,6 +91,22 @@ class Deserializer
         }
 
         return $data;
+    }
+
+    /**
+     * Заглядывает в поток и читает ID конструктора, не изменяя поток.
+     */
+    public function peekConstructor(string $stream): int
+    {
+        return $this->peekInt32($stream);
+    }
+
+    /**
+     * Читает (потребляет) ID конструктора из потока.
+     */
+    public function consumeConstructor(string &$stream): int
+    {
+        return $this->int32($stream);
     }
 
     /**

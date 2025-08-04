@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\TL;
 
+use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
+
 class Serializer
 {
     public function int32(int $value): string
@@ -118,6 +120,11 @@ class Serializer
             $buffer .= $this->bytes($item);
         } // string и bytes сериализуются одинаково
         return $buffer;
+    }
+
+    public function serializeMsgsAck(array $msgIds): string
+    {
+        return $this->int32(Constructors::MSGS_ACK) . $this->vectorOfLongs($msgIds);
     }
 
     /**
