@@ -66,8 +66,6 @@ class MessagePacker
         $messageId = $overrideMsgId ?? $this->session->generateMessageId();
         $sequence = $this->session->generateSequence($isContentRelated);
 
-        echo "[SEND] >> seqno: {$sequence}\n";
-
         // 3. Собираем внутреннюю, еще не зашифрованную часть пакета.
         $unpaddedPayload = pack('q', $salt)
             . $sessionId
@@ -94,7 +92,7 @@ class MessagePacker
         $finalPacket = $authKey->id . $msgKey . $encryptedData;
 
         // 8. Возвращаем и сам пакет, и msg_id, который был в него "зашит".
-        return [$finalPacket, $messageId];
+        return [$finalPacket, $messageId, $sequence];
     }
 
     /**

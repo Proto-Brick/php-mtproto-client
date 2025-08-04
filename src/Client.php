@@ -76,8 +76,6 @@ class Client
 
         $this->sendAcksIfNeeded();
 
-        echo "[CALL] > {$request->getPredicate()}\n";
-
         $currentMsgId = null;
 
         while ($attempt <= $maxAttempts) {
@@ -99,7 +97,6 @@ class Client
                     // 1. Проверяем, пришел ли наш ответ
                     if ($result['response'] !== null) {
                         $responseType = is_object($result['response']) ? $result['response']->getPredicate() : gettype($result['response']);
-                        echo "[ OK ] < Response received: {$responseType}\n";
                         $this->sendAcksIfNeeded();
                         return $result['response'];
                     }
@@ -148,11 +145,11 @@ class Client
             $payload = $this->serializer->wrapWithInitConnection($payload, $layer, $this->settings->api_id);
         }
 
-        [$encryptedRequest, $finalMsgId] = $this->messagePacker->packEncrypted($payload, $this->authKey, null);
+        [$encryptedRequest, $finalMsgId, $sequence] = $this->messagePacker->packEncrypted($payload, $this->authKey, null);
 
         $this->pendingRequests[$finalMsgId] = $request; // Сохраняем запрос с его msg_id
 
-        echo "[SEND] >> {$request->getPredicate()} (msg_id: {$finalMsgId})\n";
+        echo "[SEND] >> {$request->getPredicate()} (msg_id: {$finalMsgId}, seqno: $sequence)\n";
         $this->transport->send($encryptedRequest);
 
         $this->session->save($this->authKey);
@@ -199,8 +196,9 @@ class Client
         $unpacked = $this->messagePacker->unpackEncrypted($rawEncryptedResponse, $this->authKey);
 
         if ($unpacked['session_id'] !== $this->session->getId()) {
-            // Это серьёзная проблема, которая не лечится переотправкой.
-            throw new \RuntimeException("Session ID mismatch in response.");
+            // из-за пересоздания сессии приходят старые ответы со старой сессией. Нужно либо игнорировать,
+            // либо хранить все id предыдущих сессий
+//            throw new \RuntimeException("Session ID mismatch in response.");
         }
 
         $outer_msg_id = unpack('q', $unpacked['msg_id'])[1];
@@ -426,16 +424,14 @@ class Client
             return;
         }
 
-        echo "[ACK] >> Sending confirmation for " . count($ackIds) . " messages.\n";
-
         $ackPayload = $this->serializer->serializeMsgsAck($ackIds);
 
         // msgs_ack - это НЕ контентное сообщение
-        [$encryptedAck, $messageId] = $this->messagePacker->packEncrypted($ackPayload, $this->authKey, null, false);
+        [$encryptedAck, $messageId, $sequence] = $this->messagePacker->packEncrypted($ackPayload, $this->authKey, null, false);
 
         $this->transport->send($encryptedAck);
 
-        echo "[SEND] >> {msgs_ack} (msg_id: {$messageId})\n";
+        echo "[SEND] >> {msgs_ack for " . count($ackIds) . " messages} (msg_id: {$messageId}, seqno: $sequence)\n";
 
         // Сохраняем сессию, так как packEncrypted использует, но не инкрементирует sequence
         $this->session->save($this->authKey);

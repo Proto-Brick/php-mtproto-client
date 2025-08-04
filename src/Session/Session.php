@@ -113,6 +113,11 @@ class Session
         $this->sequence = 0;
     }
 
+    public function getSequence(): int
+    {
+        return $this->sequence;
+    }
+
     public function generateMessageId(): int
     {
         // Применяем смещение времени для синхронизации с сервером
