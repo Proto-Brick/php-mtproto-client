@@ -4,118 +4,168 @@ declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\Transport;
 
-use DigitalStars\MtprotoClient\Exception\AuthKeyNotFoundOnServerErrorException;
+use function Amp\async;
+
+use Amp\DeferredFuture;
+use Amp\Future;
+use Amp\TimeoutCancellation;
 use DigitalStars\MtprotoClient\Exception\TransportException;
 use DigitalStars\MtprotoClient\Settings;
+use Revolt\EventLoop;
 
 class TcpTransport implements Transport
 {
-    private ?\Socket $socket = null;
+    /** @var resource|null A stream resource */
+    private $socket = null;
 
     public function __construct(private readonly Settings $settings) {}
 
     public function isConnected(): bool
     {
-        return $this->socket !== null;
+        return \is_resource($this->socket) && !feof($this->socket);
     }
 
-    public function connect(): void
+    // ИЗМЕНЕНИЕ: connect() теперь асинхронный и возвращает Future
+    public function connect(): Future
     {
-        if ($this->socket !== null) {
-            $this->close();
-        }
-
-        $this->socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
-        if ($this->socket === false) {
-            throw new TransportException('Socket creation failed: ' . socket_strerror(socket_last_error()));
-        }
-        if (!socket_connect($this->socket, $this->settings->server_address, $this->settings->server_port)) {
-            throw new TransportException('Socket connection failed: ' . socket_strerror(socket_last_error()));
-        }
-        socket_set_option($this->socket, SOL_SOCKET, SO_RCVTIMEO, ["sec" => 15, "usec" => 0]);
-        // Отправляем заголовок Intermediate транспорта один раз
-        socket_write($this->socket, hex2bin('eeeeeeee'), 4);
-        echo "Connected to {$this->settings->server_address}:{$this->settings->server_port}\n";
-    }
-
-    public function send(string $payload): void
-    {
-        if ($this->socket === null) {
-            throw new TransportException("Socket is not connected.");
-        }
-        $packet = pack('V', \strlen($payload)) . $payload;
-        //        echo "DEBUG: Sending " . strlen($packet) . " bytes: " . bin2hex($packet) . "\n";
-        if (socket_write($this->socket, $packet, \strlen($packet)) === false) {
-            throw new TransportException('Failed to send data: ' . socket_strerror(socket_last_error($this->socket)));
-        }
-    }
-
-    public function receive(): string
-    {
-        if ($this->socket === null) {
-            throw new TransportException("Socket is not connected.");
-        }
-
-        // 1. Читаем первые 4 байта, как и раньше.
-        $prefix_bytes = socket_read($this->socket, 4);
-        if ($prefix_bytes === false || \strlen($prefix_bytes) < 4) {
-            $errorCode = socket_last_error($this->socket);
-            throw new TransportException("Failed to read response prefix from socket: " . socket_strerror($errorCode), $errorCode);
-        }
-
-        // --- НАЧАЛО ИСПРАВЛЕНИЯ ---
-
-        // 2. Распаковываем как ЗНАКОВОЕ 32-битное число ('l') для проверки на ошибку.
-        $prefix_as_signed_int = unpack('l', $prefix_bytes)[1];
-
-        // 3. Проверяем, не является ли это кодом транспортной ошибки.
-        if ($prefix_as_signed_int < 0) {
-            if ($prefix_as_signed_int === -404) {
-                // Это ошибка AUTH_KEY_NOT_FOUND. Бросаем кастомное исключение,
-                // чтобы на верхнем уровне можно было правильно среагировать.
-                throw new AuthKeyNotFoundOnServerErrorException( // Убедитесь, что создали этот класс исключения
-                    "Server returned transport error -404 (AUTH_KEY_NOT_FOUND). The auth key is unknown to the server for this connection.",
-                );
+        return async(function (): void {
+            if ($this->socket !== null) {
+                $this->close();
             }
-            // Другие возможные отрицательные коды
-            throw new TransportException("Received a transport-level error code from server: {$prefix_as_signed_int}");
-        }
 
-        // 4. Если мы здесь, значит, это не ошибка, а длина пакета.
-        // Теперь мы можем безопасно распаковать его как беззнаковое, если хотим,
-        // но $prefix_as_signed_int уже содержит правильную положительную длину.
-        $length = $prefix_as_signed_int;
+            $uri = "tcp://{$this->settings->server_address}:{$this->settings->server_port}";
+            $this->socket = @stream_socket_client($uri, $errno, $errstr, 5, STREAM_CLIENT_CONNECT | STREAM_CLIENT_ASYNC_CONNECT);
 
-        // --- КОНЕЦ ИСПРАВЛЕНИЯ ---
-
-        // Ваша существующая проверка длины. Она по-прежнему полезна.
-        if ($length > 4096 || $length <= 0) { // Условие <=0 теперь избыточно, но пусть будет
-            throw new TransportException("Invalid length received from server: {$length}. Raw bytes: " . bin2hex($prefix_bytes));
-        }
-
-        // Ваша существующая логика чтения тела пакета. Она абсолютно правильная.
-        $response = '';
-        $remaining = $length;
-        while ($remaining > 0) {
-            $chunk = socket_read($this->socket, $remaining);
-
-            if ($chunk === false || $chunk === '') {
-                $errorCode = socket_last_error($this->socket);
-                throw new TransportException("Failed to read message body from socket: " . socket_strerror($errorCode), $errorCode);
+            if (!$this->socket) {
+                throw new TransportException("Unable to create socket: {$errstr} ({$errno})");
             }
-            $response .= $chunk;
-            $remaining -= \strlen($chunk);
-        }
+            stream_set_blocking($this->socket, false); // Явно устанавливаем неблокирующий режим
 
-        return $response;
+            $deferred = new DeferredFuture();
+            $watcherId = EventLoop::onWritable($this->socket, static function (string $id) use ($deferred): void {
+                EventLoop::cancel($id);
+                if (!$deferred->isComplete()) {
+                    $deferred->complete();
+                }
+            });
+
+            try {
+                // Асинхронно ждем подключения с таймаутом
+                $deferred->getFuture()->await(new TimeoutCancellation(5));
+            } catch (\Amp\TimeoutException) {
+                EventLoop::cancel($watcherId); // Отменяем watcher при таймауте
+                throw new TransportException("Connection timed out after 5 seconds.");
+            }
+
+            // Проверяем ошибки сокета после подключения
+            if (stream_socket_get_name($this->socket, true) === false) {
+                throw new TransportException("Failed to connect: Connection refused or other error.");
+            }
+
+            echo "Connected to {$this->settings->server_address}:{$this->settings->server_port}\n";
+
+            // Отправляем заголовок и асинхронно ждем завершения отправки
+            $this->send(hex2bin('eeeeeeee'), true)->await();
+        });
+    }
+
+    public function send(string $payload, bool $isHeader = false): Future
+    {
+        return async(function () use ($payload, $isHeader): void {
+            if (!\is_resource($this->socket)) {
+                throw new TransportException("Socket is not connected.");
+            }
+
+            $packet = $isHeader ? $payload : pack('V', \strlen($payload)) . $payload;
+            $totalLength = \strlen($packet);
+            $sentLength = 0;
+
+            while ($sentLength < $totalLength) {
+                $bytesSent = @fwrite($this->socket, substr($packet, $sentLength));
+
+                if ($bytesSent === false) {
+                    throw new TransportException('Failed to send data to socket.');
+                }
+                if ($bytesSent === 0) {
+                    // Буфер переполнен, асинхронно ждем, пока он освободится
+                    $deferred = new DeferredFuture();
+                    $watcherId = EventLoop::onWritable($this->socket, static function (string $id) use ($deferred): void {
+                        EventLoop::cancel($id);
+                        if (!$deferred->isComplete()) {
+                            $deferred->complete();
+                        }
+                    });
+                    try {
+                        $deferred->getFuture()->await();
+                    } finally {
+                        EventLoop::cancel($watcherId); // Гарантированная отмена watcher'а
+                    }
+                    continue;
+                }
+                $sentLength += $bytesSent;
+            }
+        });
+    }
+
+    public function receive(int $length): Future
+    {
+        return async(function () use ($length) {
+            if (!\is_resource($this->socket)) {
+                throw new TransportException("Socket is not connected.");
+            }
+
+            $data = '';
+            $remaining = $length;
+
+            $deferred = new DeferredFuture();
+            $watcherId = null;
+            try {
+                $watcherId = EventLoop::onReadable($this->socket, function (string $id) use (&$data, &$remaining, $deferred): void {
+                    $chunk = @fread($this->socket, $remaining);
+
+                    if ($chunk === false) {
+                        EventLoop::cancel($id);
+                        $deferred->error(new TransportException("Failed to read from socket."));
+                        return;
+                    }
+                    if ($chunk === '') {
+                        EventLoop::cancel($id);
+                        $deferred->error(new TransportException("Connection closed while reading."));
+                        return;
+                    }
+
+                    $data .= $chunk;
+                    $remaining -= \strlen($chunk);
+
+                    if ($remaining <= 0) {
+                        EventLoop::cancel($id);
+                        if (!$deferred->isComplete()) {
+                            $deferred->complete($data);
+                        }
+                    }
+                });
+                // Ждем, пока колбэк не завершит Future
+                return $deferred->getFuture()->await();
+            } finally {
+                if ($watcherId !== null) {
+                    EventLoop::cancel($watcherId);
+                }
+            }
+        });
     }
 
     public function close(): void
     {
-        if ($this->socket) {
-            socket_close($this->socket);
+        if (\is_resource($this->socket)) {
+            @fclose($this->socket);
             $this->socket = null;
             echo "Connection closed.\n";
         }
+    }
+
+    /** @return resource|null */
+    public function getSocketResource()
+    {
+        return $this->socket;
     }
 }

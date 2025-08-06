@@ -85,14 +85,19 @@ class Session
         $this->ackQueue[$msgId] = true;
     }
 
-    public function getAndClearAckQueue(): array
+    /**
+     * @param bool $clear - Если true, очищает очередь после получения.
+     * @return array
+     */
+    public function getAndClearAckQueue(bool $clear = true): array
     {
         if (empty($this->ackQueue)) {
             return [];
         }
-        // array_keys вернет все msg_id, которые мы накопили.
         $queue = array_keys($this->ackQueue);
-        $this->ackQueue = [];
+        if ($clear) {
+            $this->ackQueue = [];
+        }
         return $queue;
     }
 
@@ -151,7 +156,7 @@ class Session
             $this->sequence++;
             return $seq;
         }
-        return $this->sequence * 2 - 2;
+        return $this->sequence * 2;
     }
 
     public function getId(): ?string

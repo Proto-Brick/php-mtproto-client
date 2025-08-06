@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\Auth;
 
-use DigitalStars\MtprotoClient\Crypto\Aes;
 use DigitalStars\MtprotoClient\Crypto\Ige;
 use DigitalStars\MtprotoClient\Crypto\Rsa;
 use DigitalStars\MtprotoClient\Domain\Factorizer;
 use DigitalStars\MtprotoClient\Exception\FactorizationException;
+use DigitalStars\MtprotoClient\Exception\TransportException;
 use DigitalStars\MtprotoClient\MessagePacker;
 use DigitalStars\MtprotoClient\Session\Session;
 use DigitalStars\MtprotoClient\TL\Deserializer;
@@ -93,10 +93,16 @@ class AuthKeyCreator
         $request = $this->messagePacker->packUnencrypted($payload);
 
         // 4. Отправляем полный пакет через транспорт.
-        $this->transport->send($request);
+        $this->transport->send($request)->await();
 
-        // 5. Получаем бинарный ответ от сервера.
-        $rawResponse = $this->transport->receive();
+        $prefixBytes = $this->transport->receive(4)->await();
+        $lengthOrError = $this->deserializer->int32($prefixBytes);
+
+        if ($lengthOrError <= 0) {
+            throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
+        }
+
+        $rawResponse = $this->transport->receive($lengthOrError)->await();
 
         // 6. Распаковываем MTProto-контейнер. На этом этапе `unpackUnencrypted` просто возвращает сырой MTProto-пакет.
         $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
@@ -177,8 +183,16 @@ class AuthKeyCreator
             . $this->serializer->bytes($encryptedInnerData);
 
         $request = $this->messagePacker->packUnencrypted($payload);
-        $this->transport->send($request);
-        $rawResponse = $this->transport->receive();
+        $this->transport->send($request)->await();
+
+        $prefixBytes = $this->transport->receive(4)->await();
+        $lengthOrError = $this->deserializer->int32($prefixBytes);
+
+        if ($lengthOrError <= 0) {
+            throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
+        }
+
+        $rawResponse = $this->transport->receive($lengthOrError)->await();
         $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
 
         // Снова пропускаем заголовок
@@ -383,9 +397,16 @@ class AuthKeyCreator
             . $this->serializer->bytes($encryptedClientInnerData);
 
         $request = $this->messagePacker->packUnencrypted($finalPayload);
-        $this->transport->send($request);
+        $this->transport->send($request)->await();
 
-        return $this->transport->receive();
+        $prefixBytes = $this->transport->receive(4)->await();
+        $lengthOrError = $this->deserializer->int32($prefixBytes);
+
+        if ($lengthOrError <= 0) {
+            throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
+        }
+
+        return $this->transport->receive($lengthOrError)->await();
     }
 
     /**

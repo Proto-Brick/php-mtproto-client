@@ -24,7 +24,9 @@
     "php-64bit": ">=8.2",
     "ext-openssl": "*",
     "ext-sockets": "*",
-    "phpseclib/phpseclib": "^3.0"
+    "phpseclib/phpseclib": "^3.0",
+    "amphp/sync": "^2.3",
+    "revolt/event-loop": "^1.0"
   },
   "suggest": {
     "ext-ffi": "Для максимальной производительности при создании ключа авторизации (использует скомпилированный C++ модуль).",

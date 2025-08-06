@@ -8,9 +8,9 @@ use DigitalStars\MtprotoClient\Auth\AuthKey;
 use DigitalStars\MtprotoClient\Crypto\Aes;
 use DigitalStars\MtprotoClient\Exception\TransportException;
 use DigitalStars\MtprotoClient\Session\Session;
-use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
 use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
 use Random\RandomException;
 
 class MessagePacker
@@ -189,7 +189,7 @@ class MessagePacker
     public function packContainer(array $messages, AuthKey $authKey): array
     {
         $containerPayload = $this->serializer->int32(Constructors::MSG_CONTAINER);
-        $containerPayload .= $this->serializer->int32(count($messages));
+        $containerPayload .= $this->serializer->int32(\count($messages));
 
         $rpcRequestMsgId = null;
         $innerMsgIds = [];
@@ -208,9 +208,9 @@ class MessagePacker
             $containerPayload .= pack('V', \strlen($msg['payload']));
             $containerPayload .= $msg['payload'];
 
-//            if ($msg['is_content_related']) {
-//                $this->session->incrementSequence();
-//            }
+            //            if ($msg['is_content_related']) {
+            //                $this->session->incrementSequence();
+            //            }
         }
 
         // Упаковываем сам контейнер. Он НЕ контентный.

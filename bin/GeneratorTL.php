@@ -22,11 +22,11 @@ class GeneratorTL
      */
     private const TYPE_ID_EXCEPTIONS = [ //
         // predicate => hardcoded_decimal_id
-        'channel' => 3364463788, // 0xc88974ac
-        'ipPortSecret' => 932734534, // 0x37982646
-        'accessPointRule' => 1182402143, // 0x4679b65f
-        'help.configSimple' => 1515795052, // 0x5a592a6c
-        'messageReplies' => 2172852325, // 0x81834865
+//        'channel' => 0xc88974ac, // в 195 схеме все еще норм, но потом совпадает с channelForbidden похоже
+        'ipPortSecret' => 0x37982646,
+        'accessPointRule' => 0x4679b65f,
+        'help.configSimple' => 0x5a592a6c,
+//        'messageReplies' => 0x81834865,
     ];
     private const API_SCHEMA_PATH = __DIR__ . '/../schema/mtproto_api.json';
     private const OUTPUT_DIR = __DIR__ . '/../src/Generated';
@@ -36,6 +36,8 @@ class GeneratorTL
     private array $schema;
     private array $abstractTypes = [];
     private array $typeToConstructorsMap = [];
+
+    private array $concreteTypeToConstructorMap = [];
 
     public function __construct()
     {
@@ -74,20 +76,28 @@ class GeneratorTL
 
     private function analyzeSchema(): void
     {
-        $knownConstructors = [];
-        $typeUsage = [];
+        // Шаг 1: Группируем конструкторы по возвращаемому типу
+        $this->typeToConstructorsMap = [];
         foreach ($this->schema['constructors'] as $constructor) {
-            $knownConstructors[$constructor['predicate']] = true;
-            $typeUsage[$constructor['type']][] = $constructor['predicate'];
             $this->typeToConstructorsMap[$constructor['type']][] = $constructor;
         }
 
-        foreach ($typeUsage as $type => $predicates) {
-            if (!isset($knownConstructors[$type])) {
+        // Шаг 2: Определяем абстрактные и конкретные типы
+        $this->abstractTypes = [];
+        $this->concreteTypeToConstructorMap = []; // Очищаем на всякий случай
+        foreach ($this->typeToConstructorsMap as $type => $constructors) {
+            if (count($constructors) > 1) {
                 $this->abstractTypes[$type] = true;
+            } else {
+                // Если у типа только один конструктор, и имя типа не совпадает с именем конструктора
+                $constructorPredicate = $constructors[0]['predicate'];
+                if ($type !== $constructorPredicate) {
+                    $this->concreteTypeToConstructorMap[$type] = $constructorPredicate;
+                }
             }
         }
         echo "Analyzed schema: Found " . count($this->abstractTypes) . " abstract types.\n";
+        echo "Found " . count($this->concreteTypeToConstructorMap) . " concrete types with mismatched constructor names.\n";
     }
 
     private function generateAbstractClasses(): void
@@ -115,6 +125,8 @@ class GeneratorTL
         $isMethod = ($schemaKey === 'methods');
         $excluded = $isMethod ? $this->getExcludedMethods() : $this->getExcludedConstructors();
 
+        $constructorToConcreteTypeMap = array_flip($this->concreteTypeToConstructorMap);
+
         foreach ($this->schema[$schemaKey] as $item) {
             $predicate_key = $isMethod ? 'method' : 'predicate';
             if (!isset($item[$predicate_key])) {
@@ -126,7 +138,16 @@ class GeneratorTL
                 continue;
             }
 
-            [$namespace, $className] = $this->getNamespaceAndClassName($predicate);
+            if (!$isMethod && isset($constructorToConcreteTypeMap[$predicate])) {
+                // Этот конструктор - единственная реализация типа с другим именем.
+                // Мы должны использовать имя ТИПА для класса.
+                $typeNameToUse = $constructorToConcreteTypeMap[$predicate];
+                [$namespace, $className] = $this->getNamespaceAndClassName($typeNameToUse);
+            } else {
+                // Старая логика: имя класса берется из предиката/метода
+                [$namespace, $className] = $this->getNamespaceAndClassName($predicate);
+            }
+
             if ($isMethod) {
                 $className .= 'Request';
             }
@@ -145,33 +166,38 @@ class GeneratorTL
         $predicate = $item[$predicate_key];
         $parentType = $item['type'];
         $useStatements = [];
-        $constructorId = $item['id'] ?? 'null';
-        if (isset(self::TYPE_ID_EXCEPTIONS[$predicate])) {
-            $constructorId = self::TYPE_ID_EXCEPTIONS[$predicate];
-        } elseif ($constructorId !== 'null') {
-            // Преобразуем строковое представление ID в integer
-            $id_int = intval($constructorId);
+        $constructorId = 'null';
 
-            // Если ID отрицательный, конвертируем его в беззнаковый 32-битный эквивалент
-            if ($id_int < 0) {
-                $id_unsigned = unpack('V', pack('l', $id_int))[1];
-                $constructorId = $id_unsigned;
-            }
+// --- ШАГ 1: Получаем "сырой" ID в виде числа (int) ---
+        $rawIdInt = null;
+
+        if (isset(self::TYPE_ID_EXCEPTIONS[$predicate])) {
+            $rawIdInt = self::TYPE_ID_EXCEPTIONS[$predicate];
+        } elseif (isset($item['id'])) {
+            $rawIdInt = (int) $item['id'];
+        }
+
+        if ($rawIdInt !== null) {
+            $unsigned32BitId = unpack('V', pack('l', $rawIdInt))[1];
+            $hexValue = dechex($unsigned32BitId);
+            $constructorId = '0x' . $hexValue;
         }
 
         // --- Extends logic ---
         $baseClass = basename(str_replace('\\', '/', self::TL_OBJECT_FQN));
         $extends = $baseClass;
         $parentFqcn = null;
+        $parentShortName = null;
         $isConcreteOfAbstract = !$isMethod && isset($this->abstractTypes[$parentType]);
         if ($isConcreteOfAbstract) {
             $parentFqcn = $this->resolveCustomType($parentType);
+            $parentShortName = basename(str_replace('\\', '/', $parentFqcn));
             $useStatements[$parentFqcn] = true;
             $extends = basename(str_replace('\\', '/', $parentFqcn));
         }
 
         // --- Constructor, Properties and other Use statements ---
-        $constructorData = $this->buildConstructorParams($item['params']);
+        $constructorData = $this->buildConstructorParams($item['params'], $className, $parentFqcn);
         $constructorParamsStr = $constructorData['paramsString'];
         $propertyDocs = $constructorData['propertyDocs'];
         $paramDocs = $constructorData['paramDocs']; // <--- Получаем массив @param тегов
@@ -186,7 +212,7 @@ class GeneratorTL
         }
 
         // --- Serializer/Deserializer content ---
-        $serializerData = $this->buildSerializerMethods($item, $isMethod, $isConcreteOfAbstract, $constructorData['sortedPropertyNames']);
+        $serializerData = $this->buildSerializerMethods($item, $isMethod, $isConcreteOfAbstract, $constructorData['sortedPropertyNames'], $className, $parentFqcn);
         $serializerContent = $serializerData['content'];
         $useStatements = array_merge($useStatements, $serializerData['useStatements']);
 

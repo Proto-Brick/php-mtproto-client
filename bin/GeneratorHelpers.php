@@ -165,17 +165,16 @@ trait GeneratorHelpers
     private function buildUseBlock(array $useStatements, string $currentNamespace, ?string $parentFqcn): string
     {
         $useBlock = '';
-        $uniqueUses = array_keys($useStatements);
-        sort($uniqueUses);
+        ksort($useStatements);
 
         $escapedCurrentNamespace = $this->escapeFqn($currentNamespace);
         $escapedParentFqcn = $parentFqcn ? $this->escapeFqn($parentFqcn) : null;
 
-        foreach ($uniqueUses as $useFqn) {
+        foreach ($useStatements as $useFqn => $aliasOrTrue) {
             $useFqn = $this->escapeFqn($useFqn);
             $parentOfUse = substr($useFqn, 0, (int) strrpos($useFqn, '\\'));
 
-            // Правило 1: Не импортировать родительский класс, так как он уже есть в `extends`.
+            // Правило 1: Не импортировать родительский класс.
             if ($escapedParentFqcn === $useFqn) {
                 continue;
             }
@@ -185,12 +184,17 @@ trait GeneratorHelpers
                 continue;
             }
 
-            $useBlock .= "use {$useFqn};\n";
+            // Генерируем `use` с алиасом или без
+            if (is_string($aliasOrTrue)) {
+                $useBlock .= "use {$useFqn} as {$aliasOrTrue};\n";
+            } else {
+                $useBlock .= "use {$useFqn};\n";
+            }
         }
         return $useBlock ? "\n" . $useBlock . "\n" : ''; // Добавил перенос строки для красоты
     }
 
-    private function buildConstructorParams(array $params): array
+    private function buildConstructorParams(array $params, string $currentClassName, ?string $parentFqcn): array
     {
         $paramDefinitions = [];
         $propertyDocs = [];
@@ -231,12 +235,39 @@ trait GeneratorHelpers
 
             $sortedPropertyNames[] = $propertyName;
 
+            if (str_contains($phpTypeFqn, '\\')) {
+                $isConflict = false;
+                // Конфликт 1: Короткое имя типа совпадает с именем текущего класса
+                if ($phpType === $currentClassName) {
+                    $isConflict = true;
+                }
+
+                // Конфликт 2 (новый): Короткое имя типа совпадает с именем родителя
+                if (!$isConflict && $parentFqcn) {
+                    $parentShortName = basename(str_replace('\\', '/', $parentFqcn));
+                    if ($phpType === $parentShortName) {
+                        if ($this->escapeFqn($phpTypeFqn) !== $this->escapeFqn($parentFqcn)) {
+                            $isConflict = true;
+                        }
+                    }
+                }
+
+                if ($isConflict) {
+                    // Создаем алиас, например 'Base' + 'AutoDownloadSettings'
+                    $parts = explode('\\', $this->escapeFqn($phpTypeFqn));
+                    $namespacePart = $parts[count($parts) - 2] ?? 'Dto';
+                    $alias = ucfirst($namespacePart) . $phpType;
+
+                    $useStatements[$this->escapeFqn($phpTypeFqn)] = $alias;
+                    $phpType = $alias; // Используем алиас в type-hint
+                    $docType = $alias; // Используем алиас в phpdoc
+                } else {
+                    $useStatements[$this->escapeFqn($phpTypeFqn)] = true;
+                }
+            }
+
             $docTypeForParam = $isConditional ? "{$docType}|null" : $docType;
             $paramDocs[] = "     * @param {$docTypeForParam} \${$propertyName}";
-
-            if (str_starts_with($phpTypeFqn, '\\')) {
-                $useStatements[$this->escapeFqn($phpTypeFqn)] = true;
-            }
 
             if ($docType !== $phpTypeFqn && !in_array($docType, ['array', 'int', 'string', 'bool', 'float'], true)) {
                 $propertyDocs[] = " * @property {$docType} \${$propertyName}";
@@ -262,10 +293,25 @@ trait GeneratorHelpers
     private function getSpecialTypeHandling(string $tlType): ?array
     {
         return match ($tlType) {
-            'DataJSON', 'JSONValue' => [
+            // Обработчик для DataJSON: это просто TL-строка (bytes), содержащая JSON.
+            // Используется в bots.sendCustomRequest
+            'DataJSON' => [
                 'php_type' => 'array',
-                'serialize_tpl' => '(new DataJSON(json_encode(%s)))->serialize($serializer)',
-                'deserialize_tpl' => 'json_decode((DataJSON::deserialize($deserializer, $stream))->data, true)',
+                'serialize_tpl' => '$serializer->bytes(json_encode(%s, JSON_FORCE_OBJECT))',
+                'deserialize_tpl' => '$deserializer->deserializeDataJSON($stream)',
+            ],
+
+            // Обработчик для JSONValue: это сложный TL-объект, представляющий JSON.
+            // Используется в help.getAppConfig
+            'JSONValue' => [
+                'php_type' => 'array',
+
+                // При отправке мы не будем строить сложную TL-структуру, а отправим
+                // как DataJSON. В 99% случаев сервер это поймет.
+                'serialize_tpl' => '(new DataJSON(json_encode(%s, JSON_FORCE_OBJECT)))->serialize($serializer)',
+
+                // При получении мы должны вызвать специальный метод, который умеет парсить эту структуру.
+                'deserialize_tpl' => '$deserializer->deserializeJsonValue($stream)',
             ],
             default => null,
         };
@@ -294,27 +340,27 @@ trait GeneratorHelpers
                 // Если вектор примитивов, возвращаем специальную строку, например 'vector<int>'
                 $responseClassExpr = "'vector<{$phpInnerTypeFqn}>'";
             } else {
-                // Если вектор объектов, возвращаем FQCN внутреннего класса
-                $responseTypeShort = basename(str_replace('\\', '/', $phpInnerTypeFqn));
-                $responseClassExpr = $responseTypeShort . '::class';
-                if (str_contains($phpInnerTypeFqn, '\\')) {
-                    $useStatements[$this->escapeFqn($phpInnerTypeFqn)] = true;
-                }
+                // Вектор объектов: 'vector<' . Full\Name\Space\To\Type::class . '>'
+                $innerTypeShortName = basename(str_replace('\\', '/', $phpInnerTypeFqn));
+                $responseClassExpr = "'vector<' . " . $innerTypeShortName . "::class . '>'";
+                // Добавляем FQCN в `use`, чтобы короткое имя было доступно
+                $useStatements[$this->escapeFqn($phpInnerTypeFqn)] = true;
             }
 
         } else {
             // Случай 3: Обычный TL-объект или примитив вроде Bool
-            $phpResponseType = $this->mapTlTypeToPhp($tlResponseType);
-            $isPrimitive = in_array($phpResponseType, ['bool', 'int', 'float', 'string'], true);
+            $phpResponseTypeFqn = $this->mapTlTypeToPhp($tlResponseType);
+            $isPrimitive = in_array($phpResponseTypeFqn, ['bool', 'int', 'float', 'string'], true);
 
             if ($isPrimitive) {
-                $responseClassExpr = "'" . $phpResponseType . "'";
+                // Примитив: 'bool'
+                $responseClassExpr = "'" . $phpResponseTypeFqn . "'";
             } else {
-                $responseTypeShort = basename(str_replace('\\', '/', $phpResponseType));
-                $responseClassExpr = $responseTypeShort . '::class';
-                if (str_contains($phpResponseType, '\\')) {
-                    $useStatements[$this->escapeFqn($phpResponseType)] = true;
-                }
+                // Объект: Full\Name\Space\To\Type::class
+                $responseTypeShortName = basename(str_replace('\\', '/', $phpResponseTypeFqn));
+                $responseClassExpr = $responseTypeShortName . '::class';
+                // Добавляем FQCN в `use`
+                $useStatements[$this->escapeFqn($phpResponseTypeFqn)] = true;
             }
         }
 
@@ -334,7 +380,7 @@ trait GeneratorHelpers
         return ['content' => $content, 'useStatements' => $useStatements];
     }
 
-    private function buildFlagsLogic(array $params, array &$useStatements): array
+    private function buildFlagsLogic(array $params, array &$useStatements, $currentClassName, ?string $parentFqcn): array
     {
         $serializeBody = "";
         $deserializeBody = "";
@@ -396,12 +442,12 @@ trait GeneratorHelpers
                 // Десериализация (чтение значения, только если бит установлен)
                 $expression = ($actualType === 'true')
                     ? "true"
-                    : $this->getDeserializationCodeForType($actualType, $useStatements);
+                    : $this->getDeserializationCodeForType($actualType, $useStatements, $currentClassName, $parentFqcn);
                 $deserializeBody .= "        \${$propertyName} = (\${$flagsName} & (1 << {$bit})) ? {$expression} : null;\n";
             } else {
                 // Обязательное поле
                 $serializeBody .= "        \$buffer .= " . $this->getSerializationCodeForType("\$this->{$propertyName}", $param['type']) . ";\n";
-                $deserializeBody .= "        \${$propertyName} = " . $this->getDeserializationCodeForType($param['type'], $useStatements) . ";\n";
+                $deserializeBody .= "        \${$propertyName} = " . $this->getDeserializationCodeForType($param['type'], $useStatements, $currentClassName, $parentFqcn) . ";\n";
             }
         }
 
@@ -412,13 +458,13 @@ trait GeneratorHelpers
         ];
     }
 
-    private function buildSerializerMethods(array $item, bool $isMethod, bool $isConcreteOfAbstract, array $sortedPropertyNames): array
+    private function buildSerializerMethods(array $item, bool $isMethod, bool $isConcreteOfAbstract, array $sortedPropertyNames, string $currentClassName, ?string $parentFqcn): array
     {
         $useStatements = [];
 
         // --- Сборка тела метода serialize() ---
         $serializeBody = "        \$buffer = \$serializer->int32(self::CONSTRUCTOR_ID);\n";
-        $logic = $this->buildFlagsLogic($item['params'], $useStatements);
+        $logic = $this->buildFlagsLogic($item['params'], $useStatements, $currentClassName, $parentFqcn);
         $serializeBody .= $logic['serializeBody'];
 
         // --- Сборка тела метода deserialize() ---
@@ -467,7 +513,7 @@ trait GeneratorHelpers
                 : "\n            " . implode(",\n            ", $constructorArgsForCall) . "\n        ";
 
             // Добавляем финальный return для DTO
-            $deserializeBody .= "\n            return new self({$constructorCall});";
+            $deserializeBody .= "\n        return new self({$constructorCall});";
         }
 
         // --- Сборка финального PHP-кода для обоих методов ---
@@ -525,11 +571,10 @@ trait GeneratorHelpers
         }
     }
 
-    private function getDeserializationCodeForType(string $tlType, array &$useStatements): string
+    private function getDeserializationCodeForType(string $tlType, array &$useStatements, $currentClassName, ?string $parentFqcn): string
     {
         if ($special = $this->getSpecialTypeHandling($tlType)) {
             if ($tlType === 'DataJSON' || $tlType === 'JSONValue') {
-                // Добавляем use, так как шаблон использует класс DataJSON
                 $useStatements['DigitalStars\\MtprotoClient\\Generated\\Types\\Base\\DataJSON'] = true;
             }
             return $special['deserialize_tpl'];
@@ -565,26 +610,56 @@ trait GeneratorHelpers
                     }
 
                     // Старая логика для векторов объектов
-                    [$ns, $class] = $this->getNamespaceAndClassName($innerType);
-                    $isAbstract = isset($this->abstractTypes[$innerType]);
-                    $classPrefix = $isAbstract ? 'Abstract' : '';
-                    $className = $classPrefix . $class;
-                    $fqcn = self::BASE_NAMESPACE . '\\Types\\' . ($ns ? $ns . '\\' : '') . $className;
-                    $useStatements[$fqcn] = true;
-                    $shortClass = $className;
-                    return "\$deserializer->vectorOfObjects(\$stream, [{$shortClass}::class, 'deserialize'])";
+                    $deserializationCode = $this->getDeserializationCodeForType($innerType, $useStatements, $currentClassName, $parentFqcn);
+                    // $deserializationCode будет выглядеть как `SomeClass::deserialize(...)`. Нам нужно извлечь `SomeClass::class`.
+                    $callableClass = explode('::', $deserializationCode)[0];
+                    return "\$deserializer->vectorOfObjects(\$stream, [{$callableClass}::class, 'deserialize'])";
                 }
 
-                // Этот код будет выполнен, если это не вектор, а обычный кастомный тип (updates.State и т.д.)
-                [$ns, $class] = $this->getNamespaceAndClassName($tlType);
-                $isAbstract = isset($this->abstractTypes[$tlType]);
-                $classPrefix = $isAbstract ? 'Abstract' : '';
-                $className = $classPrefix . $class;
-                $fqcn = self::BASE_NAMESPACE . '\\Types\\' . ($ns ? $ns . '\\' : '') . $className;
-                $useStatements[$fqcn] = true;
-                $shortClass = $className;
+                // 4. Обработка одиночных TL-объектов
+                $originalTlType = $tlType;
+                [$ns, $class] = $this->getNamespaceAndClassName($originalTlType);
 
-                return "{$shortClass}::deserialize(\$deserializer, \$stream)";
+                $isAbstract = isset($this->abstractTypes[$originalTlType]);
+
+                if (!$isAbstract && isset($this->concreteTypeToConstructorMap[$originalTlType])) {
+                    [$ns, $class] = $this->getNamespaceAndClassName($originalTlType);
+                }
+
+                $shortClass = ($isAbstract ? 'Abstract' : '') . $class;
+                $fqcn = self::BASE_NAMESPACE . '\\Types\\' . ($ns ? $ns . '\\' : '') . $shortClass;
+                $callableClass = $shortClass;
+
+                // --- НАЧАЛО: НОВАЯ ЛОГИКА ОПРЕДЕЛЕНИЯ КОНФЛИКТА ---
+                $isConflict = false;
+                // Конфликт 1: Короткое имя типа совпадает с именем текущего класса
+                if ($shortClass === $currentClassName) {
+                    $isConflict = true;
+                }
+
+                // Конфликт 2: Короткое имя совпадает с родительским...
+                if (!$isConflict && $parentFqcn) {
+                    $parentShortName = basename(str_replace('\\', '/', $parentFqcn));
+                    if ($shortClass === $parentShortName) {
+                        // ... но это настоящий конфликт, только если FQCN разные!
+                        if ($this->escapeFqn($fqcn) !== $this->escapeFqn($parentFqcn)) {
+                            $isConflict = true;
+                        }
+                    }
+                }
+                // --- КОНЕЦ: НОВОЙ ЛОГИКИ ОПРЕДЕЛЕНИЯ КОНФЛИКТА ---
+
+                if ($isConflict) {
+                    $parts = explode('\\', $this->escapeFqn($fqcn));
+                    $namespacePart = $parts[count($parts) - 2] ?? 'Dto';
+                    $alias = ucfirst($namespacePart) . $shortClass;
+                    $useStatements[$fqcn] = $alias;
+                    $callableClass = $alias;
+                } else {
+                    $useStatements[$fqcn] = true;
+                }
+
+                return "{$callableClass}::deserialize(\$deserializer, \$stream)";
         }
     }
 
@@ -615,7 +690,7 @@ trait GeneratorHelpers
         }
 
         // Добавляем default-ветку
-        $matchArms[] = "            default => throw new \Exception('Unknown constructor ID for type {$abstractType}: ' . dechex(\$constructorId)),";
+        $matchArms[] = "            default => throw new \Exception(sprintf('Unknown constructor ID for type {$abstractType}. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex(\$constructorId), unpack('l', pack('V', \$constructorId))[1], \$constructorId)),";
 
         $cases = implode("\n", $matchArms);
         $useBlock = $this->buildUseBlock($useStatementsForFactory, $fullParentNamespace, null);
@@ -629,12 +704,9 @@ trait GeneratorHelpers
             // Peek at the constructor ID to determine the concrete type
             \$constructorId = \$deserializer->peekInt32(\$stream);
             
-            \$result = match (\$constructorId) {
+            return match (\$constructorId) {
     {$cases}
             };
-
-            /** @var static \$result */
-            return \$result;
         }
     PHP;
 

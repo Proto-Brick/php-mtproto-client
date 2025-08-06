@@ -172,6 +172,93 @@ class Deserializer
         return $result;
     }
 
+    /**
+     * Десериализует сложный TL-тип JSONValue рекурсивно.
+     * Умеет обрабатывать все современные JSON-конструкторы.
+     */
+    public function deserializeJsonValue(string &$stream): mixed
+    {
+        // Заглядываем в поток, чтобы узнать, какой тип JSON-элемента нас ждет
+        $constructorId = $this->peekInt32($stream);
+
+        switch ($constructorId) {
+            case 0x3f6d7b68: // jsonNull#3f6d7b68 = JSONValue;
+                $this->int32($stream); // "Съедаем" ID
+                return null;
+
+            case 0xc7345e6a: // jsonBool#c7345e6a value:Bool = JSONValue;
+                $this->int32($stream); // "Съедаем" ID
+                // Читаем значение типа Bool (которое тоже является TL-объектом)
+                $boolConstructor = $this->int32($stream);
+                if ($boolConstructor === 0x997275b5) {
+                    return true;
+                } // boolTrue
+                if ($boolConstructor === 0xbc799737) {
+                    return false;
+                } // boolFalse
+                throw new \Exception("Invalid constructor for Bool inside jsonBool");
+
+            case 0x2be0dfa4: // jsonNumber#2be0dfa4 value:double = JSONValue;
+                $this->int32($stream); // "Съедаем" ID
+                return $this->double($stream);
+
+                // --- ДОБАВЛЕНО: Обработка нового конструктора для строк ---
+            case 0xb71e767a: // jsonString#b71e767a value:string = JSONValue;
+                $this->int32($stream); // "Съедаем" ID
+                return $this->bytes($stream);
+
+            case 0xf7444763: // jsonArray#f7444763 value:vector<JSONValue> = JSONValue;
+                $this->int32($stream); // "Съедаем" ID
+
+                // Это вектор<JSONValue>
+                if ($this->int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
+                    throw new \Exception('Invalid vector constructor in jsonArray');
+                }
+                $count = $this->int32($stream);
+                $result = [];
+                for ($i = 0; $i < $count; $i++) {
+                    // Рекурсивно вызываем себя для каждого элемента массива
+                    $result[] = $this->deserializeJsonValue($stream);
+                }
+                return $result;
+
+            case 0x99c1d49d: // jsonObject#99c1d49d value:vector<JSONObjectValue> = JSONValue;
+                $this->int32($stream); // "Съедаем" ID
+
+                // Это вектор<JSONObjectValue>
+                if ($this->int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
+                    throw new \Exception('Invalid vector constructor in jsonObject');
+                }
+                $count = $this->int32($stream);
+                $result = [];
+                for ($i = 0; $i < $count; $i++) {
+                    // Десериализуем пару ключ-значение (JSONObjectValue)
+                    // jsonObjectValue#c0de1bd9 key:string value:JSONValue = JSONObjectValue;
+                    if ($this->int32($stream) !== 0xc0de1bd9) {
+                        throw new \Exception('Invalid constructor for JSONObjectValue');
+                    }
+                    $key = $this->bytes($stream);
+                    // Рекурсивно вызываем себя для значения
+                    $value = $this->deserializeJsonValue($stream);
+                    $result[$key] = $value;
+                }
+                return $result;
+
+            case 0x7d748d04: // dataJSON#7d748d04 data:string = DataJSON; (псевдоним для JSONValue)
+                $this->int32($stream); // "Съедаем" ID
+                $data = $this->bytes($stream);
+                return json_decode($data, true) ?: []; // Парсим строку как JSON
+
+            default:
+                throw new \Exception('Unknown JSONValue constructor: ' . dechex($constructorId));
+        }
+    }
+
+    public function deserializeDataJSON(string &$stream): array
+    {
+        return json_decode($this->bytes($stream), true) ?: [];
+    }
+
     public function deserializeResPQ(string &$stream): array
     {
         $constructor = $this->int32($stream);
