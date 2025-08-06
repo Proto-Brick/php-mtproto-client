@@ -31,11 +31,12 @@ class GeneratorTL
     private const API_SCHEMA_PATH = __DIR__ . '/../schema/mtproto_api.json';
     private const OUTPUT_DIR = __DIR__ . '/../src/Generated';
     private const BASE_NAMESPACE = 'DigitalStars\\MtprotoClient\\Generated';
+    private const GENERATED_METHODS_NAMESPACE = self::BASE_NAMESPACE . '\\Methods';
     private const TL_OBJECT_FQN = 'DigitalStars\\MtprotoClient\\TL\\TlObject';
 
     private array $schema;
-    private array $abstractTypes = [];
-    private array $typeToConstructorsMap = [];
+    public array $abstractTypes = [];
+    public array $typeToConstructorsMap = [];
 
     private array $concreteTypeToConstructorMap = [];
 
@@ -249,13 +250,4 @@ class GeneratorTL
     }
     PHP;
     }
-}
-
-
-// --- RUN THE GENERATOR ---
-try {
-    (new GeneratorTL())->run();
-} catch (\Throwable $e) {
-    echo "An error occurred: " . $e->getMessage() . "\n";
-    echo $e->getTraceAsString() . "\n";
 }

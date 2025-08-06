@@ -4,6 +4,84 @@ declare(strict_types=1);
 
 trait GeneratorHelpers
 {
+    private const GENERATED_TYPES_NAMESPACE = 'DigitalStars\\MtprotoClient\\Generated\\Types';
+
+    /**
+     * @var array<string, string> Карта [КороткоеИмяКласса => ПолноеИмяКласса] для отслеживания конфликтов.
+     */
+    private array $shortNameToFqnMap = [];
+
+    /**
+     * @var array<string, string> Карта [ПолноеИмяКласса => Алиас_Или_КороткоеИмя]
+     */
+    private array $fqnToAliasMap = [];
+
+    /**
+     * Очищает состояние отслеживания use-стейтментов.
+     * Вызывается перед генерацией каждого нового файла.
+     */
+    private function resetUseTracking(): void
+    {
+        $this->shortNameToFqnMap = [];
+        $this->fqnToAliasMap = [];
+    }
+
+    private function registerUse(string $fqn, string $currentClassName, ?string $parentFqcn): string
+    {
+        $fqn = $this->escapeFqn($fqn);
+        if (!str_contains($fqn, '\\')) {
+            return $fqn;
+        }
+
+        if (isset($this->fqnToAliasMap[$fqn])) {
+            return $this->fqnToAliasMap[$fqn];
+        }
+
+        $shortName = basename(str_replace('\\', '/', $fqn));
+        $parentShortName = $parentFqcn ? basename(str_replace('\\', '/', $this->escapeFqn($parentFqcn))) : null;
+
+        $isConflict = false;
+        if (isset($this->shortNameToFqnMap[$shortName]) && $this->shortNameToFqnMap[$shortName] !== $fqn) {
+            $isConflict = true;
+        } elseif ($shortName === $currentClassName) {
+            $isConflict = true;
+        } elseif ($shortName === $parentShortName && $fqn !== $this->escapeFqn($parentFqcn)) {
+            $isConflict = true;
+        }
+
+        if ($isConflict) {
+            $parts = explode('\\', $fqn);
+            $namespacePart = $parts[count($parts) - 2] ?? 'Dto';
+            $alias = ucfirst($this->snakeToCamel($namespacePart)) . $shortName;
+            $this->fqnToAliasMap[$fqn] = $alias;
+            if (!isset($this->shortNameToFqnMap[$shortName])) {
+                $this->shortNameToFqnMap[$shortName] = $fqn;
+            }
+            return $alias;
+        } else {
+            $this->shortNameToFqnMap[$shortName] = $fqn;
+            $this->fqnToAliasMap[$fqn] = $shortName;
+            return $shortName;
+        }
+    }
+
+    /**
+     * Собирает и форматирует итоговый use-блок на основе зарегистрированных классов и их алиасов.
+     */
+    private function buildUseBlockFromAliasMap(string $currentNamespace, ?string $parentFqcn): string
+    {
+        $useStatements = [];
+        foreach ($this->fqnToAliasMap as $fqn => $alias) {
+            $shortName = basename(str_replace('\\', '/', $fqn));
+            if ($shortName === $alias) {
+                $useStatements[$fqn] = true;
+            } else {
+                $useStatements[$fqn] = $alias;
+            }
+        }
+        return $this->buildUseBlock($useStatements, $currentNamespace, $parentFqcn);
+    }
+
     private function getNamespaceAndClassName(string $predicate): array
     {
         $parts = explode('.', $predicate);
@@ -63,7 +141,7 @@ trait GeneratorHelpers
         }
         $tlType = ltrim($tlType, '%');
         [$namespace, $className] = $this->getNamespaceAndClassName($tlType);
-        $basePath = self::BASE_NAMESPACE . '\\Types' . ($namespace ? '\\' . $namespace : '');
+        $basePath = self::GENERATED_TYPES_NAMESPACE . ($namespace ? '\\' . $namespace : '');
         if (isset($this->abstractTypes[$tlType])) {
             return $this->escapeFqn($basePath . '\\Abstract' . $className);
         }
@@ -627,7 +705,7 @@ trait GeneratorHelpers
                 }
 
                 $shortClass = ($isAbstract ? 'Abstract' : '') . $class;
-                $fqcn = self::BASE_NAMESPACE . '\\Types\\' . ($ns ? $ns . '\\' : '') . $shortClass;
+                $fqcn = self::GENERATED_TYPES_NAMESPACE . '\\' . ($ns ? $ns . '\\' : '') . $shortClass;
                 $callableClass = $shortClass;
 
                 // --- НАЧАЛО: НОВАЯ ЛОГИКА ОПРЕДЕЛЕНИЯ КОНФЛИКТА ---

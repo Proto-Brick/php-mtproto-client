@@ -27,8 +27,87 @@ use DigitalStars\MtprotoClient\TL\TlObject;
 use DigitalStars\MtprotoClient\Transport\Transport;
 use Revolt\EventLoop;
 
+// #-- API_HANDLERS_USE_START --#
+use DigitalStars\MtprotoClient\Generated\Api\AccountMethods;
+use DigitalStars\MtprotoClient\Generated\Api\AuthMethods;
+use DigitalStars\MtprotoClient\Generated\Api\BotsMethods;
+use DigitalStars\MtprotoClient\Generated\Api\ChannelsMethods;
+use DigitalStars\MtprotoClient\Generated\Api\ChatlistsMethods;
+use DigitalStars\MtprotoClient\Generated\Api\ContactsMethods;
+use DigitalStars\MtprotoClient\Generated\Api\FoldersMethods;
+use DigitalStars\MtprotoClient\Generated\Api\FragmentMethods;
+use DigitalStars\MtprotoClient\Generated\Api\HelpMethods;
+use DigitalStars\MtprotoClient\Generated\Api\LangpackMethods;
+use DigitalStars\MtprotoClient\Generated\Api\MessagesMethods;
+use DigitalStars\MtprotoClient\Generated\Api\PaymentsMethods;
+use DigitalStars\MtprotoClient\Generated\Api\PhoneMethods;
+use DigitalStars\MtprotoClient\Generated\Api\PhotosMethods;
+use DigitalStars\MtprotoClient\Generated\Api\PremiumMethods;
+use DigitalStars\MtprotoClient\Generated\Api\SmsjobsMethods;
+use DigitalStars\MtprotoClient\Generated\Api\StatsMethods;
+use DigitalStars\MtprotoClient\Generated\Api\StickersMethods;
+use DigitalStars\MtprotoClient\Generated\Api\StoriesMethods;
+use DigitalStars\MtprotoClient\Generated\Api\UpdatesMethods;
+use DigitalStars\MtprotoClient\Generated\Api\UploadMethods;
+use DigitalStars\MtprotoClient\Generated\Api\UsersMethods;
+// #-- API_HANDLERS_USE_END --#
+
+
+/**
+ * Основной класс клиента для взаимодействия с MTProto API.
+ *
+ * #-- API_HANDLERS_DOCBLOCK_START --#
+ * @property-read AccountMethods $account
+ * @property-read AuthMethods $auth
+ * @property-read BotsMethods $bots
+ * @property-read ChannelsMethods $channels
+ * @property-read ChatlistsMethods $chatlists
+ * @property-read ContactsMethods $contacts
+ * @property-read FoldersMethods $folders
+ * @property-read FragmentMethods $fragment
+ * @property-read HelpMethods $help
+ * @property-read LangpackMethods $langpack
+ * @property-read MessagesMethods $messages
+ * @property-read PaymentsMethods $payments
+ * @property-read PhoneMethods $phone
+ * @property-read PhotosMethods $photos
+ * @property-read PremiumMethods $premium
+ * @property-read SmsjobsMethods $smsjobs
+ * @property-read StatsMethods $stats
+ * @property-read StickersMethods $stickers
+ * @property-read StoriesMethods $stories
+ * @property-read UpdatesMethods $updates
+ * @property-read UploadMethods $upload
+ * @property-read UsersMethods $users
+ * #-- API_HANDLERS_DOCBLOCK_END --#
+ */
 class Client
 {
+    // #-- API_HANDLERS_PROPERTIES_START --#
+    public readonly AccountMethods $account;
+    public readonly AuthMethods $auth;
+    public readonly BotsMethods $bots;
+    public readonly ChannelsMethods $channels;
+    public readonly ChatlistsMethods $chatlists;
+    public readonly ContactsMethods $contacts;
+    public readonly FoldersMethods $folders;
+    public readonly FragmentMethods $fragment;
+    public readonly HelpMethods $help;
+    public readonly LangpackMethods $langpack;
+    public readonly MessagesMethods $messages;
+    public readonly PaymentsMethods $payments;
+    public readonly PhoneMethods $phone;
+    public readonly PhotosMethods $photos;
+    public readonly PremiumMethods $premium;
+    public readonly SmsjobsMethods $smsjobs;
+    public readonly StatsMethods $stats;
+    public readonly StickersMethods $stickers;
+    public readonly StoriesMethods $stories;
+    public readonly UpdatesMethods $updates;
+    public readonly UploadMethods $upload;
+    public readonly UsersMethods $users;
+
+    #-- API_HANDLERS_PROPERTIES_END --#
     private const ACK_TIMEOUT = 10;
     private ?AuthKey $authKey = null;
 
@@ -49,7 +128,32 @@ class Client
         private readonly MessagePacker $messagePacker,
         private readonly Deserializer $deserializer,
         private readonly Serializer $serializer,
-    ) {}
+    ) {
+        // #-- API_HANDLERS_INIT_START --#
+        $this->account = new AccountMethods($this);
+        $this->auth = new AuthMethods($this);
+        $this->bots = new BotsMethods($this);
+        $this->channels = new ChannelsMethods($this);
+        $this->chatlists = new ChatlistsMethods($this);
+        $this->contacts = new ContactsMethods($this);
+        $this->folders = new FoldersMethods($this);
+        $this->fragment = new FragmentMethods($this);
+        $this->help = new HelpMethods($this);
+        $this->langpack = new LangpackMethods($this);
+        $this->messages = new MessagesMethods($this);
+        $this->payments = new PaymentsMethods($this);
+        $this->phone = new PhoneMethods($this);
+        $this->photos = new PhotosMethods($this);
+        $this->premium = new PremiumMethods($this);
+        $this->smsjobs = new SmsjobsMethods($this);
+        $this->stats = new StatsMethods($this);
+        $this->stickers = new StickersMethods($this);
+        $this->stories = new StoriesMethods($this);
+        $this->updates = new UpdatesMethods($this);
+        $this->upload = new UploadMethods($this);
+        $this->users = new UsersMethods($this);
+        #-- API_HANDLERS_INIT_END --#
+    }
 
     /**
      * Синхронный метод для удобного запуска.
@@ -84,7 +188,7 @@ class Client
         });
     }
 
-    public function callSync(TlObject $request, int $timeout = 30): TlObject|array|bool|string|int|null
+    public function callSync(TlObject $request, int $timeout = 30): mixed
     {
         if ($this->authKey === null) {
             throw new \LogicException("Not connected. Please call connect() first.");
