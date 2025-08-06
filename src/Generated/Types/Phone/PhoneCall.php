@@ -1,0 +1,50 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Types\Phone;
+
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPhoneCall;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/type/phone.phoneCall
+ */
+final class PhoneCall extends TlObject
+{
+    public const CONSTRUCTOR_ID = 0xec82e140;
+    
+    public string $_ = 'phone.phoneCall';
+    
+    /**
+     * @param AbstractPhoneCall $phoneCall
+     * @param list<AbstractUser> $users
+     */
+    public function __construct(
+        public readonly AbstractPhoneCall $phoneCall,
+        public readonly array $users
+    ) {}
+    
+    public function serialize(Serializer $serializer): string
+    {
+        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->phoneCall->serialize($serializer);
+        $buffer .= $serializer->vectorOfObjects($this->users);
+        return $buffer;
+    }
+
+    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    {
+        $constructorId = $deserializer->int32($stream);
+        if ($constructorId !== self::CONSTRUCTOR_ID) {
+            throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
+        }
+
+        $phoneCall = AbstractPhoneCall::deserialize($deserializer, $stream);
+        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        return new self(
+            $phoneCall,
+            $users
+        );
+    }
+}
