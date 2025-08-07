@@ -125,9 +125,7 @@ class Client
         private readonly Session $session,
         private readonly Transport $transport,
         private readonly AuthKeyCreator $authKeyCreator,
-        private readonly MessagePacker $messagePacker,
-        private readonly Deserializer $deserializer,
-        private readonly Serializer $serializer,
+        private readonly MessagePacker $messagePacker
     ) {
         // #-- API_HANDLERS_INIT_START --#
         $this->account = new AccountMethods($this);
@@ -228,10 +226,10 @@ class Client
     {
         return async(function () use ($request, $deferred): void {
             $ackIds = $this->session->getAndClearAckQueue();
-            $mainRequestPayload = $request->serialize($this->serializer);
+            $mainRequestPayload = $request->serialize();
 
             if (!$this->session->isInitialized) {
-                $mainRequestPayload = $this->serializer->wrapWithInitConnection(
+                $mainRequestPayload = Serializer::wrapWithInitConnection(
                     $mainRequestPayload,
                     195,
                     $this->settings->api_id,
@@ -249,7 +247,7 @@ class Client
                 echo "[SEND] >> {$request->getPredicate()} (msg_id: {$finalMsgId}, seqno: $sequence)\n";
                 $this->transport->send($encryptedRequest)->await();
             } else {
-                $ackPayload = $this->serializer->serializeMsgsAck($ackIds);
+                $ackPayload = Serializer::serializeMsgsAck($ackIds);
                 $messages = [
                     ['payload' => $ackPayload, 'is_content_related' => false],
                     ['payload' => $mainRequestPayload, 'is_content_related' => true, 'request_object' => $request],
@@ -370,15 +368,15 @@ class Client
 
         $this->session->setTimeOffset((unpack('q', $unpacked['msg_id'])[1] >> 32) - time());
         $responsePayload = $unpacked['body'];
-        $peekConstructor = $this->deserializer->peekConstructor($responsePayload);
+        $peekConstructor = Deserializer::peekConstructor($responsePayload);
 
         if ($peekConstructor !== 0xedab447b) { // bad_server_salt
-            $this->session->setServerSalt($this->deserializer->int64($unpacked['server_salt']));
+            $this->session->setServerSalt(Deserializer::int64($unpacked['server_salt']));
         }
 
         $containerItems = [];
         if ($peekConstructor === Constructors::MSG_CONTAINER) {
-            $containerItems = $this->deserializer->deserializeMessageContainer($responsePayload);
+            $containerItems = Deserializer::deserializeMessageContainer($responsePayload);
         } else {
             $containerItems[] = ['body' => $responsePayload, 'msg_id' => $outer_msg_id, 'seqno' => $unpacked['seq_no']];
         }
@@ -399,12 +397,12 @@ class Client
 
     private function handleSingleMessage(string &$messageBody): void
     {
-        $constructorId = $this->deserializer->peekConstructor($messageBody);
+        $constructorId = Deserializer::peekConstructor($messageBody);
 
         switch ($constructorId) {
             case Constructors::RPC_RESULT:
-                $this->deserializer->int32($messageBody);
-                $req_msg_id = $this->deserializer->int64($messageBody);
+                Deserializer::int32($messageBody);
+                $req_msg_id = Deserializer::int64($messageBody);
 
                 if (!isset($this->pendingRequests[$req_msg_id])) {
                     echo "[WARN] << rpc_result for unknown or already completed msg_id: {$req_msg_id} (ignored)\n";
@@ -441,11 +439,11 @@ class Client
                 // Важно! Такой подход съест все тело сообщения, что может быть неверно,
                 // если оно имеет сложную структуру. Проще всего обрабатывать каждый по отдельности.
                 // Пока оставим только updatesTooLong.
-                $this->deserializer->consumeConstructor($messageBody);
+                Deserializer::consumeConstructor($messageBody);
                 return;
 
             case 0xedab447b: // bad_server_salt
-                $saltData = $this->deserializer->deserializeBadServerSalt($messageBody);
+                $saltData = Deserializer::deserializeBadServerSalt($messageBody);
                 $newSalt = $saltData['new_server_salt'];
                 $bad_msg_id = $saltData['bad_msg_id'];
 
@@ -471,7 +469,7 @@ class Client
                 return;
 
             case 0x9ec20908: // new_session_created
-                $sessionData = $this->deserializer->deserializeNewSessionCreated($messageBody);
+                $sessionData = Deserializer::deserializeNewSessionCreated($messageBody);
                 $newSalt = $sessionData['server_salt'];
                 echo "[RECV] << new_session_created. New salt: {$newSalt}.\n";
                 $this->session->setServerSalt($newSalt);
@@ -479,10 +477,10 @@ class Client
                 return;
 
             case 0xa7eff811: // bad_msg_notification
-                $this->deserializer->consumeConstructor($messageBody);
-                $bad_msg_id = $this->deserializer->int64($messageBody);
-                $this->deserializer->int32($messageBody); // bad_msg_seqno
-                $error_code = $this->deserializer->int32($messageBody);
+                Deserializer::consumeConstructor($messageBody);
+                $bad_msg_id = Deserializer::int64($messageBody);
+                Deserializer::int32($messageBody); // bad_msg_seqno
+                $error_code = Deserializer::int32($messageBody);
 
                 // 1. Находим deferred и request
                 $pending = $this->pendingRequests[$bad_msg_id] ?? null;
@@ -576,7 +574,7 @@ class Client
                 return;
             }
 
-            $ackPayload = $this->serializer->serializeMsgsAck($ackIds);
+            $ackPayload = Serializer::serializeMsgsAck($ackIds);
             [$encryptedAck, $messageId, $sequence] = $this->messagePacker->packEncrypted($ackPayload, $this->authKey, null, false);
 
             echo "[SEND] >> {standalone_acks for " . \count($ackIds) . " messages} (msg_id: {$messageId}, seqno: $sequence)\n";
@@ -608,15 +606,15 @@ class Client
 
         // Это может быть FQCN сгенерированного класса
         if (class_exists($responseClassOrType)) {
-            return $responseClassOrType::deserialize($this->deserializer, $payload);
+            return $responseClassOrType::deserialize($payload);
         }
 
         // Это может быть примитив
         return match ($responseClassOrType) {
-            'bool' => $this->deserializer->deserializeBool($payload),
-            'int' => $this->deserializer->int32($payload),
-            'long' => $this->deserializer->int64($payload),
-            'string' => $this->deserializer->bytes($payload),
+            'bool' => Deserializer::deserializeBool($payload),
+            'int' => Deserializer::int32($payload),
+            'long' => Deserializer::int64($payload),
+            'string' => Deserializer::bytes($payload),
             default => throw new \Exception("Unsupported response type: '{$responseClassOrType}'"),
         };
     }
@@ -635,18 +633,18 @@ class Client
                 throw new \Exception("Cannot deserialize vector of unknown class: {$innerType}");
             }
         }
-        return $this->deserializer->vectorOfObjects($payload, [$classToDeserialize, 'deserialize']);
+        return Deserializer::vectorOfObjects($payload, [$classToDeserialize, 'deserialize']);
     }
 
     private function processRpcResultBody(string &$stream): string
     {
-        $peekConstructor = $this->deserializer->peekInt32($stream);
+        $peekConstructor = Deserializer::peekInt32($stream);
         if ($peekConstructor === Constructors::GZIP_PACKED) {
-            return $this->deserializer->deserializeGzipPacked($stream);
+            return Deserializer::deserializeGzipPacked($stream);
         }
         if ($peekConstructor === Constructors::RPC_ERROR) {
-            $this->deserializer->int32($stream);
-            throw new RpcErrorException($this->deserializer->int32($stream), $this->deserializer->bytes($stream));
+            Deserializer::int32($stream);
+            throw new RpcErrorException(Deserializer::int32($stream), Deserializer::bytes($stream));
         }
         return $stream;
     }

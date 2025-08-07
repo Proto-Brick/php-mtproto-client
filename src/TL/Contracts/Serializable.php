@@ -2,12 +2,9 @@
 
 namespace DigitalStars\MtprotoClient\TL\Contracts;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-
 interface Serializable
 {
-    public function serialize(Serializer $serializer): string;
+    public function serialize(): string;
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static;
+    public static function deserialize(string &$stream): static;
 }

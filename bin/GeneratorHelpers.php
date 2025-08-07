@@ -541,7 +541,7 @@ trait GeneratorHelpers
         $useStatements = [];
 
         // --- Сборка тела метода serialize() ---
-        $serializeBody = "        \$buffer = \$serializer->int32(self::CONSTRUCTOR_ID);\n";
+        $serializeBody = "        \$buffer = Serializer::int32(self::CONSTRUCTOR_ID);\n";
         $logic = $this->buildFlagsLogic($item['params'], $useStatements, $currentClassName, $parentFqcn);
         $serializeBody .= $logic['serializeBody'];
 
@@ -557,9 +557,9 @@ trait GeneratorHelpers
         } else {
             // --- Вариант 2: Это тип-ответ (DTO) ---
             if ($isConcreteOfAbstract) {
-                $deserializeBody = "        \$deserializer->int32(\$stream); // Constructor ID is consumed here.\n";
+                $deserializeBody = "        Deserializer::int32(\$stream); // Constructor ID is consumed here.\n";
             } else {
-                $deserializeBody = "        \$constructorId = \$deserializer->int32(\$stream);\n" .
+                $deserializeBody = "        \$constructorId = Deserializer::int32(\$stream);\n" .
                     "        if (\$constructorId !== self::CONSTRUCTOR_ID) {\n" .
                     "            throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex(\$constructorId)));\n" .
                     "        }\n\n";
@@ -597,13 +597,13 @@ trait GeneratorHelpers
         // --- Сборка финального PHP-кода для обоих методов ---
         $content = <<<PHP
     
-        public function serialize(Serializer \$serializer): string
+        public function serialize(): string
         {
     {$serializeBody}
             return \$buffer;
         }
     
-        public static function deserialize(Deserializer \$deserializer, string &\$stream): static
+        public static function deserialize(string &\$stream): static
         {
     {$deserializeBody}
         }
@@ -622,30 +622,30 @@ trait GeneratorHelpers
         switch ($tlTypeLower) {
             case 'int':
             case 'int32':
-                return "\$serializer->int32({$varName})";
+                return "Serializer::int32({$varName})";
             case 'long':
             case 'int64':
-                return "\$serializer->int64({$varName})";
-            case 'int128': return "\$serializer->int128({$varName})";
-            case 'int256': return "\$serializer->int256({$varName})";
+                return "Serializer::int64({$varName})";
+            case 'int128': return "Serializer::int128({$varName})";
+            case 'int256': return "Serializer::int256({$varName})";
             case 'double': return "pack('d', {$varName})";
             case 'string':
             case 'bytes':
-                return "\$serializer->bytes({$varName})";
+                return "Serializer::bytes({$varName})";
             case 'bool':
-                return "({$varName} ? \$serializer->int32(0x997275b5) : \$serializer->int32(0xbc799737))";
+                return "({$varName} ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737))";
             default:
                 if (str_starts_with($tlType, 'Vector<')) {
                     $innerType = substr($tlType, 7, -1);
 
                     return match ($innerType) {
-                        'int' => "\$serializer->vectorOfInts({$varName})",
-                        'long' => "\$serializer->vectorOfLongs({$varName})",
-                        'string', 'bytes' => "\$serializer->vectorOfStrings({$varName})",
-                        default => "\$serializer->vectorOfObjects({$varName})",
+                        'int' => "Serializer::vectorOfInts({$varName})",
+                        'long' => "Serializer::vectorOfLongs({$varName})",
+                        'string', 'bytes' => "Serializer::vectorOfStrings({$varName})",
+                        default => "Serializer::vectorOfObjects({$varName})",
                     };
                 }
-                return "{$varName}->serialize(\$serializer)";
+                return "{$varName}->serialize()";
         }
     }
 
@@ -661,37 +661,37 @@ trait GeneratorHelpers
         switch ($tlTypeLower) {
             case 'int':
             case 'int32':
-                return "\$deserializer->int32(\$stream)";
+                return "Deserializer::int32(\$stream)";
             case 'long':
             case 'int64':
-                return "\$deserializer->int64(\$stream)";
-            case 'int128': return "\$deserializer->int128(\$stream)";
-            case 'int256': return "\$deserializer->int256(\$stream)";
-            case 'double': return "\$deserializer->double(\$stream)";
+                return "Deserializer::int64(\$stream)";
+            case 'int128': return "Deserializer::int128(\$stream)";
+            case 'int256': return "Deserializer::int256(\$stream)";
+            case 'double': return "Deserializer::double(\$stream)";
             case 'string':
             case 'bytes':
-                return "\$deserializer->bytes(\$stream)";
+                return "Deserializer::bytes(\$stream)";
             case 'bool':
-                return "(\$deserializer->int32(\$stream) === 0x997275b5)";
+                return "(Deserializer::int32(\$stream) === 0x997275b5)";
             default:
                 if (str_starts_with($tlType, 'Vector<')) {
                     $innerType = substr($tlType, 7, -1);
 
                     if ($innerType === 'int') {
-                        return "\$deserializer->vectorOfInts(\$stream)";
+                        return "Deserializer::vectorOfInts(\$stream)";
                     }
                     if ($innerType === 'long') {
-                        return "\$deserializer->vectorOfLongs(\$stream)";
+                        return "Deserializer::vectorOfLongs(\$stream)";
                     }
                     if ($innerType === 'string' || $innerType === 'bytes') {
-                        return "\$deserializer->vectorOfStrings(\$stream)";
+                        return "Deserializer::vectorOfStrings(\$stream)";
                     }
 
                     // Старая логика для векторов объектов
                     $deserializationCode = $this->getDeserializationCodeForType($innerType, $useStatements, $currentClassName, $parentFqcn);
                     // $deserializationCode будет выглядеть как `SomeClass::deserialize(...)`. Нам нужно извлечь `SomeClass::class`.
                     $callableClass = explode('::', $deserializationCode)[0];
-                    return "\$deserializer->vectorOfObjects(\$stream, [{$callableClass}::class, 'deserialize'])";
+                    return "Deserializer::vectorOfObjects(\$stream, [{$callableClass}::class, 'deserialize'])";
                 }
 
                 // 4. Обработка одиночных TL-объектов
@@ -737,7 +737,7 @@ trait GeneratorHelpers
                     $useStatements[$fqcn] = true;
                 }
 
-                return "{$callableClass}::deserialize(\$deserializer, \$stream)";
+                return "{$callableClass}::deserialize(\$stream)";
         }
     }
 
@@ -764,7 +764,7 @@ trait GeneratorHelpers
             }
 
             // Генерируем "руку" для match-выражения
-            $matchArms[] = "            {$callableClass}::CONSTRUCTOR_ID => {$callableClass}::deserialize(\$deserializer, \$stream),";
+            $matchArms[] = "            {$callableClass}::CONSTRUCTOR_ID => {$callableClass}::deserialize(\$stream),";
         }
 
         // Добавляем default-ветку
@@ -777,10 +777,10 @@ trait GeneratorHelpers
         // правильно вывести тип после сложного match-выражения. Без этого они
         // могут ошибочно посчитать, что возвращаемый тип несовместим со static.
         $body = <<<PHP
-        public static function deserialize(Deserializer \$deserializer, string &\$stream): static
+        public static function deserialize(string &\$stream): static
         {
             // Peek at the constructor ID to determine the concrete type
-            \$constructorId = \$deserializer->peekInt32(\$stream);
+            \$constructorId = Deserializer::peekInt32(\$stream);
             
             return match (\$constructorId) {
     {$cases}
