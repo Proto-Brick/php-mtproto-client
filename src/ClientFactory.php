@@ -26,15 +26,11 @@ class ClientFactory
         $authKeyStorage = new FileAuthKeyStorage($storagePath . '/auth.key');
         $sessionStorage = new FileSessionStorage($storagePath);
         $transport = new TcpTransport($settings);
-        $serializer = new Serializer();
-        $deserializer = new Deserializer();
         $rsa = new Rsa();
         $aes = new Aes();
         $session = new Session($sessionStorage);
-        $messagePacker = new MessagePacker($session, $aes, $serializer);
-        $authKeyCreator = new AuthKeyCreator($transport, $serializer, $deserializer, $rsa, $messagePacker, $session);
-        $deserializer = new Deserializer();
-        $serializer = new Serializer();
+        $messagePacker = new MessagePacker($session, $aes);
+        $authKeyCreator = new AuthKeyCreator($transport, $rsa, $messagePacker, $session);
 
         return new Client(
             $settings,
@@ -42,9 +38,7 @@ class ClientFactory
             $session,
             $transport,
             $authKeyCreator,
-            $messagePacker,
-            $deserializer,
-            $serializer,
+            $messagePacker
         );
     }
 }

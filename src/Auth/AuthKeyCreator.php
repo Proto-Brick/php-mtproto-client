@@ -21,16 +21,12 @@ class AuthKeyCreator
 {
     /**
      * @param Transport $transport
-     * @param Serializer $serializer
-     * @param Deserializer $deserializer
      * @param Rsa $rsa
      * @param MessagePacker $messagePacker
      * @param Session $session
      */
     public function __construct(
         private readonly Transport $transport,
-        private readonly Serializer $serializer,
-        private readonly Deserializer $deserializer,
         private readonly Rsa $rsa,
         private readonly MessagePacker $messagePacker,
         private readonly Session $session,
@@ -86,7 +82,7 @@ class AuthKeyCreator
         $nonce = random_bytes(16);
 
         // 2. Сериализуем TL-объект `req_pq_multi`. Это "внутренняя" полезная нагрузка сообщения.
-        $payload = $this->serializer->int32(Constructors::REQ_PQ_MULTI) . $this->serializer->raw128($nonce);
+        $payload = Serializer::int32(Constructors::REQ_PQ_MULTI) . Serializer::raw128($nonce);
 
         // 3. Упаковываем TL-объект в незашифрованный MTProto-контейнер.
         // Структура контейнера: [auth_key_id (8 байт) = 0] [msg_id (8 байт)] [message_length (4 байта)] [payload]
@@ -96,7 +92,7 @@ class AuthKeyCreator
         $this->transport->send($request)->await();
 
         $prefixBytes = $this->transport->receive(4)->await();
-        $lengthOrError = $this->deserializer->int32($prefixBytes);
+        $lengthOrError = Deserializer::int32($prefixBytes);
 
         if ($lengthOrError <= 0) {
             throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
@@ -118,7 +114,7 @@ class AuthKeyCreator
         $tlObjectPayload = substr($responsePayload, 20);
 
         // 9. Десериализуем TL-объект `resPQ` в PHP-массив.
-        $deserialized = $this->deserializer->deserializeResPQ($tlObjectPayload);
+        $deserialized = Deserializer::deserializeResPQ($tlObjectPayload);
 
         // 10. Финальная проверка безопасности: nonce в ответе должен совпадать с тем, что мы отправили.
         // Это защищает от атак повторного воспроизведения (replay attacks).
@@ -160,33 +156,33 @@ class AuthKeyCreator
 
         // Сборка p_q_inner_data
         $innerDataPayload =
-            $this->serializer->int32(Constructors::P_Q_INNER_DATA_DC)
-            . $this->serializer->bytes($pq_big)
-            . $this->serializer->bytes($p)
-            . $this->serializer->bytes($q)
-            . $this->serializer->raw128($resPQData['original_nonce'])
-            . $this->serializer->raw128($resPQData['server_nonce'])
-            . $this->serializer->raw256($newNonce)
-            . $this->serializer->int32(2);
+            Serializer::int32(Constructors::P_Q_INNER_DATA_DC)
+            . Serializer::bytes($pq_big)
+            . Serializer::bytes($p)
+            . Serializer::bytes($q)
+            . Serializer::raw128($resPQData['original_nonce'])
+            . Serializer::raw128($resPQData['server_nonce'])
+            . Serializer::raw256($newNonce)
+            . Serializer::int32(2);
 
         // Шифрование inner_data
         $encryptedInnerData = $this->rsa->encryptPqInnerData($innerDataPayload, $publicKeyPem);
 
         // Сборка и отправка req_DH_params
         $payload =
-            $this->serializer->int32(Constructors::REQ_DH_PARAMS)
-            . $this->serializer->raw128($resPQData['nonce'])
-            . $this->serializer->raw128($resPQData['server_nonce'])
-            . $this->serializer->bytes($p)
-            . $this->serializer->bytes($q)
-            . $this->serializer->int64($foundFingerprint_int)
-            . $this->serializer->bytes($encryptedInnerData);
+            Serializer::int32(Constructors::REQ_DH_PARAMS)
+            . Serializer::raw128($resPQData['nonce'])
+            . Serializer::raw128($resPQData['server_nonce'])
+            . Serializer::bytes($p)
+            . Serializer::bytes($q)
+            . Serializer::int64($foundFingerprint_int)
+            . Serializer::bytes($encryptedInnerData);
 
         $request = $this->messagePacker->packUnencrypted($payload);
         $this->transport->send($request)->await();
 
         $prefixBytes = $this->transport->receive(4)->await();
-        $lengthOrError = $this->deserializer->int32($prefixBytes);
+        $lengthOrError = Deserializer::int32($prefixBytes);
 
         if ($lengthOrError <= 0) {
             throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
@@ -198,7 +194,7 @@ class AuthKeyCreator
         // Снова пропускаем заголовок
         $responsePayload = substr($responsePayload, 20);
 
-        $serverDhData = $this->deserializer->deserializeServerDhParamsOk($responsePayload);
+        $serverDhData = Deserializer::deserializeServerDhParamsOk($responsePayload);
 
         if ($serverDhData['nonce'] !== $resPQData['nonce']) {
             throw new \RuntimeException("Invalid nonce in Server_DH_Params response.");
@@ -309,7 +305,7 @@ class AuthKeyCreator
 
         // Десериализуем, чтобы узнать фактическую длину данных без паддинга
         $streamForParsing = $innerDataWithPadding;
-        $dhInnerData = $this->deserializer->deserializeServerDhInnerData($streamForParsing);
+        $dhInnerData = Deserializer::deserializeServerDhInnerData($streamForParsing);
         $actualDataLength = \strlen($innerDataWithPadding) - \strlen($streamForParsing);
         $actualData = substr($innerDataWithPadding, 0, $actualDataLength);
 
@@ -371,11 +367,11 @@ class AuthKeyCreator
     {
         // Формируем client_DH_inner_data
         $clientInnerDataPayload =
-            $this->serializer->int32(0x6643b654) // client_DH_inner_data constructor ID
-            . $this->serializer->raw128($resPQData['nonce'])
-            . $this->serializer->raw128($resPQData['server_nonce'])
-            . $this->serializer->int64(0) // retry_id
-            . $this->serializer->bytes($gb_bytes);
+            Serializer::int32(0x6643b654) // client_DH_inner_data constructor ID
+            . Serializer::raw128($resPQData['nonce'])
+            . Serializer::raw128($resPQData['server_nonce'])
+            . Serializer::int64(0) // retry_id
+            . Serializer::bytes($gb_bytes);
 
         // Добавляем SHA1 хэш и паддинг
         $clientDataWithHash = hash('sha1', $clientInnerDataPayload, true) . $clientInnerDataPayload;
@@ -391,16 +387,16 @@ class AuthKeyCreator
 
         // Формируем и отправляем финальный запрос
         $finalPayload =
-            $this->serializer->int32(0xf5045f1f) // set_client_DH_params constructor ID
-            . $this->serializer->raw128($resPQData['nonce'])
-            . $this->serializer->raw128($resPQData['server_nonce'])
-            . $this->serializer->bytes($encryptedClientInnerData);
+            Serializer::int32(0xf5045f1f) // set_client_DH_params constructor ID
+            . Serializer::raw128($resPQData['nonce'])
+            . Serializer::raw128($resPQData['server_nonce'])
+            . Serializer::bytes($encryptedClientInnerData);
 
         $request = $this->messagePacker->packUnencrypted($finalPayload);
         $this->transport->send($request)->await();
 
         $prefixBytes = $this->transport->receive(4)->await();
-        $lengthOrError = $this->deserializer->int32($prefixBytes);
+        $lengthOrError = Deserializer::int32($prefixBytes);
 
         if ($lengthOrError <= 0) {
             throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
@@ -421,7 +417,7 @@ class AuthKeyCreator
         $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
         $responsePayload = substr($responsePayload, 20); // Пропускаем заголовок
 
-        $finalConstructor = $this->deserializer->int32($responsePayload);
+        $finalConstructor = Deserializer::int32($responsePayload);
 
         // Проверяем статус ответа
         if ($finalConstructor === Constructors::DH_GEN_FAIL) {
@@ -439,14 +435,14 @@ class AuthKeyCreator
         }
 
         // Валидируем nonce
-        if ($this->deserializer->raw128($responsePayload) !== $resPQData['nonce']) {
+        if (Deserializer::raw128($responsePayload) !== $resPQData['nonce']) {
             throw new \RuntimeException("Final nonce mismatch.");
         }
-        if ($this->deserializer->raw128($responsePayload) !== $resPQData['server_nonce']) {
+        if (Deserializer::raw128($responsePayload) !== $resPQData['server_nonce']) {
             throw new \RuntimeException("Final server nonce mismatch.");
         }
 
-        $new_nonce_hash1_from_server = $this->deserializer->raw128($responsePayload);
+        $new_nonce_hash1_from_server = Deserializer::raw128($responsePayload);
 
         // Финальная и самая важная проверка new_nonce_hash
         $auth_key_aux_hash = substr(hash('sha1', $authKey->key, true), 0, 8);

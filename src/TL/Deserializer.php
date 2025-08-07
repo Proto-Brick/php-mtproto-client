@@ -6,7 +6,7 @@ namespace DigitalStars\MtprotoClient\TL;
 
 class Deserializer
 {
-    public function peekInt32(string $stream): int
+    public static function peekInt32(string $stream): int
     {
         if (\strlen($stream) < 4) {
             throw new \Exception("Not enough data to peek int32");
@@ -14,9 +14,9 @@ class Deserializer
         return unpack('V', substr($stream, 0, 4))[1];
     }
 
-    public function deserializeBool(string &$payload): bool
+    public static function deserializeBool(string &$payload): bool
     {
-        $constructorId = $this->consumeConstructor($payload);
+        $constructorId = self::consumeConstructor($payload);
         if ($constructorId === 0x997275b5) { // boolTrue
             return true;
         }
@@ -26,14 +26,14 @@ class Deserializer
         throw new \Exception("Expected bool, but got constructor " . dechex($constructorId));
     }
 
-    public function int32(string &$stream): int
+    public static function int32(string &$stream): int
     {
         $value_bin = substr($stream, 0, 4);
         $stream = substr($stream, 4);
         return unpack('V', $value_bin)[1]; // Распаковка как 32-bit беззнаковый little-endian integer.
     }
 
-    public function int64(string &$stream): int
+    public static function int64(string &$stream): int
     {
         $value_bin = substr($stream, 0, 8);
         $stream = substr($stream, 8);
@@ -41,14 +41,14 @@ class Deserializer
         //return unpack('q', $value_bin)[1]; // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
     }
 
-    public function int128(string &$stream): string
+    public static function int128(string &$stream): string
     {
         $value_bin = substr($stream, 0, 16);
         $stream = substr($stream, 16);
         return strrev($value_bin); // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
     }
 
-    public function double(string &$stream): float
+    public static function double(string &$stream): float
     {
         $value_bin = substr($stream, 0, 8);
         $stream = substr($stream, 8);
@@ -58,14 +58,14 @@ class Deserializer
     /**
      * НОВЫЙ МЕТОД: Читает 16 "сырых" байт и возвращает их как есть.
      */
-    public function raw128(string &$payload): string
+    public static function raw128(string &$payload): string
     {
         $value = substr($payload, 0, 16);
         $payload = substr($payload, 16);
         return $value; // Без strrev!
     }
 
-    public function bytes(string &$stream): string
+    public static function bytes(string &$stream): string
     {
         $firstByte = \ord($stream[0]);
         $stream = substr($stream, 1);
@@ -96,17 +96,17 @@ class Deserializer
     /**
      * Заглядывает в поток и читает ID конструктора, не изменяя поток.
      */
-    public function peekConstructor(string $stream): int
+    public static function peekConstructor(string $stream): int
     {
-        return $this->peekInt32($stream);
+        return self::peekInt32($stream);
     }
 
     /**
      * Читает (потребляет) ID конструктора из потока.
      */
-    public function consumeConstructor(string &$stream): int
+    public static function consumeConstructor(string &$stream): int
     {
-        return $this->int32($stream);
+        return self::int32($stream);
     }
 
     /**
@@ -117,57 +117,57 @@ class Deserializer
      * @return array
      * @throws \Exception
      */
-    public function vectorOfObjects(string &$payload, callable $itemDeserializer): array
+    public static function vectorOfObjects(string &$payload, callable $itemDeserializer): array
     {
-        if ($this->int32($payload) !== 0x1cb5c415) {
+        if (self::int32($payload) !== 0x1cb5c415) {
             throw new \Exception('Invalid vector constructor ID');
         }
 
-        $count = $this->int32($payload);
+        $count = self::int32($payload);
         $result = [];
 
         for ($i = 0; $i < $count; $i++) {
-            $result[] = $itemDeserializer($this, $payload);
+            $result[] = $itemDeserializer($payload);
         }
 
         return $result;
     }
 
-    public function vectorOfInts(string &$payload): array
+    public static function vectorOfInts(string &$payload): array
     {
-        if ($this->int32($payload) !== 0x1cb5c415) {
+        if (self::int32($payload) !== 0x1cb5c415) {
             throw new \Exception('Invalid vector constructor for Vector<int>');
         }
-        $count = $this->int32($payload);
+        $count = self::int32($payload);
         $result = [];
         for ($i = 0; $i < $count; $i++) {
-            $result[] = $this->int32($payload);
+            $result[] = self::int32($payload);
         }
         return $result;
     }
 
-    public function vectorOfLongs(string &$payload): array
+    public static function vectorOfLongs(string &$payload): array
     {
-        if ($this->int32($payload) !== 0x1cb5c415) {
+        if (self::int32($payload) !== 0x1cb5c415) {
             throw new \Exception('Invalid vector constructor for Vector<long>');
         }
-        $count = $this->int32($payload);
+        $count = self::int32($payload);
         $result = [];
         for ($i = 0; $i < $count; $i++) {
-            $result[] = $this->int64($payload);
+            $result[] = self::int64($payload);
         }
         return $result;
     }
 
-    public function vectorOfStrings(string &$payload): array
+    public static function vectorOfStrings(string &$payload): array
     {
-        if ($this->int32($payload) !== 0x1cb5c415) {
+        if (self::int32($payload) !== 0x1cb5c415) {
             throw new \Exception('Invalid vector constructor for Vector<string>');
         }
-        $count = $this->int32($payload);
+        $count = self::int32($payload);
         $result = [];
         for ($i = 0; $i < $count; $i++) {
-            $result[] = $this->bytes($payload);
+            $result[] = self::bytes($payload);
         } // string и bytes десериализуются одинаково
         return $result;
     }
@@ -176,20 +176,20 @@ class Deserializer
      * Десериализует сложный TL-тип JSONValue рекурсивно.
      * Умеет обрабатывать все современные JSON-конструкторы.
      */
-    public function deserializeJsonValue(string &$stream): mixed
+    public static function deserializeJsonValue(string &$stream): mixed
     {
         // Заглядываем в поток, чтобы узнать, какой тип JSON-элемента нас ждет
-        $constructorId = $this->peekInt32($stream);
+        $constructorId = self::peekInt32($stream);
 
         switch ($constructorId) {
             case 0x3f6d7b68: // jsonNull#3f6d7b68 = JSONValue;
-                $this->int32($stream); // "Съедаем" ID
+                self::int32($stream); // "Съедаем" ID
                 return null;
 
             case 0xc7345e6a: // jsonBool#c7345e6a value:Bool = JSONValue;
-                $this->int32($stream); // "Съедаем" ID
+                self::int32($stream); // "Съедаем" ID
                 // Читаем значение типа Bool (которое тоже является TL-объектом)
-                $boolConstructor = $this->int32($stream);
+                $boolConstructor = self::int32($stream);
                 if ($boolConstructor === 0x997275b5) {
                     return true;
                 } // boolTrue
@@ -199,54 +199,54 @@ class Deserializer
                 throw new \Exception("Invalid constructor for Bool inside jsonBool");
 
             case 0x2be0dfa4: // jsonNumber#2be0dfa4 value:double = JSONValue;
-                $this->int32($stream); // "Съедаем" ID
-                return $this->double($stream);
+                self::int32($stream); // "Съедаем" ID
+                return self::double($stream);
 
                 // --- ДОБАВЛЕНО: Обработка нового конструктора для строк ---
             case 0xb71e767a: // jsonString#b71e767a value:string = JSONValue;
-                $this->int32($stream); // "Съедаем" ID
-                return $this->bytes($stream);
+                self::int32($stream); // "Съедаем" ID
+                return self::bytes($stream);
 
             case 0xf7444763: // jsonArray#f7444763 value:vector<JSONValue> = JSONValue;
-                $this->int32($stream); // "Съедаем" ID
+                self::int32($stream); // "Съедаем" ID
 
                 // Это вектор<JSONValue>
-                if ($this->int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
+                if (self::int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
                     throw new \Exception('Invalid vector constructor in jsonArray');
                 }
-                $count = $this->int32($stream);
+                $count = self::int32($stream);
                 $result = [];
                 for ($i = 0; $i < $count; $i++) {
                     // Рекурсивно вызываем себя для каждого элемента массива
-                    $result[] = $this->deserializeJsonValue($stream);
+                    $result[] = self::deserializeJsonValue($stream);
                 }
                 return $result;
 
             case 0x99c1d49d: // jsonObject#99c1d49d value:vector<JSONObjectValue> = JSONValue;
-                $this->int32($stream); // "Съедаем" ID
+                self::int32($stream); // "Съедаем" ID
 
                 // Это вектор<JSONObjectValue>
-                if ($this->int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
+                if (self::int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
                     throw new \Exception('Invalid vector constructor in jsonObject');
                 }
-                $count = $this->int32($stream);
+                $count = self::int32($stream);
                 $result = [];
                 for ($i = 0; $i < $count; $i++) {
                     // Десериализуем пару ключ-значение (JSONObjectValue)
                     // jsonObjectValue#c0de1bd9 key:string value:JSONValue = JSONObjectValue;
-                    if ($this->int32($stream) !== 0xc0de1bd9) {
+                    if (self::int32($stream) !== 0xc0de1bd9) {
                         throw new \Exception('Invalid constructor for JSONObjectValue');
                     }
-                    $key = $this->bytes($stream);
+                    $key = self::bytes($stream);
                     // Рекурсивно вызываем себя для значения
-                    $value = $this->deserializeJsonValue($stream);
+                    $value = self::deserializeJsonValue($stream);
                     $result[$key] = $value;
                 }
                 return $result;
 
             case 0x7d748d04: // dataJSON#7d748d04 data:string = DataJSON; (псевдоним для JSONValue)
-                $this->int32($stream); // "Съедаем" ID
-                $data = $this->bytes($stream);
+                self::int32($stream); // "Съедаем" ID
+                $data = self::bytes($stream);
                 return json_decode($data, true) ?: []; // Парсим строку как JSON
 
             default:
@@ -254,23 +254,23 @@ class Deserializer
         }
     }
 
-    public function deserializeDataJSON(string &$stream): array
+    public static function deserializeDataJSON(string &$stream): array
     {
-        return json_decode($this->bytes($stream), true) ?: [];
+        return json_decode(self::bytes($stream), true) ?: [];
     }
 
-    public function deserializeResPQ(string &$stream): array
+    public static function deserializeResPQ(string &$stream): array
     {
-        $constructor = $this->int32($stream);
+        $constructor = self::int32($stream);
         if ($constructor !== 0x05162463) {
             throw new \Exception("Expected resPQ constructor, but got " . dechex($constructor));
         }
 
-        $nonce = $this->raw128($stream);
-        $server_nonce = $this->raw128($stream);
-        $pq = $this->bytes($stream);
+        $nonce = self::raw128($stream);
+        $server_nonce = self::raw128($stream);
+        $pq = self::bytes($stream);
 
-        $vector_constructor = $this->int32($stream);
+        $vector_constructor = self::int32($stream);
         if ($vector_constructor !== 0x1cb5c415) {
             throw new \Exception(
                 "Expected vector constructor, but got " . dechex($vector_constructor) . ". Stream state: " . bin2hex(
@@ -279,10 +279,10 @@ class Deserializer
             );
         }
 
-        $count = $this->int32($stream);
+        $count = self::int32($stream);
         $fingerprints = [];
         for ($i = 0; $i < $count; $i++) {
-            $fingerprints[] = $this->int64($stream);
+            $fingerprints[] = self::int64($stream);
         }
 
         return [
@@ -299,18 +299,18 @@ class Deserializer
      * @return array
      * @throws \Exception
      */
-    public function deserializeServerDhParamsOk(string &$stream): array
+    public static function deserializeServerDhParamsOk(string &$stream): array
     {
-        $constructor = $this->int32($stream);
+        $constructor = self::int32($stream);
         // Конструктор для server_DH_params_ok = 0xd0e8075c
         if ($constructor !== 0xd0e8075c) {
             throw new \Exception("Expected server_DH_params_ok constructor, but got " . dechex($constructor));
         }
 
         // Читаем поля в том порядке, в котором они идут в схеме
-        $nonce = $this->raw128($stream);
-        $server_nonce = $this->raw128($stream);
-        $encrypted_answer = $this->bytes($stream);
+        $nonce = self::raw128($stream);
+        $server_nonce = self::raw128($stream);
+        $encrypted_answer = self::bytes($stream);
 
         return [
             'nonce' => $nonce,
@@ -319,18 +319,18 @@ class Deserializer
         ];
     }
 
-    public function deserializeServerDhInnerData(string &$stream): array
+    public static function deserializeServerDhInnerData(string &$stream): array
     {
-        $constructor = $this->int32($stream);
+        $constructor = self::int32($stream);
         if ($constructor !== 0xb5890dba) {
             throw new \Exception("Invalid constructor in DH answer: " . dechex($constructor));
         }
-        $nonce = $this->raw128($stream);
-        $server_nonce = $this->raw128($stream);
-        $g = $this->int32($stream);
-        $dh_prime = $this->bytes($stream);
-        $g_a = $this->bytes($stream);
-        $server_time = $this->int32($stream);
+        $nonce = self::raw128($stream);
+        $server_nonce = self::raw128($stream);
+        $g = self::int32($stream);
+        $dh_prime = self::bytes($stream);
+        $g_a = self::bytes($stream);
+        $server_time = self::int32($stream);
 
         return [
             'nonce' => $nonce,
@@ -342,14 +342,14 @@ class Deserializer
         ];
     }
 
-    public function deserializeGzipPacked(string &$stream): string
+    public static function deserializeGzipPacked(string &$stream): string
     {
-        $constructor = $this->int32($stream);
+        $constructor = self::int32($stream);
         if ($constructor !== 0x3072cfa1) { // gzip_packed
             throw new \Exception("Expected gzip_packed constructor, but got " . dechex($constructor));
         }
 
-        $packed_data = $this->bytes($stream);
+        $packed_data = self::bytes($stream);
         $unpacked_data = gzdecode($packed_data);
 
         if ($unpacked_data === false) {
@@ -370,23 +370,23 @@ class Deserializer
      * @return array
      * @throws \Exception
      */
-    public function deserializeDcOption(string &$stream): array
+    public static function deserializeDcOption(string &$stream): array
     {
         // В новой JSON-схеме ID конструктора 414687501, что равно 0x18b7a10d
-        $constructor = $this->int32($stream);
+        $constructor = self::int32($stream);
         if ($constructor !== 0x18b7a10d) {
             throw new \Exception("Expected dcOption constructor (0x18b7a10d), but got " . dechex($constructor));
         }
 
-        $flags = $this->int32($stream);
-        $id = $this->int32($stream);
-        $ip_address = $this->bytes($stream);
-        $port = $this->int32($stream);
+        $flags = self::int32($stream);
+        $id = self::int32($stream);
+        $ip_address = self::bytes($stream);
+        $port = self::int32($stream);
 
         $secret = null;
         // Поле 'secret' присутствует, если установлен 10-й бит (2^10 = 1024)
         if ($flags & (1 << 10)) {
-            $secret = $this->bytes($stream);
+            $secret = self::bytes($stream);
         }
 
         return [
@@ -402,17 +402,17 @@ class Deserializer
     /**
      * Десериализует bad_server_salt.
      */
-    public function deserializeBadServerSalt(string &$stream): array
+    public static function deserializeBadServerSalt(string &$stream): array
     {
-        $constructor = $this->int32($stream);
+        $constructor = self::int32($stream);
         if ($constructor !== 0xedab447b) {
             throw new \Exception("Expected bad_server_salt constructor, but got " . dechex($constructor));
         }
 
-        $bad_msg_id = $this->int64($stream);
-        $bad_msg_seqno = $this->int32($stream);
-        $error_code = $this->int32($stream);
-        $new_server_salt = $this->int64($stream);
+        $bad_msg_id = self::int64($stream);
+        $bad_msg_seqno = self::int32($stream);
+        $error_code = self::int32($stream);
+        $new_server_salt = self::int64($stream);
 
         return [
             '_' => 'bad_server_salt',
@@ -432,110 +432,110 @@ class Deserializer
      * @return array
      * @throws \Exception
      */
-    public function deserializeConfig(string &$stream): array
+    public static function deserializeConfig(string &$stream): array
     {
         // ID конструктора -870702050 (signed int32) соответствует 0xcc1a241e (unsigned)
-        $constructor = $this->int32($stream);
+        $constructor = self::int32($stream);
         if ($constructor !== 0xcc1a241e) {
             throw new \Exception("Expected config constructor (0xcc1a241e), but got " . dechex($constructor));
         }
 
         $config = ['_' => 'config']; // Начинаем собирать результат
 
-        $flags = $this->int32($stream);
+        $flags = self::int32($stream);
         $config['flags'] = $flags;
 
         // --- Безусловные поля (всегда присутствуют) ---
-        $config['date'] = $this->int32($stream);
-        $config['expires'] = $this->int32($stream);
+        $config['date'] = self::int32($stream);
+        $config['expires'] = self::int32($stream);
 
-        $test_mode_constructor = $this->int32($stream);
+        $test_mode_constructor = self::int32($stream);
         $config['test_mode'] = ($test_mode_constructor === 0x997275b5); // boolTrue
 
-        $config['this_dc'] = $this->int32($stream);
+        $config['this_dc'] = self::int32($stream);
 
         // --- Вектор DcOption ---
-        $vector_constructor = $this->int32($stream);
+        $vector_constructor = self::int32($stream);
         if ($vector_constructor !== 0x1cb5c415) {
             throw new \Exception("Expected vector constructor for dc_options, but got " . dechex($vector_constructor));
         }
-        $dc_options_count = $this->int32($stream);
+        $dc_options_count = self::int32($stream);
         $dc_options = [];
         for ($i = 0; $i < $dc_options_count; $i++) {
-            $dc_options[] = $this->deserializeDcOption($stream);
+            $dc_options[] = self::deserializeDcOption($stream);
         }
         $config['dc_options'] = $dc_options;
 
         // --- Остальные безусловные поля (согласно схеме) ---
-        $config['dc_txt_domain_name'] = $this->bytes($stream);
-        $config['chat_size_max'] = $this->int32($stream);
-        $config['megagroup_size_max'] = $this->int32($stream);
-        $config['forwarded_count_max'] = $this->int32($stream);
-        $config['online_update_period_ms'] = $this->int32($stream);
-        $config['offline_blur_timeout_ms'] = $this->int32($stream);
-        $config['offline_idle_timeout_ms'] = $this->int32($stream);
-        $config['online_cloud_timeout_ms'] = $this->int32($stream);
-        $config['notify_cloud_delay_ms'] = $this->int32($stream);
-        $config['notify_default_delay_ms'] = $this->int32($stream);
-        $config['push_chat_period_ms'] = $this->int32($stream);
-        $config['push_chat_limit'] = $this->int32($stream);
-        $config['edit_time_limit'] = $this->int32($stream);
-        $config['revoke_time_limit'] = $this->int32($stream);
-        $config['revoke_pm_time_limit'] = $this->int32($stream);
-        $config['rating_e_decay'] = $this->int32($stream);
-        $config['stickers_recent_limit'] = $this->int32($stream);
-        $config['channels_read_media_period'] = $this->int32($stream);
+        $config['dc_txt_domain_name'] = self::bytes($stream);
+        $config['chat_size_max'] = self::int32($stream);
+        $config['megagroup_size_max'] = self::int32($stream);
+        $config['forwarded_count_max'] = self::int32($stream);
+        $config['online_update_period_ms'] = self::int32($stream);
+        $config['offline_blur_timeout_ms'] = self::int32($stream);
+        $config['offline_idle_timeout_ms'] = self::int32($stream);
+        $config['online_cloud_timeout_ms'] = self::int32($stream);
+        $config['notify_cloud_delay_ms'] = self::int32($stream);
+        $config['notify_default_delay_ms'] = self::int32($stream);
+        $config['push_chat_period_ms'] = self::int32($stream);
+        $config['push_chat_limit'] = self::int32($stream);
+        $config['edit_time_limit'] = self::int32($stream);
+        $config['revoke_time_limit'] = self::int32($stream);
+        $config['revoke_pm_time_limit'] = self::int32($stream);
+        $config['rating_e_decay'] = self::int32($stream);
+        $config['stickers_recent_limit'] = self::int32($stream);
+        $config['channels_read_media_period'] = self::int32($stream);
 
         // --- Поля, зависящие от флагов ---
         // (name: "tmp_sessions", type: "flags.0?int")
         if ($flags & (1 << 0)) {
-            $config['tmp_sessions'] = $this->int32($stream);
+            $config['tmp_sessions'] = self::int32($stream);
         }
 
         // (name: "call_receive_timeout_ms", type: "int") - это поле стало безусловным в новых схемах
-        $config['call_receive_timeout_ms'] = $this->int32($stream);
-        $config['call_ring_timeout_ms'] = $this->int32($stream);
-        $config['call_connect_timeout_ms'] = $this->int32($stream);
-        $config['call_packet_timeout_ms'] = $this->int32($stream);
+        $config['call_receive_timeout_ms'] = self::int32($stream);
+        $config['call_ring_timeout_ms'] = self::int32($stream);
+        $config['call_connect_timeout_ms'] = self::int32($stream);
+        $config['call_packet_timeout_ms'] = self::int32($stream);
 
-        $config['me_url_prefix'] = $this->bytes($stream);
+        $config['me_url_prefix'] = self::bytes($stream);
 
         // (name: "autoupdate_url_prefix", type: "flags.7?string")
         if ($flags & (1 << 7)) {
-            $config['autoupdate_url_prefix'] = $this->bytes($stream);
+            $config['autoupdate_url_prefix'] = self::bytes($stream);
         }
         // (name: "gif_search_username", type: "flags.9?string")
         if ($flags & (1 << 9)) {
-            $config['gif_search_username'] = $this->bytes($stream);
+            $config['gif_search_username'] = self::bytes($stream);
         }
         // (name: "venue_search_username", type: "flags.10?string")
         if ($flags & (1 << 10)) {
-            $config['venue_search_username'] = $this->bytes($stream);
+            $config['venue_search_username'] = self::bytes($stream);
         }
         // (name: "img_search_username", type: "flags.11?string")
         if ($flags & (1 << 11)) {
-            $config['img_search_username'] = $this->bytes($stream);
+            $config['img_search_username'] = self::bytes($stream);
         }
         // (name: "static_maps_provider", type: "flags.12?string")
         if ($flags & (1 << 12)) {
-            $config['static_maps_provider'] = $this->bytes($stream);
+            $config['static_maps_provider'] = self::bytes($stream);
         }
 
-        $config['caption_length_max'] = $this->int32($stream);
-        $config['message_length_max'] = $this->int32($stream);
-        $config['webfile_dc_id'] = $this->int32($stream);
+        $config['caption_length_max'] = self::int32($stream);
+        $config['message_length_max'] = self::int32($stream);
+        $config['webfile_dc_id'] = self::int32($stream);
 
         // (name: "suggested_lang_code", type: "flags.2?string")
         if ($flags & (1 << 2)) {
-            $config['suggested_lang_code'] = $this->bytes($stream);
+            $config['suggested_lang_code'] = self::bytes($stream);
         }
         // (name: "lang_pack_version", type: "flags.2?int")
         if ($flags & (1 << 2)) {
-            $config['lang_pack_version'] = $this->int32($stream);
+            $config['lang_pack_version'] = self::int32($stream);
         }
         // (name: "base_lang_pack_version", type: "flags.2?int")
         if ($flags & (1 << 2)) {
-            $config['base_lang_pack_version'] = $this->int32($stream);
+            $config['base_lang_pack_version'] = self::int32($stream);
         }
 
         // (name: "reactions_default", type: "flags.15?Reaction") - более сложный тип, пока пропустим
@@ -548,21 +548,21 @@ class Deserializer
      * Десериализует msg_container.
      * @return array Массив вложенных сообщений, каждое со своим телом (body).
      */
-    public function deserializeMessageContainer(string &$stream): array
+    public static function deserializeMessageContainer(string &$stream): array
     {
-        $constructor = $this->int32($stream);
+        $constructor = self::int32($stream);
         if ($constructor !== \DigitalStars\MtprotoClient\TL\Mtproto\Constructors::MSG_CONTAINER) {
             throw new \Exception("Expected msg_container constructor, but got " . dechex($constructor));
         }
 
-        $count = $this->int32($stream); // Количество сообщений в контейнере
+        $count = self::int32($stream); // Количество сообщений в контейнере
         $messages = [];
 
         for ($i = 0; $i < $count; $i++) {
             // Парсим каждое вложенное сообщение
-            $msg_id = $this->int64($stream); // В MTProto long - 64-бита, читаем как бинарную строку
-            $seqno = $this->int32($stream);
-            $length = $this->int32($stream);
+            $msg_id = self::int64($stream); // В MTProto long - 64-бита, читаем как бинарную строку
+            $seqno = self::int32($stream);
+            $length = self::int32($stream);
 
             if (\strlen($stream) < $length) {
                 throw new \Exception("Not enough data in stream to read message of length {$length}.");
@@ -585,16 +585,16 @@ class Deserializer
     /**
      * Десериализует new_session_created.
      */
-    public function deserializeNewSessionCreated(string &$stream): array
+    public static function deserializeNewSessionCreated(string &$stream): array
     {
-        $constructor = $this->int32($stream);
+        $constructor = self::int32($stream);
         if ($constructor !== 0x9ec20908) {
             throw new \Exception("Expected new_session_created constructor, but got " . dechex($constructor));
         }
 
-        $first_msg_id = $this->int64($stream);
-        $unique_id = $this->int64($stream);
-        $server_salt = $this->int64($stream);
+        $first_msg_id = self::int64($stream);
+        $unique_id = self::int64($stream);
+        $server_salt = self::int64($stream);
 
         return [
             '_' => 'new_session_created',

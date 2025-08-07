@@ -17,8 +17,7 @@ class MessagePacker
 {
     public function __construct(
         private readonly Session $session,
-        private readonly Aes $aes,
-        private readonly Serializer $serializer,
+        private readonly Aes $aes
     ) {}
 
     public function packUnencrypted(string $payload): string
@@ -188,8 +187,8 @@ class MessagePacker
      */
     public function packContainer(array $messages, AuthKey $authKey): array
     {
-        $containerPayload = $this->serializer->int32(Constructors::MSG_CONTAINER);
-        $containerPayload .= $this->serializer->int32(\count($messages));
+        $containerPayload = Serializer::int32(Constructors::MSG_CONTAINER);
+        $containerPayload .= Serializer::int32(\count($messages));
 
         $rpcRequestMsgId = null;
         $innerMsgIds = [];
