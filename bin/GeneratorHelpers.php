@@ -375,8 +375,8 @@ trait GeneratorHelpers
             // Используется в bots.sendCustomRequest
             'DataJSON' => [
                 'php_type' => 'array',
-                'serialize_tpl' => '$serializer->bytes(json_encode(%s, JSON_FORCE_OBJECT))',
-                'deserialize_tpl' => '$deserializer->deserializeDataJSON($stream)',
+                'serialize_tpl' => 'Serializer::bytes(json_encode(%s, JSON_FORCE_OBJECT))',
+                'deserialize_tpl' => 'Deserializer::deserializeDataJSON($stream)',
             ],
 
             // Обработчик для JSONValue: это сложный TL-объект, представляющий JSON.
@@ -386,10 +386,10 @@ trait GeneratorHelpers
 
                 // При отправке мы не будем строить сложную TL-структуру, а отправим
                 // как DataJSON. В 99% случаев сервер это поймет.
-                'serialize_tpl' => '(new DataJSON(json_encode(%s, JSON_FORCE_OBJECT)))->serialize($serializer)',
+                'serialize_tpl' => '(new DataJSON(json_encode(%s, JSON_FORCE_OBJECT)))->serialize()',
 
                 // При получении мы должны вызвать специальный метод, который умеет парсить эту структуру.
-                'deserialize_tpl' => '$deserializer->deserializeJsonValue($stream)',
+                'deserialize_tpl' => 'Deserializer::deserializeJsonValue($stream)',
             ],
             default => null,
         };
@@ -483,10 +483,10 @@ trait GeneratorHelpers
                 }
             }
             $serializeBody .= $s_flagsCalc;
-            $serializeBody .= "        \$buffer .= \$serializer->int32(\${$flagsName});\n";
+            $serializeBody .= "        \$buffer .= Serializer::int32(\${$flagsName});\n";
 
             // Десериализация: чтение этого поля флагов
-            $deserializeBody .= "        \${$flagsName} = \$deserializer->int32(\$stream);\n";
+            $deserializeBody .= "        \${$flagsName} = Deserializer::int32(\$stream);\n";
         }
         if (!empty($flagDefinitions)) {
             $serializeBody .= "\n";

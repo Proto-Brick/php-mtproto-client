@@ -29,10 +29,10 @@ abstract class TlObject implements TlObjectInterface, Serializable
     // Объявляем абстрактные методы, чтобы удовлетворить интерфейс Serializable
     // и заставить дочерние классы их реализовать.
 
-    abstract public function serialize(Serializer $serializer): string;
+    abstract public function serialize(): string;
 
     /**
      * @return static
      */
-    abstract public static function deserialize(Deserializer $deserializer, string &$stream): static;
+    abstract public static function deserialize(string &$stream): static;
 }

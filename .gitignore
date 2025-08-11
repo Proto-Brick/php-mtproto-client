@@ -6,3 +6,5 @@ composer.lock
 .php-cs-fixer.cache
 rector.php
 schema/
+.env
+/.phpunit-cache/test-results
