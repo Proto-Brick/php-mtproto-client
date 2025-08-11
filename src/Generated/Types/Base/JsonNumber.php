@@ -21,17 +21,17 @@ final class JsonNumber extends AbstractJSONValue
         public readonly float $value
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= pack('d', $this->value);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $value = $deserializer->double($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $value = Deserializer::double($stream);
         return new self(
             $value
         );

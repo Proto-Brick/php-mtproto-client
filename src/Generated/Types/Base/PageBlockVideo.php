@@ -27,28 +27,28 @@ final class PageBlockVideo extends AbstractPageBlock
         public readonly ?bool $loop = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->autoplay) $flags |= (1 << 0);
         if ($this->loop) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->videoId);
-        $buffer .= $this->caption->serialize($serializer);
+        $buffer .= Serializer::int64($this->videoId);
+        $buffer .= $this->caption->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $autoplay = ($flags & (1 << 0)) ? true : null;
         $loop = ($flags & (1 << 1)) ? true : null;
-        $videoId = $deserializer->int64($stream);
-        $caption = PageCaption::deserialize($deserializer, $stream);
+        $videoId = Deserializer::int64($stream);
+        $caption = PageCaption::deserialize($stream);
         return new self(
             $videoId,
             $caption,

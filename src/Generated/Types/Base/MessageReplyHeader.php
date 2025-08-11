@@ -41,9 +41,9 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
         public readonly ?int $quoteOffset = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->replyToScheduled) $flags |= (1 << 2);
         if ($this->forumTopic) $flags |= (1 << 3);
@@ -56,51 +56,51 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
         if ($this->quoteText !== null) $flags |= (1 << 6);
         if ($this->quoteEntities !== null) $flags |= (1 << 7);
         if ($this->quoteOffset !== null) $flags |= (1 << 10);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->replyToMsgId);
+            $buffer .= Serializer::int32($this->replyToMsgId);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $this->replyToPeerId->serialize($serializer);
+            $buffer .= $this->replyToPeerId->serialize();
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $this->replyFrom->serialize($serializer);
+            $buffer .= $this->replyFrom->serialize();
         }
         if ($flags & (1 << 8)) {
-            $buffer .= $this->replyMedia->serialize($serializer);
+            $buffer .= $this->replyMedia->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->replyToTopId);
+            $buffer .= Serializer::int32($this->replyToTopId);
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->bytes($this->quoteText);
+            $buffer .= Serializer::bytes($this->quoteText);
         }
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->vectorOfObjects($this->quoteEntities);
+            $buffer .= Serializer::vectorOfObjects($this->quoteEntities);
         }
         if ($flags & (1 << 10)) {
-            $buffer .= $serializer->int32($this->quoteOffset);
+            $buffer .= Serializer::int32($this->quoteOffset);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $replyToScheduled = ($flags & (1 << 2)) ? true : null;
         $forumTopic = ($flags & (1 << 3)) ? true : null;
         $quote = ($flags & (1 << 9)) ? true : null;
-        $replyToMsgId = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $replyToPeerId = ($flags & (1 << 0)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $replyFrom = ($flags & (1 << 5)) ? MessageFwdHeader::deserialize($deserializer, $stream) : null;
-        $replyMedia = ($flags & (1 << 8)) ? AbstractMessageMedia::deserialize($deserializer, $stream) : null;
-        $replyToTopId = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $quoteText = ($flags & (1 << 6)) ? $deserializer->bytes($stream) : null;
-        $quoteEntities = ($flags & (1 << 7)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $quoteOffset = ($flags & (1 << 10)) ? $deserializer->int32($stream) : null;
+        $replyToMsgId = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $replyToPeerId = ($flags & (1 << 0)) ? AbstractPeer::deserialize($stream) : null;
+        $replyFrom = ($flags & (1 << 5)) ? MessageFwdHeader::deserialize($stream) : null;
+        $replyMedia = ($flags & (1 << 8)) ? AbstractMessageMedia::deserialize($stream) : null;
+        $replyToTopId = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $quoteText = ($flags & (1 << 6)) ? Deserializer::bytes($stream) : null;
+        $quoteEntities = ($flags & (1 << 7)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $quoteOffset = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
         return new self(
             $replyToScheduled,
             $forumTopic,

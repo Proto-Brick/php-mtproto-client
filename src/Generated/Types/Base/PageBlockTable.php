@@ -27,28 +27,28 @@ final class PageBlockTable extends AbstractPageBlock
         public readonly ?bool $striped = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->bordered) $flags |= (1 << 0);
         if ($this->striped) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->title->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->rows);
+        $buffer .= $this->title->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->rows);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $bordered = ($flags & (1 << 0)) ? true : null;
         $striped = ($flags & (1 << 1)) ? true : null;
-        $title = AbstractRichText::deserialize($deserializer, $stream);
-        $rows = $deserializer->vectorOfObjects($stream, [PageTableRow::class, 'deserialize']);
+        $title = AbstractRichText::deserialize($stream);
+        $rows = Deserializer::vectorOfObjects($stream, [PageTableRow::class, 'deserialize']);
         return new self(
             $title,
             $rows,

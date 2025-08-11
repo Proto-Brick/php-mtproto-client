@@ -41,27 +41,27 @@ final class GetBotCallbackAnswerRequest extends TlObject
         public readonly ?AbstractInputCheckPasswordSRP $password = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->game) $flags |= (1 << 1);
         if ($this->data !== null) $flags |= (1 << 0);
         if ($this->password !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->msgId);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->msgId);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->data);
+            $buffer .= Serializer::bytes($this->data);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->password->serialize($serializer);
+            $buffer .= $this->password->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

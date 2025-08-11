@@ -21,17 +21,17 @@ final class ChannelAdminLogEventActionDeleteTopic extends AbstractChannelAdminLo
         public readonly AbstractForumTopic $topic
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->topic->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->topic->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $topic = AbstractForumTopic::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $topic = AbstractForumTopic::deserialize($stream);
         return new self(
             $topic
         );

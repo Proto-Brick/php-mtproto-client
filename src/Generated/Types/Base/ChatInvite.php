@@ -53,9 +53,9 @@ final class ChatInvite extends AbstractChatInvite
         public readonly ?int $subscriptionFormId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->channel) $flags |= (1 << 0);
         if ($this->broadcast) $flags |= (1 << 1);
@@ -70,31 +70,31 @@ final class ChatInvite extends AbstractChatInvite
         if ($this->participants !== null) $flags |= (1 << 4);
         if ($this->subscriptionPricing !== null) $flags |= (1 << 10);
         if ($this->subscriptionFormId !== null) $flags |= (1 << 12);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->title);
+        $buffer .= Serializer::bytes($this->title);
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->bytes($this->about);
+            $buffer .= Serializer::bytes($this->about);
         }
-        $buffer .= $this->photo->serialize($serializer);
-        $buffer .= $serializer->int32($this->participantsCount);
+        $buffer .= $this->photo->serialize();
+        $buffer .= Serializer::int32($this->participantsCount);
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->vectorOfObjects($this->participants);
+            $buffer .= Serializer::vectorOfObjects($this->participants);
         }
-        $buffer .= $serializer->int32($this->color);
+        $buffer .= Serializer::int32($this->color);
         if ($flags & (1 << 10)) {
-            $buffer .= $this->subscriptionPricing->serialize($serializer);
+            $buffer .= $this->subscriptionPricing->serialize();
         }
         if ($flags & (1 << 12)) {
-            $buffer .= $serializer->int64($this->subscriptionFormId);
+            $buffer .= Serializer::int64($this->subscriptionFormId);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $channel = ($flags & (1 << 0)) ? true : null;
         $broadcast = ($flags & (1 << 1)) ? true : null;
@@ -105,14 +105,14 @@ final class ChatInvite extends AbstractChatInvite
         $scam = ($flags & (1 << 8)) ? true : null;
         $fake = ($flags & (1 << 9)) ? true : null;
         $canRefulfillSubscription = ($flags & (1 << 11)) ? true : null;
-        $title = $deserializer->bytes($stream);
-        $about = ($flags & (1 << 5)) ? $deserializer->bytes($stream) : null;
-        $photo = AbstractPhoto::deserialize($deserializer, $stream);
-        $participantsCount = $deserializer->int32($stream);
-        $participants = ($flags & (1 << 4)) ? $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']) : null;
-        $color = $deserializer->int32($stream);
-        $subscriptionPricing = ($flags & (1 << 10)) ? StarsSubscriptionPricing::deserialize($deserializer, $stream) : null;
-        $subscriptionFormId = ($flags & (1 << 12)) ? $deserializer->int64($stream) : null;
+        $title = Deserializer::bytes($stream);
+        $about = ($flags & (1 << 5)) ? Deserializer::bytes($stream) : null;
+        $photo = AbstractPhoto::deserialize($stream);
+        $participantsCount = Deserializer::int32($stream);
+        $participants = ($flags & (1 << 4)) ? Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']) : null;
+        $color = Deserializer::int32($stream);
+        $subscriptionPricing = ($flags & (1 << 10)) ? StarsSubscriptionPricing::deserialize($stream) : null;
+        $subscriptionFormId = ($flags & (1 << 12)) ? Deserializer::int64($stream) : null;
         return new self(
             $title,
             $photo,

@@ -23,19 +23,19 @@ final class PageListOrderedItemBlocks extends AbstractPageListOrderedItem
         public readonly array $blocks
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->num);
-        $buffer .= $serializer->vectorOfObjects($this->blocks);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->num);
+        $buffer .= Serializer::vectorOfObjects($this->blocks);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $num = $deserializer->bytes($stream);
-        $blocks = $deserializer->vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $num = Deserializer::bytes($stream);
+        $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
         return new self(
             $num,
             $blocks

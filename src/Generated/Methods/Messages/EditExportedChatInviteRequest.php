@@ -44,35 +44,35 @@ final class EditExportedChatInviteRequest extends TlObject
         public readonly ?string $title = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->revoked) $flags |= (1 << 2);
         if ($this->expireDate !== null) $flags |= (1 << 0);
         if ($this->usageLimit !== null) $flags |= (1 << 1);
         if ($this->requestNeeded !== null) $flags |= (1 << 3);
         if ($this->title !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->bytes($this->link);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::bytes($this->link);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->expireDate);
+            $buffer .= Serializer::int32($this->expireDate);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->usageLimit);
+            $buffer .= Serializer::int32($this->usageLimit);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= ($this->requestNeeded ? $serializer->int32(0x997275b5) : $serializer->int32(0xbc799737));
+            $buffer .= ($this->requestNeeded ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -46,29 +46,29 @@ final class GetAdminLogRequest extends TlObject
         public readonly ?array $admins = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->eventsFilter !== null) $flags |= (1 << 0);
         if ($this->admins !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->channel->serialize($serializer);
-        $buffer .= $serializer->bytes($this->q);
+        $buffer .= $this->channel->serialize();
+        $buffer .= Serializer::bytes($this->q);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->eventsFilter->serialize($serializer);
+            $buffer .= $this->eventsFilter->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->admins);
+            $buffer .= Serializer::vectorOfObjects($this->admins);
         }
-        $buffer .= $serializer->int64($this->maxId);
-        $buffer .= $serializer->int64($this->minId);
-        $buffer .= $serializer->int32($this->limit);
+        $buffer .= Serializer::int64($this->maxId);
+        $buffer .= Serializer::int64($this->minId);
+        $buffer .= Serializer::int32($this->limit);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -31,42 +31,42 @@ final class AvailableEffect extends TlObject
         public readonly ?int $effectAnimationId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->premiumRequired) $flags |= (1 << 2);
         if ($this->staticIconId !== null) $flags |= (1 << 0);
         if ($this->effectAnimationId !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->bytes($this->emoticon);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::bytes($this->emoticon);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->staticIconId);
+            $buffer .= Serializer::int64($this->staticIconId);
         }
-        $buffer .= $serializer->int64($this->effectStickerId);
+        $buffer .= Serializer::int64($this->effectStickerId);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int64($this->effectAnimationId);
+            $buffer .= Serializer::int64($this->effectAnimationId);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $premiumRequired = ($flags & (1 << 2)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $emoticon = $deserializer->bytes($stream);
-        $staticIconId = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $effectStickerId = $deserializer->int64($stream);
-        $effectAnimationId = ($flags & (1 << 1)) ? $deserializer->int64($stream) : null;
+        $id = Deserializer::int64($stream);
+        $emoticon = Deserializer::bytes($stream);
+        $staticIconId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $effectStickerId = Deserializer::int64($stream);
+        $effectAnimationId = ($flags & (1 << 1)) ? Deserializer::int64($stream) : null;
         return new self(
             $id,
             $emoticon,

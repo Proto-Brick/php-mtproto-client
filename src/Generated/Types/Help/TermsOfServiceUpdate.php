@@ -23,19 +23,19 @@ final class TermsOfServiceUpdate extends AbstractTermsOfServiceUpdate
         public readonly TermsOfService $termsOfService
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->expires);
-        $buffer .= $this->termsOfService->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->expires);
+        $buffer .= $this->termsOfService->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $expires = $deserializer->int32($stream);
-        $termsOfService = TermsOfService::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $expires = Deserializer::int32($stream);
+        $termsOfService = TermsOfService::deserialize($stream);
         return new self(
             $expires,
             $termsOfService

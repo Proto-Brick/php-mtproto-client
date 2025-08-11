@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractPeerColors extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PeerColorsNotModified::CONSTRUCTOR_ID => PeerColorsNotModified::deserialize($deserializer, $stream),
-            PeerColors::CONSTRUCTOR_ID => PeerColors::deserialize($deserializer, $stream),
+            PeerColorsNotModified::CONSTRUCTOR_ID => PeerColorsNotModified::deserialize($stream),
+            PeerColors::CONSTRUCTOR_ID => PeerColors::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.PeerColors. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

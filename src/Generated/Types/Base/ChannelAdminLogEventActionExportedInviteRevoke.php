@@ -21,17 +21,17 @@ final class ChannelAdminLogEventActionExportedInviteRevoke extends AbstractChann
         public readonly AbstractExportedChatInvite $invite
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->invite->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->invite->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $invite = AbstractExportedChatInvite::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $invite = AbstractExportedChatInvite::deserialize($stream);
         return new self(
             $invite
         );

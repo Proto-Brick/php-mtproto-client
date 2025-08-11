@@ -25,21 +25,21 @@ final class UpdateGroupCallParticipants extends AbstractUpdate
         public readonly int $version
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->call->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->participants);
-        $buffer .= $serializer->int32($this->version);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->call->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->participants);
+        $buffer .= Serializer::int32($this->version);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $call = InputGroupCall::deserialize($deserializer, $stream);
-        $participants = $deserializer->vectorOfObjects($stream, [GroupCallParticipant::class, 'deserialize']);
-        $version = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $call = InputGroupCall::deserialize($stream);
+        $participants = Deserializer::vectorOfObjects($stream, [GroupCallParticipant::class, 'deserialize']);
+        $version = Deserializer::int32($stream);
         return new self(
             $call,
             $participants,

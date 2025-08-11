@@ -23,19 +23,19 @@ final class UpdatePeerSettings extends AbstractUpdate
         public readonly PeerSettings $settings
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->settings->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->settings->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $settings = PeerSettings::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractPeer::deserialize($stream);
+        $settings = PeerSettings::deserialize($stream);
         return new self(
             $peer,
             $settings

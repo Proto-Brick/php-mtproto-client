@@ -97,9 +97,9 @@ final class Message extends AbstractMessage
         public readonly ?FactCheck $factcheck = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->out) $flags |= (1 << 1);
         if ($this->mentioned) $flags |= (1 << 4);
@@ -131,93 +131,93 @@ final class Message extends AbstractMessage
         if ($this->restrictionReason !== null) $flags |= (1 << 22);
         if ($this->ttlPeriod !== null) $flags |= (1 << 25);
         if ($this->quickReplyShortcutId !== null) $flags |= (1 << 30);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
         $flags2 = 0;
         if ($this->offline) $flags2 |= (1 << 1);
         if ($this->videoProcessingPending) $flags2 |= (1 << 4);
         if ($this->viaBusinessBotId !== null) $flags2 |= (1 << 0);
         if ($this->effect !== null) $flags2 |= (1 << 2);
         if ($this->factcheck !== null) $flags2 |= (1 << 3);
-        $buffer .= $serializer->int32($flags2);
+        $buffer .= Serializer::int32($flags2);
 
-        $buffer .= $serializer->int32($this->id);
+        $buffer .= Serializer::int32($this->id);
         if ($flags & (1 << 8)) {
-            $buffer .= $this->fromId->serialize($serializer);
+            $buffer .= $this->fromId->serialize();
         }
         if ($flags & (1 << 29)) {
-            $buffer .= $serializer->int32($this->fromBoostsApplied);
+            $buffer .= Serializer::int32($this->fromBoostsApplied);
         }
-        $buffer .= $this->peerId->serialize($serializer);
+        $buffer .= $this->peerId->serialize();
         if ($flags & (1 << 28)) {
-            $buffer .= $this->savedPeerId->serialize($serializer);
+            $buffer .= $this->savedPeerId->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->fwdFrom->serialize($serializer);
+            $buffer .= $this->fwdFrom->serialize();
         }
         if ($flags & (1 << 11)) {
-            $buffer .= $serializer->int64($this->viaBotId);
+            $buffer .= Serializer::int64($this->viaBotId);
         }
         if ($flags2 & (1 << 0)) {
-            $buffer .= $serializer->int64($this->viaBusinessBotId);
+            $buffer .= Serializer::int64($this->viaBusinessBotId);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->replyTo->serialize($serializer);
+            $buffer .= $this->replyTo->serialize();
         }
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->bytes($this->message);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::bytes($this->message);
         if ($flags & (1 << 9)) {
-            $buffer .= $this->media->serialize($serializer);
+            $buffer .= $this->media->serialize();
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $this->replyMarkup->serialize($serializer);
+            $buffer .= $this->replyMarkup->serialize();
         }
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         if ($flags & (1 << 10)) {
-            $buffer .= $serializer->int32($this->views);
+            $buffer .= Serializer::int32($this->views);
         }
         if ($flags & (1 << 10)) {
-            $buffer .= $serializer->int32($this->forwards);
+            $buffer .= Serializer::int32($this->forwards);
         }
         if ($flags & (1 << 23)) {
-            $buffer .= $this->replies->serialize($serializer);
+            $buffer .= $this->replies->serialize();
         }
         if ($flags & (1 << 15)) {
-            $buffer .= $serializer->int32($this->editDate);
+            $buffer .= Serializer::int32($this->editDate);
         }
         if ($flags & (1 << 16)) {
-            $buffer .= $serializer->bytes($this->postAuthor);
+            $buffer .= Serializer::bytes($this->postAuthor);
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $serializer->int64($this->groupedId);
+            $buffer .= Serializer::int64($this->groupedId);
         }
         if ($flags & (1 << 20)) {
-            $buffer .= $this->reactions->serialize($serializer);
+            $buffer .= $this->reactions->serialize();
         }
         if ($flags & (1 << 22)) {
-            $buffer .= $serializer->vectorOfObjects($this->restrictionReason);
+            $buffer .= Serializer::vectorOfObjects($this->restrictionReason);
         }
         if ($flags & (1 << 25)) {
-            $buffer .= $serializer->int32($this->ttlPeriod);
+            $buffer .= Serializer::int32($this->ttlPeriod);
         }
         if ($flags & (1 << 30)) {
-            $buffer .= $serializer->int32($this->quickReplyShortcutId);
+            $buffer .= Serializer::int32($this->quickReplyShortcutId);
         }
         if ($flags2 & (1 << 2)) {
-            $buffer .= $serializer->int64($this->effect);
+            $buffer .= Serializer::int64($this->effect);
         }
         if ($flags2 & (1 << 3)) {
-            $buffer .= $this->factcheck->serialize($serializer);
+            $buffer .= $this->factcheck->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
-        $flags2 = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
+        $flags2 = Deserializer::int32($stream);
 
         $out = ($flags & (1 << 1)) ? true : null;
         $mentioned = ($flags & (1 << 4)) ? true : null;
@@ -232,32 +232,32 @@ final class Message extends AbstractMessage
         $invertMedia = ($flags & (1 << 27)) ? true : null;
         $offline = ($flags2 & (1 << 1)) ? true : null;
         $videoProcessingPending = ($flags2 & (1 << 4)) ? true : null;
-        $id = $deserializer->int32($stream);
-        $fromId = ($flags & (1 << 8)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $fromBoostsApplied = ($flags & (1 << 29)) ? $deserializer->int32($stream) : null;
-        $peerId = AbstractPeer::deserialize($deserializer, $stream);
-        $savedPeerId = ($flags & (1 << 28)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $fwdFrom = ($flags & (1 << 2)) ? MessageFwdHeader::deserialize($deserializer, $stream) : null;
-        $viaBotId = ($flags & (1 << 11)) ? $deserializer->int64($stream) : null;
-        $viaBusinessBotId = ($flags2 & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $replyTo = ($flags & (1 << 3)) ? AbstractMessageReplyHeader::deserialize($deserializer, $stream) : null;
-        $date = $deserializer->int32($stream);
-        $message = $deserializer->bytes($stream);
-        $media = ($flags & (1 << 9)) ? AbstractMessageMedia::deserialize($deserializer, $stream) : null;
-        $replyMarkup = ($flags & (1 << 6)) ? AbstractReplyMarkup::deserialize($deserializer, $stream) : null;
-        $entities = ($flags & (1 << 7)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $views = ($flags & (1 << 10)) ? $deserializer->int32($stream) : null;
-        $forwards = ($flags & (1 << 10)) ? $deserializer->int32($stream) : null;
-        $replies = ($flags & (1 << 23)) ? MessageReplies::deserialize($deserializer, $stream) : null;
-        $editDate = ($flags & (1 << 15)) ? $deserializer->int32($stream) : null;
-        $postAuthor = ($flags & (1 << 16)) ? $deserializer->bytes($stream) : null;
-        $groupedId = ($flags & (1 << 17)) ? $deserializer->int64($stream) : null;
-        $reactions = ($flags & (1 << 20)) ? MessageReactions::deserialize($deserializer, $stream) : null;
-        $restrictionReason = ($flags & (1 << 22)) ? $deserializer->vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
-        $ttlPeriod = ($flags & (1 << 25)) ? $deserializer->int32($stream) : null;
-        $quickReplyShortcutId = ($flags & (1 << 30)) ? $deserializer->int32($stream) : null;
-        $effect = ($flags2 & (1 << 2)) ? $deserializer->int64($stream) : null;
-        $factcheck = ($flags2 & (1 << 3)) ? FactCheck::deserialize($deserializer, $stream) : null;
+        $id = Deserializer::int32($stream);
+        $fromId = ($flags & (1 << 8)) ? AbstractPeer::deserialize($stream) : null;
+        $fromBoostsApplied = ($flags & (1 << 29)) ? Deserializer::int32($stream) : null;
+        $peerId = AbstractPeer::deserialize($stream);
+        $savedPeerId = ($flags & (1 << 28)) ? AbstractPeer::deserialize($stream) : null;
+        $fwdFrom = ($flags & (1 << 2)) ? MessageFwdHeader::deserialize($stream) : null;
+        $viaBotId = ($flags & (1 << 11)) ? Deserializer::int64($stream) : null;
+        $viaBusinessBotId = ($flags2 & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $replyTo = ($flags & (1 << 3)) ? AbstractMessageReplyHeader::deserialize($stream) : null;
+        $date = Deserializer::int32($stream);
+        $message = Deserializer::bytes($stream);
+        $media = ($flags & (1 << 9)) ? AbstractMessageMedia::deserialize($stream) : null;
+        $replyMarkup = ($flags & (1 << 6)) ? AbstractReplyMarkup::deserialize($stream) : null;
+        $entities = ($flags & (1 << 7)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $views = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
+        $forwards = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
+        $replies = ($flags & (1 << 23)) ? MessageReplies::deserialize($stream) : null;
+        $editDate = ($flags & (1 << 15)) ? Deserializer::int32($stream) : null;
+        $postAuthor = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
+        $groupedId = ($flags & (1 << 17)) ? Deserializer::int64($stream) : null;
+        $reactions = ($flags & (1 << 20)) ? MessageReactions::deserialize($stream) : null;
+        $restrictionReason = ($flags & (1 << 22)) ? Deserializer::vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
+        $ttlPeriod = ($flags & (1 << 25)) ? Deserializer::int32($stream) : null;
+        $quickReplyShortcutId = ($flags & (1 << 30)) ? Deserializer::int32($stream) : null;
+        $effect = ($flags2 & (1 << 2)) ? Deserializer::int64($stream) : null;
+        $factcheck = ($flags2 & (1 << 3)) ? FactCheck::deserialize($stream) : null;
         return new self(
             $id,
             $peerId,

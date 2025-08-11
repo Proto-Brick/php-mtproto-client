@@ -33,53 +33,53 @@ final class PageRelatedArticle extends TlObject
         public readonly ?int $publishedDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->title !== null) $flags |= (1 << 0);
         if ($this->description !== null) $flags |= (1 << 1);
         if ($this->photoId !== null) $flags |= (1 << 2);
         if ($this->author !== null) $flags |= (1 << 3);
         if ($this->publishedDate !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->int64($this->webpageId);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::int64($this->webpageId);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->description);
+            $buffer .= Serializer::bytes($this->description);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int64($this->photoId);
+            $buffer .= Serializer::int64($this->photoId);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->author);
+            $buffer .= Serializer::bytes($this->author);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->publishedDate);
+            $buffer .= Serializer::int32($this->publishedDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $url = $deserializer->bytes($stream);
-        $webpageId = $deserializer->int64($stream);
-        $title = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $description = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $photoId = ($flags & (1 << 2)) ? $deserializer->int64($stream) : null;
-        $author = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $publishedDate = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
+        $url = Deserializer::bytes($stream);
+        $webpageId = Deserializer::int64($stream);
+        $title = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $description = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $photoId = ($flags & (1 << 2)) ? Deserializer::int64($stream) : null;
+        $author = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $publishedDate = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
         return new self(
             $url,
             $webpageId,

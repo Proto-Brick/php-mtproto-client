@@ -23,19 +23,19 @@ final class PageListOrderedItemText extends AbstractPageListOrderedItem
         public readonly AbstractRichText $text
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->num);
-        $buffer .= $this->text->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->num);
+        $buffer .= $this->text->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $num = $deserializer->bytes($stream);
-        $text = AbstractRichText::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $num = Deserializer::bytes($stream);
+        $text = AbstractRichText::deserialize($stream);
         return new self(
             $num,
             $text

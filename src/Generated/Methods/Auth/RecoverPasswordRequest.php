@@ -34,21 +34,21 @@ final class RecoverPasswordRequest extends TlObject
         public readonly ?PasswordInputSettings $newSettings = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->newSettings !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->code);
+        $buffer .= Serializer::bytes($this->code);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->newSettings->serialize($serializer);
+            $buffer .= $this->newSettings->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

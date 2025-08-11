@@ -28,32 +28,32 @@ final class BotApp extends TlObject
         public readonly ?bool $hasSettings = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->inactive) $flags |= (1 << 0);
         if ($this->requestWriteAccess) $flags |= (1 << 1);
         if ($this->hasSettings) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->app->serialize($serializer);
+        $buffer .= $this->app->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $inactive = ($flags & (1 << 0)) ? true : null;
         $requestWriteAccess = ($flags & (1 << 1)) ? true : null;
         $hasSettings = ($flags & (1 << 2)) ? true : null;
-        $app = AbstractBotApp::deserialize($deserializer, $stream);
+        $app = AbstractBotApp::deserialize($stream);
         return new self(
             $app,
             $inactive,

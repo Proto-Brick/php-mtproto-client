@@ -39,21 +39,21 @@ final class SignUpRequest extends TlObject
         public readonly ?bool $noJoinedNotifications = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->noJoinedNotifications) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->phoneNumber);
-        $buffer .= $serializer->bytes($this->phoneCodeHash);
-        $buffer .= $serializer->bytes($this->firstName);
-        $buffer .= $serializer->bytes($this->lastName);
+        $buffer .= Serializer::bytes($this->phoneNumber);
+        $buffer .= Serializer::bytes($this->phoneCodeHash);
+        $buffer .= Serializer::bytes($this->firstName);
+        $buffer .= Serializer::bytes($this->lastName);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

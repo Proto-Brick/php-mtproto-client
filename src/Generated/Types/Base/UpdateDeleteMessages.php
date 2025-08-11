@@ -25,21 +25,21 @@ final class UpdateDeleteMessages extends AbstractUpdate
         public readonly int $ptsCount
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfInts($this->messages);
-        $buffer .= $serializer->int32($this->pts);
-        $buffer .= $serializer->int32($this->ptsCount);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfInts($this->messages);
+        $buffer .= Serializer::int32($this->pts);
+        $buffer .= Serializer::int32($this->ptsCount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $messages = $deserializer->vectorOfInts($stream);
-        $pts = $deserializer->int32($stream);
-        $ptsCount = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $messages = Deserializer::vectorOfInts($stream);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
         return new self(
             $messages,
             $pts,

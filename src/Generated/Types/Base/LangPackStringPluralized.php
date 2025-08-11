@@ -33,49 +33,49 @@ final class LangPackStringPluralized extends AbstractLangPackString
         public readonly ?string $manyValue = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->zeroValue !== null) $flags |= (1 << 0);
         if ($this->oneValue !== null) $flags |= (1 << 1);
         if ($this->twoValue !== null) $flags |= (1 << 2);
         if ($this->fewValue !== null) $flags |= (1 << 3);
         if ($this->manyValue !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->key);
+        $buffer .= Serializer::bytes($this->key);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->zeroValue);
+            $buffer .= Serializer::bytes($this->zeroValue);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->oneValue);
+            $buffer .= Serializer::bytes($this->oneValue);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->twoValue);
+            $buffer .= Serializer::bytes($this->twoValue);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->fewValue);
+            $buffer .= Serializer::bytes($this->fewValue);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->manyValue);
+            $buffer .= Serializer::bytes($this->manyValue);
         }
-        $buffer .= $serializer->bytes($this->otherValue);
+        $buffer .= Serializer::bytes($this->otherValue);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $key = $deserializer->bytes($stream);
-        $zeroValue = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $oneValue = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $twoValue = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $fewValue = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $manyValue = ($flags & (1 << 4)) ? $deserializer->bytes($stream) : null;
-        $otherValue = $deserializer->bytes($stream);
+        $key = Deserializer::bytes($stream);
+        $zeroValue = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $oneValue = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $twoValue = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $fewValue = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $manyValue = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
+        $otherValue = Deserializer::bytes($stream);
         return new self(
             $key,
             $otherValue,

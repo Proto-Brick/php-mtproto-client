@@ -23,19 +23,19 @@ final class PageBlockAuthorDate extends AbstractPageBlock
         public readonly int $publishedDate
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->author->serialize($serializer);
-        $buffer .= $serializer->int32($this->publishedDate);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->author->serialize();
+        $buffer .= Serializer::int32($this->publishedDate);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $author = AbstractRichText::deserialize($deserializer, $stream);
-        $publishedDate = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $author = AbstractRichText::deserialize($stream);
+        $publishedDate = Deserializer::int32($stream);
         return new self(
             $author,
             $publishedDate

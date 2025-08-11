@@ -34,15 +34,15 @@ final class SendVerifyPhoneCodeRequest extends TlObject
         public readonly CodeSettings $settings
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->phoneNumber);
-        $buffer .= $this->settings->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->phoneNumber);
+        $buffer .= $this->settings->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

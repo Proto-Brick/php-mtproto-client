@@ -25,21 +25,21 @@ final class UpdateEditChannelMessage extends AbstractUpdate
         public readonly int $ptsCount
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->message->serialize($serializer);
-        $buffer .= $serializer->int32($this->pts);
-        $buffer .= $serializer->int32($this->ptsCount);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->message->serialize();
+        $buffer .= Serializer::int32($this->pts);
+        $buffer .= Serializer::int32($this->ptsCount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $message = AbstractMessage::deserialize($deserializer, $stream);
-        $pts = $deserializer->int32($stream);
-        $ptsCount = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $message = AbstractMessage::deserialize($stream);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
         return new self(
             $message,
             $pts,

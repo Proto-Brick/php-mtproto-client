@@ -23,19 +23,19 @@ final class InputInvoiceMessage extends AbstractInputInvoice
         public readonly int $msgId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->msgId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->msgId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractInputPeer::deserialize($deserializer, $stream);
-        $msgId = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractInputPeer::deserialize($stream);
+        $msgId = Deserializer::int32($stream);
         return new self(
             $peer,
             $msgId

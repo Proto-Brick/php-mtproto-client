@@ -45,9 +45,9 @@ final class SponsoredMessage extends TlObject
         public readonly ?string $additionalInfo = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->recommended) $flags |= (1 << 5);
         if ($this->canReport) $flags |= (1 << 12);
@@ -57,56 +57,56 @@ final class SponsoredMessage extends TlObject
         if ($this->color !== null) $flags |= (1 << 13);
         if ($this->sponsorInfo !== null) $flags |= (1 << 7);
         if ($this->additionalInfo !== null) $flags |= (1 << 8);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->randomId);
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->message);
+        $buffer .= Serializer::bytes($this->randomId);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->message);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $this->media->serialize($serializer);
+            $buffer .= $this->media->serialize();
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $this->color->serialize($serializer);
+            $buffer .= $this->color->serialize();
         }
-        $buffer .= $serializer->bytes($this->buttonText);
+        $buffer .= Serializer::bytes($this->buttonText);
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->bytes($this->sponsorInfo);
+            $buffer .= Serializer::bytes($this->sponsorInfo);
         }
         if ($flags & (1 << 8)) {
-            $buffer .= $serializer->bytes($this->additionalInfo);
+            $buffer .= Serializer::bytes($this->additionalInfo);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $recommended = ($flags & (1 << 5)) ? true : null;
         $canReport = ($flags & (1 << 12)) ? true : null;
-        $randomId = $deserializer->bytes($stream);
-        $url = $deserializer->bytes($stream);
-        $title = $deserializer->bytes($stream);
-        $message = $deserializer->bytes($stream);
-        $entities = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $photo = ($flags & (1 << 6)) ? AbstractPhoto::deserialize($deserializer, $stream) : null;
-        $media = ($flags & (1 << 14)) ? AbstractMessageMedia::deserialize($deserializer, $stream) : null;
-        $color = ($flags & (1 << 13)) ? PeerColor::deserialize($deserializer, $stream) : null;
-        $buttonText = $deserializer->bytes($stream);
-        $sponsorInfo = ($flags & (1 << 7)) ? $deserializer->bytes($stream) : null;
-        $additionalInfo = ($flags & (1 << 8)) ? $deserializer->bytes($stream) : null;
+        $randomId = Deserializer::bytes($stream);
+        $url = Deserializer::bytes($stream);
+        $title = Deserializer::bytes($stream);
+        $message = Deserializer::bytes($stream);
+        $entities = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $photo = ($flags & (1 << 6)) ? AbstractPhoto::deserialize($stream) : null;
+        $media = ($flags & (1 << 14)) ? AbstractMessageMedia::deserialize($stream) : null;
+        $color = ($flags & (1 << 13)) ? PeerColor::deserialize($stream) : null;
+        $buttonText = Deserializer::bytes($stream);
+        $sponsorInfo = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
+        $additionalInfo = ($flags & (1 << 8)) ? Deserializer::bytes($stream) : null;
         return new self(
             $randomId,
             $url,

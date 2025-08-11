@@ -25,26 +25,26 @@ final class InputPeerPhotoFileLocation extends AbstractInputFileLocation
         public readonly ?bool $big = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->big) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int64($this->photoId);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int64($this->photoId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $big = ($flags & (1 << 0)) ? true : null;
-        $peer = AbstractInputPeer::deserialize($deserializer, $stream);
-        $photoId = $deserializer->int64($stream);
+        $peer = AbstractInputPeer::deserialize($stream);
+        $photoId = Deserializer::int64($stream);
         return new self(
             $peer,
             $photoId,

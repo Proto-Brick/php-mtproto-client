@@ -8,19 +8,19 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputPeer extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputPeerEmpty::CONSTRUCTOR_ID => InputPeerEmpty::deserialize($deserializer, $stream),
-            InputPeerSelf::CONSTRUCTOR_ID => InputPeerSelf::deserialize($deserializer, $stream),
-            InputPeerChat::CONSTRUCTOR_ID => InputPeerChat::deserialize($deserializer, $stream),
-            InputPeerUser::CONSTRUCTOR_ID => InputPeerUser::deserialize($deserializer, $stream),
-            InputPeerChannel::CONSTRUCTOR_ID => InputPeerChannel::deserialize($deserializer, $stream),
-            InputPeerUserFromMessage::CONSTRUCTOR_ID => InputPeerUserFromMessage::deserialize($deserializer, $stream),
-            InputPeerChannelFromMessage::CONSTRUCTOR_ID => InputPeerChannelFromMessage::deserialize($deserializer, $stream),
+            InputPeerEmpty::CONSTRUCTOR_ID => InputPeerEmpty::deserialize($stream),
+            InputPeerSelf::CONSTRUCTOR_ID => InputPeerSelf::deserialize($stream),
+            InputPeerChat::CONSTRUCTOR_ID => InputPeerChat::deserialize($stream),
+            InputPeerUser::CONSTRUCTOR_ID => InputPeerUser::deserialize($stream),
+            InputPeerChannel::CONSTRUCTOR_ID => InputPeerChannel::deserialize($stream),
+            InputPeerUserFromMessage::CONSTRUCTOR_ID => InputPeerUserFromMessage::deserialize($stream),
+            InputPeerChannelFromMessage::CONSTRUCTOR_ID => InputPeerChannelFromMessage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputPeer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

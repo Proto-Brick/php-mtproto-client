@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionChangeUsernames extends AbstractChannelAdm
         public readonly array $newValue
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfStrings($this->prevValue);
-        $buffer .= $serializer->vectorOfStrings($this->newValue);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfStrings($this->prevValue);
+        $buffer .= Serializer::vectorOfStrings($this->newValue);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevValue = $deserializer->vectorOfStrings($stream);
-        $newValue = $deserializer->vectorOfStrings($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevValue = Deserializer::vectorOfStrings($stream);
+        $newValue = Deserializer::vectorOfStrings($stream);
         return new self(
             $prevValue,
             $newValue

@@ -139,9 +139,9 @@ final class ChannelFull extends AbstractChatFull
         public readonly ?StickerSet $emojiset = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->canViewParticipants) $flags |= (1 << 3);
         if ($this->canSetUsername) $flags |= (1 << 6);
@@ -177,7 +177,7 @@ final class ChannelFull extends AbstractChatFull
         if ($this->recentRequesters !== null) $flags |= (1 << 28);
         if ($this->defaultSendAs !== null) $flags |= (1 << 29);
         if ($this->availableReactions !== null) $flags |= (1 << 30);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
         $flags2 = 0;
         if ($this->canDeleteChannel) $flags2 |= (1 << 0);
         if ($this->antispam) $flags2 |= (1 << 1);
@@ -196,121 +196,121 @@ final class ChannelFull extends AbstractChatFull
         if ($this->boostsApplied !== null) $flags2 |= (1 << 8);
         if ($this->boostsUnrestrict !== null) $flags2 |= (1 << 9);
         if ($this->emojiset !== null) $flags2 |= (1 << 10);
-        $buffer .= $serializer->int32($flags2);
+        $buffer .= Serializer::int32($flags2);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->bytes($this->about);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::bytes($this->about);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->participantsCount);
+            $buffer .= Serializer::int32($this->participantsCount);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->adminsCount);
+            $buffer .= Serializer::int32($this->adminsCount);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->kickedCount);
+            $buffer .= Serializer::int32($this->kickedCount);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->bannedCount);
+            $buffer .= Serializer::int32($this->bannedCount);
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $serializer->int32($this->onlineCount);
+            $buffer .= Serializer::int32($this->onlineCount);
         }
-        $buffer .= $serializer->int32($this->readInboxMaxId);
-        $buffer .= $serializer->int32($this->readOutboxMaxId);
-        $buffer .= $serializer->int32($this->unreadCount);
-        $buffer .= $this->chatPhoto->serialize($serializer);
-        $buffer .= $this->notifySettings->serialize($serializer);
+        $buffer .= Serializer::int32($this->readInboxMaxId);
+        $buffer .= Serializer::int32($this->readOutboxMaxId);
+        $buffer .= Serializer::int32($this->unreadCount);
+        $buffer .= $this->chatPhoto->serialize();
+        $buffer .= $this->notifySettings->serialize();
         if ($flags & (1 << 23)) {
-            $buffer .= $this->exportedInvite->serialize($serializer);
+            $buffer .= $this->exportedInvite->serialize();
         }
-        $buffer .= $serializer->vectorOfObjects($this->botInfo);
+        $buffer .= Serializer::vectorOfObjects($this->botInfo);
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int64($this->migratedFromChatId);
+            $buffer .= Serializer::int64($this->migratedFromChatId);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->migratedFromMaxId);
+            $buffer .= Serializer::int32($this->migratedFromMaxId);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int32($this->pinnedMsgId);
+            $buffer .= Serializer::int32($this->pinnedMsgId);
         }
         if ($flags & (1 << 8)) {
-            $buffer .= $this->stickerset->serialize($serializer);
+            $buffer .= $this->stickerset->serialize();
         }
         if ($flags & (1 << 9)) {
-            $buffer .= $serializer->int32($this->availableMinId);
+            $buffer .= Serializer::int32($this->availableMinId);
         }
         if ($flags & (1 << 11)) {
-            $buffer .= $serializer->int32($this->folderId);
+            $buffer .= Serializer::int32($this->folderId);
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $serializer->int64($this->linkedChatId);
+            $buffer .= Serializer::int64($this->linkedChatId);
         }
         if ($flags & (1 << 15)) {
-            $buffer .= $this->location->serialize($serializer);
+            $buffer .= $this->location->serialize();
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $serializer->int32($this->slowmodeSeconds);
+            $buffer .= Serializer::int32($this->slowmodeSeconds);
         }
         if ($flags & (1 << 18)) {
-            $buffer .= $serializer->int32($this->slowmodeNextSendDate);
+            $buffer .= Serializer::int32($this->slowmodeNextSendDate);
         }
         if ($flags & (1 << 12)) {
-            $buffer .= $serializer->int32($this->statsDc);
+            $buffer .= Serializer::int32($this->statsDc);
         }
-        $buffer .= $serializer->int32($this->pts);
+        $buffer .= Serializer::int32($this->pts);
         if ($flags & (1 << 21)) {
-            $buffer .= $this->call->serialize($serializer);
+            $buffer .= $this->call->serialize();
         }
         if ($flags & (1 << 24)) {
-            $buffer .= $serializer->int32($this->ttlPeriod);
+            $buffer .= Serializer::int32($this->ttlPeriod);
         }
         if ($flags & (1 << 25)) {
-            $buffer .= $serializer->vectorOfStrings($this->pendingSuggestions);
+            $buffer .= Serializer::vectorOfStrings($this->pendingSuggestions);
         }
         if ($flags & (1 << 26)) {
-            $buffer .= $this->groupcallDefaultJoinAs->serialize($serializer);
+            $buffer .= $this->groupcallDefaultJoinAs->serialize();
         }
         if ($flags & (1 << 27)) {
-            $buffer .= $serializer->bytes($this->themeEmoticon);
+            $buffer .= Serializer::bytes($this->themeEmoticon);
         }
         if ($flags & (1 << 28)) {
-            $buffer .= $serializer->int32($this->requestsPending);
+            $buffer .= Serializer::int32($this->requestsPending);
         }
         if ($flags & (1 << 28)) {
-            $buffer .= $serializer->vectorOfLongs($this->recentRequesters);
+            $buffer .= Serializer::vectorOfLongs($this->recentRequesters);
         }
         if ($flags & (1 << 29)) {
-            $buffer .= $this->defaultSendAs->serialize($serializer);
+            $buffer .= $this->defaultSendAs->serialize();
         }
         if ($flags & (1 << 30)) {
-            $buffer .= $this->availableReactions->serialize($serializer);
+            $buffer .= $this->availableReactions->serialize();
         }
         if ($flags2 & (1 << 13)) {
-            $buffer .= $serializer->int32($this->reactionsLimit);
+            $buffer .= Serializer::int32($this->reactionsLimit);
         }
         if ($flags2 & (1 << 4)) {
-            $buffer .= $this->stories->serialize($serializer);
+            $buffer .= $this->stories->serialize();
         }
         if ($flags2 & (1 << 7)) {
-            $buffer .= $this->wallpaper->serialize($serializer);
+            $buffer .= $this->wallpaper->serialize();
         }
         if ($flags2 & (1 << 8)) {
-            $buffer .= $serializer->int32($this->boostsApplied);
+            $buffer .= Serializer::int32($this->boostsApplied);
         }
         if ($flags2 & (1 << 9)) {
-            $buffer .= $serializer->int32($this->boostsUnrestrict);
+            $buffer .= Serializer::int32($this->boostsUnrestrict);
         }
         if ($flags2 & (1 << 10)) {
-            $buffer .= $this->emojiset->serialize($serializer);
+            $buffer .= $this->emojiset->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
-        $flags2 = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
+        $flags2 = Deserializer::int32($stream);
 
         $canViewParticipants = ($flags & (1 << 3)) ? true : null;
         $canSetUsername = ($flags & (1 << 6)) ? true : null;
@@ -331,47 +331,47 @@ final class ChannelFull extends AbstractChatFull
         $paidMediaAllowed = ($flags2 & (1 << 14)) ? true : null;
         $canViewStarsRevenue = ($flags2 & (1 << 15)) ? true : null;
         $paidReactionsAvailable = ($flags2 & (1 << 16)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $about = $deserializer->bytes($stream);
-        $participantsCount = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $adminsCount = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $kickedCount = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $bannedCount = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $onlineCount = ($flags & (1 << 13)) ? $deserializer->int32($stream) : null;
-        $readInboxMaxId = $deserializer->int32($stream);
-        $readOutboxMaxId = $deserializer->int32($stream);
-        $unreadCount = $deserializer->int32($stream);
-        $chatPhoto = AbstractPhoto::deserialize($deserializer, $stream);
-        $notifySettings = PeerNotifySettings::deserialize($deserializer, $stream);
-        $exportedInvite = ($flags & (1 << 23)) ? AbstractExportedChatInvite::deserialize($deserializer, $stream) : null;
-        $botInfo = $deserializer->vectorOfObjects($stream, [BotInfo::class, 'deserialize']);
-        $migratedFromChatId = ($flags & (1 << 4)) ? $deserializer->int64($stream) : null;
-        $migratedFromMaxId = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $pinnedMsgId = ($flags & (1 << 5)) ? $deserializer->int32($stream) : null;
-        $stickerset = ($flags & (1 << 8)) ? StickerSet::deserialize($deserializer, $stream) : null;
-        $availableMinId = ($flags & (1 << 9)) ? $deserializer->int32($stream) : null;
-        $folderId = ($flags & (1 << 11)) ? $deserializer->int32($stream) : null;
-        $linkedChatId = ($flags & (1 << 14)) ? $deserializer->int64($stream) : null;
-        $location = ($flags & (1 << 15)) ? AbstractChannelLocation::deserialize($deserializer, $stream) : null;
-        $slowmodeSeconds = ($flags & (1 << 17)) ? $deserializer->int32($stream) : null;
-        $slowmodeNextSendDate = ($flags & (1 << 18)) ? $deserializer->int32($stream) : null;
-        $statsDc = ($flags & (1 << 12)) ? $deserializer->int32($stream) : null;
-        $pts = $deserializer->int32($stream);
-        $call = ($flags & (1 << 21)) ? InputGroupCall::deserialize($deserializer, $stream) : null;
-        $ttlPeriod = ($flags & (1 << 24)) ? $deserializer->int32($stream) : null;
-        $pendingSuggestions = ($flags & (1 << 25)) ? $deserializer->vectorOfStrings($stream) : null;
-        $groupcallDefaultJoinAs = ($flags & (1 << 26)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $themeEmoticon = ($flags & (1 << 27)) ? $deserializer->bytes($stream) : null;
-        $requestsPending = ($flags & (1 << 28)) ? $deserializer->int32($stream) : null;
-        $recentRequesters = ($flags & (1 << 28)) ? $deserializer->vectorOfLongs($stream) : null;
-        $defaultSendAs = ($flags & (1 << 29)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $availableReactions = ($flags & (1 << 30)) ? AbstractChatReactions::deserialize($deserializer, $stream) : null;
-        $reactionsLimit = ($flags2 & (1 << 13)) ? $deserializer->int32($stream) : null;
-        $stories = ($flags2 & (1 << 4)) ? PeerStories::deserialize($deserializer, $stream) : null;
-        $wallpaper = ($flags2 & (1 << 7)) ? AbstractWallPaper::deserialize($deserializer, $stream) : null;
-        $boostsApplied = ($flags2 & (1 << 8)) ? $deserializer->int32($stream) : null;
-        $boostsUnrestrict = ($flags2 & (1 << 9)) ? $deserializer->int32($stream) : null;
-        $emojiset = ($flags2 & (1 << 10)) ? StickerSet::deserialize($deserializer, $stream) : null;
+        $id = Deserializer::int64($stream);
+        $about = Deserializer::bytes($stream);
+        $participantsCount = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $adminsCount = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $kickedCount = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $bannedCount = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $onlineCount = ($flags & (1 << 13)) ? Deserializer::int32($stream) : null;
+        $readInboxMaxId = Deserializer::int32($stream);
+        $readOutboxMaxId = Deserializer::int32($stream);
+        $unreadCount = Deserializer::int32($stream);
+        $chatPhoto = AbstractPhoto::deserialize($stream);
+        $notifySettings = PeerNotifySettings::deserialize($stream);
+        $exportedInvite = ($flags & (1 << 23)) ? AbstractExportedChatInvite::deserialize($stream) : null;
+        $botInfo = Deserializer::vectorOfObjects($stream, [BotInfo::class, 'deserialize']);
+        $migratedFromChatId = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;
+        $migratedFromMaxId = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $pinnedMsgId = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $stickerset = ($flags & (1 << 8)) ? StickerSet::deserialize($stream) : null;
+        $availableMinId = ($flags & (1 << 9)) ? Deserializer::int32($stream) : null;
+        $folderId = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
+        $linkedChatId = ($flags & (1 << 14)) ? Deserializer::int64($stream) : null;
+        $location = ($flags & (1 << 15)) ? AbstractChannelLocation::deserialize($stream) : null;
+        $slowmodeSeconds = ($flags & (1 << 17)) ? Deserializer::int32($stream) : null;
+        $slowmodeNextSendDate = ($flags & (1 << 18)) ? Deserializer::int32($stream) : null;
+        $statsDc = ($flags & (1 << 12)) ? Deserializer::int32($stream) : null;
+        $pts = Deserializer::int32($stream);
+        $call = ($flags & (1 << 21)) ? InputGroupCall::deserialize($stream) : null;
+        $ttlPeriod = ($flags & (1 << 24)) ? Deserializer::int32($stream) : null;
+        $pendingSuggestions = ($flags & (1 << 25)) ? Deserializer::vectorOfStrings($stream) : null;
+        $groupcallDefaultJoinAs = ($flags & (1 << 26)) ? AbstractPeer::deserialize($stream) : null;
+        $themeEmoticon = ($flags & (1 << 27)) ? Deserializer::bytes($stream) : null;
+        $requestsPending = ($flags & (1 << 28)) ? Deserializer::int32($stream) : null;
+        $recentRequesters = ($flags & (1 << 28)) ? Deserializer::vectorOfLongs($stream) : null;
+        $defaultSendAs = ($flags & (1 << 29)) ? AbstractPeer::deserialize($stream) : null;
+        $availableReactions = ($flags & (1 << 30)) ? AbstractChatReactions::deserialize($stream) : null;
+        $reactionsLimit = ($flags2 & (1 << 13)) ? Deserializer::int32($stream) : null;
+        $stories = ($flags2 & (1 << 4)) ? PeerStories::deserialize($stream) : null;
+        $wallpaper = ($flags2 & (1 << 7)) ? AbstractWallPaper::deserialize($stream) : null;
+        $boostsApplied = ($flags2 & (1 << 8)) ? Deserializer::int32($stream) : null;
+        $boostsUnrestrict = ($flags2 & (1 << 9)) ? Deserializer::int32($stream) : null;
+        $emojiset = ($flags2 & (1 << 10)) ? StickerSet::deserialize($stream) : null;
         return new self(
             $id,
             $about,

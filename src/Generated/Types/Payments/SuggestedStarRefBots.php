@@ -29,35 +29,35 @@ final class SuggestedStarRefBots extends TlObject
         public readonly ?string $nextOffset = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->nextOffset !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->count);
-        $buffer .= $serializer->vectorOfObjects($this->suggestedBots);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::int32($this->count);
+        $buffer .= Serializer::vectorOfObjects($this->suggestedBots);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->nextOffset);
+            $buffer .= Serializer::bytes($this->nextOffset);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $count = $deserializer->int32($stream);
-        $suggestedBots = $deserializer->vectorOfObjects($stream, [StarRefProgram::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $nextOffset = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
+        $count = Deserializer::int32($stream);
+        $suggestedBots = Deserializer::vectorOfObjects($stream, [StarRefProgram::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $nextOffset = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
         return new self(
             $count,
             $suggestedBots,

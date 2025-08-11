@@ -35,16 +35,16 @@ final class GetStringsRequest extends TlObject
         public readonly array $keys
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->langPack);
-        $buffer .= $serializer->bytes($this->langCode);
-        $buffer .= $serializer->vectorOfStrings($this->keys);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->langPack);
+        $buffer .= Serializer::bytes($this->langCode);
+        $buffer .= Serializer::vectorOfStrings($this->keys);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

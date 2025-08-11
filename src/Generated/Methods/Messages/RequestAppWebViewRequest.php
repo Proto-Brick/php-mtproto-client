@@ -48,30 +48,30 @@ final class RequestAppWebViewRequest extends TlObject
         public readonly ?array $themeParams = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->writeAllowed) $flags |= (1 << 0);
         if ($this->compact) $flags |= (1 << 7);
         if ($this->fullscreen) $flags |= (1 << 8);
         if ($this->startParam !== null) $flags |= (1 << 1);
         if ($this->themeParams !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->app->serialize($serializer);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->app->serialize();
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->startParam);
+            $buffer .= Serializer::bytes($this->startParam);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes(json_encode($this->themeParams, JSON_FORCE_OBJECT));
+            $buffer .= Serializer::bytes(json_encode($this->themeParams, JSON_FORCE_OBJECT));
         }
-        $buffer .= $serializer->bytes($this->platform);
+        $buffer .= Serializer::bytes($this->platform);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

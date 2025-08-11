@@ -23,19 +23,19 @@ final class ChatInvitePeek extends AbstractChatInvite
         public readonly int $expires
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->chat->serialize($serializer);
-        $buffer .= $serializer->int32($this->expires);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->chat->serialize();
+        $buffer .= Serializer::int32($this->expires);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $chat = AbstractChat::deserialize($deserializer, $stream);
-        $expires = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $chat = AbstractChat::deserialize($stream);
+        $expires = Deserializer::int32($stream);
         return new self(
             $chat,
             $expires

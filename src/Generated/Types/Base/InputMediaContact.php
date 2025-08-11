@@ -27,23 +27,23 @@ final class InputMediaContact extends AbstractInputMedia
         public readonly string $vcard
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->phoneNumber);
-        $buffer .= $serializer->bytes($this->firstName);
-        $buffer .= $serializer->bytes($this->lastName);
-        $buffer .= $serializer->bytes($this->vcard);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->phoneNumber);
+        $buffer .= Serializer::bytes($this->firstName);
+        $buffer .= Serializer::bytes($this->lastName);
+        $buffer .= Serializer::bytes($this->vcard);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $phoneNumber = $deserializer->bytes($stream);
-        $firstName = $deserializer->bytes($stream);
-        $lastName = $deserializer->bytes($stream);
-        $vcard = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $phoneNumber = Deserializer::bytes($stream);
+        $firstName = Deserializer::bytes($stream);
+        $lastName = Deserializer::bytes($stream);
+        $vcard = Deserializer::bytes($stream);
         return new self(
             $phoneNumber,
             $firstName,

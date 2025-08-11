@@ -27,32 +27,32 @@ final class BroadcastRevenueBalances extends TlObject
         public readonly ?bool $withdrawalEnabled = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->withdrawalEnabled) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->currentBalance);
-        $buffer .= $serializer->int64($this->availableBalance);
-        $buffer .= $serializer->int64($this->overallRevenue);
+        $buffer .= Serializer::int64($this->currentBalance);
+        $buffer .= Serializer::int64($this->availableBalance);
+        $buffer .= Serializer::int64($this->overallRevenue);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $withdrawalEnabled = ($flags & (1 << 0)) ? true : null;
-        $currentBalance = $deserializer->int64($stream);
-        $availableBalance = $deserializer->int64($stream);
-        $overallRevenue = $deserializer->int64($stream);
+        $currentBalance = Deserializer::int64($stream);
+        $availableBalance = Deserializer::int64($stream);
+        $overallRevenue = Deserializer::int64($stream);
         return new self(
             $currentBalance,
             $availableBalance,

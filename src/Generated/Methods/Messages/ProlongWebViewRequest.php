@@ -43,28 +43,28 @@ final class ProlongWebViewRequest extends TlObject
         public readonly ?AbstractInputPeer $sendAs = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->silent) $flags |= (1 << 5);
         if ($this->replyTo !== null) $flags |= (1 << 0);
         if ($this->sendAs !== null) $flags |= (1 << 13);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->bot->serialize($serializer);
-        $buffer .= $serializer->int64($this->queryId);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->bot->serialize();
+        $buffer .= Serializer::int64($this->queryId);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->replyTo->serialize($serializer);
+            $buffer .= $this->replyTo->serialize();
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $this->sendAs->serialize($serializer);
+            $buffer .= $this->sendAs->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

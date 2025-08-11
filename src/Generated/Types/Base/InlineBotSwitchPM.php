@@ -23,23 +23,23 @@ final class InlineBotSwitchPM extends TlObject
         public readonly string $startParam
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->text);
-        $buffer .= $serializer->bytes($this->startParam);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->text);
+        $buffer .= Serializer::bytes($this->startParam);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $text = $deserializer->bytes($stream);
-        $startParam = $deserializer->bytes($stream);
+        $text = Deserializer::bytes($stream);
+        $startParam = Deserializer::bytes($stream);
         return new self(
             $text,
             $startParam

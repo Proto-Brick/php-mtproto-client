@@ -21,17 +21,17 @@ final class JsonArray extends AbstractJSONValue
         public readonly array $value
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->value);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->value);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $value = $deserializer->vectorOfObjects($stream, [$deserializer->deserializeJsonValue($stream)::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $value = Deserializer::vectorOfObjects($stream, [Deserializer::class, 'deserialize']);
         return new self(
             $value
         );

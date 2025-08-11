@@ -23,23 +23,23 @@ final class BotPreparedInlineMessage extends TlObject
         public readonly int $expireDate
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $serializer->int32($this->expireDate);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= Serializer::int32($this->expireDate);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $id = $deserializer->bytes($stream);
-        $expireDate = $deserializer->int32($stream);
+        $id = Deserializer::bytes($stream);
+        $expireDate = Deserializer::int32($stream);
         return new self(
             $id,
             $expireDate

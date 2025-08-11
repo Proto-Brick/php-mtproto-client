@@ -31,27 +31,27 @@ final class InputPhotoLegacyFileLocation extends AbstractInputFileLocation
         public readonly int $secret
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->bytes($this->fileReference);
-        $buffer .= $serializer->int64($this->volumeId);
-        $buffer .= $serializer->int32($this->localId);
-        $buffer .= $serializer->int64($this->secret);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::bytes($this->fileReference);
+        $buffer .= Serializer::int64($this->volumeId);
+        $buffer .= Serializer::int32($this->localId);
+        $buffer .= Serializer::int64($this->secret);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $id = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
-        $fileReference = $deserializer->bytes($stream);
-        $volumeId = $deserializer->int64($stream);
-        $localId = $deserializer->int32($stream);
-        $secret = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $fileReference = Deserializer::bytes($stream);
+        $volumeId = Deserializer::int64($stream);
+        $localId = Deserializer::int32($stream);
+        $secret = Deserializer::int64($stream);
         return new self(
             $id,
             $accessHash,

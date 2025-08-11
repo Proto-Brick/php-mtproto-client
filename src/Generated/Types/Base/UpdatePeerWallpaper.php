@@ -25,29 +25,29 @@ final class UpdatePeerWallpaper extends AbstractUpdate
         public readonly ?AbstractWallPaper $wallpaper = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->wallpaperOverridden) $flags |= (1 << 1);
         if ($this->wallpaper !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
+        $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $this->wallpaper->serialize($serializer);
+            $buffer .= $this->wallpaper->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $wallpaperOverridden = ($flags & (1 << 1)) ? true : null;
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $wallpaper = ($flags & (1 << 0)) ? AbstractWallPaper::deserialize($deserializer, $stream) : null;
+        $peer = AbstractPeer::deserialize($stream);
+        $wallpaper = ($flags & (1 << 0)) ? AbstractWallPaper::deserialize($stream) : null;
         return new self(
             $peer,
             $wallpaperOverridden,

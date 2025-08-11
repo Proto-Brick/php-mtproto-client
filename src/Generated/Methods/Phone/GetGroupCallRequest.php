@@ -34,15 +34,15 @@ final class GetGroupCallRequest extends TlObject
         public readonly int $limit
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->call->serialize($serializer);
-        $buffer .= $serializer->int32($this->limit);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->call->serialize();
+        $buffer .= Serializer::int32($this->limit);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

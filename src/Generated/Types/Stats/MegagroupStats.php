@@ -60,53 +60,53 @@ final class MegagroupStats extends TlObject
         public readonly array $users
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->period->serialize($serializer);
-        $buffer .= $this->members->serialize($serializer);
-        $buffer .= $this->messages->serialize($serializer);
-        $buffer .= $this->viewers->serialize($serializer);
-        $buffer .= $this->posters->serialize($serializer);
-        $buffer .= $this->growthGraph->serialize($serializer);
-        $buffer .= $this->membersGraph->serialize($serializer);
-        $buffer .= $this->newMembersBySourceGraph->serialize($serializer);
-        $buffer .= $this->languagesGraph->serialize($serializer);
-        $buffer .= $this->messagesGraph->serialize($serializer);
-        $buffer .= $this->actionsGraph->serialize($serializer);
-        $buffer .= $this->topHoursGraph->serialize($serializer);
-        $buffer .= $this->weekdaysGraph->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->topPosters);
-        $buffer .= $serializer->vectorOfObjects($this->topAdmins);
-        $buffer .= $serializer->vectorOfObjects($this->topInviters);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->period->serialize();
+        $buffer .= $this->members->serialize();
+        $buffer .= $this->messages->serialize();
+        $buffer .= $this->viewers->serialize();
+        $buffer .= $this->posters->serialize();
+        $buffer .= $this->growthGraph->serialize();
+        $buffer .= $this->membersGraph->serialize();
+        $buffer .= $this->newMembersBySourceGraph->serialize();
+        $buffer .= $this->languagesGraph->serialize();
+        $buffer .= $this->messagesGraph->serialize();
+        $buffer .= $this->actionsGraph->serialize();
+        $buffer .= $this->topHoursGraph->serialize();
+        $buffer .= $this->weekdaysGraph->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->topPosters);
+        $buffer .= Serializer::vectorOfObjects($this->topAdmins);
+        $buffer .= Serializer::vectorOfObjects($this->topInviters);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $period = StatsDateRangeDays::deserialize($deserializer, $stream);
-        $members = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $messages = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $viewers = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $posters = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $growthGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $membersGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $newMembersBySourceGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $languagesGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $messagesGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $actionsGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $topHoursGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $weekdaysGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $topPosters = $deserializer->vectorOfObjects($stream, [StatsGroupTopPoster::class, 'deserialize']);
-        $topAdmins = $deserializer->vectorOfObjects($stream, [StatsGroupTopAdmin::class, 'deserialize']);
-        $topInviters = $deserializer->vectorOfObjects($stream, [StatsGroupTopInviter::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $period = StatsDateRangeDays::deserialize($stream);
+        $members = StatsAbsValueAndPrev::deserialize($stream);
+        $messages = StatsAbsValueAndPrev::deserialize($stream);
+        $viewers = StatsAbsValueAndPrev::deserialize($stream);
+        $posters = StatsAbsValueAndPrev::deserialize($stream);
+        $growthGraph = AbstractStatsGraph::deserialize($stream);
+        $membersGraph = AbstractStatsGraph::deserialize($stream);
+        $newMembersBySourceGraph = AbstractStatsGraph::deserialize($stream);
+        $languagesGraph = AbstractStatsGraph::deserialize($stream);
+        $messagesGraph = AbstractStatsGraph::deserialize($stream);
+        $actionsGraph = AbstractStatsGraph::deserialize($stream);
+        $topHoursGraph = AbstractStatsGraph::deserialize($stream);
+        $weekdaysGraph = AbstractStatsGraph::deserialize($stream);
+        $topPosters = Deserializer::vectorOfObjects($stream, [StatsGroupTopPoster::class, 'deserialize']);
+        $topAdmins = Deserializer::vectorOfObjects($stream, [StatsGroupTopAdmin::class, 'deserialize']);
+        $topInviters = Deserializer::vectorOfObjects($stream, [StatsGroupTopInviter::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $period,
             $members,

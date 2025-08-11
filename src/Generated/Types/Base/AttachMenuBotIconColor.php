@@ -23,23 +23,23 @@ final class AttachMenuBotIconColor extends TlObject
         public readonly int $color
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->name);
-        $buffer .= $serializer->int32($this->color);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->name);
+        $buffer .= Serializer::int32($this->color);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $name = $deserializer->bytes($stream);
-        $color = $deserializer->int32($stream);
+        $name = Deserializer::bytes($stream);
+        $color = Deserializer::int32($stream);
         return new self(
             $name,
             $color

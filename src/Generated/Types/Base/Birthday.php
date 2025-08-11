@@ -25,33 +25,33 @@ final class Birthday extends TlObject
         public readonly ?int $year = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->year !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->day);
-        $buffer .= $serializer->int32($this->month);
+        $buffer .= Serializer::int32($this->day);
+        $buffer .= Serializer::int32($this->month);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->year);
+            $buffer .= Serializer::int32($this->year);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $day = $deserializer->int32($stream);
-        $month = $deserializer->int32($stream);
-        $year = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
+        $day = Deserializer::int32($stream);
+        $month = Deserializer::int32($stream);
+        $year = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
         return new self(
             $day,
             $month,

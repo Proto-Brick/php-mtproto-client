@@ -30,23 +30,23 @@ final class ChannelParticipants extends AbstractChannelParticipants
         public readonly array $users
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->count);
-        $buffer .= $serializer->vectorOfObjects($this->participants);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->count);
+        $buffer .= Serializer::vectorOfObjects($this->participants);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $count = $deserializer->int32($stream);
-        $participants = $deserializer->vectorOfObjects($stream, [AbstractChannelParticipant::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $count = Deserializer::int32($stream);
+        $participants = Deserializer::vectorOfObjects($stream, [AbstractChannelParticipant::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $count,
             $participants,

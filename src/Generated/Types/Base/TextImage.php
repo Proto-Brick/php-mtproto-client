@@ -25,21 +25,21 @@ final class TextImage extends AbstractRichText
         public readonly int $h
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->documentId);
-        $buffer .= $serializer->int32($this->w);
-        $buffer .= $serializer->int32($this->h);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->documentId);
+        $buffer .= Serializer::int32($this->w);
+        $buffer .= Serializer::int32($this->h);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $documentId = $deserializer->int64($stream);
-        $w = $deserializer->int32($stream);
-        $h = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $documentId = Deserializer::int64($stream);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
         return new self(
             $documentId,
             $w,

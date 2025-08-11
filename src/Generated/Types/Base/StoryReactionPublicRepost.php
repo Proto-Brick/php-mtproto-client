@@ -23,19 +23,19 @@ final class StoryReactionPublicRepost extends AbstractStoryReaction
         public readonly AbstractStoryItem $story
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peerId->serialize($serializer);
-        $buffer .= $this->story->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peerId->serialize();
+        $buffer .= $this->story->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peerId = AbstractPeer::deserialize($deserializer, $stream);
-        $story = AbstractStoryItem::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peerId = AbstractPeer::deserialize($stream);
+        $story = AbstractStoryItem::deserialize($stream);
         return new self(
             $peerId,
             $story

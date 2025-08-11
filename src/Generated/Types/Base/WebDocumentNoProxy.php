@@ -27,23 +27,23 @@ final class WebDocumentNoProxy extends AbstractWebDocument
         public readonly array $attributes
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->int32($this->size);
-        $buffer .= $serializer->bytes($this->mimeType);
-        $buffer .= $serializer->vectorOfObjects($this->attributes);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::int32($this->size);
+        $buffer .= Serializer::bytes($this->mimeType);
+        $buffer .= Serializer::vectorOfObjects($this->attributes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $url = $deserializer->bytes($stream);
-        $size = $deserializer->int32($stream);
-        $mimeType = $deserializer->bytes($stream);
-        $attributes = $deserializer->vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $url = Deserializer::bytes($stream);
+        $size = Deserializer::int32($stream);
+        $mimeType = Deserializer::bytes($stream);
+        $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
         return new self(
             $url,
             $size,

@@ -25,21 +25,21 @@ final class InputCheckPasswordSRP extends AbstractInputCheckPasswordSRP
         public readonly string $m1
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->srpId);
-        $buffer .= $serializer->bytes($this->a);
-        $buffer .= $serializer->bytes($this->m1);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->srpId);
+        $buffer .= Serializer::bytes($this->a);
+        $buffer .= Serializer::bytes($this->m1);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $srpId = $deserializer->int64($stream);
-        $a = $deserializer->bytes($stream);
-        $m1 = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $srpId = Deserializer::int64($stream);
+        $a = Deserializer::bytes($stream);
+        $m1 = Deserializer::bytes($stream);
         return new self(
             $srpId,
             $a,

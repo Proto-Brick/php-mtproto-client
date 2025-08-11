@@ -23,19 +23,19 @@ final class UpdateEncryption extends AbstractUpdate
         public readonly int $date
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->chat->serialize($serializer);
-        $buffer .= $serializer->int32($this->date);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->chat->serialize();
+        $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $chat = AbstractEncryptedChat::deserialize($deserializer, $stream);
-        $date = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $chat = AbstractEncryptedChat::deserialize($stream);
+        $date = Deserializer::int32($stream);
         return new self(
             $chat,
             $date

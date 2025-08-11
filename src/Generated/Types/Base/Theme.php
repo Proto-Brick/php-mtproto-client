@@ -41,9 +41,9 @@ final class Theme extends TlObject
         public readonly ?int $installsCount = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->creator) $flags |= (1 << 0);
         if ($this->default_) $flags |= (1 << 1);
@@ -52,47 +52,47 @@ final class Theme extends TlObject
         if ($this->settings !== null) $flags |= (1 << 3);
         if ($this->emoticon !== null) $flags |= (1 << 6);
         if ($this->installsCount !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->bytes($this->slug);
-        $buffer .= $serializer->bytes($this->title);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::bytes($this->slug);
+        $buffer .= Serializer::bytes($this->title);
         if ($flags & (1 << 2)) {
-            $buffer .= $this->document->serialize($serializer);
+            $buffer .= $this->document->serialize();
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->settings);
+            $buffer .= Serializer::vectorOfObjects($this->settings);
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->bytes($this->emoticon);
+            $buffer .= Serializer::bytes($this->emoticon);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->installsCount);
+            $buffer .= Serializer::int32($this->installsCount);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $creator = ($flags & (1 << 0)) ? true : null;
         $default_ = ($flags & (1 << 1)) ? true : null;
         $forChat = ($flags & (1 << 5)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
-        $slug = $deserializer->bytes($stream);
-        $title = $deserializer->bytes($stream);
-        $document = ($flags & (1 << 2)) ? AbstractDocument::deserialize($deserializer, $stream) : null;
-        $settings = ($flags & (1 << 3)) ? $deserializer->vectorOfObjects($stream, [ThemeSettings::class, 'deserialize']) : null;
-        $emoticon = ($flags & (1 << 6)) ? $deserializer->bytes($stream) : null;
-        $installsCount = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $slug = Deserializer::bytes($stream);
+        $title = Deserializer::bytes($stream);
+        $document = ($flags & (1 << 2)) ? AbstractDocument::deserialize($stream) : null;
+        $settings = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [ThemeSettings::class, 'deserialize']) : null;
+        $emoticon = ($flags & (1 << 6)) ? Deserializer::bytes($stream) : null;
+        $installsCount = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
         return new self(
             $id,
             $accessHash,

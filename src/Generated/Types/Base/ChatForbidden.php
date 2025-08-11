@@ -23,19 +23,19 @@ final class ChatForbidden extends AbstractChat
         public readonly string $title
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->bytes($this->title);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::bytes($this->title);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $id = $deserializer->int64($stream);
-        $title = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $id = Deserializer::int64($stream);
+        $title = Deserializer::bytes($stream);
         return new self(
             $id,
             $title

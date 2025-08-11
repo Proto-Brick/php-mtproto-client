@@ -62,43 +62,43 @@ final class SearchRequest extends TlObject
         public readonly ?int $topMsgId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->fromId !== null) $flags |= (1 << 0);
         if ($this->savedPeerId !== null) $flags |= (1 << 2);
         if ($this->savedReaction !== null) $flags |= (1 << 3);
         if ($this->topMsgId !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->bytes($this->q);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::bytes($this->q);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->fromId->serialize($serializer);
+            $buffer .= $this->fromId->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->savedPeerId->serialize($serializer);
+            $buffer .= $this->savedPeerId->serialize();
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->savedReaction);
+            $buffer .= Serializer::vectorOfObjects($this->savedReaction);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->topMsgId);
+            $buffer .= Serializer::int32($this->topMsgId);
         }
-        $buffer .= $this->filter->serialize($serializer);
-        $buffer .= $serializer->int32($this->minDate);
-        $buffer .= $serializer->int32($this->maxDate);
-        $buffer .= $serializer->int32($this->offsetId);
-        $buffer .= $serializer->int32($this->addOffset);
-        $buffer .= $serializer->int32($this->limit);
-        $buffer .= $serializer->int32($this->maxId);
-        $buffer .= $serializer->int32($this->minId);
-        $buffer .= $serializer->int64($this->hash);
+        $buffer .= $this->filter->serialize();
+        $buffer .= Serializer::int32($this->minDate);
+        $buffer .= Serializer::int32($this->maxDate);
+        $buffer .= Serializer::int32($this->offsetId);
+        $buffer .= Serializer::int32($this->addOffset);
+        $buffer .= Serializer::int32($this->limit);
+        $buffer .= Serializer::int32($this->maxId);
+        $buffer .= Serializer::int32($this->minId);
+        $buffer .= Serializer::int64($this->hash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

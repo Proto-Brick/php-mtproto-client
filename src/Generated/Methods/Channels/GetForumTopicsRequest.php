@@ -42,25 +42,25 @@ final class GetForumTopicsRequest extends TlObject
         public readonly ?string $q = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->q !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->channel->serialize($serializer);
+        $buffer .= $this->channel->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->q);
+            $buffer .= Serializer::bytes($this->q);
         }
-        $buffer .= $serializer->int32($this->offsetDate);
-        $buffer .= $serializer->int32($this->offsetId);
-        $buffer .= $serializer->int32($this->offsetTopic);
-        $buffer .= $serializer->int32($this->limit);
+        $buffer .= Serializer::int32($this->offsetDate);
+        $buffer .= Serializer::int32($this->offsetId);
+        $buffer .= Serializer::int32($this->offsetTopic);
+        $buffer .= Serializer::int32($this->limit);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

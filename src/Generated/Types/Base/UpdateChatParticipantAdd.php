@@ -29,25 +29,25 @@ final class UpdateChatParticipantAdd extends AbstractUpdate
         public readonly int $version
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->chatId);
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->int64($this->inviterId);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int32($this->version);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->chatId);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::int64($this->inviterId);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int32($this->version);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $chatId = $deserializer->int64($stream);
-        $userId = $deserializer->int64($stream);
-        $inviterId = $deserializer->int64($stream);
-        $date = $deserializer->int32($stream);
-        $version = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $chatId = Deserializer::int64($stream);
+        $userId = Deserializer::int64($stream);
+        $inviterId = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
+        $version = Deserializer::int32($stream);
         return new self(
             $chatId,
             $userId,

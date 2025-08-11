@@ -31,27 +31,27 @@ final class InputWebFileGeoPointLocation extends AbstractInputWebFileLocation
         public readonly int $scale
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->geoPoint->serialize($serializer);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->int32($this->w);
-        $buffer .= $serializer->int32($this->h);
-        $buffer .= $serializer->int32($this->zoom);
-        $buffer .= $serializer->int32($this->scale);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->geoPoint->serialize();
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::int32($this->w);
+        $buffer .= Serializer::int32($this->h);
+        $buffer .= Serializer::int32($this->zoom);
+        $buffer .= Serializer::int32($this->scale);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $geoPoint = AbstractInputGeoPoint::deserialize($deserializer, $stream);
-        $accessHash = $deserializer->int64($stream);
-        $w = $deserializer->int32($stream);
-        $h = $deserializer->int32($stream);
-        $zoom = $deserializer->int32($stream);
-        $scale = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $geoPoint = AbstractInputGeoPoint::deserialize($stream);
+        $accessHash = Deserializer::int64($stream);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
+        $zoom = Deserializer::int32($stream);
+        $scale = Deserializer::int32($stream);
         return new self(
             $geoPoint,
             $accessHash,

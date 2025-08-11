@@ -40,27 +40,27 @@ final class CreateGroupCallRequest extends TlObject
         public readonly ?int $scheduleDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->rtmpStream) $flags |= (1 << 2);
         if ($this->title !== null) $flags |= (1 << 0);
         if ($this->scheduleDate !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->randomId);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->randomId);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->scheduleDate);
+            $buffer .= Serializer::int32($this->scheduleDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

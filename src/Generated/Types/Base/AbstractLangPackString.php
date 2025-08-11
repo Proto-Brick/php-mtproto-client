@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractLangPackString extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            LangPackString::CONSTRUCTOR_ID => LangPackString::deserialize($deserializer, $stream),
-            LangPackStringPluralized::CONSTRUCTOR_ID => LangPackStringPluralized::deserialize($deserializer, $stream),
-            LangPackStringDeleted::CONSTRUCTOR_ID => LangPackStringDeleted::deserialize($deserializer, $stream),
+            LangPackString::CONSTRUCTOR_ID => LangPackString::deserialize($stream),
+            LangPackStringPluralized::CONSTRUCTOR_ID => LangPackStringPluralized::deserialize($stream),
+            LangPackStringDeleted::CONSTRUCTOR_ID => LangPackStringDeleted::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type LangPackString. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

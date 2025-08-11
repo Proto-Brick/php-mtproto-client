@@ -24,19 +24,19 @@ final class SentEncryptedFile extends AbstractSentEncryptedMessage
         public readonly AbstractEncryptedFile $file
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $this->file->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= $this->file->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $date = $deserializer->int32($stream);
-        $file = AbstractEncryptedFile::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $date = Deserializer::int32($stream);
+        $file = AbstractEncryptedFile::deserialize($stream);
         return new self(
             $date,
             $file

@@ -41,31 +41,31 @@ final class GetDifferenceRequest extends TlObject
         public readonly ?int $qtsLimit = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->ptsLimit !== null) $flags |= (1 << 1);
         if ($this->ptsTotalLimit !== null) $flags |= (1 << 0);
         if ($this->qtsLimit !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->pts);
+        $buffer .= Serializer::int32($this->pts);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->ptsLimit);
+            $buffer .= Serializer::int32($this->ptsLimit);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->ptsTotalLimit);
+            $buffer .= Serializer::int32($this->ptsTotalLimit);
         }
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int32($this->qts);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int32($this->qts);
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->qtsLimit);
+            $buffer .= Serializer::int32($this->qtsLimit);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

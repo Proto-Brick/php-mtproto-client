@@ -25,21 +25,21 @@ final class UpdateChannelMessageViews extends AbstractUpdate
         public readonly int $views
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->channelId);
-        $buffer .= $serializer->int32($this->id);
-        $buffer .= $serializer->int32($this->views);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->channelId);
+        $buffer .= Serializer::int32($this->id);
+        $buffer .= Serializer::int32($this->views);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $channelId = $deserializer->int64($stream);
-        $id = $deserializer->int32($stream);
-        $views = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $channelId = Deserializer::int64($stream);
+        $id = Deserializer::int32($stream);
+        $views = Deserializer::int32($stream);
         return new self(
             $channelId,
             $id,

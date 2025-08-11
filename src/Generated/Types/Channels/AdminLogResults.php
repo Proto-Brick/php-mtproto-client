@@ -28,25 +28,25 @@ final class AdminLogResults extends TlObject
         public readonly array $users
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->events);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->events);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $events = $deserializer->vectorOfObjects($stream, [ChannelAdminLogEvent::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $events = Deserializer::vectorOfObjects($stream, [ChannelAdminLogEvent::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $events,
             $chats,

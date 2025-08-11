@@ -36,16 +36,16 @@ final class UploadRingtoneRequest extends TlObject
         public readonly string $mimeType
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->file->serialize($serializer);
-        $buffer .= $serializer->bytes($this->fileName);
-        $buffer .= $serializer->bytes($this->mimeType);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->file->serialize();
+        $buffer .= Serializer::bytes($this->fileName);
+        $buffer .= Serializer::bytes($this->mimeType);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

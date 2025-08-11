@@ -27,35 +27,35 @@ final class GroupCallParticipantVideo extends TlObject
         public readonly ?int $audioSource = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->paused) $flags |= (1 << 0);
         if ($this->audioSource !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->endpoint);
-        $buffer .= $serializer->vectorOfObjects($this->sourceGroups);
+        $buffer .= Serializer::bytes($this->endpoint);
+        $buffer .= Serializer::vectorOfObjects($this->sourceGroups);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->audioSource);
+            $buffer .= Serializer::int32($this->audioSource);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $paused = ($flags & (1 << 0)) ? true : null;
-        $endpoint = $deserializer->bytes($stream);
-        $sourceGroups = $deserializer->vectorOfObjects($stream, [GroupCallParticipantVideoSourceGroup::class, 'deserialize']);
-        $audioSource = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
+        $endpoint = Deserializer::bytes($stream);
+        $sourceGroups = Deserializer::vectorOfObjects($stream, [GroupCallParticipantVideoSourceGroup::class, 'deserialize']);
+        $audioSource = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
         return new self(
             $endpoint,
             $sourceGroups,

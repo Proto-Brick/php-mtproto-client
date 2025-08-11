@@ -31,38 +31,38 @@ final class SentCodeTypeEmailCode extends AbstractSentCodeType
         public readonly ?int $resetPendingDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->appleSigninAllowed) $flags |= (1 << 0);
         if ($this->googleSigninAllowed) $flags |= (1 << 1);
         if ($this->resetAvailablePeriod !== null) $flags |= (1 << 3);
         if ($this->resetPendingDate !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->emailPattern);
-        $buffer .= $serializer->int32($this->length);
+        $buffer .= Serializer::bytes($this->emailPattern);
+        $buffer .= Serializer::int32($this->length);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int32($this->resetAvailablePeriod);
+            $buffer .= Serializer::int32($this->resetAvailablePeriod);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->resetPendingDate);
+            $buffer .= Serializer::int32($this->resetPendingDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $appleSigninAllowed = ($flags & (1 << 0)) ? true : null;
         $googleSigninAllowed = ($flags & (1 << 1)) ? true : null;
-        $emailPattern = $deserializer->bytes($stream);
-        $length = $deserializer->int32($stream);
-        $resetAvailablePeriod = ($flags & (1 << 3)) ? $deserializer->int32($stream) : null;
-        $resetPendingDate = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
+        $emailPattern = Deserializer::bytes($stream);
+        $length = Deserializer::int32($stream);
+        $resetAvailablePeriod = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $resetPendingDate = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
         return new self(
             $emailPattern,
             $length,

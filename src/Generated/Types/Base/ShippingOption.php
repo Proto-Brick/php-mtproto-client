@@ -25,25 +25,25 @@ final class ShippingOption extends TlObject
         public readonly array $prices
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->vectorOfObjects($this->prices);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::vectorOfObjects($this->prices);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $id = $deserializer->bytes($stream);
-        $title = $deserializer->bytes($stream);
-        $prices = $deserializer->vectorOfObjects($stream, [LabeledPrice::class, 'deserialize']);
+        $id = Deserializer::bytes($stream);
+        $title = Deserializer::bytes($stream);
+        $prices = Deserializer::vectorOfObjects($stream, [LabeledPrice::class, 'deserialize']);
         return new self(
             $id,
             $title,

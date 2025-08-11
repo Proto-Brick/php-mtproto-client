@@ -27,23 +27,23 @@ final class PostInteractionCountersStory extends AbstractPostInteractionCounters
         public readonly int $reactions
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->storyId);
-        $buffer .= $serializer->int32($this->views);
-        $buffer .= $serializer->int32($this->forwards);
-        $buffer .= $serializer->int32($this->reactions);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->storyId);
+        $buffer .= Serializer::int32($this->views);
+        $buffer .= Serializer::int32($this->forwards);
+        $buffer .= Serializer::int32($this->reactions);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $storyId = $deserializer->int32($stream);
-        $views = $deserializer->int32($stream);
-        $forwards = $deserializer->int32($stream);
-        $reactions = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $storyId = Deserializer::int32($stream);
+        $views = Deserializer::int32($stream);
+        $forwards = Deserializer::int32($stream);
+        $reactions = Deserializer::int32($stream);
         return new self(
             $storyId,
             $views,

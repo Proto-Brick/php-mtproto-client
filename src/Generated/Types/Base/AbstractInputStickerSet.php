@@ -8,23 +8,23 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputStickerSet extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputStickerSetEmpty::CONSTRUCTOR_ID => InputStickerSetEmpty::deserialize($deserializer, $stream),
-            InputStickerSetID::CONSTRUCTOR_ID => InputStickerSetID::deserialize($deserializer, $stream),
-            InputStickerSetShortName::CONSTRUCTOR_ID => InputStickerSetShortName::deserialize($deserializer, $stream),
-            InputStickerSetAnimatedEmoji::CONSTRUCTOR_ID => InputStickerSetAnimatedEmoji::deserialize($deserializer, $stream),
-            InputStickerSetDice::CONSTRUCTOR_ID => InputStickerSetDice::deserialize($deserializer, $stream),
-            InputStickerSetAnimatedEmojiAnimations::CONSTRUCTOR_ID => InputStickerSetAnimatedEmojiAnimations::deserialize($deserializer, $stream),
-            InputStickerSetPremiumGifts::CONSTRUCTOR_ID => InputStickerSetPremiumGifts::deserialize($deserializer, $stream),
-            InputStickerSetEmojiGenericAnimations::CONSTRUCTOR_ID => InputStickerSetEmojiGenericAnimations::deserialize($deserializer, $stream),
-            InputStickerSetEmojiDefaultStatuses::CONSTRUCTOR_ID => InputStickerSetEmojiDefaultStatuses::deserialize($deserializer, $stream),
-            InputStickerSetEmojiDefaultTopicIcons::CONSTRUCTOR_ID => InputStickerSetEmojiDefaultTopicIcons::deserialize($deserializer, $stream),
-            InputStickerSetEmojiChannelDefaultStatuses::CONSTRUCTOR_ID => InputStickerSetEmojiChannelDefaultStatuses::deserialize($deserializer, $stream),
+            InputStickerSetEmpty::CONSTRUCTOR_ID => InputStickerSetEmpty::deserialize($stream),
+            InputStickerSetID::CONSTRUCTOR_ID => InputStickerSetID::deserialize($stream),
+            InputStickerSetShortName::CONSTRUCTOR_ID => InputStickerSetShortName::deserialize($stream),
+            InputStickerSetAnimatedEmoji::CONSTRUCTOR_ID => InputStickerSetAnimatedEmoji::deserialize($stream),
+            InputStickerSetDice::CONSTRUCTOR_ID => InputStickerSetDice::deserialize($stream),
+            InputStickerSetAnimatedEmojiAnimations::CONSTRUCTOR_ID => InputStickerSetAnimatedEmojiAnimations::deserialize($stream),
+            InputStickerSetPremiumGifts::CONSTRUCTOR_ID => InputStickerSetPremiumGifts::deserialize($stream),
+            InputStickerSetEmojiGenericAnimations::CONSTRUCTOR_ID => InputStickerSetEmojiGenericAnimations::deserialize($stream),
+            InputStickerSetEmojiDefaultStatuses::CONSTRUCTOR_ID => InputStickerSetEmojiDefaultStatuses::deserialize($stream),
+            InputStickerSetEmojiDefaultTopicIcons::CONSTRUCTOR_ID => InputStickerSetEmojiDefaultTopicIcons::deserialize($stream),
+            InputStickerSetEmojiChannelDefaultStatuses::CONSTRUCTOR_ID => InputStickerSetEmojiChannelDefaultStatuses::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputStickerSet. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

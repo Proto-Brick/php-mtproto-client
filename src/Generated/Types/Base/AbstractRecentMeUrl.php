@@ -8,17 +8,17 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractRecentMeUrl extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            RecentMeUrlUnknown::CONSTRUCTOR_ID => RecentMeUrlUnknown::deserialize($deserializer, $stream),
-            RecentMeUrlUser::CONSTRUCTOR_ID => RecentMeUrlUser::deserialize($deserializer, $stream),
-            RecentMeUrlChat::CONSTRUCTOR_ID => RecentMeUrlChat::deserialize($deserializer, $stream),
-            RecentMeUrlChatInvite::CONSTRUCTOR_ID => RecentMeUrlChatInvite::deserialize($deserializer, $stream),
-            RecentMeUrlStickerSet::CONSTRUCTOR_ID => RecentMeUrlStickerSet::deserialize($deserializer, $stream),
+            RecentMeUrlUnknown::CONSTRUCTOR_ID => RecentMeUrlUnknown::deserialize($stream),
+            RecentMeUrlUser::CONSTRUCTOR_ID => RecentMeUrlUser::deserialize($stream),
+            RecentMeUrlChat::CONSTRUCTOR_ID => RecentMeUrlChat::deserialize($stream),
+            RecentMeUrlChatInvite::CONSTRUCTOR_ID => RecentMeUrlChatInvite::deserialize($stream),
+            RecentMeUrlStickerSet::CONSTRUCTOR_ID => RecentMeUrlStickerSet::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type RecentMeUrl. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

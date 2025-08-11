@@ -113,9 +113,9 @@ final class Config extends TlObject
         public readonly ?string $autologinToken = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->defaultP2pContacts) $flags |= (1 << 3);
         if ($this->preloadFeaturedStickers) $flags |= (1 << 4);
@@ -133,131 +133,131 @@ final class Config extends TlObject
         if ($this->baseLangPackVersion !== null) $flags |= (1 << 2);
         if ($this->reactionsDefault !== null) $flags |= (1 << 15);
         if ($this->autologinToken !== null) $flags |= (1 << 16);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int32($this->expires);
-        $buffer .= ($this->testMode ? $serializer->int32(0x997275b5) : $serializer->int32(0xbc799737));
-        $buffer .= $serializer->int32($this->thisDc);
-        $buffer .= $serializer->vectorOfObjects($this->dcOptions);
-        $buffer .= $serializer->bytes($this->dcTxtDomainName);
-        $buffer .= $serializer->int32($this->chatSizeMax);
-        $buffer .= $serializer->int32($this->megagroupSizeMax);
-        $buffer .= $serializer->int32($this->forwardedCountMax);
-        $buffer .= $serializer->int32($this->onlineUpdatePeriodMs);
-        $buffer .= $serializer->int32($this->offlineBlurTimeoutMs);
-        $buffer .= $serializer->int32($this->offlineIdleTimeoutMs);
-        $buffer .= $serializer->int32($this->onlineCloudTimeoutMs);
-        $buffer .= $serializer->int32($this->notifyCloudDelayMs);
-        $buffer .= $serializer->int32($this->notifyDefaultDelayMs);
-        $buffer .= $serializer->int32($this->pushChatPeriodMs);
-        $buffer .= $serializer->int32($this->pushChatLimit);
-        $buffer .= $serializer->int32($this->editTimeLimit);
-        $buffer .= $serializer->int32($this->revokeTimeLimit);
-        $buffer .= $serializer->int32($this->revokePmTimeLimit);
-        $buffer .= $serializer->int32($this->ratingEDecay);
-        $buffer .= $serializer->int32($this->stickersRecentLimit);
-        $buffer .= $serializer->int32($this->channelsReadMediaPeriod);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int32($this->expires);
+        $buffer .= ($this->testMode ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
+        $buffer .= Serializer::int32($this->thisDc);
+        $buffer .= Serializer::vectorOfObjects($this->dcOptions);
+        $buffer .= Serializer::bytes($this->dcTxtDomainName);
+        $buffer .= Serializer::int32($this->chatSizeMax);
+        $buffer .= Serializer::int32($this->megagroupSizeMax);
+        $buffer .= Serializer::int32($this->forwardedCountMax);
+        $buffer .= Serializer::int32($this->onlineUpdatePeriodMs);
+        $buffer .= Serializer::int32($this->offlineBlurTimeoutMs);
+        $buffer .= Serializer::int32($this->offlineIdleTimeoutMs);
+        $buffer .= Serializer::int32($this->onlineCloudTimeoutMs);
+        $buffer .= Serializer::int32($this->notifyCloudDelayMs);
+        $buffer .= Serializer::int32($this->notifyDefaultDelayMs);
+        $buffer .= Serializer::int32($this->pushChatPeriodMs);
+        $buffer .= Serializer::int32($this->pushChatLimit);
+        $buffer .= Serializer::int32($this->editTimeLimit);
+        $buffer .= Serializer::int32($this->revokeTimeLimit);
+        $buffer .= Serializer::int32($this->revokePmTimeLimit);
+        $buffer .= Serializer::int32($this->ratingEDecay);
+        $buffer .= Serializer::int32($this->stickersRecentLimit);
+        $buffer .= Serializer::int32($this->channelsReadMediaPeriod);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->tmpSessions);
+            $buffer .= Serializer::int32($this->tmpSessions);
         }
-        $buffer .= $serializer->int32($this->callReceiveTimeoutMs);
-        $buffer .= $serializer->int32($this->callRingTimeoutMs);
-        $buffer .= $serializer->int32($this->callConnectTimeoutMs);
-        $buffer .= $serializer->int32($this->callPacketTimeoutMs);
-        $buffer .= $serializer->bytes($this->meUrlPrefix);
+        $buffer .= Serializer::int32($this->callReceiveTimeoutMs);
+        $buffer .= Serializer::int32($this->callRingTimeoutMs);
+        $buffer .= Serializer::int32($this->callConnectTimeoutMs);
+        $buffer .= Serializer::int32($this->callPacketTimeoutMs);
+        $buffer .= Serializer::bytes($this->meUrlPrefix);
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->bytes($this->autoupdateUrlPrefix);
+            $buffer .= Serializer::bytes($this->autoupdateUrlPrefix);
         }
         if ($flags & (1 << 9)) {
-            $buffer .= $serializer->bytes($this->gifSearchUsername);
+            $buffer .= Serializer::bytes($this->gifSearchUsername);
         }
         if ($flags & (1 << 10)) {
-            $buffer .= $serializer->bytes($this->venueSearchUsername);
+            $buffer .= Serializer::bytes($this->venueSearchUsername);
         }
         if ($flags & (1 << 11)) {
-            $buffer .= $serializer->bytes($this->imgSearchUsername);
+            $buffer .= Serializer::bytes($this->imgSearchUsername);
         }
         if ($flags & (1 << 12)) {
-            $buffer .= $serializer->bytes($this->staticMapsProvider);
+            $buffer .= Serializer::bytes($this->staticMapsProvider);
         }
-        $buffer .= $serializer->int32($this->captionLengthMax);
-        $buffer .= $serializer->int32($this->messageLengthMax);
-        $buffer .= $serializer->int32($this->webfileDcId);
+        $buffer .= Serializer::int32($this->captionLengthMax);
+        $buffer .= Serializer::int32($this->messageLengthMax);
+        $buffer .= Serializer::int32($this->webfileDcId);
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->suggestedLangCode);
-        }
-        if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->langPackVersion);
+            $buffer .= Serializer::bytes($this->suggestedLangCode);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->baseLangPackVersion);
+            $buffer .= Serializer::int32($this->langPackVersion);
+        }
+        if ($flags & (1 << 2)) {
+            $buffer .= Serializer::int32($this->baseLangPackVersion);
         }
         if ($flags & (1 << 15)) {
-            $buffer .= $this->reactionsDefault->serialize($serializer);
+            $buffer .= $this->reactionsDefault->serialize();
         }
         if ($flags & (1 << 16)) {
-            $buffer .= $serializer->bytes($this->autologinToken);
+            $buffer .= Serializer::bytes($this->autologinToken);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $defaultP2pContacts = ($flags & (1 << 3)) ? true : null;
         $preloadFeaturedStickers = ($flags & (1 << 4)) ? true : null;
         $revokePmInbox = ($flags & (1 << 6)) ? true : null;
         $blockedMode = ($flags & (1 << 8)) ? true : null;
         $forceTryIpv6 = ($flags & (1 << 14)) ? true : null;
-        $date = $deserializer->int32($stream);
-        $expires = $deserializer->int32($stream);
-        $testMode = ($deserializer->int32($stream) === 0x997275b5);
-        $thisDc = $deserializer->int32($stream);
-        $dcOptions = $deserializer->vectorOfObjects($stream, [DcOption::class, 'deserialize']);
-        $dcTxtDomainName = $deserializer->bytes($stream);
-        $chatSizeMax = $deserializer->int32($stream);
-        $megagroupSizeMax = $deserializer->int32($stream);
-        $forwardedCountMax = $deserializer->int32($stream);
-        $onlineUpdatePeriodMs = $deserializer->int32($stream);
-        $offlineBlurTimeoutMs = $deserializer->int32($stream);
-        $offlineIdleTimeoutMs = $deserializer->int32($stream);
-        $onlineCloudTimeoutMs = $deserializer->int32($stream);
-        $notifyCloudDelayMs = $deserializer->int32($stream);
-        $notifyDefaultDelayMs = $deserializer->int32($stream);
-        $pushChatPeriodMs = $deserializer->int32($stream);
-        $pushChatLimit = $deserializer->int32($stream);
-        $editTimeLimit = $deserializer->int32($stream);
-        $revokeTimeLimit = $deserializer->int32($stream);
-        $revokePmTimeLimit = $deserializer->int32($stream);
-        $ratingEDecay = $deserializer->int32($stream);
-        $stickersRecentLimit = $deserializer->int32($stream);
-        $channelsReadMediaPeriod = $deserializer->int32($stream);
-        $tmpSessions = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $callReceiveTimeoutMs = $deserializer->int32($stream);
-        $callRingTimeoutMs = $deserializer->int32($stream);
-        $callConnectTimeoutMs = $deserializer->int32($stream);
-        $callPacketTimeoutMs = $deserializer->int32($stream);
-        $meUrlPrefix = $deserializer->bytes($stream);
-        $autoupdateUrlPrefix = ($flags & (1 << 7)) ? $deserializer->bytes($stream) : null;
-        $gifSearchUsername = ($flags & (1 << 9)) ? $deserializer->bytes($stream) : null;
-        $venueSearchUsername = ($flags & (1 << 10)) ? $deserializer->bytes($stream) : null;
-        $imgSearchUsername = ($flags & (1 << 11)) ? $deserializer->bytes($stream) : null;
-        $staticMapsProvider = ($flags & (1 << 12)) ? $deserializer->bytes($stream) : null;
-        $captionLengthMax = $deserializer->int32($stream);
-        $messageLengthMax = $deserializer->int32($stream);
-        $webfileDcId = $deserializer->int32($stream);
-        $suggestedLangCode = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $langPackVersion = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $baseLangPackVersion = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $reactionsDefault = ($flags & (1 << 15)) ? AbstractReaction::deserialize($deserializer, $stream) : null;
-        $autologinToken = ($flags & (1 << 16)) ? $deserializer->bytes($stream) : null;
+        $date = Deserializer::int32($stream);
+        $expires = Deserializer::int32($stream);
+        $testMode = (Deserializer::int32($stream) === 0x997275b5);
+        $thisDc = Deserializer::int32($stream);
+        $dcOptions = Deserializer::vectorOfObjects($stream, [DcOption::class, 'deserialize']);
+        $dcTxtDomainName = Deserializer::bytes($stream);
+        $chatSizeMax = Deserializer::int32($stream);
+        $megagroupSizeMax = Deserializer::int32($stream);
+        $forwardedCountMax = Deserializer::int32($stream);
+        $onlineUpdatePeriodMs = Deserializer::int32($stream);
+        $offlineBlurTimeoutMs = Deserializer::int32($stream);
+        $offlineIdleTimeoutMs = Deserializer::int32($stream);
+        $onlineCloudTimeoutMs = Deserializer::int32($stream);
+        $notifyCloudDelayMs = Deserializer::int32($stream);
+        $notifyDefaultDelayMs = Deserializer::int32($stream);
+        $pushChatPeriodMs = Deserializer::int32($stream);
+        $pushChatLimit = Deserializer::int32($stream);
+        $editTimeLimit = Deserializer::int32($stream);
+        $revokeTimeLimit = Deserializer::int32($stream);
+        $revokePmTimeLimit = Deserializer::int32($stream);
+        $ratingEDecay = Deserializer::int32($stream);
+        $stickersRecentLimit = Deserializer::int32($stream);
+        $channelsReadMediaPeriod = Deserializer::int32($stream);
+        $tmpSessions = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $callReceiveTimeoutMs = Deserializer::int32($stream);
+        $callRingTimeoutMs = Deserializer::int32($stream);
+        $callConnectTimeoutMs = Deserializer::int32($stream);
+        $callPacketTimeoutMs = Deserializer::int32($stream);
+        $meUrlPrefix = Deserializer::bytes($stream);
+        $autoupdateUrlPrefix = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
+        $gifSearchUsername = ($flags & (1 << 9)) ? Deserializer::bytes($stream) : null;
+        $venueSearchUsername = ($flags & (1 << 10)) ? Deserializer::bytes($stream) : null;
+        $imgSearchUsername = ($flags & (1 << 11)) ? Deserializer::bytes($stream) : null;
+        $staticMapsProvider = ($flags & (1 << 12)) ? Deserializer::bytes($stream) : null;
+        $captionLengthMax = Deserializer::int32($stream);
+        $messageLengthMax = Deserializer::int32($stream);
+        $webfileDcId = Deserializer::int32($stream);
+        $suggestedLangCode = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $langPackVersion = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $baseLangPackVersion = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $reactionsDefault = ($flags & (1 << 15)) ? AbstractReaction::deserialize($stream) : null;
+        $autologinToken = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
         return new self(
             $date,
             $expires,

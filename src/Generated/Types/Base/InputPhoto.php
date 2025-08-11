@@ -25,21 +25,21 @@ final class InputPhoto extends AbstractInputPhoto
         public readonly string $fileReference
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->bytes($this->fileReference);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::bytes($this->fileReference);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $id = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
-        $fileReference = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $fileReference = Deserializer::bytes($stream);
         return new self(
             $id,
             $accessHash,

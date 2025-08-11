@@ -23,23 +23,23 @@ final class PageCaption extends TlObject
         public readonly AbstractRichText $credit
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->text->serialize($serializer);
-        $buffer .= $this->credit->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->text->serialize();
+        $buffer .= $this->credit->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $text = AbstractRichText::deserialize($deserializer, $stream);
-        $credit = AbstractRichText::deserialize($deserializer, $stream);
+        $text = AbstractRichText::deserialize($stream);
+        $credit = AbstractRichText::deserialize($stream);
         return new self(
             $text,
             $credit

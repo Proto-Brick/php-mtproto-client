@@ -29,25 +29,25 @@ final class PageBlockMap extends AbstractPageBlock
         public readonly PageCaption $caption
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->geo->serialize($serializer);
-        $buffer .= $serializer->int32($this->zoom);
-        $buffer .= $serializer->int32($this->w);
-        $buffer .= $serializer->int32($this->h);
-        $buffer .= $this->caption->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->geo->serialize();
+        $buffer .= Serializer::int32($this->zoom);
+        $buffer .= Serializer::int32($this->w);
+        $buffer .= Serializer::int32($this->h);
+        $buffer .= $this->caption->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $geo = AbstractGeoPoint::deserialize($deserializer, $stream);
-        $zoom = $deserializer->int32($stream);
-        $w = $deserializer->int32($stream);
-        $h = $deserializer->int32($stream);
-        $caption = PageCaption::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $geo = AbstractGeoPoint::deserialize($stream);
+        $zoom = Deserializer::int32($stream);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
+        $caption = PageCaption::deserialize($stream);
         return new self(
             $geo,
             $zoom,

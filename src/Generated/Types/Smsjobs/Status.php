@@ -35,43 +35,43 @@ final class Status extends TlObject
         public readonly ?string $lastGiftSlug = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->allowInternational) $flags |= (1 << 0);
         if ($this->lastGiftSlug !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->recentSent);
-        $buffer .= $serializer->int32($this->recentSince);
-        $buffer .= $serializer->int32($this->recentRemains);
-        $buffer .= $serializer->int32($this->totalSent);
-        $buffer .= $serializer->int32($this->totalSince);
+        $buffer .= Serializer::int32($this->recentSent);
+        $buffer .= Serializer::int32($this->recentSince);
+        $buffer .= Serializer::int32($this->recentRemains);
+        $buffer .= Serializer::int32($this->totalSent);
+        $buffer .= Serializer::int32($this->totalSince);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->lastGiftSlug);
+            $buffer .= Serializer::bytes($this->lastGiftSlug);
         }
-        $buffer .= $serializer->bytes($this->termsUrl);
+        $buffer .= Serializer::bytes($this->termsUrl);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $allowInternational = ($flags & (1 << 0)) ? true : null;
-        $recentSent = $deserializer->int32($stream);
-        $recentSince = $deserializer->int32($stream);
-        $recentRemains = $deserializer->int32($stream);
-        $totalSent = $deserializer->int32($stream);
-        $totalSince = $deserializer->int32($stream);
-        $lastGiftSlug = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $termsUrl = $deserializer->bytes($stream);
+        $recentSent = Deserializer::int32($stream);
+        $recentSince = Deserializer::int32($stream);
+        $recentRemains = Deserializer::int32($stream);
+        $totalSent = Deserializer::int32($stream);
+        $totalSince = Deserializer::int32($stream);
+        $lastGiftSlug = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $termsUrl = Deserializer::bytes($stream);
         return new self(
             $recentSent,
             $recentSince,

@@ -48,9 +48,9 @@ final class SaveDraftRequest extends TlObject
         public readonly ?int $effect = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->noWebpage) $flags |= (1 << 1);
         if ($this->invertMedia) $flags |= (1 << 6);
@@ -58,26 +58,26 @@ final class SaveDraftRequest extends TlObject
         if ($this->entities !== null) $flags |= (1 << 3);
         if ($this->media !== null) $flags |= (1 << 5);
         if ($this->effect !== null) $flags |= (1 << 7);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 4)) {
-            $buffer .= $this->replyTo->serialize($serializer);
+            $buffer .= $this->replyTo->serialize();
         }
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->bytes($this->message);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::bytes($this->message);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $this->media->serialize($serializer);
+            $buffer .= $this->media->serialize();
         }
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->int64($this->effect);
+            $buffer .= Serializer::int64($this->effect);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

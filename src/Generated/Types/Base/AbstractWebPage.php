@@ -8,16 +8,16 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractWebPage extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            WebPageEmpty::CONSTRUCTOR_ID => WebPageEmpty::deserialize($deserializer, $stream),
-            WebPagePending::CONSTRUCTOR_ID => WebPagePending::deserialize($deserializer, $stream),
-            WebPage::CONSTRUCTOR_ID => WebPage::deserialize($deserializer, $stream),
-            WebPageNotModified::CONSTRUCTOR_ID => WebPageNotModified::deserialize($deserializer, $stream),
+            WebPageEmpty::CONSTRUCTOR_ID => WebPageEmpty::deserialize($stream),
+            WebPagePending::CONSTRUCTOR_ID => WebPagePending::deserialize($stream),
+            WebPage::CONSTRUCTOR_ID => WebPage::deserialize($stream),
+            WebPageNotModified::CONSTRUCTOR_ID => WebPageNotModified::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type WebPage. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

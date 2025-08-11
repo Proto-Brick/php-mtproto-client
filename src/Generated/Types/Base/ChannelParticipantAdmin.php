@@ -35,42 +35,42 @@ final class ChannelParticipantAdmin extends AbstractChannelParticipant
         public readonly ?string $rank = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->canEdit) $flags |= (1 << 0);
         if ($this->self) $flags |= (1 << 1);
         if ($this->inviterId !== null) $flags |= (1 << 1);
         if ($this->rank !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->userId);
+        $buffer .= Serializer::int64($this->userId);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int64($this->inviterId);
+            $buffer .= Serializer::int64($this->inviterId);
         }
-        $buffer .= $serializer->int64($this->promotedBy);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $this->adminRights->serialize($serializer);
+        $buffer .= Serializer::int64($this->promotedBy);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= $this->adminRights->serialize();
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->rank);
+            $buffer .= Serializer::bytes($this->rank);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $canEdit = ($flags & (1 << 0)) ? true : null;
         $self = ($flags & (1 << 1)) ? true : null;
-        $userId = $deserializer->int64($stream);
-        $inviterId = ($flags & (1 << 1)) ? $deserializer->int64($stream) : null;
-        $promotedBy = $deserializer->int64($stream);
-        $date = $deserializer->int32($stream);
-        $adminRights = ChatAdminRights::deserialize($deserializer, $stream);
-        $rank = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
+        $userId = Deserializer::int64($stream);
+        $inviterId = ($flags & (1 << 1)) ? Deserializer::int64($stream) : null;
+        $promotedBy = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
+        $adminRights = ChatAdminRights::deserialize($stream);
+        $rank = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
         return new self(
             $userId,
             $promotedBy,

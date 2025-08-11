@@ -23,27 +23,27 @@ final class KeyboardButtonRequestPoll extends AbstractKeyboardButton
         public readonly ?bool $quiz = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->quiz !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= ($this->quiz ? $serializer->int32(0x997275b5) : $serializer->int32(0xbc799737));
+            $buffer .= ($this->quiz ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         }
-        $buffer .= $serializer->bytes($this->text);
+        $buffer .= Serializer::bytes($this->text);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $quiz = ($flags & (1 << 0)) ? ($deserializer->int32($stream) === 0x997275b5) : null;
-        $text = $deserializer->bytes($stream);
+        $quiz = ($flags & (1 << 0)) ? (Deserializer::int32($stream) === 0x997275b5) : null;
+        $text = Deserializer::bytes($stream);
         return new self(
             $text,
             $quiz

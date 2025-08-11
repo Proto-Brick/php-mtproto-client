@@ -29,33 +29,33 @@ final class VideoSize extends AbstractVideoSize
         public readonly ?float $videoStartTs = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->videoStartTs !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->type);
-        $buffer .= $serializer->int32($this->w);
-        $buffer .= $serializer->int32($this->h);
-        $buffer .= $serializer->int32($this->size);
+        $buffer .= Serializer::bytes($this->type);
+        $buffer .= Serializer::int32($this->w);
+        $buffer .= Serializer::int32($this->h);
+        $buffer .= Serializer::int32($this->size);
         if ($flags & (1 << 0)) {
             $buffer .= pack('d', $this->videoStartTs);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $type = $deserializer->bytes($stream);
-        $w = $deserializer->int32($stream);
-        $h = $deserializer->int32($stream);
-        $size = $deserializer->int32($stream);
-        $videoStartTs = ($flags & (1 << 0)) ? $deserializer->double($stream) : null;
+        $type = Deserializer::bytes($stream);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
+        $size = Deserializer::int32($stream);
+        $videoStartTs = ($flags & (1 << 0)) ? Deserializer::double($stream) : null;
         return new self(
             $type,
             $w,

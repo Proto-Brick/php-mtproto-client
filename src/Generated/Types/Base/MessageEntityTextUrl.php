@@ -25,21 +25,21 @@ final class MessageEntityTextUrl extends AbstractMessageEntity
         public readonly string $url
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->offset);
-        $buffer .= $serializer->int32($this->length);
-        $buffer .= $serializer->bytes($this->url);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->offset);
+        $buffer .= Serializer::int32($this->length);
+        $buffer .= Serializer::bytes($this->url);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $offset = $deserializer->int32($stream);
-        $length = $deserializer->int32($stream);
-        $url = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $offset = Deserializer::int32($stream);
+        $length = Deserializer::int32($stream);
+        $url = Deserializer::bytes($stream);
         return new self(
             $offset,
             $length,

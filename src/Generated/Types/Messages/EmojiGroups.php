@@ -24,19 +24,19 @@ final class EmojiGroups extends AbstractEmojiGroups
         public readonly array $groups
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->hash);
-        $buffer .= $serializer->vectorOfObjects($this->groups);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->hash);
+        $buffer .= Serializer::vectorOfObjects($this->groups);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $hash = $deserializer->int32($stream);
-        $groups = $deserializer->vectorOfObjects($stream, [AbstractEmojiGroup::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $hash = Deserializer::int32($stream);
+        $groups = Deserializer::vectorOfObjects($stream, [AbstractEmojiGroup::class, 'deserialize']);
         return new self(
             $hash,
             $groups

@@ -43,31 +43,31 @@ final class SendPaymentFormRequest extends TlObject
         public readonly ?int $tipAmount = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->requestedInfoId !== null) $flags |= (1 << 0);
         if ($this->shippingOptionId !== null) $flags |= (1 << 1);
         if ($this->tipAmount !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->formId);
-        $buffer .= $this->invoice->serialize($serializer);
+        $buffer .= Serializer::int64($this->formId);
+        $buffer .= $this->invoice->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->requestedInfoId);
+            $buffer .= Serializer::bytes($this->requestedInfoId);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->shippingOptionId);
+            $buffer .= Serializer::bytes($this->shippingOptionId);
         }
-        $buffer .= $this->credentials->serialize($serializer);
+        $buffer .= $this->credentials->serialize();
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int64($this->tipAmount);
+            $buffer .= Serializer::int64($this->tipAmount);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

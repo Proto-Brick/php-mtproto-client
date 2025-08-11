@@ -33,15 +33,15 @@ final class StartHistoryImportRequest extends TlObject
         public readonly int $importId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int64($this->importId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int64($this->importId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

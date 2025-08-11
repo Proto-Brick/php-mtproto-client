@@ -24,19 +24,19 @@ final class AppConfig extends AbstractAppConfig
         public readonly array $config
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->hash);
-        $buffer .= (new DataJSON(json_encode($this->config, JSON_FORCE_OBJECT)))->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->hash);
+        $buffer .= (new DataJSON(json_encode($this->config, JSON_FORCE_OBJECT)))->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $hash = $deserializer->int32($stream);
-        $config = $deserializer->deserializeJsonValue($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $hash = Deserializer::int32($stream);
+        $config = Deserializer::deserializeJsonValue($stream);
         return new self(
             $hash,
             $config

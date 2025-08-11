@@ -45,9 +45,9 @@ final class MessageService extends AbstractMessage
         public readonly ?int $ttlPeriod = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->out) $flags |= (1 << 1);
         if ($this->mentioned) $flags |= (1 << 4);
@@ -58,28 +58,28 @@ final class MessageService extends AbstractMessage
         if ($this->fromId !== null) $flags |= (1 << 8);
         if ($this->replyTo !== null) $flags |= (1 << 3);
         if ($this->ttlPeriod !== null) $flags |= (1 << 25);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->id);
+        $buffer .= Serializer::int32($this->id);
         if ($flags & (1 << 8)) {
-            $buffer .= $this->fromId->serialize($serializer);
+            $buffer .= $this->fromId->serialize();
         }
-        $buffer .= $this->peerId->serialize($serializer);
+        $buffer .= $this->peerId->serialize();
         if ($flags & (1 << 3)) {
-            $buffer .= $this->replyTo->serialize($serializer);
+            $buffer .= $this->replyTo->serialize();
         }
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $this->action->serialize($serializer);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= $this->action->serialize();
         if ($flags & (1 << 25)) {
-            $buffer .= $serializer->int32($this->ttlPeriod);
+            $buffer .= Serializer::int32($this->ttlPeriod);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $out = ($flags & (1 << 1)) ? true : null;
         $mentioned = ($flags & (1 << 4)) ? true : null;
@@ -87,13 +87,13 @@ final class MessageService extends AbstractMessage
         $silent = ($flags & (1 << 13)) ? true : null;
         $post = ($flags & (1 << 14)) ? true : null;
         $legacy = ($flags & (1 << 19)) ? true : null;
-        $id = $deserializer->int32($stream);
-        $fromId = ($flags & (1 << 8)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $peerId = AbstractPeer::deserialize($deserializer, $stream);
-        $replyTo = ($flags & (1 << 3)) ? AbstractMessageReplyHeader::deserialize($deserializer, $stream) : null;
-        $date = $deserializer->int32($stream);
-        $action = AbstractMessageAction::deserialize($deserializer, $stream);
-        $ttlPeriod = ($flags & (1 << 25)) ? $deserializer->int32($stream) : null;
+        $id = Deserializer::int32($stream);
+        $fromId = ($flags & (1 << 8)) ? AbstractPeer::deserialize($stream) : null;
+        $peerId = AbstractPeer::deserialize($stream);
+        $replyTo = ($flags & (1 << 3)) ? AbstractMessageReplyHeader::deserialize($stream) : null;
+        $date = Deserializer::int32($stream);
+        $action = AbstractMessageAction::deserialize($stream);
+        $ttlPeriod = ($flags & (1 << 25)) ? Deserializer::int32($stream) : null;
         return new self(
             $id,
             $peerId,

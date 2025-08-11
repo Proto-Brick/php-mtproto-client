@@ -31,38 +31,38 @@ final class UpdateInlineBotCallbackQuery extends AbstractUpdate
         public readonly ?string $gameShortName = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->data !== null) $flags |= (1 << 0);
         if ($this->gameShortName !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->queryId);
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $this->msgId->serialize($serializer);
-        $buffer .= $serializer->int64($this->chatInstance);
+        $buffer .= Serializer::int64($this->queryId);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= $this->msgId->serialize();
+        $buffer .= Serializer::int64($this->chatInstance);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->data);
+            $buffer .= Serializer::bytes($this->data);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->gameShortName);
+            $buffer .= Serializer::bytes($this->gameShortName);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $queryId = $deserializer->int64($stream);
-        $userId = $deserializer->int64($stream);
-        $msgId = AbstractInputBotInlineMessageID::deserialize($deserializer, $stream);
-        $chatInstance = $deserializer->int64($stream);
-        $data = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $gameShortName = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
+        $queryId = Deserializer::int64($stream);
+        $userId = Deserializer::int64($stream);
+        $msgId = AbstractInputBotInlineMessageID::deserialize($stream);
+        $chatInstance = Deserializer::int64($stream);
+        $data = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $gameShortName = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
         return new self(
             $queryId,
             $userId,

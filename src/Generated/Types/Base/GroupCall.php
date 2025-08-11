@@ -55,9 +55,9 @@ final class GroupCall extends AbstractGroupCall
         public readonly ?int $unmutedVideoCount = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->joinMuted) $flags |= (1 << 1);
         if ($this->canChangeJoinMuted) $flags |= (1 << 2);
@@ -72,35 +72,35 @@ final class GroupCall extends AbstractGroupCall
         if ($this->recordStartDate !== null) $flags |= (1 << 5);
         if ($this->scheduleDate !== null) $flags |= (1 << 7);
         if ($this->unmutedVideoCount !== null) $flags |= (1 << 10);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->int32($this->participantsCount);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::int32($this->participantsCount);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->streamDcId);
+            $buffer .= Serializer::int32($this->streamDcId);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int32($this->recordStartDate);
+            $buffer .= Serializer::int32($this->recordStartDate);
         }
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->int32($this->scheduleDate);
+            $buffer .= Serializer::int32($this->scheduleDate);
         }
         if ($flags & (1 << 10)) {
-            $buffer .= $serializer->int32($this->unmutedVideoCount);
+            $buffer .= Serializer::int32($this->unmutedVideoCount);
         }
-        $buffer .= $serializer->int32($this->unmutedVideoLimit);
-        $buffer .= $serializer->int32($this->version);
+        $buffer .= Serializer::int32($this->unmutedVideoLimit);
+        $buffer .= Serializer::int32($this->version);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $joinMuted = ($flags & (1 << 1)) ? true : null;
         $canChangeJoinMuted = ($flags & (1 << 2)) ? true : null;
@@ -110,16 +110,16 @@ final class GroupCall extends AbstractGroupCall
         $recordVideoActive = ($flags & (1 << 11)) ? true : null;
         $rtmpStream = ($flags & (1 << 12)) ? true : null;
         $listenersHidden = ($flags & (1 << 13)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
-        $participantsCount = $deserializer->int32($stream);
-        $title = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $streamDcId = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $recordStartDate = ($flags & (1 << 5)) ? $deserializer->int32($stream) : null;
-        $scheduleDate = ($flags & (1 << 7)) ? $deserializer->int32($stream) : null;
-        $unmutedVideoCount = ($flags & (1 << 10)) ? $deserializer->int32($stream) : null;
-        $unmutedVideoLimit = $deserializer->int32($stream);
-        $version = $deserializer->int32($stream);
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $participantsCount = Deserializer::int32($stream);
+        $title = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $streamDcId = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $recordStartDate = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $scheduleDate = ($flags & (1 << 7)) ? Deserializer::int32($stream) : null;
+        $unmutedVideoCount = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
+        $unmutedVideoLimit = Deserializer::int32($stream);
+        $version = Deserializer::int32($stream);
         return new self(
             $id,
             $accessHash,

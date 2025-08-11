@@ -109,9 +109,9 @@ final class UserFull extends TlObject
         public readonly ?StarRefProgram $starrefProgram = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->blocked) $flags |= (1 << 0);
         if ($this->phoneCallsAvailable) $flags |= (1 << 4);
@@ -141,7 +141,7 @@ final class UserFull extends TlObject
         if ($this->premiumGifts !== null) $flags |= (1 << 19);
         if ($this->wallpaper !== null) $flags |= (1 << 24);
         if ($this->stories !== null) $flags |= (1 << 25);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
         $flags2 = 0;
         if ($this->sponsoredEnabled) $flags2 |= (1 << 7);
         if ($this->canViewRevenue) $flags2 |= (1 << 9);
@@ -156,99 +156,99 @@ final class UserFull extends TlObject
         if ($this->personalChannelMessage !== null) $flags2 |= (1 << 6);
         if ($this->stargiftsCount !== null) $flags2 |= (1 << 8);
         if ($this->starrefProgram !== null) $flags2 |= (1 << 11);
-        $buffer .= $serializer->int32($flags2);
+        $buffer .= Serializer::int32($flags2);
 
-        $buffer .= $serializer->int64($this->id);
+        $buffer .= Serializer::int64($this->id);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->about);
+            $buffer .= Serializer::bytes($this->about);
         }
-        $buffer .= $this->settings->serialize($serializer);
+        $buffer .= $this->settings->serialize();
         if ($flags & (1 << 21)) {
-            $buffer .= $this->personalPhoto->serialize($serializer);
+            $buffer .= $this->personalPhoto->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->profilePhoto->serialize($serializer);
+            $buffer .= $this->profilePhoto->serialize();
         }
         if ($flags & (1 << 22)) {
-            $buffer .= $this->fallbackPhoto->serialize($serializer);
+            $buffer .= $this->fallbackPhoto->serialize();
         }
-        $buffer .= $this->notifySettings->serialize($serializer);
+        $buffer .= $this->notifySettings->serialize();
         if ($flags & (1 << 3)) {
-            $buffer .= $this->botInfo->serialize($serializer);
+            $buffer .= $this->botInfo->serialize();
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->int32($this->pinnedMsgId);
+            $buffer .= Serializer::int32($this->pinnedMsgId);
         }
-        $buffer .= $serializer->int32($this->commonChatsCount);
+        $buffer .= Serializer::int32($this->commonChatsCount);
         if ($flags & (1 << 11)) {
-            $buffer .= $serializer->int32($this->folderId);
+            $buffer .= Serializer::int32($this->folderId);
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $serializer->int32($this->ttlPeriod);
+            $buffer .= Serializer::int32($this->ttlPeriod);
         }
         if ($flags & (1 << 15)) {
-            $buffer .= $serializer->bytes($this->themeEmoticon);
+            $buffer .= Serializer::bytes($this->themeEmoticon);
         }
         if ($flags & (1 << 16)) {
-            $buffer .= $serializer->bytes($this->privateForwardName);
+            $buffer .= Serializer::bytes($this->privateForwardName);
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $this->botGroupAdminRights->serialize($serializer);
+            $buffer .= $this->botGroupAdminRights->serialize();
         }
         if ($flags & (1 << 18)) {
-            $buffer .= $this->botBroadcastAdminRights->serialize($serializer);
+            $buffer .= $this->botBroadcastAdminRights->serialize();
         }
         if ($flags & (1 << 19)) {
-            $buffer .= $serializer->vectorOfObjects($this->premiumGifts);
+            $buffer .= Serializer::vectorOfObjects($this->premiumGifts);
         }
         if ($flags & (1 << 24)) {
-            $buffer .= $this->wallpaper->serialize($serializer);
+            $buffer .= $this->wallpaper->serialize();
         }
         if ($flags & (1 << 25)) {
-            $buffer .= $this->stories->serialize($serializer);
+            $buffer .= $this->stories->serialize();
         }
         if ($flags2 & (1 << 0)) {
-            $buffer .= $this->businessWorkHours->serialize($serializer);
+            $buffer .= $this->businessWorkHours->serialize();
         }
         if ($flags2 & (1 << 1)) {
-            $buffer .= $this->businessLocation->serialize($serializer);
+            $buffer .= $this->businessLocation->serialize();
         }
         if ($flags2 & (1 << 2)) {
-            $buffer .= $this->businessGreetingMessage->serialize($serializer);
+            $buffer .= $this->businessGreetingMessage->serialize();
         }
         if ($flags2 & (1 << 3)) {
-            $buffer .= $this->businessAwayMessage->serialize($serializer);
+            $buffer .= $this->businessAwayMessage->serialize();
         }
         if ($flags2 & (1 << 4)) {
-            $buffer .= $this->businessIntro->serialize($serializer);
+            $buffer .= $this->businessIntro->serialize();
         }
         if ($flags2 & (1 << 5)) {
-            $buffer .= $this->birthday->serialize($serializer);
+            $buffer .= $this->birthday->serialize();
         }
         if ($flags2 & (1 << 6)) {
-            $buffer .= $serializer->int64($this->personalChannelId);
+            $buffer .= Serializer::int64($this->personalChannelId);
         }
         if ($flags2 & (1 << 6)) {
-            $buffer .= $serializer->int32($this->personalChannelMessage);
+            $buffer .= Serializer::int32($this->personalChannelMessage);
         }
         if ($flags2 & (1 << 8)) {
-            $buffer .= $serializer->int32($this->stargiftsCount);
+            $buffer .= Serializer::int32($this->stargiftsCount);
         }
         if ($flags2 & (1 << 11)) {
-            $buffer .= $this->starrefProgram->serialize($serializer);
+            $buffer .= $this->starrefProgram->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
-        $flags2 = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
+        $flags2 = Deserializer::int32($stream);
 
         $blocked = ($flags & (1 << 0)) ? true : null;
         $phoneCallsAvailable = ($flags & (1 << 4)) ? true : null;
@@ -266,35 +266,35 @@ final class UserFull extends TlObject
         $sponsoredEnabled = ($flags2 & (1 << 7)) ? true : null;
         $canViewRevenue = ($flags2 & (1 << 9)) ? true : null;
         $botCanManageEmojiStatus = ($flags2 & (1 << 10)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $about = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $settings = PeerSettings::deserialize($deserializer, $stream);
-        $personalPhoto = ($flags & (1 << 21)) ? AbstractPhoto::deserialize($deserializer, $stream) : null;
-        $profilePhoto = ($flags & (1 << 2)) ? AbstractPhoto::deserialize($deserializer, $stream) : null;
-        $fallbackPhoto = ($flags & (1 << 22)) ? AbstractPhoto::deserialize($deserializer, $stream) : null;
-        $notifySettings = PeerNotifySettings::deserialize($deserializer, $stream);
-        $botInfo = ($flags & (1 << 3)) ? BotInfo::deserialize($deserializer, $stream) : null;
-        $pinnedMsgId = ($flags & (1 << 6)) ? $deserializer->int32($stream) : null;
-        $commonChatsCount = $deserializer->int32($stream);
-        $folderId = ($flags & (1 << 11)) ? $deserializer->int32($stream) : null;
-        $ttlPeriod = ($flags & (1 << 14)) ? $deserializer->int32($stream) : null;
-        $themeEmoticon = ($flags & (1 << 15)) ? $deserializer->bytes($stream) : null;
-        $privateForwardName = ($flags & (1 << 16)) ? $deserializer->bytes($stream) : null;
-        $botGroupAdminRights = ($flags & (1 << 17)) ? ChatAdminRights::deserialize($deserializer, $stream) : null;
-        $botBroadcastAdminRights = ($flags & (1 << 18)) ? ChatAdminRights::deserialize($deserializer, $stream) : null;
-        $premiumGifts = ($flags & (1 << 19)) ? $deserializer->vectorOfObjects($stream, [PremiumGiftOption::class, 'deserialize']) : null;
-        $wallpaper = ($flags & (1 << 24)) ? AbstractWallPaper::deserialize($deserializer, $stream) : null;
-        $stories = ($flags & (1 << 25)) ? PeerStories::deserialize($deserializer, $stream) : null;
-        $businessWorkHours = ($flags2 & (1 << 0)) ? BusinessWorkHours::deserialize($deserializer, $stream) : null;
-        $businessLocation = ($flags2 & (1 << 1)) ? BusinessLocation::deserialize($deserializer, $stream) : null;
-        $businessGreetingMessage = ($flags2 & (1 << 2)) ? BusinessGreetingMessage::deserialize($deserializer, $stream) : null;
-        $businessAwayMessage = ($flags2 & (1 << 3)) ? BusinessAwayMessage::deserialize($deserializer, $stream) : null;
-        $businessIntro = ($flags2 & (1 << 4)) ? BusinessIntro::deserialize($deserializer, $stream) : null;
-        $birthday = ($flags2 & (1 << 5)) ? Birthday::deserialize($deserializer, $stream) : null;
-        $personalChannelId = ($flags2 & (1 << 6)) ? $deserializer->int64($stream) : null;
-        $personalChannelMessage = ($flags2 & (1 << 6)) ? $deserializer->int32($stream) : null;
-        $stargiftsCount = ($flags2 & (1 << 8)) ? $deserializer->int32($stream) : null;
-        $starrefProgram = ($flags2 & (1 << 11)) ? StarRefProgram::deserialize($deserializer, $stream) : null;
+        $id = Deserializer::int64($stream);
+        $about = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $settings = PeerSettings::deserialize($stream);
+        $personalPhoto = ($flags & (1 << 21)) ? AbstractPhoto::deserialize($stream) : null;
+        $profilePhoto = ($flags & (1 << 2)) ? AbstractPhoto::deserialize($stream) : null;
+        $fallbackPhoto = ($flags & (1 << 22)) ? AbstractPhoto::deserialize($stream) : null;
+        $notifySettings = PeerNotifySettings::deserialize($stream);
+        $botInfo = ($flags & (1 << 3)) ? BotInfo::deserialize($stream) : null;
+        $pinnedMsgId = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
+        $commonChatsCount = Deserializer::int32($stream);
+        $folderId = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
+        $ttlPeriod = ($flags & (1 << 14)) ? Deserializer::int32($stream) : null;
+        $themeEmoticon = ($flags & (1 << 15)) ? Deserializer::bytes($stream) : null;
+        $privateForwardName = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
+        $botGroupAdminRights = ($flags & (1 << 17)) ? ChatAdminRights::deserialize($stream) : null;
+        $botBroadcastAdminRights = ($flags & (1 << 18)) ? ChatAdminRights::deserialize($stream) : null;
+        $premiumGifts = ($flags & (1 << 19)) ? Deserializer::vectorOfObjects($stream, [PremiumGiftOption::class, 'deserialize']) : null;
+        $wallpaper = ($flags & (1 << 24)) ? AbstractWallPaper::deserialize($stream) : null;
+        $stories = ($flags & (1 << 25)) ? PeerStories::deserialize($stream) : null;
+        $businessWorkHours = ($flags2 & (1 << 0)) ? BusinessWorkHours::deserialize($stream) : null;
+        $businessLocation = ($flags2 & (1 << 1)) ? BusinessLocation::deserialize($stream) : null;
+        $businessGreetingMessage = ($flags2 & (1 << 2)) ? BusinessGreetingMessage::deserialize($stream) : null;
+        $businessAwayMessage = ($flags2 & (1 << 3)) ? BusinessAwayMessage::deserialize($stream) : null;
+        $businessIntro = ($flags2 & (1 << 4)) ? BusinessIntro::deserialize($stream) : null;
+        $birthday = ($flags2 & (1 << 5)) ? Birthday::deserialize($stream) : null;
+        $personalChannelId = ($flags2 & (1 << 6)) ? Deserializer::int64($stream) : null;
+        $personalChannelMessage = ($flags2 & (1 << 6)) ? Deserializer::int32($stream) : null;
+        $stargiftsCount = ($flags2 & (1 << 8)) ? Deserializer::int32($stream) : null;
+        $starrefProgram = ($flags2 & (1 << 11)) ? StarRefProgram::deserialize($stream) : null;
         return new self(
             $id,
             $settings,

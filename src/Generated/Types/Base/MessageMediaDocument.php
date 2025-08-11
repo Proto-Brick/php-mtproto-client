@@ -35,9 +35,9 @@ final class MessageMediaDocument extends AbstractMessageMedia
         public readonly ?int $ttlSeconds = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->nopremium) $flags |= (1 << 3);
         if ($this->spoiler) $flags |= (1 << 4);
@@ -47,33 +47,33 @@ final class MessageMediaDocument extends AbstractMessageMedia
         if ($this->document !== null) $flags |= (1 << 0);
         if ($this->altDocuments !== null) $flags |= (1 << 5);
         if ($this->ttlSeconds !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->document->serialize($serializer);
+            $buffer .= $this->document->serialize();
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->vectorOfObjects($this->altDocuments);
+            $buffer .= Serializer::vectorOfObjects($this->altDocuments);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->ttlSeconds);
+            $buffer .= Serializer::int32($this->ttlSeconds);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $nopremium = ($flags & (1 << 3)) ? true : null;
         $spoiler = ($flags & (1 << 4)) ? true : null;
         $video = ($flags & (1 << 6)) ? true : null;
         $round = ($flags & (1 << 7)) ? true : null;
         $voice = ($flags & (1 << 8)) ? true : null;
-        $document = ($flags & (1 << 0)) ? AbstractDocument::deserialize($deserializer, $stream) : null;
-        $altDocuments = ($flags & (1 << 5)) ? $deserializer->vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']) : null;
-        $ttlSeconds = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
+        $document = ($flags & (1 << 0)) ? AbstractDocument::deserialize($stream) : null;
+        $altDocuments = ($flags & (1 << 5)) ? Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']) : null;
+        $ttlSeconds = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
         return new self(
             $nopremium,
             $spoiler,

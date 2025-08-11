@@ -35,51 +35,51 @@ final class InputBotInlineResult extends AbstractInputBotInlineResult
         public readonly ?InputWebDocument $content = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->title !== null) $flags |= (1 << 1);
         if ($this->description !== null) $flags |= (1 << 2);
         if ($this->url !== null) $flags |= (1 << 3);
         if ($this->thumb !== null) $flags |= (1 << 4);
         if ($this->content !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $serializer->bytes($this->type);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= Serializer::bytes($this->type);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->description);
+            $buffer .= Serializer::bytes($this->description);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->url);
+            $buffer .= Serializer::bytes($this->url);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $this->thumb->serialize($serializer);
+            $buffer .= $this->thumb->serialize();
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $this->content->serialize($serializer);
+            $buffer .= $this->content->serialize();
         }
-        $buffer .= $this->sendMessage->serialize($serializer);
+        $buffer .= $this->sendMessage->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $id = $deserializer->bytes($stream);
-        $type = $deserializer->bytes($stream);
-        $title = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $description = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $url = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $thumb = ($flags & (1 << 4)) ? InputWebDocument::deserialize($deserializer, $stream) : null;
-        $content = ($flags & (1 << 5)) ? InputWebDocument::deserialize($deserializer, $stream) : null;
-        $sendMessage = AbstractInputBotInlineMessage::deserialize($deserializer, $stream);
+        $id = Deserializer::bytes($stream);
+        $type = Deserializer::bytes($stream);
+        $title = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $description = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $url = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $thumb = ($flags & (1 << 4)) ? InputWebDocument::deserialize($stream) : null;
+        $content = ($flags & (1 << 5)) ? InputWebDocument::deserialize($stream) : null;
+        $sendMessage = AbstractInputBotInlineMessage::deserialize($stream);
         return new self(
             $id,
             $type,

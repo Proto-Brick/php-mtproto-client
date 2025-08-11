@@ -8,30 +8,30 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractSendMessageAction extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SendMessageTypingAction::CONSTRUCTOR_ID => SendMessageTypingAction::deserialize($deserializer, $stream),
-            SendMessageCancelAction::CONSTRUCTOR_ID => SendMessageCancelAction::deserialize($deserializer, $stream),
-            SendMessageRecordVideoAction::CONSTRUCTOR_ID => SendMessageRecordVideoAction::deserialize($deserializer, $stream),
-            SendMessageUploadVideoAction::CONSTRUCTOR_ID => SendMessageUploadVideoAction::deserialize($deserializer, $stream),
-            SendMessageRecordAudioAction::CONSTRUCTOR_ID => SendMessageRecordAudioAction::deserialize($deserializer, $stream),
-            SendMessageUploadAudioAction::CONSTRUCTOR_ID => SendMessageUploadAudioAction::deserialize($deserializer, $stream),
-            SendMessageUploadPhotoAction::CONSTRUCTOR_ID => SendMessageUploadPhotoAction::deserialize($deserializer, $stream),
-            SendMessageUploadDocumentAction::CONSTRUCTOR_ID => SendMessageUploadDocumentAction::deserialize($deserializer, $stream),
-            SendMessageGeoLocationAction::CONSTRUCTOR_ID => SendMessageGeoLocationAction::deserialize($deserializer, $stream),
-            SendMessageChooseContactAction::CONSTRUCTOR_ID => SendMessageChooseContactAction::deserialize($deserializer, $stream),
-            SendMessageGamePlayAction::CONSTRUCTOR_ID => SendMessageGamePlayAction::deserialize($deserializer, $stream),
-            SendMessageRecordRoundAction::CONSTRUCTOR_ID => SendMessageRecordRoundAction::deserialize($deserializer, $stream),
-            SendMessageUploadRoundAction::CONSTRUCTOR_ID => SendMessageUploadRoundAction::deserialize($deserializer, $stream),
-            SpeakingInGroupCallAction::CONSTRUCTOR_ID => SpeakingInGroupCallAction::deserialize($deserializer, $stream),
-            SendMessageHistoryImportAction::CONSTRUCTOR_ID => SendMessageHistoryImportAction::deserialize($deserializer, $stream),
-            SendMessageChooseStickerAction::CONSTRUCTOR_ID => SendMessageChooseStickerAction::deserialize($deserializer, $stream),
-            SendMessageEmojiInteraction::CONSTRUCTOR_ID => SendMessageEmojiInteraction::deserialize($deserializer, $stream),
-            SendMessageEmojiInteractionSeen::CONSTRUCTOR_ID => SendMessageEmojiInteractionSeen::deserialize($deserializer, $stream),
+            SendMessageTypingAction::CONSTRUCTOR_ID => SendMessageTypingAction::deserialize($stream),
+            SendMessageCancelAction::CONSTRUCTOR_ID => SendMessageCancelAction::deserialize($stream),
+            SendMessageRecordVideoAction::CONSTRUCTOR_ID => SendMessageRecordVideoAction::deserialize($stream),
+            SendMessageUploadVideoAction::CONSTRUCTOR_ID => SendMessageUploadVideoAction::deserialize($stream),
+            SendMessageRecordAudioAction::CONSTRUCTOR_ID => SendMessageRecordAudioAction::deserialize($stream),
+            SendMessageUploadAudioAction::CONSTRUCTOR_ID => SendMessageUploadAudioAction::deserialize($stream),
+            SendMessageUploadPhotoAction::CONSTRUCTOR_ID => SendMessageUploadPhotoAction::deserialize($stream),
+            SendMessageUploadDocumentAction::CONSTRUCTOR_ID => SendMessageUploadDocumentAction::deserialize($stream),
+            SendMessageGeoLocationAction::CONSTRUCTOR_ID => SendMessageGeoLocationAction::deserialize($stream),
+            SendMessageChooseContactAction::CONSTRUCTOR_ID => SendMessageChooseContactAction::deserialize($stream),
+            SendMessageGamePlayAction::CONSTRUCTOR_ID => SendMessageGamePlayAction::deserialize($stream),
+            SendMessageRecordRoundAction::CONSTRUCTOR_ID => SendMessageRecordRoundAction::deserialize($stream),
+            SendMessageUploadRoundAction::CONSTRUCTOR_ID => SendMessageUploadRoundAction::deserialize($stream),
+            SpeakingInGroupCallAction::CONSTRUCTOR_ID => SpeakingInGroupCallAction::deserialize($stream),
+            SendMessageHistoryImportAction::CONSTRUCTOR_ID => SendMessageHistoryImportAction::deserialize($stream),
+            SendMessageChooseStickerAction::CONSTRUCTOR_ID => SendMessageChooseStickerAction::deserialize($stream),
+            SendMessageEmojiInteraction::CONSTRUCTOR_ID => SendMessageEmojiInteraction::deserialize($stream),
+            SendMessageEmojiInteractionSeen::CONSTRUCTOR_ID => SendMessageEmojiInteractionSeen::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type SendMessageAction. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

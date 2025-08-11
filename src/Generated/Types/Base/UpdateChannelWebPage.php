@@ -27,23 +27,23 @@ final class UpdateChannelWebPage extends AbstractUpdate
         public readonly int $ptsCount
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->channelId);
-        $buffer .= $this->webpage->serialize($serializer);
-        $buffer .= $serializer->int32($this->pts);
-        $buffer .= $serializer->int32($this->ptsCount);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->channelId);
+        $buffer .= $this->webpage->serialize();
+        $buffer .= Serializer::int32($this->pts);
+        $buffer .= Serializer::int32($this->ptsCount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $channelId = $deserializer->int64($stream);
-        $webpage = AbstractWebPage::deserialize($deserializer, $stream);
-        $pts = $deserializer->int32($stream);
-        $ptsCount = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $channelId = Deserializer::int64($stream);
+        $webpage = AbstractWebPage::deserialize($stream);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
         return new self(
             $channelId,
             $webpage,

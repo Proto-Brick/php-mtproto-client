@@ -29,30 +29,30 @@ final class MessageMediaWebPage extends AbstractMessageMedia
         public readonly ?bool $safe = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->forceLargeMedia) $flags |= (1 << 0);
         if ($this->forceSmallMedia) $flags |= (1 << 1);
         if ($this->manual) $flags |= (1 << 3);
         if ($this->safe) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->webpage->serialize($serializer);
+        $buffer .= $this->webpage->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $forceLargeMedia = ($flags & (1 << 0)) ? true : null;
         $forceSmallMedia = ($flags & (1 << 1)) ? true : null;
         $manual = ($flags & (1 << 3)) ? true : null;
         $safe = ($flags & (1 << 4)) ? true : null;
-        $webpage = AbstractWebPage::deserialize($deserializer, $stream);
+        $webpage = AbstractWebPage::deserialize($stream);
         return new self(
             $webpage,
             $forceLargeMedia,

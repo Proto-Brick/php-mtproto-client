@@ -31,31 +31,31 @@ final class CollectibleInfo extends TlObject
         public readonly string $url
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->purchaseDate);
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->amount);
-        $buffer .= $serializer->bytes($this->cryptoCurrency);
-        $buffer .= $serializer->int64($this->cryptoAmount);
-        $buffer .= $serializer->bytes($this->url);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->purchaseDate);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->amount);
+        $buffer .= Serializer::bytes($this->cryptoCurrency);
+        $buffer .= Serializer::int64($this->cryptoAmount);
+        $buffer .= Serializer::bytes($this->url);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $purchaseDate = $deserializer->int32($stream);
-        $currency = $deserializer->bytes($stream);
-        $amount = $deserializer->int64($stream);
-        $cryptoCurrency = $deserializer->bytes($stream);
-        $cryptoAmount = $deserializer->int64($stream);
-        $url = $deserializer->bytes($stream);
+        $purchaseDate = Deserializer::int32($stream);
+        $currency = Deserializer::bytes($stream);
+        $amount = Deserializer::int64($stream);
+        $cryptoCurrency = Deserializer::bytes($stream);
+        $cryptoAmount = Deserializer::int64($stream);
+        $url = Deserializer::bytes($stream);
         return new self(
             $purchaseDate,
             $currency,

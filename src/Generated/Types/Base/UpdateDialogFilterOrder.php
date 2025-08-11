@@ -21,17 +21,17 @@ final class UpdateDialogFilterOrder extends AbstractUpdate
         public readonly array $order
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfInts($this->order);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfInts($this->order);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $order = $deserializer->vectorOfInts($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $order = Deserializer::vectorOfInts($stream);
         return new self(
             $order
         );

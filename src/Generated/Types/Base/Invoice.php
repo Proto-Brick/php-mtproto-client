@@ -49,9 +49,9 @@ final class Invoice extends TlObject
         public readonly ?int $subscriptionPeriod = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->test) $flags |= (1 << 0);
         if ($this->nameRequested) $flags |= (1 << 1);
@@ -66,33 +66,33 @@ final class Invoice extends TlObject
         if ($this->suggestedTipAmounts !== null) $flags |= (1 << 8);
         if ($this->termsUrl !== null) $flags |= (1 << 10);
         if ($this->subscriptionPeriod !== null) $flags |= (1 << 11);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->vectorOfObjects($this->prices);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::vectorOfObjects($this->prices);
         if ($flags & (1 << 8)) {
-            $buffer .= $serializer->int64($this->maxTipAmount);
+            $buffer .= Serializer::int64($this->maxTipAmount);
         }
         if ($flags & (1 << 8)) {
-            $buffer .= $serializer->vectorOfLongs($this->suggestedTipAmounts);
+            $buffer .= Serializer::vectorOfLongs($this->suggestedTipAmounts);
         }
         if ($flags & (1 << 10)) {
-            $buffer .= $serializer->bytes($this->termsUrl);
+            $buffer .= Serializer::bytes($this->termsUrl);
         }
         if ($flags & (1 << 11)) {
-            $buffer .= $serializer->int32($this->subscriptionPeriod);
+            $buffer .= Serializer::int32($this->subscriptionPeriod);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $test = ($flags & (1 << 0)) ? true : null;
         $nameRequested = ($flags & (1 << 1)) ? true : null;
@@ -103,12 +103,12 @@ final class Invoice extends TlObject
         $phoneToProvider = ($flags & (1 << 6)) ? true : null;
         $emailToProvider = ($flags & (1 << 7)) ? true : null;
         $recurring = ($flags & (1 << 9)) ? true : null;
-        $currency = $deserializer->bytes($stream);
-        $prices = $deserializer->vectorOfObjects($stream, [LabeledPrice::class, 'deserialize']);
-        $maxTipAmount = ($flags & (1 << 8)) ? $deserializer->int64($stream) : null;
-        $suggestedTipAmounts = ($flags & (1 << 8)) ? $deserializer->vectorOfLongs($stream) : null;
-        $termsUrl = ($flags & (1 << 10)) ? $deserializer->bytes($stream) : null;
-        $subscriptionPeriod = ($flags & (1 << 11)) ? $deserializer->int32($stream) : null;
+        $currency = Deserializer::bytes($stream);
+        $prices = Deserializer::vectorOfObjects($stream, [LabeledPrice::class, 'deserialize']);
+        $maxTipAmount = ($flags & (1 << 8)) ? Deserializer::int64($stream) : null;
+        $suggestedTipAmounts = ($flags & (1 << 8)) ? Deserializer::vectorOfLongs($stream) : null;
+        $termsUrl = ($flags & (1 << 10)) ? Deserializer::bytes($stream) : null;
+        $subscriptionPeriod = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
         return new self(
             $currency,
             $prices,

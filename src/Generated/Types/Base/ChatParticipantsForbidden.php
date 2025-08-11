@@ -23,27 +23,27 @@ final class ChatParticipantsForbidden extends AbstractChatParticipants
         public readonly ?AbstractChatParticipant $selfParticipant = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->selfParticipant !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->chatId);
+        $buffer .= Serializer::int64($this->chatId);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->selfParticipant->serialize($serializer);
+            $buffer .= $this->selfParticipant->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $chatId = $deserializer->int64($stream);
-        $selfParticipant = ($flags & (1 << 0)) ? AbstractChatParticipant::deserialize($deserializer, $stream) : null;
+        $chatId = Deserializer::int64($stream);
+        $selfParticipant = ($flags & (1 << 0)) ? AbstractChatParticipant::deserialize($stream) : null;
         return new self(
             $chatId,
             $selfParticipant

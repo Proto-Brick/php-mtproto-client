@@ -8,21 +8,21 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractSecureValueError extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SecureValueErrorData::CONSTRUCTOR_ID => SecureValueErrorData::deserialize($deserializer, $stream),
-            SecureValueErrorFrontSide::CONSTRUCTOR_ID => SecureValueErrorFrontSide::deserialize($deserializer, $stream),
-            SecureValueErrorReverseSide::CONSTRUCTOR_ID => SecureValueErrorReverseSide::deserialize($deserializer, $stream),
-            SecureValueErrorSelfie::CONSTRUCTOR_ID => SecureValueErrorSelfie::deserialize($deserializer, $stream),
-            SecureValueErrorFile::CONSTRUCTOR_ID => SecureValueErrorFile::deserialize($deserializer, $stream),
-            SecureValueErrorFiles::CONSTRUCTOR_ID => SecureValueErrorFiles::deserialize($deserializer, $stream),
-            SecureValueError::CONSTRUCTOR_ID => SecureValueError::deserialize($deserializer, $stream),
-            SecureValueErrorTranslationFile::CONSTRUCTOR_ID => SecureValueErrorTranslationFile::deserialize($deserializer, $stream),
-            SecureValueErrorTranslationFiles::CONSTRUCTOR_ID => SecureValueErrorTranslationFiles::deserialize($deserializer, $stream),
+            SecureValueErrorData::CONSTRUCTOR_ID => SecureValueErrorData::deserialize($stream),
+            SecureValueErrorFrontSide::CONSTRUCTOR_ID => SecureValueErrorFrontSide::deserialize($stream),
+            SecureValueErrorReverseSide::CONSTRUCTOR_ID => SecureValueErrorReverseSide::deserialize($stream),
+            SecureValueErrorSelfie::CONSTRUCTOR_ID => SecureValueErrorSelfie::deserialize($stream),
+            SecureValueErrorFile::CONSTRUCTOR_ID => SecureValueErrorFile::deserialize($stream),
+            SecureValueErrorFiles::CONSTRUCTOR_ID => SecureValueErrorFiles::deserialize($stream),
+            SecureValueError::CONSTRUCTOR_ID => SecureValueError::deserialize($stream),
+            SecureValueErrorTranslationFile::CONSTRUCTOR_ID => SecureValueErrorTranslationFile::deserialize($stream),
+            SecureValueErrorTranslationFiles::CONSTRUCTOR_ID => SecureValueErrorTranslationFiles::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type SecureValueError. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -23,23 +23,23 @@ final class MessageRange extends TlObject
         public readonly int $maxId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->minId);
-        $buffer .= $serializer->int32($this->maxId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->minId);
+        $buffer .= Serializer::int32($this->maxId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $minId = $deserializer->int32($stream);
-        $maxId = $deserializer->int32($stream);
+        $minId = Deserializer::int32($stream);
+        $maxId = Deserializer::int32($stream);
         return new self(
             $minId,
             $maxId

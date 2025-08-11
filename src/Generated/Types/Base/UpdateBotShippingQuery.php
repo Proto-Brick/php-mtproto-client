@@ -27,23 +27,23 @@ final class UpdateBotShippingQuery extends AbstractUpdate
         public readonly PostAddress $shippingAddress
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->queryId);
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->bytes($this->payload);
-        $buffer .= $this->shippingAddress->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->queryId);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::bytes($this->payload);
+        $buffer .= $this->shippingAddress->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $queryId = $deserializer->int64($stream);
-        $userId = $deserializer->int64($stream);
-        $payload = $deserializer->bytes($stream);
-        $shippingAddress = PostAddress::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $queryId = Deserializer::int64($stream);
+        $userId = Deserializer::int64($stream);
+        $payload = Deserializer::bytes($stream);
+        $shippingAddress = PostAddress::deserialize($stream);
         return new self(
             $queryId,
             $userId,

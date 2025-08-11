@@ -23,19 +23,19 @@ final class StickerSetCovered extends AbstractStickerSetCovered
         public readonly AbstractDocument $cover
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->set->serialize($serializer);
-        $buffer .= $this->cover->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->set->serialize();
+        $buffer .= $this->cover->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $set = StickerSet::deserialize($deserializer, $stream);
-        $cover = AbstractDocument::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $set = StickerSet::deserialize($stream);
+        $cover = AbstractDocument::deserialize($stream);
         return new self(
             $set,
             $cover

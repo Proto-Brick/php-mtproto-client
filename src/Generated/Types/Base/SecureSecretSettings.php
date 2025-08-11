@@ -25,25 +25,25 @@ final class SecureSecretSettings extends TlObject
         public readonly int $secureSecretId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->secureAlgo->serialize($serializer);
-        $buffer .= $serializer->bytes($this->secureSecret);
-        $buffer .= $serializer->int64($this->secureSecretId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->secureAlgo->serialize();
+        $buffer .= Serializer::bytes($this->secureSecret);
+        $buffer .= Serializer::int64($this->secureSecretId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $secureAlgo = AbstractSecurePasswordKdfAlgo::deserialize($deserializer, $stream);
-        $secureSecret = $deserializer->bytes($stream);
-        $secureSecretId = $deserializer->int64($stream);
+        $secureAlgo = AbstractSecurePasswordKdfAlgo::deserialize($stream);
+        $secureSecret = Deserializer::bytes($stream);
+        $secureSecretId = Deserializer::int64($stream);
         return new self(
             $secureAlgo,
             $secureSecret,

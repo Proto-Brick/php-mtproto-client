@@ -27,27 +27,27 @@ final class SearchResultsCalendarPeriod extends TlObject
         public readonly int $count
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int32($this->minMsgId);
-        $buffer .= $serializer->int32($this->maxMsgId);
-        $buffer .= $serializer->int32($this->count);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int32($this->minMsgId);
+        $buffer .= Serializer::int32($this->maxMsgId);
+        $buffer .= Serializer::int32($this->count);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $date = $deserializer->int32($stream);
-        $minMsgId = $deserializer->int32($stream);
-        $maxMsgId = $deserializer->int32($stream);
-        $count = $deserializer->int32($stream);
+        $date = Deserializer::int32($stream);
+        $minMsgId = Deserializer::int32($stream);
+        $maxMsgId = Deserializer::int32($stream);
+        $count = Deserializer::int32($stream);
         return new self(
             $date,
             $minMsgId,

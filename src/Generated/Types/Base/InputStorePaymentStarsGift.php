@@ -27,23 +27,23 @@ final class InputStorePaymentStarsGift extends AbstractInputStorePaymentPurpose
         public readonly int $amount
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->userId->serialize($serializer);
-        $buffer .= $serializer->int64($this->stars);
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->amount);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->userId->serialize();
+        $buffer .= Serializer::int64($this->stars);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->amount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $userId = AbstractInputUser::deserialize($deserializer, $stream);
-        $stars = $deserializer->int64($stream);
-        $currency = $deserializer->bytes($stream);
-        $amount = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $userId = AbstractInputUser::deserialize($stream);
+        $stars = Deserializer::int64($stream);
+        $currency = Deserializer::bytes($stream);
+        $amount = Deserializer::int64($stream);
         return new self(
             $userId,
             $stars,

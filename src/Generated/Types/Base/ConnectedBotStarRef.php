@@ -35,43 +35,43 @@ final class ConnectedBotStarRef extends TlObject
         public readonly ?int $durationMonths = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->revoked) $flags |= (1 << 1);
         if ($this->durationMonths !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int64($this->botId);
-        $buffer .= $serializer->int32($this->commissionPermille);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int64($this->botId);
+        $buffer .= Serializer::int32($this->commissionPermille);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->durationMonths);
+            $buffer .= Serializer::int32($this->durationMonths);
         }
-        $buffer .= $serializer->int64($this->participants);
-        $buffer .= $serializer->int64($this->revenue);
+        $buffer .= Serializer::int64($this->participants);
+        $buffer .= Serializer::int64($this->revenue);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $revoked = ($flags & (1 << 1)) ? true : null;
-        $url = $deserializer->bytes($stream);
-        $date = $deserializer->int32($stream);
-        $botId = $deserializer->int64($stream);
-        $commissionPermille = $deserializer->int32($stream);
-        $durationMonths = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $participants = $deserializer->int64($stream);
-        $revenue = $deserializer->int64($stream);
+        $url = Deserializer::bytes($stream);
+        $date = Deserializer::int32($stream);
+        $botId = Deserializer::int64($stream);
+        $commissionPermille = Deserializer::int32($stream);
+        $durationMonths = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $participants = Deserializer::int64($stream);
+        $revenue = Deserializer::int64($stream);
         return new self(
             $url,
             $date,

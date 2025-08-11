@@ -23,19 +23,19 @@ final class UpdateUserEmojiStatus extends AbstractUpdate
         public readonly AbstractEmojiStatus $emojiStatus
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $this->emojiStatus->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= $this->emojiStatus->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $userId = $deserializer->int64($stream);
-        $emojiStatus = AbstractEmojiStatus::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $userId = Deserializer::int64($stream);
+        $emojiStatus = AbstractEmojiStatus::deserialize($stream);
         return new self(
             $userId,
             $emojiStatus

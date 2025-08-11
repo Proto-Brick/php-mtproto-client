@@ -8,16 +8,16 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputPaymentCredentials extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputPaymentCredentialsSaved::CONSTRUCTOR_ID => InputPaymentCredentialsSaved::deserialize($deserializer, $stream),
-            InputPaymentCredentials::CONSTRUCTOR_ID => InputPaymentCredentials::deserialize($deserializer, $stream),
-            InputPaymentCredentialsApplePay::CONSTRUCTOR_ID => InputPaymentCredentialsApplePay::deserialize($deserializer, $stream),
-            InputPaymentCredentialsGooglePay::CONSTRUCTOR_ID => InputPaymentCredentialsGooglePay::deserialize($deserializer, $stream),
+            InputPaymentCredentialsSaved::CONSTRUCTOR_ID => InputPaymentCredentialsSaved::deserialize($stream),
+            InputPaymentCredentials::CONSTRUCTOR_ID => InputPaymentCredentials::deserialize($stream),
+            InputPaymentCredentialsApplePay::CONSTRUCTOR_ID => InputPaymentCredentialsApplePay::deserialize($stream),
+            InputPaymentCredentialsGooglePay::CONSTRUCTOR_ID => InputPaymentCredentialsGooglePay::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputPaymentCredentials. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

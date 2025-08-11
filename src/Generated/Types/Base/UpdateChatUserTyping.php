@@ -25,21 +25,21 @@ final class UpdateChatUserTyping extends AbstractUpdate
         public readonly AbstractSendMessageAction $action
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->chatId);
-        $buffer .= $this->fromId->serialize($serializer);
-        $buffer .= $this->action->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->chatId);
+        $buffer .= $this->fromId->serialize();
+        $buffer .= $this->action->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $chatId = $deserializer->int64($stream);
-        $fromId = AbstractPeer::deserialize($deserializer, $stream);
-        $action = AbstractSendMessageAction::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $chatId = Deserializer::int64($stream);
+        $fromId = AbstractPeer::deserialize($stream);
+        $action = AbstractSendMessageAction::deserialize($stream);
         return new self(
             $chatId,
             $fromId,

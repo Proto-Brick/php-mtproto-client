@@ -35,39 +35,39 @@ final class Photo extends AbstractPhoto
         public readonly ?array $videoSizes = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->hasStickers) $flags |= (1 << 0);
         if ($this->videoSizes !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->bytes($this->fileReference);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->vectorOfObjects($this->sizes);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::bytes($this->fileReference);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::vectorOfObjects($this->sizes);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->videoSizes);
+            $buffer .= Serializer::vectorOfObjects($this->videoSizes);
         }
-        $buffer .= $serializer->int32($this->dcId);
+        $buffer .= Serializer::int32($this->dcId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $hasStickers = ($flags & (1 << 0)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
-        $fileReference = $deserializer->bytes($stream);
-        $date = $deserializer->int32($stream);
-        $sizes = $deserializer->vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']);
-        $videoSizes = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [AbstractVideoSize::class, 'deserialize']) : null;
-        $dcId = $deserializer->int32($stream);
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $fileReference = Deserializer::bytes($stream);
+        $date = Deserializer::int32($stream);
+        $sizes = Deserializer::vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']);
+        $videoSizes = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractVideoSize::class, 'deserialize']) : null;
+        $dcId = Deserializer::int32($stream);
         return new self(
             $id,
             $accessHash,

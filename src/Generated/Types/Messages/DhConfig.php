@@ -27,23 +27,23 @@ final class DhConfig extends AbstractDhConfig
         public readonly string $random
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->g);
-        $buffer .= $serializer->bytes($this->p);
-        $buffer .= $serializer->int32($this->version);
-        $buffer .= $serializer->bytes($this->random);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->g);
+        $buffer .= Serializer::bytes($this->p);
+        $buffer .= Serializer::int32($this->version);
+        $buffer .= Serializer::bytes($this->random);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $g = $deserializer->int32($stream);
-        $p = $deserializer->bytes($stream);
-        $version = $deserializer->int32($stream);
-        $random = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $g = Deserializer::int32($stream);
+        $p = Deserializer::bytes($stream);
+        $version = Deserializer::int32($stream);
+        $random = Deserializer::bytes($stream);
         return new self(
             $g,
             $p,

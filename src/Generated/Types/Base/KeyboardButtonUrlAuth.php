@@ -27,31 +27,31 @@ final class KeyboardButtonUrlAuth extends AbstractKeyboardButton
         public readonly ?string $fwdText = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->fwdText !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->text);
+        $buffer .= Serializer::bytes($this->text);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->fwdText);
+            $buffer .= Serializer::bytes($this->fwdText);
         }
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->int32($this->buttonId);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::int32($this->buttonId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $text = $deserializer->bytes($stream);
-        $fwdText = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $url = $deserializer->bytes($stream);
-        $buttonId = $deserializer->int32($stream);
+        $text = Deserializer::bytes($stream);
+        $fwdText = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $url = Deserializer::bytes($stream);
+        $buttonId = Deserializer::int32($stream);
         return new self(
             $text,
             $url,

@@ -25,26 +25,26 @@ final class UrlAuthResultRequest extends AbstractUrlAuthResult
         public readonly ?bool $requestWriteAccess = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->requestWriteAccess) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->bot->serialize($serializer);
-        $buffer .= $serializer->bytes($this->domain);
+        $buffer .= $this->bot->serialize();
+        $buffer .= Serializer::bytes($this->domain);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $requestWriteAccess = ($flags & (1 << 0)) ? true : null;
-        $bot = AbstractUser::deserialize($deserializer, $stream);
-        $domain = $deserializer->bytes($stream);
+        $bot = AbstractUser::deserialize($stream);
+        $domain = Deserializer::bytes($stream);
         return new self(
             $bot,
             $domain,

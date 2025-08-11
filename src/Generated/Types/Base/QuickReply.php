@@ -27,27 +27,27 @@ final class QuickReply extends TlObject
         public readonly int $count
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->shortcutId);
-        $buffer .= $serializer->bytes($this->shortcut);
-        $buffer .= $serializer->int32($this->topMessage);
-        $buffer .= $serializer->int32($this->count);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->shortcutId);
+        $buffer .= Serializer::bytes($this->shortcut);
+        $buffer .= Serializer::int32($this->topMessage);
+        $buffer .= Serializer::int32($this->count);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $shortcutId = $deserializer->int32($stream);
-        $shortcut = $deserializer->bytes($stream);
-        $topMessage = $deserializer->int32($stream);
-        $count = $deserializer->int32($stream);
+        $shortcutId = Deserializer::int32($stream);
+        $shortcut = Deserializer::bytes($stream);
+        $topMessage = Deserializer::int32($stream);
+        $count = Deserializer::int32($stream);
         return new self(
             $shortcutId,
             $shortcut,

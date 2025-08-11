@@ -37,47 +37,47 @@ final class UpdateChannelParticipant extends AbstractUpdate
         public readonly ?AbstractExportedChatInvite $invite = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->viaChatlist) $flags |= (1 << 3);
         if ($this->prevParticipant !== null) $flags |= (1 << 0);
         if ($this->newParticipant !== null) $flags |= (1 << 1);
         if ($this->invite !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->channelId);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int64($this->actorId);
-        $buffer .= $serializer->int64($this->userId);
+        $buffer .= Serializer::int64($this->channelId);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int64($this->actorId);
+        $buffer .= Serializer::int64($this->userId);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->prevParticipant->serialize($serializer);
+            $buffer .= $this->prevParticipant->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->newParticipant->serialize($serializer);
+            $buffer .= $this->newParticipant->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->invite->serialize($serializer);
+            $buffer .= $this->invite->serialize();
         }
-        $buffer .= $serializer->int32($this->qts);
+        $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $viaChatlist = ($flags & (1 << 3)) ? true : null;
-        $channelId = $deserializer->int64($stream);
-        $date = $deserializer->int32($stream);
-        $actorId = $deserializer->int64($stream);
-        $userId = $deserializer->int64($stream);
-        $prevParticipant = ($flags & (1 << 0)) ? AbstractChannelParticipant::deserialize($deserializer, $stream) : null;
-        $newParticipant = ($flags & (1 << 1)) ? AbstractChannelParticipant::deserialize($deserializer, $stream) : null;
-        $invite = ($flags & (1 << 2)) ? AbstractExportedChatInvite::deserialize($deserializer, $stream) : null;
-        $qts = $deserializer->int32($stream);
+        $channelId = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
+        $actorId = Deserializer::int64($stream);
+        $userId = Deserializer::int64($stream);
+        $prevParticipant = ($flags & (1 << 0)) ? AbstractChannelParticipant::deserialize($stream) : null;
+        $newParticipant = ($flags & (1 << 1)) ? AbstractChannelParticipant::deserialize($stream) : null;
+        $invite = ($flags & (1 << 2)) ? AbstractExportedChatInvite::deserialize($stream) : null;
+        $qts = Deserializer::int32($stream);
         return new self(
             $channelId,
             $date,

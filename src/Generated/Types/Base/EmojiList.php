@@ -23,19 +23,19 @@ final class EmojiList extends AbstractEmojiList
         public readonly array $documentId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->hash);
-        $buffer .= $serializer->vectorOfLongs($this->documentId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->hash);
+        $buffer .= Serializer::vectorOfLongs($this->documentId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $hash = $deserializer->int64($stream);
-        $documentId = $deserializer->vectorOfLongs($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $hash = Deserializer::int64($stream);
+        $documentId = Deserializer::vectorOfLongs($stream);
         return new self(
             $hash,
             $documentId

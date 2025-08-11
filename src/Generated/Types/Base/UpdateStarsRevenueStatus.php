@@ -23,19 +23,19 @@ final class UpdateStarsRevenueStatus extends AbstractUpdate
         public readonly StarsRevenueStatus $status
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->status->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->status->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $status = StarsRevenueStatus::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractPeer::deserialize($stream);
+        $status = StarsRevenueStatus::deserialize($stream);
         return new self(
             $peer,
             $status

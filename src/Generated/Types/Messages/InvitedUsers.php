@@ -25,23 +25,23 @@ final class InvitedUsers extends TlObject
         public readonly array $missingInvitees
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->updates->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->missingInvitees);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->updates->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->missingInvitees);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $updates = AbstractUpdates::deserialize($deserializer, $stream);
-        $missingInvitees = $deserializer->vectorOfObjects($stream, [MissingInvitee::class, 'deserialize']);
+        $updates = AbstractUpdates::deserialize($stream);
+        $missingInvitees = Deserializer::vectorOfObjects($stream, [MissingInvitee::class, 'deserialize']);
         return new self(
             $updates,
             $missingInvitees

@@ -39,49 +39,49 @@ final class BotResults extends TlObject
         public readonly ?InlineBotWebView $switchWebview = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->gallery) $flags |= (1 << 0);
         if ($this->nextOffset !== null) $flags |= (1 << 1);
         if ($this->switchPm !== null) $flags |= (1 << 2);
         if ($this->switchWebview !== null) $flags |= (1 << 3);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->queryId);
+        $buffer .= Serializer::int64($this->queryId);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->nextOffset);
+            $buffer .= Serializer::bytes($this->nextOffset);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->switchPm->serialize($serializer);
+            $buffer .= $this->switchPm->serialize();
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->switchWebview->serialize($serializer);
+            $buffer .= $this->switchWebview->serialize();
         }
-        $buffer .= $serializer->vectorOfObjects($this->results);
-        $buffer .= $serializer->int32($this->cacheTime);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::vectorOfObjects($this->results);
+        $buffer .= Serializer::int32($this->cacheTime);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $gallery = ($flags & (1 << 0)) ? true : null;
-        $queryId = $deserializer->int64($stream);
-        $nextOffset = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $switchPm = ($flags & (1 << 2)) ? InlineBotSwitchPM::deserialize($deserializer, $stream) : null;
-        $switchWebview = ($flags & (1 << 3)) ? InlineBotWebView::deserialize($deserializer, $stream) : null;
-        $results = $deserializer->vectorOfObjects($stream, [AbstractBotInlineResult::class, 'deserialize']);
-        $cacheTime = $deserializer->int32($stream);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $queryId = Deserializer::int64($stream);
+        $nextOffset = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $switchPm = ($flags & (1 << 2)) ? InlineBotSwitchPM::deserialize($stream) : null;
+        $switchWebview = ($flags & (1 << 3)) ? InlineBotWebView::deserialize($stream) : null;
+        $results = Deserializer::vectorOfObjects($stream, [AbstractBotInlineResult::class, 'deserialize']);
+        $cacheTime = Deserializer::int32($stream);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $queryId,
             $results,

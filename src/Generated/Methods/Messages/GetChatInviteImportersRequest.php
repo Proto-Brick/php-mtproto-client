@@ -47,30 +47,30 @@ final class GetChatInviteImportersRequest extends TlObject
         public readonly ?string $q = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->requested) $flags |= (1 << 0);
         if ($this->subscriptionExpired) $flags |= (1 << 3);
         if ($this->link !== null) $flags |= (1 << 1);
         if ($this->q !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
+        $buffer .= $this->peer->serialize();
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->link);
+            $buffer .= Serializer::bytes($this->link);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->q);
+            $buffer .= Serializer::bytes($this->q);
         }
-        $buffer .= $serializer->int32($this->offsetDate);
-        $buffer .= $this->offsetUser->serialize($serializer);
-        $buffer .= $serializer->int32($this->limit);
+        $buffer .= Serializer::int32($this->offsetDate);
+        $buffer .= $this->offsetUser->serialize();
+        $buffer .= Serializer::int32($this->limit);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

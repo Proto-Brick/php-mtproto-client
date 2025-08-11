@@ -55,9 +55,9 @@ final class Authorization extends TlObject
         public readonly ?bool $unconfirmed = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->current) $flags |= (1 << 0);
         if ($this->officialApp) $flags |= (1 << 1);
@@ -65,31 +65,31 @@ final class Authorization extends TlObject
         if ($this->encryptedRequestsDisabled) $flags |= (1 << 3);
         if ($this->callRequestsDisabled) $flags |= (1 << 4);
         if ($this->unconfirmed) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->hash);
-        $buffer .= $serializer->bytes($this->deviceModel);
-        $buffer .= $serializer->bytes($this->platform);
-        $buffer .= $serializer->bytes($this->systemVersion);
-        $buffer .= $serializer->int32($this->apiId);
-        $buffer .= $serializer->bytes($this->appName);
-        $buffer .= $serializer->bytes($this->appVersion);
-        $buffer .= $serializer->int32($this->dateCreated);
-        $buffer .= $serializer->int32($this->dateActive);
-        $buffer .= $serializer->bytes($this->ip);
-        $buffer .= $serializer->bytes($this->country);
-        $buffer .= $serializer->bytes($this->region);
+        $buffer .= Serializer::int64($this->hash);
+        $buffer .= Serializer::bytes($this->deviceModel);
+        $buffer .= Serializer::bytes($this->platform);
+        $buffer .= Serializer::bytes($this->systemVersion);
+        $buffer .= Serializer::int32($this->apiId);
+        $buffer .= Serializer::bytes($this->appName);
+        $buffer .= Serializer::bytes($this->appVersion);
+        $buffer .= Serializer::int32($this->dateCreated);
+        $buffer .= Serializer::int32($this->dateActive);
+        $buffer .= Serializer::bytes($this->ip);
+        $buffer .= Serializer::bytes($this->country);
+        $buffer .= Serializer::bytes($this->region);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $current = ($flags & (1 << 0)) ? true : null;
         $officialApp = ($flags & (1 << 1)) ? true : null;
@@ -97,18 +97,18 @@ final class Authorization extends TlObject
         $encryptedRequestsDisabled = ($flags & (1 << 3)) ? true : null;
         $callRequestsDisabled = ($flags & (1 << 4)) ? true : null;
         $unconfirmed = ($flags & (1 << 5)) ? true : null;
-        $hash = $deserializer->int64($stream);
-        $deviceModel = $deserializer->bytes($stream);
-        $platform = $deserializer->bytes($stream);
-        $systemVersion = $deserializer->bytes($stream);
-        $apiId = $deserializer->int32($stream);
-        $appName = $deserializer->bytes($stream);
-        $appVersion = $deserializer->bytes($stream);
-        $dateCreated = $deserializer->int32($stream);
-        $dateActive = $deserializer->int32($stream);
-        $ip = $deserializer->bytes($stream);
-        $country = $deserializer->bytes($stream);
-        $region = $deserializer->bytes($stream);
+        $hash = Deserializer::int64($stream);
+        $deviceModel = Deserializer::bytes($stream);
+        $platform = Deserializer::bytes($stream);
+        $systemVersion = Deserializer::bytes($stream);
+        $apiId = Deserializer::int32($stream);
+        $appName = Deserializer::bytes($stream);
+        $appVersion = Deserializer::bytes($stream);
+        $dateCreated = Deserializer::int32($stream);
+        $dateActive = Deserializer::int32($stream);
+        $ip = Deserializer::bytes($stream);
+        $country = Deserializer::bytes($stream);
+        $region = Deserializer::bytes($stream);
         return new self(
             $hash,
             $deviceModel,

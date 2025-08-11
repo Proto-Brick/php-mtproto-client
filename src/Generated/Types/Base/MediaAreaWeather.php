@@ -27,23 +27,23 @@ final class MediaAreaWeather extends AbstractMediaArea
         public readonly int $color
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->coordinates->serialize($serializer);
-        $buffer .= $serializer->bytes($this->emoji);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->coordinates->serialize();
+        $buffer .= Serializer::bytes($this->emoji);
         $buffer .= pack('d', $this->temperatureC);
-        $buffer .= $serializer->int32($this->color);
+        $buffer .= Serializer::int32($this->color);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $coordinates = MediaAreaCoordinates::deserialize($deserializer, $stream);
-        $emoji = $deserializer->bytes($stream);
-        $temperatureC = $deserializer->double($stream);
-        $color = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $coordinates = MediaAreaCoordinates::deserialize($stream);
+        $emoji = Deserializer::bytes($stream);
+        $temperatureC = Deserializer::double($stream);
+        $color = Deserializer::int32($stream);
         return new self(
             $coordinates,
             $emoji,

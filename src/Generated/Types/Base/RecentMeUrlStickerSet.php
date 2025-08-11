@@ -23,19 +23,19 @@ final class RecentMeUrlStickerSet extends AbstractRecentMeUrl
         public readonly AbstractStickerSetCovered $set
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $this->set->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= $this->set->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $url = $deserializer->bytes($stream);
-        $set = AbstractStickerSetCovered::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $url = Deserializer::bytes($stream);
+        $set = AbstractStickerSetCovered::deserialize($stream);
         return new self(
             $url,
             $set

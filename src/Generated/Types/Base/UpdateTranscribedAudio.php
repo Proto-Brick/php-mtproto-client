@@ -29,30 +29,30 @@ final class UpdateTranscribedAudio extends AbstractUpdate
         public readonly ?bool $pending = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->pending) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->msgId);
-        $buffer .= $serializer->int64($this->transcriptionId);
-        $buffer .= $serializer->bytes($this->text);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->msgId);
+        $buffer .= Serializer::int64($this->transcriptionId);
+        $buffer .= Serializer::bytes($this->text);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $pending = ($flags & (1 << 0)) ? true : null;
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $msgId = $deserializer->int32($stream);
-        $transcriptionId = $deserializer->int64($stream);
-        $text = $deserializer->bytes($stream);
+        $peer = AbstractPeer::deserialize($stream);
+        $msgId = Deserializer::int32($stream);
+        $transcriptionId = Deserializer::int64($stream);
+        $text = Deserializer::bytes($stream);
         return new self(
             $peer,
             $msgId,

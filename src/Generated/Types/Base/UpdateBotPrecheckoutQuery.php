@@ -33,40 +33,40 @@ final class UpdateBotPrecheckoutQuery extends AbstractUpdate
         public readonly ?string $shippingOptionId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->info !== null) $flags |= (1 << 0);
         if ($this->shippingOptionId !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->queryId);
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->bytes($this->payload);
+        $buffer .= Serializer::int64($this->queryId);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::bytes($this->payload);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->info->serialize($serializer);
+            $buffer .= $this->info->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->shippingOptionId);
+            $buffer .= Serializer::bytes($this->shippingOptionId);
         }
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->totalAmount);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->totalAmount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $queryId = $deserializer->int64($stream);
-        $userId = $deserializer->int64($stream);
-        $payload = $deserializer->bytes($stream);
-        $info = ($flags & (1 << 0)) ? PaymentRequestedInfo::deserialize($deserializer, $stream) : null;
-        $shippingOptionId = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $currency = $deserializer->bytes($stream);
-        $totalAmount = $deserializer->int64($stream);
+        $queryId = Deserializer::int64($stream);
+        $userId = Deserializer::int64($stream);
+        $payload = Deserializer::bytes($stream);
+        $info = ($flags & (1 << 0)) ? PaymentRequestedInfo::deserialize($stream) : null;
+        $shippingOptionId = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $currency = Deserializer::bytes($stream);
+        $totalAmount = Deserializer::int64($stream);
         return new self(
             $queryId,
             $userId,

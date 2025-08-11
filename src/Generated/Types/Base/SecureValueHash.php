@@ -23,23 +23,23 @@ final class SecureValueHash extends TlObject
         public readonly string $hash
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->type->serialize($serializer);
-        $buffer .= $serializer->bytes($this->hash);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->type->serialize();
+        $buffer .= Serializer::bytes($this->hash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $type = AbstractSecureValueType::deserialize($deserializer, $stream);
-        $hash = $deserializer->bytes($stream);
+        $type = AbstractSecureValueType::deserialize($stream);
+        $hash = Deserializer::bytes($stream);
         return new self(
             $type,
             $hash

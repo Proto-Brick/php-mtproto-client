@@ -33,37 +33,37 @@ final class ResolvedBusinessChatLinks extends TlObject
         public readonly ?array $entities = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->entities !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->bytes($this->message);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::bytes($this->message);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $message = $deserializer->bytes($stream);
-        $entities = ($flags & (1 << 0)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $peer = AbstractPeer::deserialize($stream);
+        $message = Deserializer::bytes($stream);
+        $entities = ($flags & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $peer,
             $message,

@@ -21,17 +21,17 @@ final class InputInvoiceStars extends AbstractInputInvoice
         public readonly AbstractInputStorePaymentPurpose $purpose
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->purpose->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->purpose->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $purpose = AbstractInputStorePaymentPurpose::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $purpose = AbstractInputStorePaymentPurpose::deserialize($stream);
         return new self(
             $purpose
         );

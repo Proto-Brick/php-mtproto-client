@@ -37,9 +37,9 @@ final class Poll extends TlObject
         public readonly ?int $closeDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->closed) $flags |= (1 << 0);
         if ($this->publicVoters) $flags |= (1 << 1);
@@ -47,38 +47,38 @@ final class Poll extends TlObject
         if ($this->quiz) $flags |= (1 << 3);
         if ($this->closePeriod !== null) $flags |= (1 << 4);
         if ($this->closeDate !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $this->question->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->answers);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= $this->question->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->answers);
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->closePeriod);
+            $buffer .= Serializer::int32($this->closePeriod);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int32($this->closeDate);
+            $buffer .= Serializer::int32($this->closeDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $id = $deserializer->int64($stream);
+        $id = Deserializer::int64($stream);
         $closed = ($flags & (1 << 0)) ? true : null;
         $publicVoters = ($flags & (1 << 1)) ? true : null;
         $multipleChoice = ($flags & (1 << 2)) ? true : null;
         $quiz = ($flags & (1 << 3)) ? true : null;
-        $question = TextWithEntities::deserialize($deserializer, $stream);
-        $answers = $deserializer->vectorOfObjects($stream, [PollAnswer::class, 'deserialize']);
-        $closePeriod = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $closeDate = ($flags & (1 << 5)) ? $deserializer->int32($stream) : null;
+        $question = TextWithEntities::deserialize($stream);
+        $answers = Deserializer::vectorOfObjects($stream, [PollAnswer::class, 'deserialize']);
+        $closePeriod = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $closeDate = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
         return new self(
             $id,
             $question,

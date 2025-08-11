@@ -27,38 +27,38 @@ final class InputStickerSetItem extends TlObject
         public readonly ?string $keywords = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->maskCoords !== null) $flags |= (1 << 0);
         if ($this->keywords !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->document->serialize($serializer);
-        $buffer .= $serializer->bytes($this->emoji);
+        $buffer .= $this->document->serialize();
+        $buffer .= Serializer::bytes($this->emoji);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->maskCoords->serialize($serializer);
+            $buffer .= $this->maskCoords->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->keywords);
+            $buffer .= Serializer::bytes($this->keywords);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $document = AbstractInputDocument::deserialize($deserializer, $stream);
-        $emoji = $deserializer->bytes($stream);
-        $maskCoords = ($flags & (1 << 0)) ? MaskCoords::deserialize($deserializer, $stream) : null;
-        $keywords = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
+        $document = AbstractInputDocument::deserialize($stream);
+        $emoji = Deserializer::bytes($stream);
+        $maskCoords = ($flags & (1 << 0)) ? MaskCoords::deserialize($stream) : null;
+        $keywords = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
         return new self(
             $document,
             $emoji,

@@ -33,29 +33,29 @@ final class PageBlockEmbedPost extends AbstractPageBlock
         public readonly PageCaption $caption
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->int64($this->webpageId);
-        $buffer .= $serializer->int64($this->authorPhotoId);
-        $buffer .= $serializer->bytes($this->author);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->vectorOfObjects($this->blocks);
-        $buffer .= $this->caption->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::int64($this->webpageId);
+        $buffer .= Serializer::int64($this->authorPhotoId);
+        $buffer .= Serializer::bytes($this->author);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::vectorOfObjects($this->blocks);
+        $buffer .= $this->caption->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $url = $deserializer->bytes($stream);
-        $webpageId = $deserializer->int64($stream);
-        $authorPhotoId = $deserializer->int64($stream);
-        $author = $deserializer->bytes($stream);
-        $date = $deserializer->int32($stream);
-        $blocks = $deserializer->vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
-        $caption = PageCaption::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $url = Deserializer::bytes($stream);
+        $webpageId = Deserializer::int64($stream);
+        $authorPhotoId = Deserializer::int64($stream);
+        $author = Deserializer::bytes($stream);
+        $date = Deserializer::int32($stream);
+        $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
+        $caption = PageCaption::deserialize($stream);
         return new self(
             $url,
             $webpageId,

@@ -23,19 +23,19 @@ final class VideoSizeEmojiMarkup extends AbstractVideoSize
         public readonly array $backgroundColors
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->emojiId);
-        $buffer .= $serializer->vectorOfInts($this->backgroundColors);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->emojiId);
+        $buffer .= Serializer::vectorOfInts($this->backgroundColors);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $emojiId = $deserializer->int64($stream);
-        $backgroundColors = $deserializer->vectorOfInts($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $emojiId = Deserializer::int64($stream);
+        $backgroundColors = Deserializer::vectorOfInts($stream);
         return new self(
             $emojiId,
             $backgroundColors

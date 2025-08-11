@@ -25,21 +25,21 @@ final class SendMessageEmojiInteraction extends AbstractSendMessageAction
         public readonly array $interaction
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->emoticon);
-        $buffer .= $serializer->int32($this->msgId);
-        $buffer .= $serializer->bytes(json_encode($this->interaction, JSON_FORCE_OBJECT));
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->emoticon);
+        $buffer .= Serializer::int32($this->msgId);
+        $buffer .= Serializer::bytes(json_encode($this->interaction, JSON_FORCE_OBJECT));
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $emoticon = $deserializer->bytes($stream);
-        $msgId = $deserializer->int32($stream);
-        $interaction = $deserializer->deserializeDataJSON($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $emoticon = Deserializer::bytes($stream);
+        $msgId = Deserializer::int32($stream);
+        $interaction = Deserializer::deserializeDataJSON($stream);
         return new self(
             $emoticon,
             $msgId,

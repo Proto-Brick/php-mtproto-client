@@ -27,23 +27,23 @@ final class InputFileLocation extends AbstractInputFileLocation
         public readonly string $fileReference
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->volumeId);
-        $buffer .= $serializer->int32($this->localId);
-        $buffer .= $serializer->int64($this->secret);
-        $buffer .= $serializer->bytes($this->fileReference);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->volumeId);
+        $buffer .= Serializer::int32($this->localId);
+        $buffer .= Serializer::int64($this->secret);
+        $buffer .= Serializer::bytes($this->fileReference);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $volumeId = $deserializer->int64($stream);
-        $localId = $deserializer->int32($stream);
-        $secret = $deserializer->int64($stream);
-        $fileReference = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $volumeId = Deserializer::int64($stream);
+        $localId = Deserializer::int32($stream);
+        $secret = Deserializer::int64($stream);
+        $fileReference = Deserializer::bytes($stream);
         return new self(
             $volumeId,
             $localId,

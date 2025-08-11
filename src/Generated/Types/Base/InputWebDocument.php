@@ -27,27 +27,27 @@ final class InputWebDocument extends TlObject
         public readonly array $attributes
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->int32($this->size);
-        $buffer .= $serializer->bytes($this->mimeType);
-        $buffer .= $serializer->vectorOfObjects($this->attributes);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::int32($this->size);
+        $buffer .= Serializer::bytes($this->mimeType);
+        $buffer .= Serializer::vectorOfObjects($this->attributes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $url = $deserializer->bytes($stream);
-        $size = $deserializer->int32($stream);
-        $mimeType = $deserializer->bytes($stream);
-        $attributes = $deserializer->vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
+        $url = Deserializer::bytes($stream);
+        $size = Deserializer::int32($stream);
+        $mimeType = Deserializer::bytes($stream);
+        $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
         return new self(
             $url,
             $size,

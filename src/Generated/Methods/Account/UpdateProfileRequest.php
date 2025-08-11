@@ -35,28 +35,28 @@ final class UpdateProfileRequest extends TlObject
         public readonly ?string $about = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->firstName !== null) $flags |= (1 << 0);
         if ($this->lastName !== null) $flags |= (1 << 1);
         if ($this->about !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->firstName);
+            $buffer .= Serializer::bytes($this->firstName);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->lastName);
+            $buffer .= Serializer::bytes($this->lastName);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->about);
+            $buffer .= Serializer::bytes($this->about);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -39,17 +39,17 @@ final class EditPreviewMediaRequest extends TlObject
         public readonly AbstractInputMedia $newMedia
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->bot->serialize($serializer);
-        $buffer .= $serializer->bytes($this->langCode);
-        $buffer .= $this->media->serialize($serializer);
-        $buffer .= $this->newMedia->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->bot->serialize();
+        $buffer .= Serializer::bytes($this->langCode);
+        $buffer .= $this->media->serialize();
+        $buffer .= $this->newMedia->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -27,23 +27,23 @@ final class InputBotInlineResultPhoto extends AbstractInputBotInlineResult
         public readonly AbstractInputBotInlineMessage $sendMessage
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $serializer->bytes($this->type);
-        $buffer .= $this->photo->serialize($serializer);
-        $buffer .= $this->sendMessage->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= Serializer::bytes($this->type);
+        $buffer .= $this->photo->serialize();
+        $buffer .= $this->sendMessage->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $id = $deserializer->bytes($stream);
-        $type = $deserializer->bytes($stream);
-        $photo = AbstractInputPhoto::deserialize($deserializer, $stream);
-        $sendMessage = AbstractInputBotInlineMessage::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $id = Deserializer::bytes($stream);
+        $type = Deserializer::bytes($stream);
+        $photo = AbstractInputPhoto::deserialize($stream);
+        $sendMessage = AbstractInputBotInlineMessage::deserialize($stream);
         return new self(
             $id,
             $type,

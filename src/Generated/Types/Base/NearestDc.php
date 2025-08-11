@@ -25,25 +25,25 @@ final class NearestDc extends TlObject
         public readonly int $nearestDc
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->country);
-        $buffer .= $serializer->int32($this->thisDc);
-        $buffer .= $serializer->int32($this->nearestDc);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->country);
+        $buffer .= Serializer::int32($this->thisDc);
+        $buffer .= Serializer::int32($this->nearestDc);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $country = $deserializer->bytes($stream);
-        $thisDc = $deserializer->int32($stream);
-        $nearestDc = $deserializer->int32($stream);
+        $country = Deserializer::bytes($stream);
+        $thisDc = Deserializer::int32($stream);
+        $nearestDc = Deserializer::int32($stream);
         return new self(
             $country,
             $thisDc,

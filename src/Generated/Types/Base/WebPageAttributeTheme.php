@@ -23,30 +23,30 @@ final class WebPageAttributeTheme extends AbstractWebPageAttribute
         public readonly ?ThemeSettings $settings = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->documents !== null) $flags |= (1 << 0);
         if ($this->settings !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->documents);
+            $buffer .= Serializer::vectorOfObjects($this->documents);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->settings->serialize($serializer);
+            $buffer .= $this->settings->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $documents = ($flags & (1 << 0)) ? $deserializer->vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']) : null;
-        $settings = ($flags & (1 << 1)) ? ThemeSettings::deserialize($deserializer, $stream) : null;
+        $documents = ($flags & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']) : null;
+        $settings = ($flags & (1 << 1)) ? ThemeSettings::deserialize($stream) : null;
         return new self(
             $documents,
             $settings

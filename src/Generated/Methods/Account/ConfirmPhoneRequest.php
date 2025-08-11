@@ -32,15 +32,15 @@ final class ConfirmPhoneRequest extends TlObject
         public readonly string $phoneCode
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->phoneCodeHash);
-        $buffer .= $serializer->bytes($this->phoneCode);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->phoneCodeHash);
+        $buffer .= Serializer::bytes($this->phoneCode);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

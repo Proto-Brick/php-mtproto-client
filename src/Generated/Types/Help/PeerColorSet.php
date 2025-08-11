@@ -21,17 +21,17 @@ final class PeerColorSet extends AbstractPeerColorSet
         public readonly array $colors
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfInts($this->colors);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfInts($this->colors);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $colors = $deserializer->vectorOfInts($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $colors = Deserializer::vectorOfInts($stream);
         return new self(
             $colors
         );

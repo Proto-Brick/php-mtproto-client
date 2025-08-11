@@ -29,33 +29,33 @@ final class StoryView extends AbstractStoryView
         public readonly ?AbstractReaction $reaction = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->blocked) $flags |= (1 << 0);
         if ($this->blockedMyStoriesFrom) $flags |= (1 << 1);
         if ($this->reaction !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->int32($this->date);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::int32($this->date);
         if ($flags & (1 << 2)) {
-            $buffer .= $this->reaction->serialize($serializer);
+            $buffer .= $this->reaction->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $blocked = ($flags & (1 << 0)) ? true : null;
         $blockedMyStoriesFrom = ($flags & (1 << 1)) ? true : null;
-        $userId = $deserializer->int64($stream);
-        $date = $deserializer->int32($stream);
-        $reaction = ($flags & (1 << 2)) ? AbstractReaction::deserialize($deserializer, $stream) : null;
+        $userId = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
+        $reaction = ($flags & (1 << 2)) ? AbstractReaction::deserialize($stream) : null;
         return new self(
             $userId,
             $date,

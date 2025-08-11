@@ -29,25 +29,25 @@ final class MessageMediaContact extends AbstractMessageMedia
         public readonly int $userId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->phoneNumber);
-        $buffer .= $serializer->bytes($this->firstName);
-        $buffer .= $serializer->bytes($this->lastName);
-        $buffer .= $serializer->bytes($this->vcard);
-        $buffer .= $serializer->int64($this->userId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->phoneNumber);
+        $buffer .= Serializer::bytes($this->firstName);
+        $buffer .= Serializer::bytes($this->lastName);
+        $buffer .= Serializer::bytes($this->vcard);
+        $buffer .= Serializer::int64($this->userId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $phoneNumber = $deserializer->bytes($stream);
-        $firstName = $deserializer->bytes($stream);
-        $lastName = $deserializer->bytes($stream);
-        $vcard = $deserializer->bytes($stream);
-        $userId = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $phoneNumber = Deserializer::bytes($stream);
+        $firstName = Deserializer::bytes($stream);
+        $lastName = Deserializer::bytes($stream);
+        $vcard = Deserializer::bytes($stream);
+        $userId = Deserializer::int64($stream);
         return new self(
             $phoneNumber,
             $firstName,

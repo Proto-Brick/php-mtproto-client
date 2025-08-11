@@ -29,33 +29,33 @@ final class UpdateReadChannelInbox extends AbstractUpdate
         public readonly ?int $folderId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->folderId !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->folderId);
+            $buffer .= Serializer::int32($this->folderId);
         }
-        $buffer .= $serializer->int64($this->channelId);
-        $buffer .= $serializer->int32($this->maxId);
-        $buffer .= $serializer->int32($this->stillUnreadCount);
-        $buffer .= $serializer->int32($this->pts);
+        $buffer .= Serializer::int64($this->channelId);
+        $buffer .= Serializer::int32($this->maxId);
+        $buffer .= Serializer::int32($this->stillUnreadCount);
+        $buffer .= Serializer::int32($this->pts);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $folderId = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $channelId = $deserializer->int64($stream);
-        $maxId = $deserializer->int32($stream);
-        $stillUnreadCount = $deserializer->int32($stream);
-        $pts = $deserializer->int32($stream);
+        $folderId = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $channelId = Deserializer::int64($stream);
+        $maxId = Deserializer::int32($stream);
+        $stillUnreadCount = Deserializer::int32($stream);
+        $pts = Deserializer::int32($stream);
         return new self(
             $channelId,
             $maxId,

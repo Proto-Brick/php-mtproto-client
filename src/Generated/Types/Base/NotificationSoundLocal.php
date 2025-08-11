@@ -23,19 +23,19 @@ final class NotificationSoundLocal extends AbstractNotificationSound
         public readonly string $data
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->data);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->data);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $title = $deserializer->bytes($stream);
-        $data = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $title = Deserializer::bytes($stream);
+        $data = Deserializer::bytes($stream);
         return new self(
             $title,
             $data

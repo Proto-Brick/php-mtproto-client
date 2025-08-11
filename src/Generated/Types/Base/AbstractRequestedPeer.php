@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractRequestedPeer extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            RequestedPeerUser::CONSTRUCTOR_ID => RequestedPeerUser::deserialize($deserializer, $stream),
-            RequestedPeerChat::CONSTRUCTOR_ID => RequestedPeerChat::deserialize($deserializer, $stream),
-            RequestedPeerChannel::CONSTRUCTOR_ID => RequestedPeerChannel::deserialize($deserializer, $stream),
+            RequestedPeerUser::CONSTRUCTOR_ID => RequestedPeerUser::deserialize($stream),
+            RequestedPeerChat::CONSTRUCTOR_ID => RequestedPeerChat::deserialize($stream),
+            RequestedPeerChannel::CONSTRUCTOR_ID => RequestedPeerChannel::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type RequestedPeer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

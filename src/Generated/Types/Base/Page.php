@@ -35,43 +35,43 @@ final class Page extends TlObject
         public readonly ?int $views = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->part) $flags |= (1 << 0);
         if ($this->rtl) $flags |= (1 << 1);
         if ($this->v2) $flags |= (1 << 2);
         if ($this->views !== null) $flags |= (1 << 3);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->vectorOfObjects($this->blocks);
-        $buffer .= $serializer->vectorOfObjects($this->photos);
-        $buffer .= $serializer->vectorOfObjects($this->documents);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::vectorOfObjects($this->blocks);
+        $buffer .= Serializer::vectorOfObjects($this->photos);
+        $buffer .= Serializer::vectorOfObjects($this->documents);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int32($this->views);
+            $buffer .= Serializer::int32($this->views);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $part = ($flags & (1 << 0)) ? true : null;
         $rtl = ($flags & (1 << 1)) ? true : null;
         $v2 = ($flags & (1 << 2)) ? true : null;
-        $url = $deserializer->bytes($stream);
-        $blocks = $deserializer->vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
-        $photos = $deserializer->vectorOfObjects($stream, [AbstractPhoto::class, 'deserialize']);
-        $documents = $deserializer->vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
-        $views = ($flags & (1 << 3)) ? $deserializer->int32($stream) : null;
+        $url = Deserializer::bytes($stream);
+        $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
+        $photos = Deserializer::vectorOfObjects($stream, [AbstractPhoto::class, 'deserialize']);
+        $documents = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
+        $views = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
         return new self(
             $url,
             $blocks,

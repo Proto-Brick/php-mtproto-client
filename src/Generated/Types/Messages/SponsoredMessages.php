@@ -30,31 +30,31 @@ final class SponsoredMessages extends AbstractSponsoredMessages
         public readonly ?int $postsBetween = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->postsBetween !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->postsBetween);
+            $buffer .= Serializer::int32($this->postsBetween);
         }
-        $buffer .= $serializer->vectorOfObjects($this->messages);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::vectorOfObjects($this->messages);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $postsBetween = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $messages = $deserializer->vectorOfObjects($stream, [SponsoredMessage::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $postsBetween = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $messages = Deserializer::vectorOfObjects($stream, [SponsoredMessage::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $messages,
             $chats,

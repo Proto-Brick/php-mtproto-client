@@ -31,41 +31,41 @@ final class MessageActionGiftPremium extends AbstractMessageAction
         public readonly ?TextWithEntities $message = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->cryptoCurrency !== null) $flags |= (1 << 0);
         if ($this->cryptoAmount !== null) $flags |= (1 << 0);
         if ($this->message !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->amount);
-        $buffer .= $serializer->int32($this->months);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->amount);
+        $buffer .= Serializer::int32($this->months);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->cryptoCurrency);
+            $buffer .= Serializer::bytes($this->cryptoCurrency);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->cryptoAmount);
+            $buffer .= Serializer::int64($this->cryptoAmount);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->message->serialize($serializer);
+            $buffer .= $this->message->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $currency = $deserializer->bytes($stream);
-        $amount = $deserializer->int64($stream);
-        $months = $deserializer->int32($stream);
-        $cryptoCurrency = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $cryptoAmount = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $message = ($flags & (1 << 1)) ? TextWithEntities::deserialize($deserializer, $stream) : null;
+        $currency = Deserializer::bytes($stream);
+        $amount = Deserializer::int64($stream);
+        $months = Deserializer::int32($stream);
+        $cryptoCurrency = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $cryptoAmount = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $message = ($flags & (1 << 1)) ? TextWithEntities::deserialize($stream) : null;
         return new self(
             $currency,
             $amount,

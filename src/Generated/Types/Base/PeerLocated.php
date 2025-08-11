@@ -25,21 +25,21 @@ final class PeerLocated extends AbstractPeerLocated
         public readonly int $distance
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->expires);
-        $buffer .= $serializer->int32($this->distance);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->expires);
+        $buffer .= Serializer::int32($this->distance);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $expires = $deserializer->int32($stream);
-        $distance = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractPeer::deserialize($stream);
+        $expires = Deserializer::int32($stream);
+        $distance = Deserializer::int32($stream);
         return new self(
             $peer,
             $expires,

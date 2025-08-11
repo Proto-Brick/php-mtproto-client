@@ -27,31 +27,31 @@ final class ChatPhoto extends AbstractChatPhoto
         public readonly ?string $strippedThumb = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->hasVideo) $flags |= (1 << 0);
         if ($this->strippedThumb !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->photoId);
+        $buffer .= Serializer::int64($this->photoId);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->strippedThumb);
+            $buffer .= Serializer::bytes($this->strippedThumb);
         }
-        $buffer .= $serializer->int32($this->dcId);
+        $buffer .= Serializer::int32($this->dcId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $hasVideo = ($flags & (1 << 0)) ? true : null;
-        $photoId = $deserializer->int64($stream);
-        $strippedThumb = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $dcId = $deserializer->int32($stream);
+        $photoId = Deserializer::int64($stream);
+        $strippedThumb = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $dcId = Deserializer::int32($stream);
         return new self(
             $photoId,
             $dcId,

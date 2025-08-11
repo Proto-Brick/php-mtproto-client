@@ -35,16 +35,16 @@ final class GetAuthorizationFormRequest extends TlObject
         public readonly string $publicKey
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->botId);
-        $buffer .= $serializer->bytes($this->scope);
-        $buffer .= $serializer->bytes($this->publicKey);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->botId);
+        $buffer .= Serializer::bytes($this->scope);
+        $buffer .= Serializer::bytes($this->publicKey);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

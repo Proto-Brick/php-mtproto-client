@@ -25,21 +25,21 @@ final class MessageEntityCustomEmoji extends AbstractMessageEntity
         public readonly int $documentId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->offset);
-        $buffer .= $serializer->int32($this->length);
-        $buffer .= $serializer->int64($this->documentId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->offset);
+        $buffer .= Serializer::int32($this->length);
+        $buffer .= Serializer::int64($this->documentId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $offset = $deserializer->int32($stream);
-        $length = $deserializer->int32($stream);
-        $documentId = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $offset = Deserializer::int32($stream);
+        $length = Deserializer::int32($stream);
+        $documentId = Deserializer::int64($stream);
         return new self(
             $offset,
             $length,

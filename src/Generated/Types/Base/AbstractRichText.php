@@ -8,28 +8,28 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractRichText extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            TextEmpty::CONSTRUCTOR_ID => TextEmpty::deserialize($deserializer, $stream),
-            TextPlain::CONSTRUCTOR_ID => TextPlain::deserialize($deserializer, $stream),
-            TextBold::CONSTRUCTOR_ID => TextBold::deserialize($deserializer, $stream),
-            TextItalic::CONSTRUCTOR_ID => TextItalic::deserialize($deserializer, $stream),
-            TextUnderline::CONSTRUCTOR_ID => TextUnderline::deserialize($deserializer, $stream),
-            TextStrike::CONSTRUCTOR_ID => TextStrike::deserialize($deserializer, $stream),
-            TextFixed::CONSTRUCTOR_ID => TextFixed::deserialize($deserializer, $stream),
-            TextUrl::CONSTRUCTOR_ID => TextUrl::deserialize($deserializer, $stream),
-            TextEmail::CONSTRUCTOR_ID => TextEmail::deserialize($deserializer, $stream),
-            TextConcat::CONSTRUCTOR_ID => TextConcat::deserialize($deserializer, $stream),
-            TextSubscript::CONSTRUCTOR_ID => TextSubscript::deserialize($deserializer, $stream),
-            TextSuperscript::CONSTRUCTOR_ID => TextSuperscript::deserialize($deserializer, $stream),
-            TextMarked::CONSTRUCTOR_ID => TextMarked::deserialize($deserializer, $stream),
-            TextPhone::CONSTRUCTOR_ID => TextPhone::deserialize($deserializer, $stream),
-            TextImage::CONSTRUCTOR_ID => TextImage::deserialize($deserializer, $stream),
-            TextAnchor::CONSTRUCTOR_ID => TextAnchor::deserialize($deserializer, $stream),
+            TextEmpty::CONSTRUCTOR_ID => TextEmpty::deserialize($stream),
+            TextPlain::CONSTRUCTOR_ID => TextPlain::deserialize($stream),
+            TextBold::CONSTRUCTOR_ID => TextBold::deserialize($stream),
+            TextItalic::CONSTRUCTOR_ID => TextItalic::deserialize($stream),
+            TextUnderline::CONSTRUCTOR_ID => TextUnderline::deserialize($stream),
+            TextStrike::CONSTRUCTOR_ID => TextStrike::deserialize($stream),
+            TextFixed::CONSTRUCTOR_ID => TextFixed::deserialize($stream),
+            TextUrl::CONSTRUCTOR_ID => TextUrl::deserialize($stream),
+            TextEmail::CONSTRUCTOR_ID => TextEmail::deserialize($stream),
+            TextConcat::CONSTRUCTOR_ID => TextConcat::deserialize($stream),
+            TextSubscript::CONSTRUCTOR_ID => TextSubscript::deserialize($stream),
+            TextSuperscript::CONSTRUCTOR_ID => TextSuperscript::deserialize($stream),
+            TextMarked::CONSTRUCTOR_ID => TextMarked::deserialize($stream),
+            TextPhone::CONSTRUCTOR_ID => TextPhone::deserialize($stream),
+            TextImage::CONSTRUCTOR_ID => TextImage::deserialize($stream),
+            TextAnchor::CONSTRUCTOR_ID => TextAnchor::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type RichText. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -40,24 +40,24 @@ final class SendPaidReactionRequest extends TlObject
         public readonly ?bool $private = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->private !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->msgId);
-        $buffer .= $serializer->int32($this->count);
-        $buffer .= $serializer->int64($this->randomId);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->msgId);
+        $buffer .= Serializer::int32($this->count);
+        $buffer .= Serializer::int64($this->randomId);
         if ($flags & (1 << 0)) {
-            $buffer .= ($this->private ? $serializer->int32(0x997275b5) : $serializer->int32(0xbc799737));
+            $buffer .= ($this->private ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

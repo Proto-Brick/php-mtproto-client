@@ -27,23 +27,23 @@ final class UpdateMessagePollVote extends AbstractUpdate
         public readonly int $qts
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->pollId);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->vectorOfStrings($this->options);
-        $buffer .= $serializer->int32($this->qts);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->pollId);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::vectorOfStrings($this->options);
+        $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $pollId = $deserializer->int64($stream);
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $options = $deserializer->vectorOfStrings($stream);
-        $qts = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $pollId = Deserializer::int64($stream);
+        $peer = AbstractPeer::deserialize($stream);
+        $options = Deserializer::vectorOfStrings($stream);
+        $qts = Deserializer::int32($stream);
         return new self(
             $pollId,
             $peer,

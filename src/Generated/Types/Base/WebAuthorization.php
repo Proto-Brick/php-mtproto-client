@@ -37,37 +37,37 @@ final class WebAuthorization extends TlObject
         public readonly string $region
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->hash);
-        $buffer .= $serializer->int64($this->botId);
-        $buffer .= $serializer->bytes($this->domain);
-        $buffer .= $serializer->bytes($this->browser);
-        $buffer .= $serializer->bytes($this->platform);
-        $buffer .= $serializer->int32($this->dateCreated);
-        $buffer .= $serializer->int32($this->dateActive);
-        $buffer .= $serializer->bytes($this->ip);
-        $buffer .= $serializer->bytes($this->region);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->hash);
+        $buffer .= Serializer::int64($this->botId);
+        $buffer .= Serializer::bytes($this->domain);
+        $buffer .= Serializer::bytes($this->browser);
+        $buffer .= Serializer::bytes($this->platform);
+        $buffer .= Serializer::int32($this->dateCreated);
+        $buffer .= Serializer::int32($this->dateActive);
+        $buffer .= Serializer::bytes($this->ip);
+        $buffer .= Serializer::bytes($this->region);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $hash = $deserializer->int64($stream);
-        $botId = $deserializer->int64($stream);
-        $domain = $deserializer->bytes($stream);
-        $browser = $deserializer->bytes($stream);
-        $platform = $deserializer->bytes($stream);
-        $dateCreated = $deserializer->int32($stream);
-        $dateActive = $deserializer->int32($stream);
-        $ip = $deserializer->bytes($stream);
-        $region = $deserializer->bytes($stream);
+        $hash = Deserializer::int64($stream);
+        $botId = Deserializer::int64($stream);
+        $domain = Deserializer::bytes($stream);
+        $browser = Deserializer::bytes($stream);
+        $platform = Deserializer::bytes($stream);
+        $dateCreated = Deserializer::int32($stream);
+        $dateActive = Deserializer::int32($stream);
+        $ip = Deserializer::bytes($stream);
+        $region = Deserializer::bytes($stream);
         return new self(
             $hash,
             $botId,

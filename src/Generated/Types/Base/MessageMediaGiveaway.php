@@ -37,9 +37,9 @@ final class MessageMediaGiveaway extends AbstractMessageMedia
         public readonly ?int $stars = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->onlyNewSubscribers) $flags |= (1 << 0);
         if ($this->winnersAreVisible) $flags |= (1 << 2);
@@ -47,40 +47,40 @@ final class MessageMediaGiveaway extends AbstractMessageMedia
         if ($this->prizeDescription !== null) $flags |= (1 << 3);
         if ($this->months !== null) $flags |= (1 << 4);
         if ($this->stars !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->vectorOfLongs($this->channels);
+        $buffer .= Serializer::vectorOfLongs($this->channels);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfStrings($this->countriesIso2);
+            $buffer .= Serializer::vectorOfStrings($this->countriesIso2);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->prizeDescription);
+            $buffer .= Serializer::bytes($this->prizeDescription);
         }
-        $buffer .= $serializer->int32($this->quantity);
+        $buffer .= Serializer::int32($this->quantity);
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->months);
+            $buffer .= Serializer::int32($this->months);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int64($this->stars);
+            $buffer .= Serializer::int64($this->stars);
         }
-        $buffer .= $serializer->int32($this->untilDate);
+        $buffer .= Serializer::int32($this->untilDate);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $onlyNewSubscribers = ($flags & (1 << 0)) ? true : null;
         $winnersAreVisible = ($flags & (1 << 2)) ? true : null;
-        $channels = $deserializer->vectorOfLongs($stream);
-        $countriesIso2 = ($flags & (1 << 1)) ? $deserializer->vectorOfStrings($stream) : null;
-        $prizeDescription = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $quantity = $deserializer->int32($stream);
-        $months = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $stars = ($flags & (1 << 5)) ? $deserializer->int64($stream) : null;
-        $untilDate = $deserializer->int32($stream);
+        $channels = Deserializer::vectorOfLongs($stream);
+        $countriesIso2 = ($flags & (1 << 1)) ? Deserializer::vectorOfStrings($stream) : null;
+        $prizeDescription = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $quantity = Deserializer::int32($stream);
+        $months = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $stars = ($flags & (1 << 5)) ? Deserializer::int64($stream) : null;
+        $untilDate = Deserializer::int32($stream);
         return new self(
             $channels,
             $quantity,

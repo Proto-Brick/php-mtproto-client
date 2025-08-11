@@ -31,41 +31,41 @@ final class GiveawayInfo extends AbstractGiveawayInfo
         public readonly ?string $disallowedCountry = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->participating) $flags |= (1 << 0);
         if ($this->preparingResults) $flags |= (1 << 3);
         if ($this->joinedTooEarlyDate !== null) $flags |= (1 << 1);
         if ($this->adminDisallowedChatId !== null) $flags |= (1 << 2);
         if ($this->disallowedCountry !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->startDate);
+        $buffer .= Serializer::int32($this->startDate);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->joinedTooEarlyDate);
+            $buffer .= Serializer::int32($this->joinedTooEarlyDate);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int64($this->adminDisallowedChatId);
+            $buffer .= Serializer::int64($this->adminDisallowedChatId);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->disallowedCountry);
+            $buffer .= Serializer::bytes($this->disallowedCountry);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $participating = ($flags & (1 << 0)) ? true : null;
         $preparingResults = ($flags & (1 << 3)) ? true : null;
-        $startDate = $deserializer->int32($stream);
-        $joinedTooEarlyDate = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $adminDisallowedChatId = ($flags & (1 << 2)) ? $deserializer->int64($stream) : null;
-        $disallowedCountry = ($flags & (1 << 4)) ? $deserializer->bytes($stream) : null;
+        $startDate = Deserializer::int32($stream);
+        $joinedTooEarlyDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $adminDisallowedChatId = ($flags & (1 << 2)) ? Deserializer::int64($stream) : null;
+        $disallowedCountry = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
         return new self(
             $startDate,
             $participating,

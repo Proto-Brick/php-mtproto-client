@@ -27,21 +27,21 @@ final class AvailableEffects extends AbstractAvailableEffects
         public readonly array $documents
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->hash);
-        $buffer .= $serializer->vectorOfObjects($this->effects);
-        $buffer .= $serializer->vectorOfObjects($this->documents);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->hash);
+        $buffer .= Serializer::vectorOfObjects($this->effects);
+        $buffer .= Serializer::vectorOfObjects($this->documents);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $hash = $deserializer->int32($stream);
-        $effects = $deserializer->vectorOfObjects($stream, [AvailableEffect::class, 'deserialize']);
-        $documents = $deserializer->vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $hash = Deserializer::int32($stream);
+        $effects = Deserializer::vectorOfObjects($stream, [AvailableEffect::class, 'deserialize']);
+        $documents = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
         return new self(
             $hash,
             $effects,

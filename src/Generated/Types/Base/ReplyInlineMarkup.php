@@ -21,17 +21,17 @@ final class ReplyInlineMarkup extends AbstractReplyMarkup
         public readonly array $rows
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->rows);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->rows);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $rows = $deserializer->vectorOfObjects($stream, [KeyboardButtonRow::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $rows = Deserializer::vectorOfObjects($stream, [KeyboardButtonRow::class, 'deserialize']);
         return new self(
             $rows
         );

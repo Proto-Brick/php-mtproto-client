@@ -34,16 +34,16 @@ final class UnregisterDeviceRequest extends TlObject
         public readonly array $otherUids
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->tokenType);
-        $buffer .= $serializer->bytes($this->token);
-        $buffer .= $serializer->vectorOfLongs($this->otherUids);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->tokenType);
+        $buffer .= Serializer::bytes($this->token);
+        $buffer .= Serializer::vectorOfLongs($this->otherUids);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

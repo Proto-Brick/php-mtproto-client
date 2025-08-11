@@ -27,35 +27,35 @@ final class WebViewResult extends TlObject
         public readonly ?int $queryId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->fullsize) $flags |= (1 << 1);
         if ($this->fullscreen) $flags |= (1 << 2);
         if ($this->queryId !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->queryId);
+            $buffer .= Serializer::int64($this->queryId);
         }
-        $buffer .= $serializer->bytes($this->url);
+        $buffer .= Serializer::bytes($this->url);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $fullsize = ($flags & (1 << 1)) ? true : null;
         $fullscreen = ($flags & (1 << 2)) ? true : null;
-        $queryId = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $url = $deserializer->bytes($stream);
+        $queryId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $url = Deserializer::bytes($stream);
         return new self(
             $url,
             $fullsize,

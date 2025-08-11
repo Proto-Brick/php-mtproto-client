@@ -25,21 +25,21 @@ final class InputStorePaymentStarsTopup extends AbstractInputStorePaymentPurpose
         public readonly int $amount
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->stars);
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->amount);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->stars);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->amount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $stars = $deserializer->int64($stream);
-        $currency = $deserializer->bytes($stream);
-        $amount = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $stars = Deserializer::int64($stream);
+        $currency = Deserializer::bytes($stream);
+        $amount = Deserializer::int64($stream);
         return new self(
             $stars,
             $currency,

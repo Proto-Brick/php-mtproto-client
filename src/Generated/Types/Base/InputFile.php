@@ -27,23 +27,23 @@ final class InputFile extends AbstractInputFile
         public readonly string $md5Checksum
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int32($this->parts);
-        $buffer .= $serializer->bytes($this->name);
-        $buffer .= $serializer->bytes($this->md5Checksum);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int32($this->parts);
+        $buffer .= Serializer::bytes($this->name);
+        $buffer .= Serializer::bytes($this->md5Checksum);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $id = $deserializer->int64($stream);
-        $parts = $deserializer->int32($stream);
-        $name = $deserializer->bytes($stream);
-        $md5Checksum = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $id = Deserializer::int64($stream);
+        $parts = Deserializer::int32($stream);
+        $name = Deserializer::bytes($stream);
+        $md5Checksum = Deserializer::bytes($stream);
         return new self(
             $id,
             $parts,

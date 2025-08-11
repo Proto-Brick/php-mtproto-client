@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractChannelDifference extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ChannelDifferenceEmpty::CONSTRUCTOR_ID => ChannelDifferenceEmpty::deserialize($deserializer, $stream),
-            ChannelDifferenceTooLong::CONSTRUCTOR_ID => ChannelDifferenceTooLong::deserialize($deserializer, $stream),
-            ChannelDifference::CONSTRUCTOR_ID => ChannelDifference::deserialize($deserializer, $stream),
+            ChannelDifferenceEmpty::CONSTRUCTOR_ID => ChannelDifferenceEmpty::deserialize($stream),
+            ChannelDifferenceTooLong::CONSTRUCTOR_ID => ChannelDifferenceTooLong::deserialize($stream),
+            ChannelDifference::CONSTRUCTOR_ID => ChannelDifference::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type updates.ChannelDifference. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

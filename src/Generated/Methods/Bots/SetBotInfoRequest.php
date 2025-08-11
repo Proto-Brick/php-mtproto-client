@@ -39,33 +39,33 @@ final class SetBotInfoRequest extends TlObject
         public readonly ?string $description = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->bot !== null) $flags |= (1 << 2);
         if ($this->name !== null) $flags |= (1 << 3);
         if ($this->about !== null) $flags |= (1 << 0);
         if ($this->description !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 2)) {
-            $buffer .= $this->bot->serialize($serializer);
+            $buffer .= $this->bot->serialize();
         }
-        $buffer .= $serializer->bytes($this->langCode);
+        $buffer .= Serializer::bytes($this->langCode);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->name);
+            $buffer .= Serializer::bytes($this->name);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->about);
+            $buffer .= Serializer::bytes($this->about);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->description);
+            $buffer .= Serializer::bytes($this->description);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

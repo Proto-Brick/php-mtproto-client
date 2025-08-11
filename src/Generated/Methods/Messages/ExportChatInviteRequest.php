@@ -45,9 +45,9 @@ final class ExportChatInviteRequest extends TlObject
         public readonly ?StarsSubscriptionPricing $subscriptionPricing = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->legacyRevokePermanent) $flags |= (1 << 2);
         if ($this->requestNeeded) $flags |= (1 << 3);
@@ -55,25 +55,25 @@ final class ExportChatInviteRequest extends TlObject
         if ($this->usageLimit !== null) $flags |= (1 << 1);
         if ($this->title !== null) $flags |= (1 << 4);
         if ($this->subscriptionPricing !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
+        $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->expireDate);
+            $buffer .= Serializer::int32($this->expireDate);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->usageLimit);
+            $buffer .= Serializer::int32($this->usageLimit);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $this->subscriptionPricing->serialize($serializer);
+            $buffer .= $this->subscriptionPricing->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

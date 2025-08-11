@@ -23,30 +23,30 @@ final class ChannelAdminLogEventActionPinTopic extends AbstractChannelAdminLogEv
         public readonly ?AbstractForumTopic $newTopic = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->prevTopic !== null) $flags |= (1 << 0);
         if ($this->newTopic !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->prevTopic->serialize($serializer);
+            $buffer .= $this->prevTopic->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->newTopic->serialize($serializer);
+            $buffer .= $this->newTopic->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $prevTopic = ($flags & (1 << 0)) ? AbstractForumTopic::deserialize($deserializer, $stream) : null;
-        $newTopic = ($flags & (1 << 1)) ? AbstractForumTopic::deserialize($deserializer, $stream) : null;
+        $prevTopic = ($flags & (1 << 0)) ? AbstractForumTopic::deserialize($stream) : null;
+        $newTopic = ($flags & (1 << 1)) ? AbstractForumTopic::deserialize($stream) : null;
         return new self(
             $prevTopic,
             $newTopic

@@ -31,27 +31,27 @@ final class UpdateBotChatInviteRequester extends AbstractUpdate
         public readonly int $qts
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->bytes($this->about);
-        $buffer .= $this->invite->serialize($serializer);
-        $buffer .= $serializer->int32($this->qts);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::bytes($this->about);
+        $buffer .= $this->invite->serialize();
+        $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $date = $deserializer->int32($stream);
-        $userId = $deserializer->int64($stream);
-        $about = $deserializer->bytes($stream);
-        $invite = AbstractExportedChatInvite::deserialize($deserializer, $stream);
-        $qts = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractPeer::deserialize($stream);
+        $date = Deserializer::int32($stream);
+        $userId = Deserializer::int64($stream);
+        $about = Deserializer::bytes($stream);
+        $invite = AbstractExportedChatInvite::deserialize($stream);
+        $qts = Deserializer::int32($stream);
         return new self(
             $peer,
             $date,

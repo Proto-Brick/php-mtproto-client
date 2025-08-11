@@ -27,38 +27,38 @@ final class ReactionsNotifySettings extends TlObject
         public readonly ?AbstractReactionNotificationsFrom $storiesNotifyFrom = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->messagesNotifyFrom !== null) $flags |= (1 << 0);
         if ($this->storiesNotifyFrom !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->messagesNotifyFrom->serialize($serializer);
+            $buffer .= $this->messagesNotifyFrom->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->storiesNotifyFrom->serialize($serializer);
+            $buffer .= $this->storiesNotifyFrom->serialize();
         }
-        $buffer .= $this->sound->serialize($serializer);
-        $buffer .= ($this->showPreviews ? $serializer->int32(0x997275b5) : $serializer->int32(0xbc799737));
+        $buffer .= $this->sound->serialize();
+        $buffer .= ($this->showPreviews ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $messagesNotifyFrom = ($flags & (1 << 0)) ? AbstractReactionNotificationsFrom::deserialize($deserializer, $stream) : null;
-        $storiesNotifyFrom = ($flags & (1 << 1)) ? AbstractReactionNotificationsFrom::deserialize($deserializer, $stream) : null;
-        $sound = AbstractNotificationSound::deserialize($deserializer, $stream);
-        $showPreviews = ($deserializer->int32($stream) === 0x997275b5);
+        $messagesNotifyFrom = ($flags & (1 << 0)) ? AbstractReactionNotificationsFrom::deserialize($stream) : null;
+        $storiesNotifyFrom = ($flags & (1 << 1)) ? AbstractReactionNotificationsFrom::deserialize($stream) : null;
+        $sound = AbstractNotificationSound::deserialize($stream);
+        $showPreviews = (Deserializer::int32($stream) === 0x997275b5);
         return new self(
             $sound,
             $showPreviews,

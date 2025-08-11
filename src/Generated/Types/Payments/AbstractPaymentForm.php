@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractPaymentForm extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PaymentForm::CONSTRUCTOR_ID => PaymentForm::deserialize($deserializer, $stream),
-            PaymentFormStars::CONSTRUCTOR_ID => PaymentFormStars::deserialize($deserializer, $stream),
-            PaymentFormStarGift::CONSTRUCTOR_ID => PaymentFormStarGift::deserialize($deserializer, $stream),
+            PaymentForm::CONSTRUCTOR_ID => PaymentForm::deserialize($stream),
+            PaymentFormStars::CONSTRUCTOR_ID => PaymentFormStars::deserialize($stream),
+            PaymentFormStarGift::CONSTRUCTOR_ID => PaymentFormStarGift::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type payments.PaymentForm. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

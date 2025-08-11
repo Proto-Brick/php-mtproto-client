@@ -23,23 +23,23 @@ final class ContactBirthday extends TlObject
         public readonly Birthday $birthday
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->contactId);
-        $buffer .= $this->birthday->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->contactId);
+        $buffer .= $this->birthday->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $contactId = $deserializer->int64($stream);
-        $birthday = Birthday::deserialize($deserializer, $stream);
+        $contactId = Deserializer::int64($stream);
+        $birthday = Birthday::deserialize($stream);
         return new self(
             $contactId,
             $birthday

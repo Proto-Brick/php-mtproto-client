@@ -29,30 +29,30 @@ final class MessageActionPrizeStars extends AbstractMessageAction
         public readonly ?bool $unclaimed = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->unclaimed) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->stars);
-        $buffer .= $serializer->bytes($this->transactionId);
-        $buffer .= $this->boostPeer->serialize($serializer);
-        $buffer .= $serializer->int32($this->giveawayMsgId);
+        $buffer .= Serializer::int64($this->stars);
+        $buffer .= Serializer::bytes($this->transactionId);
+        $buffer .= $this->boostPeer->serialize();
+        $buffer .= Serializer::int32($this->giveawayMsgId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $unclaimed = ($flags & (1 << 0)) ? true : null;
-        $stars = $deserializer->int64($stream);
-        $transactionId = $deserializer->bytes($stream);
-        $boostPeer = AbstractPeer::deserialize($deserializer, $stream);
-        $giveawayMsgId = $deserializer->int32($stream);
+        $stars = Deserializer::int64($stream);
+        $transactionId = Deserializer::bytes($stream);
+        $boostPeer = AbstractPeer::deserialize($stream);
+        $giveawayMsgId = Deserializer::int32($stream);
         return new self(
             $stars,
             $transactionId,

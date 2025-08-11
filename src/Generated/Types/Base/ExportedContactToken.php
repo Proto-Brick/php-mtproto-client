@@ -23,23 +23,23 @@ final class ExportedContactToken extends TlObject
         public readonly int $expires
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->int32($this->expires);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::int32($this->expires);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $url = $deserializer->bytes($stream);
-        $expires = $deserializer->int32($stream);
+        $url = Deserializer::bytes($stream);
+        $expires = Deserializer::int32($stream);
         return new self(
             $url,
             $expires

@@ -25,21 +25,21 @@ final class BroadcastRevenueTransactionRefund extends AbstractBroadcastRevenueTr
         public readonly string $provider
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->amount);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->bytes($this->provider);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->amount);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::bytes($this->provider);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $amount = $deserializer->int64($stream);
-        $date = $deserializer->int32($stream);
-        $provider = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $amount = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
+        $provider = Deserializer::bytes($stream);
         return new self(
             $amount,
             $date,

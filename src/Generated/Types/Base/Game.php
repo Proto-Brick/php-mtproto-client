@@ -33,41 +33,41 @@ final class Game extends TlObject
         public readonly ?AbstractDocument $document = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->document !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->bytes($this->shortName);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->description);
-        $buffer .= $this->photo->serialize($serializer);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::bytes($this->shortName);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->description);
+        $buffer .= $this->photo->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $this->document->serialize($serializer);
+            $buffer .= $this->document->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $id = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
-        $shortName = $deserializer->bytes($stream);
-        $title = $deserializer->bytes($stream);
-        $description = $deserializer->bytes($stream);
-        $photo = AbstractPhoto::deserialize($deserializer, $stream);
-        $document = ($flags & (1 << 0)) ? AbstractDocument::deserialize($deserializer, $stream) : null;
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $shortName = Deserializer::bytes($stream);
+        $title = Deserializer::bytes($stream);
+        $description = Deserializer::bytes($stream);
+        $photo = AbstractPhoto::deserialize($stream);
+        $document = ($flags & (1 << 0)) ? AbstractDocument::deserialize($stream) : null;
         return new self(
             $id,
             $accessHash,

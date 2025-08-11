@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionChangeAvailableReactions extends AbstractC
         public readonly AbstractChatReactions $newValue
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->prevValue->serialize($serializer);
-        $buffer .= $this->newValue->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->prevValue->serialize();
+        $buffer .= $this->newValue->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevValue = AbstractChatReactions::deserialize($deserializer, $stream);
-        $newValue = AbstractChatReactions::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevValue = AbstractChatReactions::deserialize($stream);
+        $newValue = AbstractChatReactions::deserialize($stream);
         return new self(
             $prevValue,
             $newValue

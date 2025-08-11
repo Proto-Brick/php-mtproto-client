@@ -39,17 +39,17 @@ final class StartBotRequest extends TlObject
         public readonly string $startParam
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->bot->serialize($serializer);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int64($this->randomId);
-        $buffer .= $serializer->bytes($this->startParam);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->bot->serialize();
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int64($this->randomId);
+        $buffer .= Serializer::bytes($this->startParam);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

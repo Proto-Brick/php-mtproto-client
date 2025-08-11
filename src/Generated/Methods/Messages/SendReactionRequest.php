@@ -41,24 +41,24 @@ final class SendReactionRequest extends TlObject
         public readonly ?array $reaction = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->big) $flags |= (1 << 1);
         if ($this->addToRecent) $flags |= (1 << 2);
         if ($this->reaction !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->msgId);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->msgId);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->reaction);
+            $buffer .= Serializer::vectorOfObjects($this->reaction);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

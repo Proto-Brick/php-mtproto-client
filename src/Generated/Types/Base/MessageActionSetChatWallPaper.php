@@ -25,26 +25,26 @@ final class MessageActionSetChatWallPaper extends AbstractMessageAction
         public readonly ?bool $forBoth = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->same) $flags |= (1 << 0);
         if ($this->forBoth) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->wallpaper->serialize($serializer);
+        $buffer .= $this->wallpaper->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $same = ($flags & (1 << 0)) ? true : null;
         $forBoth = ($flags & (1 << 1)) ? true : null;
-        $wallpaper = AbstractWallPaper::deserialize($deserializer, $stream);
+        $wallpaper = AbstractWallPaper::deserialize($stream);
         return new self(
             $wallpaper,
             $same,

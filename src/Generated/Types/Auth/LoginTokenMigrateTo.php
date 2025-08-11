@@ -23,19 +23,19 @@ final class LoginTokenMigrateTo extends AbstractLoginToken
         public readonly string $token
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->dcId);
-        $buffer .= $serializer->bytes($this->token);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->dcId);
+        $buffer .= Serializer::bytes($this->token);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $dcId = $deserializer->int32($stream);
-        $token = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $dcId = Deserializer::int32($stream);
+        $token = Deserializer::bytes($stream);
         return new self(
             $dcId,
             $token

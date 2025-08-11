@@ -24,34 +24,34 @@ final class PasswordSettings extends TlObject
         public readonly ?SecureSecretSettings $secureSettings = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->email !== null) $flags |= (1 << 0);
         if ($this->secureSettings !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->email);
+            $buffer .= Serializer::bytes($this->email);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->secureSettings->serialize($serializer);
+            $buffer .= $this->secureSettings->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $email = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $secureSettings = ($flags & (1 << 1)) ? SecureSecretSettings::deserialize($deserializer, $stream) : null;
+        $email = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $secureSettings = ($flags & (1 << 1)) ? SecureSecretSettings::deserialize($stream) : null;
         return new self(
             $email,
             $secureSettings

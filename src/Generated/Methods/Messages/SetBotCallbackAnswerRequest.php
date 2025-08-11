@@ -38,27 +38,27 @@ final class SetBotCallbackAnswerRequest extends TlObject
         public readonly ?string $url = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->alert) $flags |= (1 << 1);
         if ($this->message !== null) $flags |= (1 << 0);
         if ($this->url !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->queryId);
+        $buffer .= Serializer::int64($this->queryId);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->message);
+            $buffer .= Serializer::bytes($this->message);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->url);
+            $buffer .= Serializer::bytes($this->url);
         }
-        $buffer .= $serializer->int32($this->cacheTime);
+        $buffer .= Serializer::int32($this->cacheTime);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

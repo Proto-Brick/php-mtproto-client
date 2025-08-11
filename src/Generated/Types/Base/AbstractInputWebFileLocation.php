@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputWebFileLocation extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputWebFileLocation::CONSTRUCTOR_ID => InputWebFileLocation::deserialize($deserializer, $stream),
-            InputWebFileGeoPointLocation::CONSTRUCTOR_ID => InputWebFileGeoPointLocation::deserialize($deserializer, $stream),
-            InputWebFileAudioAlbumThumbLocation::CONSTRUCTOR_ID => InputWebFileAudioAlbumThumbLocation::deserialize($deserializer, $stream),
+            InputWebFileLocation::CONSTRUCTOR_ID => InputWebFileLocation::deserialize($stream),
+            InputWebFileGeoPointLocation::CONSTRUCTOR_ID => InputWebFileGeoPointLocation::deserialize($stream),
+            InputWebFileAudioAlbumThumbLocation::CONSTRUCTOR_ID => InputWebFileAudioAlbumThumbLocation::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputWebFileLocation. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

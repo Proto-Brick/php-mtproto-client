@@ -31,49 +31,49 @@ final class PasswordInputSettings extends TlObject
         public readonly ?SecureSecretSettings $newSecureSettings = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->newAlgo !== null) $flags |= (1 << 0);
         if ($this->newPasswordHash !== null) $flags |= (1 << 0);
         if ($this->hint !== null) $flags |= (1 << 0);
         if ($this->email !== null) $flags |= (1 << 1);
         if ($this->newSecureSettings !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->newAlgo->serialize($serializer);
+            $buffer .= $this->newAlgo->serialize();
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->newPasswordHash);
+            $buffer .= Serializer::bytes($this->newPasswordHash);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->hint);
+            $buffer .= Serializer::bytes($this->hint);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->email);
+            $buffer .= Serializer::bytes($this->email);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->newSecureSettings->serialize($serializer);
+            $buffer .= $this->newSecureSettings->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $newAlgo = ($flags & (1 << 0)) ? AbstractPasswordKdfAlgo::deserialize($deserializer, $stream) : null;
-        $newPasswordHash = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $hint = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $email = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $newSecureSettings = ($flags & (1 << 2)) ? SecureSecretSettings::deserialize($deserializer, $stream) : null;
+        $newAlgo = ($flags & (1 << 0)) ? AbstractPasswordKdfAlgo::deserialize($stream) : null;
+        $newPasswordHash = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $hint = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $email = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $newSecureSettings = ($flags & (1 << 2)) ? SecureSecretSettings::deserialize($stream) : null;
         return new self(
             $newAlgo,
             $newPasswordHash,

@@ -23,19 +23,19 @@ final class UpdateDeleteQuickReplyMessages extends AbstractUpdate
         public readonly array $messages
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->shortcutId);
-        $buffer .= $serializer->vectorOfInts($this->messages);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->shortcutId);
+        $buffer .= Serializer::vectorOfInts($this->messages);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $shortcutId = $deserializer->int32($stream);
-        $messages = $deserializer->vectorOfInts($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $shortcutId = Deserializer::int32($stream);
+        $messages = Deserializer::vectorOfInts($stream);
         return new self(
             $shortcutId,
             $messages

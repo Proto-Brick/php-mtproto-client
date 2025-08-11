@@ -59,9 +59,9 @@ final class ChatFull extends AbstractChatFull
         public readonly ?int $reactionsLimit = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->canSetUsername) $flags |= (1 << 7);
         if ($this->hasScheduled) $flags |= (1 << 8);
@@ -79,79 +79,79 @@ final class ChatFull extends AbstractChatFull
         if ($this->recentRequesters !== null) $flags |= (1 << 17);
         if ($this->availableReactions !== null) $flags |= (1 << 18);
         if ($this->reactionsLimit !== null) $flags |= (1 << 20);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->bytes($this->about);
-        $buffer .= $this->participants->serialize($serializer);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::bytes($this->about);
+        $buffer .= $this->participants->serialize();
         if ($flags & (1 << 2)) {
-            $buffer .= $this->chatPhoto->serialize($serializer);
+            $buffer .= $this->chatPhoto->serialize();
         }
-        $buffer .= $this->notifySettings->serialize($serializer);
+        $buffer .= $this->notifySettings->serialize();
         if ($flags & (1 << 13)) {
-            $buffer .= $this->exportedInvite->serialize($serializer);
+            $buffer .= $this->exportedInvite->serialize();
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->botInfo);
+            $buffer .= Serializer::vectorOfObjects($this->botInfo);
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->int32($this->pinnedMsgId);
+            $buffer .= Serializer::int32($this->pinnedMsgId);
         }
         if ($flags & (1 << 11)) {
-            $buffer .= $serializer->int32($this->folderId);
+            $buffer .= Serializer::int32($this->folderId);
         }
         if ($flags & (1 << 12)) {
-            $buffer .= $this->call->serialize($serializer);
+            $buffer .= $this->call->serialize();
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $serializer->int32($this->ttlPeriod);
+            $buffer .= Serializer::int32($this->ttlPeriod);
         }
         if ($flags & (1 << 15)) {
-            $buffer .= $this->groupcallDefaultJoinAs->serialize($serializer);
+            $buffer .= $this->groupcallDefaultJoinAs->serialize();
         }
         if ($flags & (1 << 16)) {
-            $buffer .= $serializer->bytes($this->themeEmoticon);
+            $buffer .= Serializer::bytes($this->themeEmoticon);
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $serializer->int32($this->requestsPending);
+            $buffer .= Serializer::int32($this->requestsPending);
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $serializer->vectorOfLongs($this->recentRequesters);
+            $buffer .= Serializer::vectorOfLongs($this->recentRequesters);
         }
         if ($flags & (1 << 18)) {
-            $buffer .= $this->availableReactions->serialize($serializer);
+            $buffer .= $this->availableReactions->serialize();
         }
         if ($flags & (1 << 20)) {
-            $buffer .= $serializer->int32($this->reactionsLimit);
+            $buffer .= Serializer::int32($this->reactionsLimit);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $canSetUsername = ($flags & (1 << 7)) ? true : null;
         $hasScheduled = ($flags & (1 << 8)) ? true : null;
         $translationsDisabled = ($flags & (1 << 19)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $about = $deserializer->bytes($stream);
-        $participants = AbstractChatParticipants::deserialize($deserializer, $stream);
-        $chatPhoto = ($flags & (1 << 2)) ? AbstractPhoto::deserialize($deserializer, $stream) : null;
-        $notifySettings = PeerNotifySettings::deserialize($deserializer, $stream);
-        $exportedInvite = ($flags & (1 << 13)) ? AbstractExportedChatInvite::deserialize($deserializer, $stream) : null;
-        $botInfo = ($flags & (1 << 3)) ? $deserializer->vectorOfObjects($stream, [BotInfo::class, 'deserialize']) : null;
-        $pinnedMsgId = ($flags & (1 << 6)) ? $deserializer->int32($stream) : null;
-        $folderId = ($flags & (1 << 11)) ? $deserializer->int32($stream) : null;
-        $call = ($flags & (1 << 12)) ? InputGroupCall::deserialize($deserializer, $stream) : null;
-        $ttlPeriod = ($flags & (1 << 14)) ? $deserializer->int32($stream) : null;
-        $groupcallDefaultJoinAs = ($flags & (1 << 15)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $themeEmoticon = ($flags & (1 << 16)) ? $deserializer->bytes($stream) : null;
-        $requestsPending = ($flags & (1 << 17)) ? $deserializer->int32($stream) : null;
-        $recentRequesters = ($flags & (1 << 17)) ? $deserializer->vectorOfLongs($stream) : null;
-        $availableReactions = ($flags & (1 << 18)) ? AbstractChatReactions::deserialize($deserializer, $stream) : null;
-        $reactionsLimit = ($flags & (1 << 20)) ? $deserializer->int32($stream) : null;
+        $id = Deserializer::int64($stream);
+        $about = Deserializer::bytes($stream);
+        $participants = AbstractChatParticipants::deserialize($stream);
+        $chatPhoto = ($flags & (1 << 2)) ? AbstractPhoto::deserialize($stream) : null;
+        $notifySettings = PeerNotifySettings::deserialize($stream);
+        $exportedInvite = ($flags & (1 << 13)) ? AbstractExportedChatInvite::deserialize($stream) : null;
+        $botInfo = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [BotInfo::class, 'deserialize']) : null;
+        $pinnedMsgId = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
+        $folderId = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
+        $call = ($flags & (1 << 12)) ? InputGroupCall::deserialize($stream) : null;
+        $ttlPeriod = ($flags & (1 << 14)) ? Deserializer::int32($stream) : null;
+        $groupcallDefaultJoinAs = ($flags & (1 << 15)) ? AbstractPeer::deserialize($stream) : null;
+        $themeEmoticon = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
+        $requestsPending = ($flags & (1 << 17)) ? Deserializer::int32($stream) : null;
+        $recentRequesters = ($flags & (1 << 17)) ? Deserializer::vectorOfLongs($stream) : null;
+        $availableReactions = ($flags & (1 << 18)) ? AbstractChatReactions::deserialize($stream) : null;
+        $reactionsLimit = ($flags & (1 << 20)) ? Deserializer::int32($stream) : null;
         return new self(
             $id,
             $about,

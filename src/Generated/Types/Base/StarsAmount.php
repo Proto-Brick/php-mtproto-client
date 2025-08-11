@@ -23,23 +23,23 @@ final class StarsAmount extends TlObject
         public readonly int $nanos
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->amount);
-        $buffer .= $serializer->int32($this->nanos);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->amount);
+        $buffer .= Serializer::int32($this->nanos);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $amount = $deserializer->int64($stream);
-        $nanos = $deserializer->int32($stream);
+        $amount = Deserializer::int64($stream);
+        $nanos = Deserializer::int32($stream);
         return new self(
             $amount,
             $nanos

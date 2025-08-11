@@ -23,19 +23,19 @@ final class TextAnchor extends AbstractRichText
         public readonly string $name
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->text->serialize($serializer);
-        $buffer .= $serializer->bytes($this->name);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->text->serialize();
+        $buffer .= Serializer::bytes($this->name);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $text = AbstractRichText::deserialize($deserializer, $stream);
-        $name = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $text = AbstractRichText::deserialize($stream);
+        $name = Deserializer::bytes($stream);
         return new self(
             $text,
             $name

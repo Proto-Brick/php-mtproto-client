@@ -31,31 +31,31 @@ final class PostAddress extends TlObject
         public readonly string $postCode
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->streetLine1);
-        $buffer .= $serializer->bytes($this->streetLine2);
-        $buffer .= $serializer->bytes($this->city);
-        $buffer .= $serializer->bytes($this->state);
-        $buffer .= $serializer->bytes($this->countryIso2);
-        $buffer .= $serializer->bytes($this->postCode);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->streetLine1);
+        $buffer .= Serializer::bytes($this->streetLine2);
+        $buffer .= Serializer::bytes($this->city);
+        $buffer .= Serializer::bytes($this->state);
+        $buffer .= Serializer::bytes($this->countryIso2);
+        $buffer .= Serializer::bytes($this->postCode);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $streetLine1 = $deserializer->bytes($stream);
-        $streetLine2 = $deserializer->bytes($stream);
-        $city = $deserializer->bytes($stream);
-        $state = $deserializer->bytes($stream);
-        $countryIso2 = $deserializer->bytes($stream);
-        $postCode = $deserializer->bytes($stream);
+        $streetLine1 = Deserializer::bytes($stream);
+        $streetLine2 = Deserializer::bytes($stream);
+        $city = Deserializer::bytes($stream);
+        $state = Deserializer::bytes($stream);
+        $countryIso2 = Deserializer::bytes($stream);
+        $postCode = Deserializer::bytes($stream);
         return new self(
             $streetLine1,
             $streetLine2,

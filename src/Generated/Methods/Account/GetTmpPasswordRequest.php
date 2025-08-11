@@ -34,15 +34,15 @@ final class GetTmpPasswordRequest extends TlObject
         public readonly int $period
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->password->serialize($serializer);
-        $buffer .= $serializer->int32($this->period);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->password->serialize();
+        $buffer .= Serializer::int32($this->period);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

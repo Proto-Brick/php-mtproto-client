@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractReportResult extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ReportResultChooseOption::CONSTRUCTOR_ID => ReportResultChooseOption::deserialize($deserializer, $stream),
-            ReportResultAddComment::CONSTRUCTOR_ID => ReportResultAddComment::deserialize($deserializer, $stream),
-            ReportResultReported::CONSTRUCTOR_ID => ReportResultReported::deserialize($deserializer, $stream),
+            ReportResultChooseOption::CONSTRUCTOR_ID => ReportResultChooseOption::deserialize($stream),
+            ReportResultAddComment::CONSTRUCTOR_ID => ReportResultAddComment::deserialize($stream),
+            ReportResultReported::CONSTRUCTOR_ID => ReportResultReported::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ReportResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

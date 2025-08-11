@@ -24,19 +24,19 @@ final class Themes extends AbstractThemes
         public readonly array $themes
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->hash);
-        $buffer .= $serializer->vectorOfObjects($this->themes);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->hash);
+        $buffer .= Serializer::vectorOfObjects($this->themes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $hash = $deserializer->int64($stream);
-        $themes = $deserializer->vectorOfObjects($stream, [Theme::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $hash = Deserializer::int64($stream);
+        $themes = Deserializer::vectorOfObjects($stream, [Theme::class, 'deserialize']);
         return new self(
             $hash,
             $themes

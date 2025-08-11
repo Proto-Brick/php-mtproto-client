@@ -25,21 +25,21 @@ final class MessageActionGeoProximityReached extends AbstractMessageAction
         public readonly int $distance
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->fromId->serialize($serializer);
-        $buffer .= $this->toId->serialize($serializer);
-        $buffer .= $serializer->int32($this->distance);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->fromId->serialize();
+        $buffer .= $this->toId->serialize();
+        $buffer .= Serializer::int32($this->distance);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $fromId = AbstractPeer::deserialize($deserializer, $stream);
-        $toId = AbstractPeer::deserialize($deserializer, $stream);
-        $distance = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $fromId = AbstractPeer::deserialize($stream);
+        $toId = AbstractPeer::deserialize($stream);
+        $distance = Deserializer::int32($stream);
         return new self(
             $fromId,
             $toId,

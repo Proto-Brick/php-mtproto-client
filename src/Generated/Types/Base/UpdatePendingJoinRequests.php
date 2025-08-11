@@ -25,21 +25,21 @@ final class UpdatePendingJoinRequests extends AbstractUpdate
         public readonly array $recentRequesters
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->requestsPending);
-        $buffer .= $serializer->vectorOfLongs($this->recentRequesters);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->requestsPending);
+        $buffer .= Serializer::vectorOfLongs($this->recentRequesters);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $requestsPending = $deserializer->int32($stream);
-        $recentRequesters = $deserializer->vectorOfLongs($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractPeer::deserialize($stream);
+        $requestsPending = Deserializer::int32($stream);
+        $recentRequesters = Deserializer::vectorOfLongs($stream);
         return new self(
             $peer,
             $requestsPending,

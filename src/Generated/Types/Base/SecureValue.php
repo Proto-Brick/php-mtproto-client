@@ -37,9 +37,9 @@ final class SecureValue extends TlObject
         public readonly ?AbstractSecurePlainData $plainData = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->data !== null) $flags |= (1 << 0);
         if ($this->frontSide !== null) $flags |= (1 << 1);
@@ -48,52 +48,52 @@ final class SecureValue extends TlObject
         if ($this->translation !== null) $flags |= (1 << 6);
         if ($this->files !== null) $flags |= (1 << 4);
         if ($this->plainData !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->type->serialize($serializer);
+        $buffer .= $this->type->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $this->data->serialize($serializer);
+            $buffer .= $this->data->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->frontSide->serialize($serializer);
+            $buffer .= $this->frontSide->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->reverseSide->serialize($serializer);
+            $buffer .= $this->reverseSide->serialize();
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->selfie->serialize($serializer);
+            $buffer .= $this->selfie->serialize();
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->vectorOfObjects($this->translation);
+            $buffer .= Serializer::vectorOfObjects($this->translation);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->vectorOfObjects($this->files);
+            $buffer .= Serializer::vectorOfObjects($this->files);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $this->plainData->serialize($serializer);
+            $buffer .= $this->plainData->serialize();
         }
-        $buffer .= $serializer->bytes($this->hash);
+        $buffer .= Serializer::bytes($this->hash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $type = AbstractSecureValueType::deserialize($deserializer, $stream);
-        $data = ($flags & (1 << 0)) ? SecureData::deserialize($deserializer, $stream) : null;
-        $frontSide = ($flags & (1 << 1)) ? AbstractSecureFile::deserialize($deserializer, $stream) : null;
-        $reverseSide = ($flags & (1 << 2)) ? AbstractSecureFile::deserialize($deserializer, $stream) : null;
-        $selfie = ($flags & (1 << 3)) ? AbstractSecureFile::deserialize($deserializer, $stream) : null;
-        $translation = ($flags & (1 << 6)) ? $deserializer->vectorOfObjects($stream, [AbstractSecureFile::class, 'deserialize']) : null;
-        $files = ($flags & (1 << 4)) ? $deserializer->vectorOfObjects($stream, [AbstractSecureFile::class, 'deserialize']) : null;
-        $plainData = ($flags & (1 << 5)) ? AbstractSecurePlainData::deserialize($deserializer, $stream) : null;
-        $hash = $deserializer->bytes($stream);
+        $type = AbstractSecureValueType::deserialize($stream);
+        $data = ($flags & (1 << 0)) ? SecureData::deserialize($stream) : null;
+        $frontSide = ($flags & (1 << 1)) ? AbstractSecureFile::deserialize($stream) : null;
+        $reverseSide = ($flags & (1 << 2)) ? AbstractSecureFile::deserialize($stream) : null;
+        $selfie = ($flags & (1 << 3)) ? AbstractSecureFile::deserialize($stream) : null;
+        $translation = ($flags & (1 << 6)) ? Deserializer::vectorOfObjects($stream, [AbstractSecureFile::class, 'deserialize']) : null;
+        $files = ($flags & (1 << 4)) ? Deserializer::vectorOfObjects($stream, [AbstractSecureFile::class, 'deserialize']) : null;
+        $plainData = ($flags & (1 << 5)) ? AbstractSecurePlainData::deserialize($stream) : null;
+        $hash = Deserializer::bytes($stream);
         return new self(
             $type,
             $hash,

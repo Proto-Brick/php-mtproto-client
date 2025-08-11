@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputGeoPoint extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputGeoPointEmpty::CONSTRUCTOR_ID => InputGeoPointEmpty::deserialize($deserializer, $stream),
-            InputGeoPoint::CONSTRUCTOR_ID => InputGeoPoint::deserialize($deserializer, $stream),
+            InputGeoPointEmpty::CONSTRUCTOR_ID => InputGeoPointEmpty::deserialize($stream),
+            InputGeoPoint::CONSTRUCTOR_ID => InputGeoPoint::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputGeoPoint. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

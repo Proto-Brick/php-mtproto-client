@@ -31,42 +31,42 @@ final class MessageReactions extends TlObject
         public readonly ?array $topReactors = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->min) $flags |= (1 << 0);
         if ($this->canSeeList) $flags |= (1 << 2);
         if ($this->reactionsAsTags) $flags |= (1 << 3);
         if ($this->recentReactions !== null) $flags |= (1 << 1);
         if ($this->topReactors !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->vectorOfObjects($this->results);
+        $buffer .= Serializer::vectorOfObjects($this->results);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->recentReactions);
+            $buffer .= Serializer::vectorOfObjects($this->recentReactions);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->vectorOfObjects($this->topReactors);
+            $buffer .= Serializer::vectorOfObjects($this->topReactors);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $min = ($flags & (1 << 0)) ? true : null;
         $canSeeList = ($flags & (1 << 2)) ? true : null;
         $reactionsAsTags = ($flags & (1 << 3)) ? true : null;
-        $results = $deserializer->vectorOfObjects($stream, [ReactionCount::class, 'deserialize']);
-        $recentReactions = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [MessagePeerReaction::class, 'deserialize']) : null;
-        $topReactors = ($flags & (1 << 4)) ? $deserializer->vectorOfObjects($stream, [MessageReactor::class, 'deserialize']) : null;
+        $results = Deserializer::vectorOfObjects($stream, [ReactionCount::class, 'deserialize']);
+        $recentReactions = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [MessagePeerReaction::class, 'deserialize']) : null;
+        $topReactors = ($flags & (1 << 4)) ? Deserializer::vectorOfObjects($stream, [MessageReactor::class, 'deserialize']) : null;
         return new self(
             $results,
             $min,

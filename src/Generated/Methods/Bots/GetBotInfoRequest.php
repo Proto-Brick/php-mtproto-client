@@ -34,21 +34,21 @@ final class GetBotInfoRequest extends TlObject
         public readonly ?AbstractInputUser $bot = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->bot !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->bot->serialize($serializer);
+            $buffer .= $this->bot->serialize();
         }
-        $buffer .= $serializer->bytes($this->langCode);
+        $buffer .= Serializer::bytes($this->langCode);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

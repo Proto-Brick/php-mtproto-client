@@ -35,16 +35,16 @@ final class GetDocumentByHashRequest extends TlObject
         public readonly string $mimeType
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->sha256);
-        $buffer .= $serializer->int64($this->size);
-        $buffer .= $serializer->bytes($this->mimeType);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->sha256);
+        $buffer .= Serializer::int64($this->size);
+        $buffer .= Serializer::bytes($this->mimeType);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

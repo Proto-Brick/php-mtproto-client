@@ -30,39 +30,39 @@ final class Authorization extends AbstractAuthorization
         public readonly ?string $futureAuthToken = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->setupPasswordRequired) $flags |= (1 << 1);
         if ($this->otherwiseReloginDays !== null) $flags |= (1 << 1);
         if ($this->tmpSessions !== null) $flags |= (1 << 0);
         if ($this->futureAuthToken !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->otherwiseReloginDays);
+            $buffer .= Serializer::int32($this->otherwiseReloginDays);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->tmpSessions);
+            $buffer .= Serializer::int32($this->tmpSessions);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->futureAuthToken);
+            $buffer .= Serializer::bytes($this->futureAuthToken);
         }
-        $buffer .= $this->user->serialize($serializer);
+        $buffer .= $this->user->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $setupPasswordRequired = ($flags & (1 << 1)) ? true : null;
-        $otherwiseReloginDays = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $tmpSessions = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $futureAuthToken = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $user = AbstractUser::deserialize($deserializer, $stream);
+        $otherwiseReloginDays = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $tmpSessions = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $futureAuthToken = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $user = AbstractUser::deserialize($stream);
         return new self(
             $user,
             $setupPasswordRequired,

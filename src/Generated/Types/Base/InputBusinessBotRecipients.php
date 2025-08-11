@@ -33,9 +33,9 @@ final class InputBusinessBotRecipients extends TlObject
         public readonly ?array $excludeUsers = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->existingChats) $flags |= (1 << 0);
         if ($this->newChats) $flags |= (1 << 1);
@@ -44,33 +44,33 @@ final class InputBusinessBotRecipients extends TlObject
         if ($this->excludeSelected) $flags |= (1 << 5);
         if ($this->users !== null) $flags |= (1 << 4);
         if ($this->excludeUsers !== null) $flags |= (1 << 6);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->vectorOfObjects($this->users);
+            $buffer .= Serializer::vectorOfObjects($this->users);
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->vectorOfObjects($this->excludeUsers);
+            $buffer .= Serializer::vectorOfObjects($this->excludeUsers);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $existingChats = ($flags & (1 << 0)) ? true : null;
         $newChats = ($flags & (1 << 1)) ? true : null;
         $contacts = ($flags & (1 << 2)) ? true : null;
         $nonContacts = ($flags & (1 << 3)) ? true : null;
         $excludeSelected = ($flags & (1 << 5)) ? true : null;
-        $users = ($flags & (1 << 4)) ? $deserializer->vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']) : null;
-        $excludeUsers = ($flags & (1 << 6)) ? $deserializer->vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']) : null;
+        $users = ($flags & (1 << 4)) ? Deserializer::vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']) : null;
+        $excludeUsers = ($flags & (1 << 6)) ? Deserializer::vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']) : null;
         return new self(
             $existingChats,
             $newChats,

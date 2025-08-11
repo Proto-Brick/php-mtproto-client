@@ -27,32 +27,32 @@ final class PollAnswerVoters extends TlObject
         public readonly ?bool $correct = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->chosen) $flags |= (1 << 0);
         if ($this->correct) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->option);
-        $buffer .= $serializer->int32($this->voters);
+        $buffer .= Serializer::bytes($this->option);
+        $buffer .= Serializer::int32($this->voters);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $chosen = ($flags & (1 << 0)) ? true : null;
         $correct = ($flags & (1 << 1)) ? true : null;
-        $option = $deserializer->bytes($stream);
-        $voters = $deserializer->int32($stream);
+        $option = Deserializer::bytes($stream);
+        $voters = Deserializer::int32($stream);
         return new self(
             $option,
             $voters,

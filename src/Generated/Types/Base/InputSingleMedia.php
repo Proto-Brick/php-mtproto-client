@@ -27,35 +27,35 @@ final class InputSingleMedia extends TlObject
         public readonly ?array $entities = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->entities !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->media->serialize($serializer);
-        $buffer .= $serializer->int64($this->randomId);
-        $buffer .= $serializer->bytes($this->message);
+        $buffer .= $this->media->serialize();
+        $buffer .= Serializer::int64($this->randomId);
+        $buffer .= Serializer::bytes($this->message);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $media = AbstractInputMedia::deserialize($deserializer, $stream);
-        $randomId = $deserializer->int64($stream);
-        $message = $deserializer->bytes($stream);
-        $entities = ($flags & (1 << 0)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $media = AbstractInputMedia::deserialize($stream);
+        $randomId = Deserializer::int64($stream);
+        $message = Deserializer::bytes($stream);
+        $entities = ($flags & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
         return new self(
             $media,
             $randomId,

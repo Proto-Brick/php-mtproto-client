@@ -25,29 +25,29 @@ final class UpdateDeleteScheduledMessages extends AbstractUpdate
         public readonly ?array $sentMessages = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->sentMessages !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->vectorOfInts($this->messages);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::vectorOfInts($this->messages);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfInts($this->sentMessages);
+            $buffer .= Serializer::vectorOfInts($this->sentMessages);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $messages = $deserializer->vectorOfInts($stream);
-        $sentMessages = ($flags & (1 << 0)) ? $deserializer->vectorOfInts($stream) : null;
+        $peer = AbstractPeer::deserialize($stream);
+        $messages = Deserializer::vectorOfInts($stream);
+        $sentMessages = ($flags & (1 << 0)) ? Deserializer::vectorOfInts($stream) : null;
         return new self(
             $peer,
             $messages,

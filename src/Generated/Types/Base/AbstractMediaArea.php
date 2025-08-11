@@ -8,20 +8,20 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractMediaArea extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            MediaAreaVenue::CONSTRUCTOR_ID => MediaAreaVenue::deserialize($deserializer, $stream),
-            InputMediaAreaVenue::CONSTRUCTOR_ID => InputMediaAreaVenue::deserialize($deserializer, $stream),
-            MediaAreaGeoPoint::CONSTRUCTOR_ID => MediaAreaGeoPoint::deserialize($deserializer, $stream),
-            MediaAreaSuggestedReaction::CONSTRUCTOR_ID => MediaAreaSuggestedReaction::deserialize($deserializer, $stream),
-            MediaAreaChannelPost::CONSTRUCTOR_ID => MediaAreaChannelPost::deserialize($deserializer, $stream),
-            InputMediaAreaChannelPost::CONSTRUCTOR_ID => InputMediaAreaChannelPost::deserialize($deserializer, $stream),
-            MediaAreaUrl::CONSTRUCTOR_ID => MediaAreaUrl::deserialize($deserializer, $stream),
-            MediaAreaWeather::CONSTRUCTOR_ID => MediaAreaWeather::deserialize($deserializer, $stream),
+            MediaAreaVenue::CONSTRUCTOR_ID => MediaAreaVenue::deserialize($stream),
+            InputMediaAreaVenue::CONSTRUCTOR_ID => InputMediaAreaVenue::deserialize($stream),
+            MediaAreaGeoPoint::CONSTRUCTOR_ID => MediaAreaGeoPoint::deserialize($stream),
+            MediaAreaSuggestedReaction::CONSTRUCTOR_ID => MediaAreaSuggestedReaction::deserialize($stream),
+            MediaAreaChannelPost::CONSTRUCTOR_ID => MediaAreaChannelPost::deserialize($stream),
+            InputMediaAreaChannelPost::CONSTRUCTOR_ID => InputMediaAreaChannelPost::deserialize($stream),
+            MediaAreaUrl::CONSTRUCTOR_ID => MediaAreaUrl::deserialize($stream),
+            MediaAreaWeather::CONSTRUCTOR_ID => MediaAreaWeather::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type MediaArea. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

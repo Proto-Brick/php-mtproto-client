@@ -39,26 +39,26 @@ final class GetSearchCountersRequest extends TlObject
         public readonly ?int $topMsgId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->savedPeerId !== null) $flags |= (1 << 2);
         if ($this->topMsgId !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
+        $buffer .= $this->peer->serialize();
         if ($flags & (1 << 2)) {
-            $buffer .= $this->savedPeerId->serialize($serializer);
+            $buffer .= $this->savedPeerId->serialize();
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->topMsgId);
+            $buffer .= Serializer::int32($this->topMsgId);
         }
-        $buffer .= $serializer->vectorOfObjects($this->filters);
+        $buffer .= Serializer::vectorOfObjects($this->filters);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

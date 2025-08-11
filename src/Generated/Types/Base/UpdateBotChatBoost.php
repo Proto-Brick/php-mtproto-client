@@ -25,21 +25,21 @@ final class UpdateBotChatBoost extends AbstractUpdate
         public readonly int $qts
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->boost->serialize($serializer);
-        $buffer .= $serializer->int32($this->qts);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->boost->serialize();
+        $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $boost = Boost::deserialize($deserializer, $stream);
-        $qts = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractPeer::deserialize($stream);
+        $boost = Boost::deserialize($stream);
+        $qts = Deserializer::int32($stream);
         return new self(
             $peer,
             $boost,

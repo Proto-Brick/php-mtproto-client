@@ -25,25 +25,25 @@ final class ChatAdminWithInvites extends TlObject
         public readonly int $revokedInvitesCount
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->adminId);
-        $buffer .= $serializer->int32($this->invitesCount);
-        $buffer .= $serializer->int32($this->revokedInvitesCount);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->adminId);
+        $buffer .= Serializer::int32($this->invitesCount);
+        $buffer .= Serializer::int32($this->revokedInvitesCount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $adminId = $deserializer->int64($stream);
-        $invitesCount = $deserializer->int32($stream);
-        $revokedInvitesCount = $deserializer->int32($stream);
+        $adminId = Deserializer::int64($stream);
+        $invitesCount = Deserializer::int32($stream);
+        $revokedInvitesCount = Deserializer::int32($stream);
         return new self(
             $adminId,
             $invitesCount,

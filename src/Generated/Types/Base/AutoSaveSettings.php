@@ -25,33 +25,33 @@ final class AutoSaveSettings extends TlObject
         public readonly ?int $videoMaxSize = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->photos) $flags |= (1 << 0);
         if ($this->videos) $flags |= (1 << 1);
         if ($this->videoMaxSize !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int64($this->videoMaxSize);
+            $buffer .= Serializer::int64($this->videoMaxSize);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $photos = ($flags & (1 << 0)) ? true : null;
         $videos = ($flags & (1 << 1)) ? true : null;
-        $videoMaxSize = ($flags & (1 << 2)) ? $deserializer->int64($stream) : null;
+        $videoMaxSize = ($flags & (1 << 2)) ? Deserializer::int64($stream) : null;
         return new self(
             $photos,
             $videos,

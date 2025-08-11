@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionParticipantToggleBan extends AbstractChann
         public readonly AbstractChannelParticipant $newParticipant
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->prevParticipant->serialize($serializer);
-        $buffer .= $this->newParticipant->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->prevParticipant->serialize();
+        $buffer .= $this->newParticipant->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevParticipant = AbstractChannelParticipant::deserialize($deserializer, $stream);
-        $newParticipant = AbstractChannelParticipant::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevParticipant = AbstractChannelParticipant::deserialize($stream);
+        $newParticipant = AbstractChannelParticipant::deserialize($stream);
         return new self(
             $prevParticipant,
             $newParticipant

@@ -23,23 +23,23 @@ final class StarsSubscriptionPricing extends TlObject
         public readonly int $amount
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->period);
-        $buffer .= $serializer->int64($this->amount);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->period);
+        $buffer .= Serializer::int64($this->amount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $period = $deserializer->int32($stream);
-        $amount = $deserializer->int64($stream);
+        $period = Deserializer::int32($stream);
+        $amount = Deserializer::int64($stream);
         return new self(
             $period,
             $amount

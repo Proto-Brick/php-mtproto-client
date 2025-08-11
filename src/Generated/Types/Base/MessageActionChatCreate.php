@@ -23,19 +23,19 @@ final class MessageActionChatCreate extends AbstractMessageAction
         public readonly array $users
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->vectorOfLongs($this->users);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::vectorOfLongs($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $title = $deserializer->bytes($stream);
-        $users = $deserializer->vectorOfLongs($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $title = Deserializer::bytes($stream);
+        $users = Deserializer::vectorOfLongs($stream);
         return new self(
             $title,
             $users

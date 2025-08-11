@@ -29,49 +29,49 @@ final class BotAppSettings extends TlObject
         public readonly ?int $headerDarkColor = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->placeholderPath !== null) $flags |= (1 << 0);
         if ($this->backgroundColor !== null) $flags |= (1 << 1);
         if ($this->backgroundDarkColor !== null) $flags |= (1 << 2);
         if ($this->headerColor !== null) $flags |= (1 << 3);
         if ($this->headerDarkColor !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->placeholderPath);
+            $buffer .= Serializer::bytes($this->placeholderPath);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->backgroundColor);
+            $buffer .= Serializer::int32($this->backgroundColor);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->backgroundDarkColor);
+            $buffer .= Serializer::int32($this->backgroundDarkColor);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int32($this->headerColor);
+            $buffer .= Serializer::int32($this->headerColor);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->headerDarkColor);
+            $buffer .= Serializer::int32($this->headerDarkColor);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $placeholderPath = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $backgroundColor = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $backgroundDarkColor = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $headerColor = ($flags & (1 << 3)) ? $deserializer->int32($stream) : null;
-        $headerDarkColor = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
+        $placeholderPath = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $backgroundColor = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $backgroundDarkColor = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $headerColor = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $headerDarkColor = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
         return new self(
             $placeholderPath,
             $backgroundColor,

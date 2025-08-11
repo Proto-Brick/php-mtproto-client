@@ -29,39 +29,39 @@ final class DocumentAttributeAudio extends AbstractDocumentAttribute
         public readonly ?string $waveform = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->voice) $flags |= (1 << 10);
         if ($this->title !== null) $flags |= (1 << 0);
         if ($this->performer !== null) $flags |= (1 << 1);
         if ($this->waveform !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->duration);
+        $buffer .= Serializer::int32($this->duration);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->performer);
+            $buffer .= Serializer::bytes($this->performer);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->waveform);
+            $buffer .= Serializer::bytes($this->waveform);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $voice = ($flags & (1 << 10)) ? true : null;
-        $duration = $deserializer->int32($stream);
-        $title = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $performer = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $waveform = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
+        $duration = Deserializer::int32($stream);
+        $title = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $performer = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $waveform = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
         return new self(
             $duration,
             $voice,

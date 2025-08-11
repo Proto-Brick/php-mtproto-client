@@ -37,50 +37,50 @@ final class InputMediaInvoice extends AbstractInputMedia
         public readonly ?AbstractInputMedia $extendedMedia = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->photo !== null) $flags |= (1 << 0);
         if ($this->provider !== null) $flags |= (1 << 3);
         if ($this->startParam !== null) $flags |= (1 << 1);
         if ($this->extendedMedia !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->description);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->description);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
-        $buffer .= $this->invoice->serialize($serializer);
-        $buffer .= $serializer->bytes($this->payload);
+        $buffer .= $this->invoice->serialize();
+        $buffer .= Serializer::bytes($this->payload);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->provider);
+            $buffer .= Serializer::bytes($this->provider);
         }
-        $buffer .= $serializer->bytes(json_encode($this->providerData, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::bytes(json_encode($this->providerData, JSON_FORCE_OBJECT));
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->startParam);
+            $buffer .= Serializer::bytes($this->startParam);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->extendedMedia->serialize($serializer);
+            $buffer .= $this->extendedMedia->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $title = $deserializer->bytes($stream);
-        $description = $deserializer->bytes($stream);
-        $photo = ($flags & (1 << 0)) ? InputWebDocument::deserialize($deserializer, $stream) : null;
-        $invoice = Invoice::deserialize($deserializer, $stream);
-        $payload = $deserializer->bytes($stream);
-        $provider = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $providerData = $deserializer->deserializeDataJSON($stream);
-        $startParam = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $extendedMedia = ($flags & (1 << 2)) ? AbstractInputMedia::deserialize($deserializer, $stream) : null;
+        $title = Deserializer::bytes($stream);
+        $description = Deserializer::bytes($stream);
+        $photo = ($flags & (1 << 0)) ? InputWebDocument::deserialize($stream) : null;
+        $invoice = Invoice::deserialize($stream);
+        $payload = Deserializer::bytes($stream);
+        $provider = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $providerData = Deserializer::deserializeDataJSON($stream);
+        $startParam = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $extendedMedia = ($flags & (1 << 2)) ? AbstractInputMedia::deserialize($stream) : null;
         return new self(
             $title,
             $description,

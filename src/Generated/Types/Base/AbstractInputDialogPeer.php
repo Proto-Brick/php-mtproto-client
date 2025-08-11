@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputDialogPeer extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputDialogPeer::CONSTRUCTOR_ID => InputDialogPeer::deserialize($deserializer, $stream),
-            InputDialogPeerFolder::CONSTRUCTOR_ID => InputDialogPeerFolder::deserialize($deserializer, $stream),
+            InputDialogPeer::CONSTRUCTOR_ID => InputDialogPeer::deserialize($stream),
+            InputDialogPeerFolder::CONSTRUCTOR_ID => InputDialogPeerFolder::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputDialogPeer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -23,19 +23,19 @@ final class MessageActionRequestedPeerSentMe extends AbstractMessageAction
         public readonly array $peers
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->buttonId);
-        $buffer .= $serializer->vectorOfObjects($this->peers);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->buttonId);
+        $buffer .= Serializer::vectorOfObjects($this->peers);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $buttonId = $deserializer->int32($stream);
-        $peers = $deserializer->vectorOfObjects($stream, [AbstractRequestedPeer::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $buttonId = Deserializer::int32($stream);
+        $peers = Deserializer::vectorOfObjects($stream, [AbstractRequestedPeer::class, 'deserialize']);
         return new self(
             $buttonId,
             $peers

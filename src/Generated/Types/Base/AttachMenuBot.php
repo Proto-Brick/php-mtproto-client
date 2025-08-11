@@ -39,9 +39,9 @@ final class AttachMenuBot extends TlObject
         public readonly ?array $peerTypes = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->inactive) $flags |= (1 << 0);
         if ($this->hasSettings) $flags |= (1 << 1);
@@ -50,25 +50,25 @@ final class AttachMenuBot extends TlObject
         if ($this->showInSideMenu) $flags |= (1 << 4);
         if ($this->sideMenuDisclaimerNeeded) $flags |= (1 << 5);
         if ($this->peerTypes !== null) $flags |= (1 << 3);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->botId);
-        $buffer .= $serializer->bytes($this->shortName);
+        $buffer .= Serializer::int64($this->botId);
+        $buffer .= Serializer::bytes($this->shortName);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->peerTypes);
+            $buffer .= Serializer::vectorOfObjects($this->peerTypes);
         }
-        $buffer .= $serializer->vectorOfObjects($this->icons);
+        $buffer .= Serializer::vectorOfObjects($this->icons);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $inactive = ($flags & (1 << 0)) ? true : null;
         $hasSettings = ($flags & (1 << 1)) ? true : null;
@@ -76,10 +76,10 @@ final class AttachMenuBot extends TlObject
         $showInAttachMenu = ($flags & (1 << 3)) ? true : null;
         $showInSideMenu = ($flags & (1 << 4)) ? true : null;
         $sideMenuDisclaimerNeeded = ($flags & (1 << 5)) ? true : null;
-        $botId = $deserializer->int64($stream);
-        $shortName = $deserializer->bytes($stream);
-        $peerTypes = ($flags & (1 << 3)) ? $deserializer->vectorOfObjects($stream, [AbstractAttachMenuPeerType::class, 'deserialize']) : null;
-        $icons = $deserializer->vectorOfObjects($stream, [AttachMenuBotIcon::class, 'deserialize']);
+        $botId = Deserializer::int64($stream);
+        $shortName = Deserializer::bytes($stream);
+        $peerTypes = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [AbstractAttachMenuPeerType::class, 'deserialize']) : null;
+        $icons = Deserializer::vectorOfObjects($stream, [AttachMenuBotIcon::class, 'deserialize']);
         return new self(
             $botId,
             $shortName,

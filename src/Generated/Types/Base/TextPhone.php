@@ -23,19 +23,19 @@ final class TextPhone extends AbstractRichText
         public readonly string $phone
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->text->serialize($serializer);
-        $buffer .= $serializer->bytes($this->phone);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->text->serialize();
+        $buffer .= Serializer::bytes($this->phone);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $text = AbstractRichText::deserialize($deserializer, $stream);
-        $phone = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $text = AbstractRichText::deserialize($stream);
+        $phone = Deserializer::bytes($stream);
         return new self(
             $text,
             $phone

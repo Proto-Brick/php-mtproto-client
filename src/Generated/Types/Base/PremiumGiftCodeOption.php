@@ -31,42 +31,42 @@ final class PremiumGiftCodeOption extends TlObject
         public readonly ?int $storeQuantity = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->storeProduct !== null) $flags |= (1 << 0);
         if ($this->storeQuantity !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->users);
-        $buffer .= $serializer->int32($this->months);
+        $buffer .= Serializer::int32($this->users);
+        $buffer .= Serializer::int32($this->months);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->storeProduct);
+            $buffer .= Serializer::bytes($this->storeProduct);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->storeQuantity);
+            $buffer .= Serializer::int32($this->storeQuantity);
         }
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->amount);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->amount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $users = $deserializer->int32($stream);
-        $months = $deserializer->int32($stream);
-        $storeProduct = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $storeQuantity = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $currency = $deserializer->bytes($stream);
-        $amount = $deserializer->int64($stream);
+        $users = Deserializer::int32($stream);
+        $months = Deserializer::int32($stream);
+        $storeProduct = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $storeQuantity = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $currency = Deserializer::bytes($stream);
+        $amount = Deserializer::int64($stream);
         return new self(
             $users,
             $months,

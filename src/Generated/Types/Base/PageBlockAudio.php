@@ -23,19 +23,19 @@ final class PageBlockAudio extends AbstractPageBlock
         public readonly PageCaption $caption
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->audioId);
-        $buffer .= $this->caption->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->audioId);
+        $buffer .= $this->caption->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $audioId = $deserializer->int64($stream);
-        $caption = PageCaption::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $audioId = Deserializer::int64($stream);
+        $caption = PageCaption::deserialize($stream);
         return new self(
             $audioId,
             $caption

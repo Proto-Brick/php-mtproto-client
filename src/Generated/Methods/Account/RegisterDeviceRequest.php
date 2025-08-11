@@ -40,22 +40,22 @@ final class RegisterDeviceRequest extends TlObject
         public readonly ?bool $noMuted = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->noMuted) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->tokenType);
-        $buffer .= $serializer->bytes($this->token);
-        $buffer .= ($this->appSandbox ? $serializer->int32(0x997275b5) : $serializer->int32(0xbc799737));
-        $buffer .= $serializer->bytes($this->secret);
-        $buffer .= $serializer->vectorOfLongs($this->otherUids);
+        $buffer .= Serializer::int32($this->tokenType);
+        $buffer .= Serializer::bytes($this->token);
+        $buffer .= ($this->appSandbox ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
+        $buffer .= Serializer::bytes($this->secret);
+        $buffer .= Serializer::vectorOfLongs($this->otherUids);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

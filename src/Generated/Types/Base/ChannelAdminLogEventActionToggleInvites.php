@@ -21,17 +21,17 @@ final class ChannelAdminLogEventActionToggleInvites extends AbstractChannelAdmin
         public readonly bool $newValue
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= ($this->newValue ? $serializer->int32(0x997275b5) : $serializer->int32(0xbc799737));
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= ($this->newValue ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $newValue = ($deserializer->int32($stream) === 0x997275b5);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $newValue = (Deserializer::int32($stream) === 0x997275b5);
         return new self(
             $newValue
         );

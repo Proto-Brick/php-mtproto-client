@@ -35,9 +35,9 @@ final class PageBlockEmbed extends AbstractPageBlock
         public readonly ?int $h = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->fullWidth) $flags |= (1 << 0);
         if ($this->allowScrolling) $flags |= (1 << 3);
@@ -46,40 +46,40 @@ final class PageBlockEmbed extends AbstractPageBlock
         if ($this->posterPhotoId !== null) $flags |= (1 << 4);
         if ($this->w !== null) $flags |= (1 << 5);
         if ($this->h !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->url);
+            $buffer .= Serializer::bytes($this->url);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->html);
+            $buffer .= Serializer::bytes($this->html);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int64($this->posterPhotoId);
+            $buffer .= Serializer::int64($this->posterPhotoId);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int32($this->w);
+            $buffer .= Serializer::int32($this->w);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int32($this->h);
+            $buffer .= Serializer::int32($this->h);
         }
-        $buffer .= $this->caption->serialize($serializer);
+        $buffer .= $this->caption->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $fullWidth = ($flags & (1 << 0)) ? true : null;
         $allowScrolling = ($flags & (1 << 3)) ? true : null;
-        $url = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $html = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $posterPhotoId = ($flags & (1 << 4)) ? $deserializer->int64($stream) : null;
-        $w = ($flags & (1 << 5)) ? $deserializer->int32($stream) : null;
-        $h = ($flags & (1 << 5)) ? $deserializer->int32($stream) : null;
-        $caption = PageCaption::deserialize($deserializer, $stream);
+        $url = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $html = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $posterPhotoId = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;
+        $w = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $h = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $caption = PageCaption::deserialize($stream);
         return new self(
             $caption,
             $fullWidth,

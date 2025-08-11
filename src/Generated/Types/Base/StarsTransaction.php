@@ -67,9 +67,9 @@ final class StarsTransaction extends TlObject
         public readonly ?StarsAmount $starrefAmount = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->refund) $flags |= (1 << 3);
         if ($this->pending) $flags |= (1 << 4);
@@ -91,93 +91,93 @@ final class StarsTransaction extends TlObject
         if ($this->starrefCommissionPermille !== null) $flags |= (1 << 16);
         if ($this->starrefPeer !== null) $flags |= (1 << 17);
         if ($this->starrefAmount !== null) $flags |= (1 << 17);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $this->stars->serialize($serializer);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $this->peer->serialize($serializer);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= $this->stars->serialize();
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->description);
+            $buffer .= Serializer::bytes($this->description);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int32($this->transactionDate);
+            $buffer .= Serializer::int32($this->transactionDate);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->bytes($this->transactionUrl);
+            $buffer .= Serializer::bytes($this->transactionUrl);
         }
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->bytes($this->botPayload);
+            $buffer .= Serializer::bytes($this->botPayload);
         }
         if ($flags & (1 << 8)) {
-            $buffer .= $serializer->int32($this->msgId);
+            $buffer .= Serializer::int32($this->msgId);
         }
         if ($flags & (1 << 9)) {
-            $buffer .= $serializer->vectorOfObjects($this->extendedMedia);
+            $buffer .= Serializer::vectorOfObjects($this->extendedMedia);
         }
         if ($flags & (1 << 12)) {
-            $buffer .= $serializer->int32($this->subscriptionPeriod);
+            $buffer .= Serializer::int32($this->subscriptionPeriod);
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $serializer->int32($this->giveawayPostId);
+            $buffer .= Serializer::int32($this->giveawayPostId);
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $this->stargift->serialize($serializer);
+            $buffer .= $this->stargift->serialize();
         }
         if ($flags & (1 << 15)) {
-            $buffer .= $serializer->int32($this->floodskipNumber);
+            $buffer .= Serializer::int32($this->floodskipNumber);
         }
         if ($flags & (1 << 16)) {
-            $buffer .= $serializer->int32($this->starrefCommissionPermille);
+            $buffer .= Serializer::int32($this->starrefCommissionPermille);
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $this->starrefPeer->serialize($serializer);
+            $buffer .= $this->starrefPeer->serialize();
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $this->starrefAmount->serialize($serializer);
+            $buffer .= $this->starrefAmount->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $refund = ($flags & (1 << 3)) ? true : null;
         $pending = ($flags & (1 << 4)) ? true : null;
         $failed = ($flags & (1 << 6)) ? true : null;
         $gift = ($flags & (1 << 10)) ? true : null;
         $reaction = ($flags & (1 << 11)) ? true : null;
-        $id = $deserializer->bytes($stream);
-        $stars = StarsAmount::deserialize($deserializer, $stream);
-        $date = $deserializer->int32($stream);
-        $peer = AbstractStarsTransactionPeer::deserialize($deserializer, $stream);
-        $title = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $description = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $photo = ($flags & (1 << 2)) ? AbstractWebDocument::deserialize($deserializer, $stream) : null;
-        $transactionDate = ($flags & (1 << 5)) ? $deserializer->int32($stream) : null;
-        $transactionUrl = ($flags & (1 << 5)) ? $deserializer->bytes($stream) : null;
-        $botPayload = ($flags & (1 << 7)) ? $deserializer->bytes($stream) : null;
-        $msgId = ($flags & (1 << 8)) ? $deserializer->int32($stream) : null;
-        $extendedMedia = ($flags & (1 << 9)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageMedia::class, 'deserialize']) : null;
-        $subscriptionPeriod = ($flags & (1 << 12)) ? $deserializer->int32($stream) : null;
-        $giveawayPostId = ($flags & (1 << 13)) ? $deserializer->int32($stream) : null;
-        $stargift = ($flags & (1 << 14)) ? StarGift::deserialize($deserializer, $stream) : null;
-        $floodskipNumber = ($flags & (1 << 15)) ? $deserializer->int32($stream) : null;
-        $starrefCommissionPermille = ($flags & (1 << 16)) ? $deserializer->int32($stream) : null;
-        $starrefPeer = ($flags & (1 << 17)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $starrefAmount = ($flags & (1 << 17)) ? StarsAmount::deserialize($deserializer, $stream) : null;
+        $id = Deserializer::bytes($stream);
+        $stars = StarsAmount::deserialize($stream);
+        $date = Deserializer::int32($stream);
+        $peer = AbstractStarsTransactionPeer::deserialize($stream);
+        $title = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $description = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $photo = ($flags & (1 << 2)) ? AbstractWebDocument::deserialize($stream) : null;
+        $transactionDate = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $transactionUrl = ($flags & (1 << 5)) ? Deserializer::bytes($stream) : null;
+        $botPayload = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
+        $msgId = ($flags & (1 << 8)) ? Deserializer::int32($stream) : null;
+        $extendedMedia = ($flags & (1 << 9)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageMedia::class, 'deserialize']) : null;
+        $subscriptionPeriod = ($flags & (1 << 12)) ? Deserializer::int32($stream) : null;
+        $giveawayPostId = ($flags & (1 << 13)) ? Deserializer::int32($stream) : null;
+        $stargift = ($flags & (1 << 14)) ? StarGift::deserialize($stream) : null;
+        $floodskipNumber = ($flags & (1 << 15)) ? Deserializer::int32($stream) : null;
+        $starrefCommissionPermille = ($flags & (1 << 16)) ? Deserializer::int32($stream) : null;
+        $starrefPeer = ($flags & (1 << 17)) ? AbstractPeer::deserialize($stream) : null;
+        $starrefAmount = ($flags & (1 << 17)) ? StarsAmount::deserialize($stream) : null;
         return new self(
             $id,
             $stars,

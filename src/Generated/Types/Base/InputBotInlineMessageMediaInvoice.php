@@ -35,42 +35,42 @@ final class InputBotInlineMessageMediaInvoice extends AbstractInputBotInlineMess
         public readonly ?AbstractReplyMarkup $replyMarkup = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->photo !== null) $flags |= (1 << 0);
         if ($this->replyMarkup !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->description);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->description);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
-        $buffer .= $this->invoice->serialize($serializer);
-        $buffer .= $serializer->bytes($this->payload);
-        $buffer .= $serializer->bytes($this->provider);
-        $buffer .= $serializer->bytes(json_encode($this->providerData, JSON_FORCE_OBJECT));
+        $buffer .= $this->invoice->serialize();
+        $buffer .= Serializer::bytes($this->payload);
+        $buffer .= Serializer::bytes($this->provider);
+        $buffer .= Serializer::bytes(json_encode($this->providerData, JSON_FORCE_OBJECT));
         if ($flags & (1 << 2)) {
-            $buffer .= $this->replyMarkup->serialize($serializer);
+            $buffer .= $this->replyMarkup->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $title = $deserializer->bytes($stream);
-        $description = $deserializer->bytes($stream);
-        $photo = ($flags & (1 << 0)) ? InputWebDocument::deserialize($deserializer, $stream) : null;
-        $invoice = Invoice::deserialize($deserializer, $stream);
-        $payload = $deserializer->bytes($stream);
-        $provider = $deserializer->bytes($stream);
-        $providerData = $deserializer->deserializeDataJSON($stream);
-        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($deserializer, $stream) : null;
+        $title = Deserializer::bytes($stream);
+        $description = Deserializer::bytes($stream);
+        $photo = ($flags & (1 << 0)) ? InputWebDocument::deserialize($stream) : null;
+        $invoice = Invoice::deserialize($stream);
+        $payload = Deserializer::bytes($stream);
+        $provider = Deserializer::bytes($stream);
+        $providerData = Deserializer::deserializeDataJSON($stream);
+        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($stream) : null;
         return new self(
             $title,
             $description,

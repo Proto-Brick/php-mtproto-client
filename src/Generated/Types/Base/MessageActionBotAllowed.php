@@ -27,34 +27,34 @@ final class MessageActionBotAllowed extends AbstractMessageAction
         public readonly ?AbstractBotApp $app = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->attachMenu) $flags |= (1 << 1);
         if ($this->fromRequest) $flags |= (1 << 3);
         if ($this->domain !== null) $flags |= (1 << 0);
         if ($this->app !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->domain);
+            $buffer .= Serializer::bytes($this->domain);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->app->serialize($serializer);
+            $buffer .= $this->app->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $attachMenu = ($flags & (1 << 1)) ? true : null;
         $fromRequest = ($flags & (1 << 3)) ? true : null;
-        $domain = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $app = ($flags & (1 << 2)) ? AbstractBotApp::deserialize($deserializer, $stream) : null;
+        $domain = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $app = ($flags & (1 << 2)) ? AbstractBotApp::deserialize($stream) : null;
         return new self(
             $attachMenu,
             $fromRequest,

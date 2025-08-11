@@ -24,19 +24,19 @@ final class PaymentFormStarGift extends AbstractPaymentForm
         public readonly Invoice $invoice
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->formId);
-        $buffer .= $this->invoice->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->formId);
+        $buffer .= $this->invoice->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $formId = $deserializer->int64($stream);
-        $invoice = Invoice::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $formId = Deserializer::int64($stream);
+        $invoice = Invoice::deserialize($stream);
         return new self(
             $formId,
             $invoice

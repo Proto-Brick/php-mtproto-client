@@ -23,23 +23,23 @@ final class StatsAbsValueAndPrev extends TlObject
         public readonly float $previous
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= pack('d', $this->current);
         $buffer .= pack('d', $this->previous);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $current = $deserializer->double($stream);
-        $previous = $deserializer->double($stream);
+        $current = Deserializer::double($stream);
+        $previous = Deserializer::double($stream);
         return new self(
             $current,
             $previous

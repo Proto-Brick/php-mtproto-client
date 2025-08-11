@@ -39,20 +39,20 @@ final class UpdateConnectedBotRequest extends TlObject
         public readonly ?bool $deleted = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->canReply) $flags |= (1 << 0);
         if ($this->deleted) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->bot->serialize($serializer);
-        $buffer .= $this->recipients->serialize($serializer);
+        $buffer .= $this->bot->serialize();
+        $buffer .= $this->recipients->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

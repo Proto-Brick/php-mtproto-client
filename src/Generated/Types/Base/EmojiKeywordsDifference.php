@@ -27,27 +27,27 @@ final class EmojiKeywordsDifference extends TlObject
         public readonly array $keywords
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->langCode);
-        $buffer .= $serializer->int32($this->fromVersion);
-        $buffer .= $serializer->int32($this->version);
-        $buffer .= $serializer->vectorOfObjects($this->keywords);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->langCode);
+        $buffer .= Serializer::int32($this->fromVersion);
+        $buffer .= Serializer::int32($this->version);
+        $buffer .= Serializer::vectorOfObjects($this->keywords);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $langCode = $deserializer->bytes($stream);
-        $fromVersion = $deserializer->int32($stream);
-        $version = $deserializer->int32($stream);
-        $keywords = $deserializer->vectorOfObjects($stream, [AbstractEmojiKeyword::class, 'deserialize']);
+        $langCode = Deserializer::bytes($stream);
+        $fromVersion = Deserializer::int32($stream);
+        $version = Deserializer::int32($stream);
+        $keywords = Deserializer::vectorOfObjects($stream, [AbstractEmojiKeyword::class, 'deserialize']);
         return new self(
             $langCode,
             $fromVersion,

@@ -23,19 +23,19 @@ final class UpdateReadChannelOutbox extends AbstractUpdate
         public readonly int $maxId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->channelId);
-        $buffer .= $serializer->int32($this->maxId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->channelId);
+        $buffer .= Serializer::int32($this->maxId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $channelId = $deserializer->int64($stream);
-        $maxId = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $channelId = Deserializer::int64($stream);
+        $maxId = Deserializer::int32($stream);
         return new self(
             $channelId,
             $maxId

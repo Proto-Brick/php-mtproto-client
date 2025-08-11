@@ -31,9 +31,9 @@ final class PollResults extends TlObject
         public readonly ?array $solutionEntities = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->min) $flags |= (1 << 0);
         if ($this->results !== null) $flags |= (1 << 1);
@@ -41,41 +41,41 @@ final class PollResults extends TlObject
         if ($this->recentVoters !== null) $flags |= (1 << 3);
         if ($this->solution !== null) $flags |= (1 << 4);
         if ($this->solutionEntities !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->results);
+            $buffer .= Serializer::vectorOfObjects($this->results);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->totalVoters);
+            $buffer .= Serializer::int32($this->totalVoters);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->recentVoters);
+            $buffer .= Serializer::vectorOfObjects($this->recentVoters);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->solution);
+            $buffer .= Serializer::bytes($this->solution);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->vectorOfObjects($this->solutionEntities);
+            $buffer .= Serializer::vectorOfObjects($this->solutionEntities);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $min = ($flags & (1 << 0)) ? true : null;
-        $results = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [PollAnswerVoters::class, 'deserialize']) : null;
-        $totalVoters = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $recentVoters = ($flags & (1 << 3)) ? $deserializer->vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']) : null;
-        $solution = ($flags & (1 << 4)) ? $deserializer->bytes($stream) : null;
-        $solutionEntities = ($flags & (1 << 4)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $results = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [PollAnswerVoters::class, 'deserialize']) : null;
+        $totalVoters = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $recentVoters = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']) : null;
+        $solution = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
+        $solutionEntities = ($flags & (1 << 4)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
         return new self(
             $min,
             $results,

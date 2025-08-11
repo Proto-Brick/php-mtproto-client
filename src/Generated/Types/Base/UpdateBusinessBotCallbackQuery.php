@@ -33,40 +33,40 @@ final class UpdateBusinessBotCallbackQuery extends AbstractUpdate
         public readonly ?string $data = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->replyToMessage !== null) $flags |= (1 << 2);
         if ($this->data !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->queryId);
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->bytes($this->connectionId);
-        $buffer .= $this->message->serialize($serializer);
+        $buffer .= Serializer::int64($this->queryId);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::bytes($this->connectionId);
+        $buffer .= $this->message->serialize();
         if ($flags & (1 << 2)) {
-            $buffer .= $this->replyToMessage->serialize($serializer);
+            $buffer .= $this->replyToMessage->serialize();
         }
-        $buffer .= $serializer->int64($this->chatInstance);
+        $buffer .= Serializer::int64($this->chatInstance);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->data);
+            $buffer .= Serializer::bytes($this->data);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $queryId = $deserializer->int64($stream);
-        $userId = $deserializer->int64($stream);
-        $connectionId = $deserializer->bytes($stream);
-        $message = AbstractMessage::deserialize($deserializer, $stream);
-        $replyToMessage = ($flags & (1 << 2)) ? AbstractMessage::deserialize($deserializer, $stream) : null;
-        $chatInstance = $deserializer->int64($stream);
-        $data = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
+        $queryId = Deserializer::int64($stream);
+        $userId = Deserializer::int64($stream);
+        $connectionId = Deserializer::bytes($stream);
+        $message = AbstractMessage::deserialize($stream);
+        $replyToMessage = ($flags & (1 << 2)) ? AbstractMessage::deserialize($stream) : null;
+        $chatInstance = Deserializer::int64($stream);
+        $data = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
         return new self(
             $queryId,
             $userId,

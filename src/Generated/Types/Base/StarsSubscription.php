@@ -43,9 +43,9 @@ final class StarsSubscription extends TlObject
         public readonly ?string $invoiceSlug = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->canceled) $flags |= (1 << 0);
         if ($this->canRefulfill) $flags |= (1 << 1);
@@ -55,48 +55,48 @@ final class StarsSubscription extends TlObject
         if ($this->title !== null) $flags |= (1 << 4);
         if ($this->photo !== null) $flags |= (1 << 5);
         if ($this->invoiceSlug !== null) $flags |= (1 << 6);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->untilDate);
-        $buffer .= $this->pricing->serialize($serializer);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->untilDate);
+        $buffer .= $this->pricing->serialize();
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->chatInviteHash);
+            $buffer .= Serializer::bytes($this->chatInviteHash);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->bytes($this->invoiceSlug);
+            $buffer .= Serializer::bytes($this->invoiceSlug);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $canceled = ($flags & (1 << 0)) ? true : null;
         $canRefulfill = ($flags & (1 << 1)) ? true : null;
         $missingBalance = ($flags & (1 << 2)) ? true : null;
         $botCanceled = ($flags & (1 << 7)) ? true : null;
-        $id = $deserializer->bytes($stream);
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $untilDate = $deserializer->int32($stream);
-        $pricing = StarsSubscriptionPricing::deserialize($deserializer, $stream);
-        $chatInviteHash = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $title = ($flags & (1 << 4)) ? $deserializer->bytes($stream) : null;
-        $photo = ($flags & (1 << 5)) ? AbstractWebDocument::deserialize($deserializer, $stream) : null;
-        $invoiceSlug = ($flags & (1 << 6)) ? $deserializer->bytes($stream) : null;
+        $id = Deserializer::bytes($stream);
+        $peer = AbstractPeer::deserialize($stream);
+        $untilDate = Deserializer::int32($stream);
+        $pricing = StarsSubscriptionPricing::deserialize($stream);
+        $chatInviteHash = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $title = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
+        $photo = ($flags & (1 << 5)) ? AbstractWebDocument::deserialize($stream) : null;
+        $invoiceSlug = ($flags & (1 << 6)) ? Deserializer::bytes($stream) : null;
         return new self(
             $id,
             $peer,

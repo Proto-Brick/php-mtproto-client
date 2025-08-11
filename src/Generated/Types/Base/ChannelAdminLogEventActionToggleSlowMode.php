@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionToggleSlowMode extends AbstractChannelAdmi
         public readonly int $newValue
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->prevValue);
-        $buffer .= $serializer->int32($this->newValue);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->prevValue);
+        $buffer .= Serializer::int32($this->newValue);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevValue = $deserializer->int32($stream);
-        $newValue = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevValue = Deserializer::int32($stream);
+        $newValue = Deserializer::int32($stream);
         return new self(
             $prevValue,
             $newValue

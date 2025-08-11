@@ -40,17 +40,17 @@ final class EditAdminRequest extends TlObject
         public readonly string $rank
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->channel->serialize($serializer);
-        $buffer .= $this->userId->serialize($serializer);
-        $buffer .= $this->adminRights->serialize($serializer);
-        $buffer .= $serializer->bytes($this->rank);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->channel->serialize();
+        $buffer .= $this->userId->serialize();
+        $buffer .= $this->adminRights->serialize();
+        $buffer .= Serializer::bytes($this->rank);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -33,37 +33,37 @@ final class BotInlineMessageMediaVenue extends AbstractBotInlineMessage
         public readonly ?AbstractReplyMarkup $replyMarkup = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->replyMarkup !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->geo->serialize($serializer);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->address);
-        $buffer .= $serializer->bytes($this->provider);
-        $buffer .= $serializer->bytes($this->venueId);
-        $buffer .= $serializer->bytes($this->venueType);
+        $buffer .= $this->geo->serialize();
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->address);
+        $buffer .= Serializer::bytes($this->provider);
+        $buffer .= Serializer::bytes($this->venueId);
+        $buffer .= Serializer::bytes($this->venueType);
         if ($flags & (1 << 2)) {
-            $buffer .= $this->replyMarkup->serialize($serializer);
+            $buffer .= $this->replyMarkup->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $geo = AbstractGeoPoint::deserialize($deserializer, $stream);
-        $title = $deserializer->bytes($stream);
-        $address = $deserializer->bytes($stream);
-        $provider = $deserializer->bytes($stream);
-        $venueId = $deserializer->bytes($stream);
-        $venueType = $deserializer->bytes($stream);
-        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($deserializer, $stream) : null;
+        $geo = AbstractGeoPoint::deserialize($stream);
+        $title = Deserializer::bytes($stream);
+        $address = Deserializer::bytes($stream);
+        $provider = Deserializer::bytes($stream);
+        $venueId = Deserializer::bytes($stream);
+        $venueType = Deserializer::bytes($stream);
+        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($stream) : null;
         return new self(
             $geo,
             $title,

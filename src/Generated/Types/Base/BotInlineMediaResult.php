@@ -33,46 +33,46 @@ final class BotInlineMediaResult extends AbstractBotInlineResult
         public readonly ?string $description = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->photo !== null) $flags |= (1 << 0);
         if ($this->document !== null) $flags |= (1 << 1);
         if ($this->title !== null) $flags |= (1 << 2);
         if ($this->description !== null) $flags |= (1 << 3);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $serializer->bytes($this->type);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= Serializer::bytes($this->type);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->document->serialize($serializer);
+            $buffer .= $this->document->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->description);
+            $buffer .= Serializer::bytes($this->description);
         }
-        $buffer .= $this->sendMessage->serialize($serializer);
+        $buffer .= $this->sendMessage->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $id = $deserializer->bytes($stream);
-        $type = $deserializer->bytes($stream);
-        $photo = ($flags & (1 << 0)) ? AbstractPhoto::deserialize($deserializer, $stream) : null;
-        $document = ($flags & (1 << 1)) ? AbstractDocument::deserialize($deserializer, $stream) : null;
-        $title = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $description = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $sendMessage = AbstractBotInlineMessage::deserialize($deserializer, $stream);
+        $id = Deserializer::bytes($stream);
+        $type = Deserializer::bytes($stream);
+        $photo = ($flags & (1 << 0)) ? AbstractPhoto::deserialize($stream) : null;
+        $document = ($flags & (1 << 1)) ? AbstractDocument::deserialize($stream) : null;
+        $title = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $description = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $sendMessage = AbstractBotInlineMessage::deserialize($stream);
         return new self(
             $id,
             $type,

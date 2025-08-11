@@ -35,45 +35,45 @@ final class GiveawayInfoResults extends AbstractGiveawayInfo
         public readonly ?int $activatedCount = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->winner) $flags |= (1 << 0);
         if ($this->refunded) $flags |= (1 << 1);
         if ($this->giftCodeSlug !== null) $flags |= (1 << 3);
         if ($this->starsPrize !== null) $flags |= (1 << 4);
         if ($this->activatedCount !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->startDate);
+        $buffer .= Serializer::int32($this->startDate);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->giftCodeSlug);
+            $buffer .= Serializer::bytes($this->giftCodeSlug);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int64($this->starsPrize);
+            $buffer .= Serializer::int64($this->starsPrize);
         }
-        $buffer .= $serializer->int32($this->finishDate);
-        $buffer .= $serializer->int32($this->winnersCount);
+        $buffer .= Serializer::int32($this->finishDate);
+        $buffer .= Serializer::int32($this->winnersCount);
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->activatedCount);
+            $buffer .= Serializer::int32($this->activatedCount);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $winner = ($flags & (1 << 0)) ? true : null;
         $refunded = ($flags & (1 << 1)) ? true : null;
-        $startDate = $deserializer->int32($stream);
-        $giftCodeSlug = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $starsPrize = ($flags & (1 << 4)) ? $deserializer->int64($stream) : null;
-        $finishDate = $deserializer->int32($stream);
-        $winnersCount = $deserializer->int32($stream);
-        $activatedCount = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
+        $startDate = Deserializer::int32($stream);
+        $giftCodeSlug = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $starsPrize = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;
+        $finishDate = Deserializer::int32($stream);
+        $winnersCount = Deserializer::int32($stream);
+        $activatedCount = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
         return new self(
             $startDate,
             $finishDate,

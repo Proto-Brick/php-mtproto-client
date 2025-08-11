@@ -23,27 +23,27 @@ final class UpdateChannelPinnedTopics extends AbstractUpdate
         public readonly ?array $order = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->order !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->channelId);
+        $buffer .= Serializer::int64($this->channelId);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfInts($this->order);
+            $buffer .= Serializer::vectorOfInts($this->order);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $channelId = $deserializer->int64($stream);
-        $order = ($flags & (1 << 0)) ? $deserializer->vectorOfInts($stream) : null;
+        $channelId = Deserializer::int64($stream);
+        $order = ($flags & (1 << 0)) ? Deserializer::vectorOfInts($stream) : null;
         return new self(
             $channelId,
             $order

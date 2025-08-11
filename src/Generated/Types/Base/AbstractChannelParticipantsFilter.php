@@ -8,20 +8,20 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractChannelParticipantsFilter extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ChannelParticipantsRecent::CONSTRUCTOR_ID => ChannelParticipantsRecent::deserialize($deserializer, $stream),
-            ChannelParticipantsAdmins::CONSTRUCTOR_ID => ChannelParticipantsAdmins::deserialize($deserializer, $stream),
-            ChannelParticipantsKicked::CONSTRUCTOR_ID => ChannelParticipantsKicked::deserialize($deserializer, $stream),
-            ChannelParticipantsBots::CONSTRUCTOR_ID => ChannelParticipantsBots::deserialize($deserializer, $stream),
-            ChannelParticipantsBanned::CONSTRUCTOR_ID => ChannelParticipantsBanned::deserialize($deserializer, $stream),
-            ChannelParticipantsSearch::CONSTRUCTOR_ID => ChannelParticipantsSearch::deserialize($deserializer, $stream),
-            ChannelParticipantsContacts::CONSTRUCTOR_ID => ChannelParticipantsContacts::deserialize($deserializer, $stream),
-            ChannelParticipantsMentions::CONSTRUCTOR_ID => ChannelParticipantsMentions::deserialize($deserializer, $stream),
+            ChannelParticipantsRecent::CONSTRUCTOR_ID => ChannelParticipantsRecent::deserialize($stream),
+            ChannelParticipantsAdmins::CONSTRUCTOR_ID => ChannelParticipantsAdmins::deserialize($stream),
+            ChannelParticipantsKicked::CONSTRUCTOR_ID => ChannelParticipantsKicked::deserialize($stream),
+            ChannelParticipantsBots::CONSTRUCTOR_ID => ChannelParticipantsBots::deserialize($stream),
+            ChannelParticipantsBanned::CONSTRUCTOR_ID => ChannelParticipantsBanned::deserialize($stream),
+            ChannelParticipantsSearch::CONSTRUCTOR_ID => ChannelParticipantsSearch::deserialize($stream),
+            ChannelParticipantsContacts::CONSTRUCTOR_ID => ChannelParticipantsContacts::deserialize($stream),
+            ChannelParticipantsMentions::CONSTRUCTOR_ID => ChannelParticipantsMentions::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ChannelParticipantsFilter. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

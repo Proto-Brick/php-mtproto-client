@@ -27,34 +27,34 @@ final class BotInlineMessageMediaAuto extends AbstractBotInlineMessage
         public readonly ?AbstractReplyMarkup $replyMarkup = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->invertMedia) $flags |= (1 << 3);
         if ($this->entities !== null) $flags |= (1 << 1);
         if ($this->replyMarkup !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->message);
+        $buffer .= Serializer::bytes($this->message);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->replyMarkup->serialize($serializer);
+            $buffer .= $this->replyMarkup->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $invertMedia = ($flags & (1 << 3)) ? true : null;
-        $message = $deserializer->bytes($stream);
-        $entities = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($deserializer, $stream) : null;
+        $message = Deserializer::bytes($stream);
+        $entities = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($stream) : null;
         return new self(
             $message,
             $invertMedia,

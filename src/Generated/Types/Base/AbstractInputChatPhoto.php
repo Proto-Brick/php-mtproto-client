@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputChatPhoto extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputChatPhotoEmpty::CONSTRUCTOR_ID => InputChatPhotoEmpty::deserialize($deserializer, $stream),
-            InputChatUploadedPhoto::CONSTRUCTOR_ID => InputChatUploadedPhoto::deserialize($deserializer, $stream),
-            InputChatPhoto::CONSTRUCTOR_ID => InputChatPhoto::deserialize($deserializer, $stream),
+            InputChatPhotoEmpty::CONSTRUCTOR_ID => InputChatPhotoEmpty::deserialize($stream),
+            InputChatUploadedPhoto::CONSTRUCTOR_ID => InputChatUploadedPhoto::deserialize($stream),
+            InputChatPhoto::CONSTRUCTOR_ID => InputChatPhoto::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputChatPhoto. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

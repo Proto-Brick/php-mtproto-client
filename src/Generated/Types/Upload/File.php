@@ -26,21 +26,21 @@ final class File extends AbstractFile
         public readonly string $bytes
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->type->serialize($serializer);
-        $buffer .= $serializer->int32($this->mtime);
-        $buffer .= $serializer->bytes($this->bytes);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->type->serialize();
+        $buffer .= Serializer::int32($this->mtime);
+        $buffer .= Serializer::bytes($this->bytes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $type = AbstractFileType::deserialize($deserializer, $stream);
-        $mtime = $deserializer->int32($stream);
-        $bytes = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $type = AbstractFileType::deserialize($stream);
+        $mtime = Deserializer::int32($stream);
+        $bytes = Deserializer::bytes($stream);
         return new self(
             $type,
             $mtime,

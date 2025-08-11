@@ -25,32 +25,32 @@ final class MessageMediaPhoto extends AbstractMessageMedia
         public readonly ?int $ttlSeconds = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->spoiler) $flags |= (1 << 3);
         if ($this->photo !== null) $flags |= (1 << 0);
         if ($this->ttlSeconds !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->ttlSeconds);
+            $buffer .= Serializer::int32($this->ttlSeconds);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $spoiler = ($flags & (1 << 3)) ? true : null;
-        $photo = ($flags & (1 << 0)) ? AbstractPhoto::deserialize($deserializer, $stream) : null;
-        $ttlSeconds = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
+        $photo = ($flags & (1 << 0)) ? AbstractPhoto::deserialize($stream) : null;
+        $ttlSeconds = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
         return new self(
             $spoiler,
             $photo,

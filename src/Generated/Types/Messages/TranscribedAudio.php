@@ -29,40 +29,40 @@ final class TranscribedAudio extends TlObject
         public readonly ?int $trialRemainsUntilDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->pending) $flags |= (1 << 0);
         if ($this->trialRemainsNum !== null) $flags |= (1 << 1);
         if ($this->trialRemainsUntilDate !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->transcriptionId);
-        $buffer .= $serializer->bytes($this->text);
+        $buffer .= Serializer::int64($this->transcriptionId);
+        $buffer .= Serializer::bytes($this->text);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->trialRemainsNum);
+            $buffer .= Serializer::int32($this->trialRemainsNum);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->trialRemainsUntilDate);
+            $buffer .= Serializer::int32($this->trialRemainsUntilDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $pending = ($flags & (1 << 0)) ? true : null;
-        $transcriptionId = $deserializer->int64($stream);
-        $text = $deserializer->bytes($stream);
-        $trialRemainsNum = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $trialRemainsUntilDate = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
+        $transcriptionId = Deserializer::int64($stream);
+        $text = Deserializer::bytes($stream);
+        $trialRemainsNum = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $trialRemainsUntilDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
         return new self(
             $transcriptionId,
             $text,

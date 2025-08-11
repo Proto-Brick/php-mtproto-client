@@ -35,31 +35,31 @@ final class AutoSaveSettings extends TlObject
         public readonly array $users
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->usersSettings->serialize($serializer);
-        $buffer .= $this->chatsSettings->serialize($serializer);
-        $buffer .= $this->broadcastsSettings->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->exceptions);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->usersSettings->serialize();
+        $buffer .= $this->chatsSettings->serialize();
+        $buffer .= $this->broadcastsSettings->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->exceptions);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $usersSettings = BaseAutoSaveSettings::deserialize($deserializer, $stream);
-        $chatsSettings = BaseAutoSaveSettings::deserialize($deserializer, $stream);
-        $broadcastsSettings = BaseAutoSaveSettings::deserialize($deserializer, $stream);
-        $exceptions = $deserializer->vectorOfObjects($stream, [AutoSaveException::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $usersSettings = BaseAutoSaveSettings::deserialize($stream);
+        $chatsSettings = BaseAutoSaveSettings::deserialize($stream);
+        $broadcastsSettings = BaseAutoSaveSettings::deserialize($stream);
+        $exceptions = Deserializer::vectorOfObjects($stream, [AutoSaveException::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $usersSettings,
             $chatsSettings,

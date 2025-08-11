@@ -37,45 +37,45 @@ final class AppUpdate extends AbstractAppUpdate
         public readonly ?AbstractDocument $sticker = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->canNotSkip) $flags |= (1 << 0);
         if ($this->document !== null) $flags |= (1 << 1);
         if ($this->url !== null) $flags |= (1 << 2);
         if ($this->sticker !== null) $flags |= (1 << 3);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->id);
-        $buffer .= $serializer->bytes($this->version);
-        $buffer .= $serializer->bytes($this->text);
-        $buffer .= $serializer->vectorOfObjects($this->entities);
+        $buffer .= Serializer::int32($this->id);
+        $buffer .= Serializer::bytes($this->version);
+        $buffer .= Serializer::bytes($this->text);
+        $buffer .= Serializer::vectorOfObjects($this->entities);
         if ($flags & (1 << 1)) {
-            $buffer .= $this->document->serialize($serializer);
+            $buffer .= $this->document->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->url);
+            $buffer .= Serializer::bytes($this->url);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->sticker->serialize($serializer);
+            $buffer .= $this->sticker->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $canNotSkip = ($flags & (1 << 0)) ? true : null;
-        $id = $deserializer->int32($stream);
-        $version = $deserializer->bytes($stream);
-        $text = $deserializer->bytes($stream);
-        $entities = $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
-        $document = ($flags & (1 << 1)) ? AbstractDocument::deserialize($deserializer, $stream) : null;
-        $url = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $sticker = ($flags & (1 << 3)) ? AbstractDocument::deserialize($deserializer, $stream) : null;
+        $id = Deserializer::int32($stream);
+        $version = Deserializer::bytes($stream);
+        $text = Deserializer::bytes($stream);
+        $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
+        $document = ($flags & (1 << 1)) ? AbstractDocument::deserialize($stream) : null;
+        $url = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $sticker = ($flags & (1 << 3)) ? AbstractDocument::deserialize($stream) : null;
         return new self(
             $id,
             $version,

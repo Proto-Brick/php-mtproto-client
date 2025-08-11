@@ -44,31 +44,31 @@ final class SetChatWallPaperRequest extends TlObject
         public readonly ?int $id = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->forBoth) $flags |= (1 << 3);
         if ($this->revert) $flags |= (1 << 4);
         if ($this->wallpaper !== null) $flags |= (1 << 0);
         if ($this->settings !== null) $flags |= (1 << 2);
         if ($this->id !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
+        $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $this->wallpaper->serialize($serializer);
+            $buffer .= $this->wallpaper->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->settings->serialize($serializer);
+            $buffer .= $this->settings->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->id);
+            $buffer .= Serializer::int32($this->id);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -41,46 +41,46 @@ final class AutoDownloadSettings extends TlObject
         public readonly ?bool $storiesPreload = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->disabled) $flags |= (1 << 0);
         if ($this->videoPreloadLarge) $flags |= (1 << 1);
         if ($this->audioPreloadNext) $flags |= (1 << 2);
         if ($this->phonecallsLessData) $flags |= (1 << 3);
         if ($this->storiesPreload) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->photoSizeMax);
-        $buffer .= $serializer->int64($this->videoSizeMax);
-        $buffer .= $serializer->int64($this->fileSizeMax);
-        $buffer .= $serializer->int32($this->videoUploadMaxbitrate);
-        $buffer .= $serializer->int32($this->smallQueueActiveOperationsMax);
-        $buffer .= $serializer->int32($this->largeQueueActiveOperationsMax);
+        $buffer .= Serializer::int32($this->photoSizeMax);
+        $buffer .= Serializer::int64($this->videoSizeMax);
+        $buffer .= Serializer::int64($this->fileSizeMax);
+        $buffer .= Serializer::int32($this->videoUploadMaxbitrate);
+        $buffer .= Serializer::int32($this->smallQueueActiveOperationsMax);
+        $buffer .= Serializer::int32($this->largeQueueActiveOperationsMax);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $disabled = ($flags & (1 << 0)) ? true : null;
         $videoPreloadLarge = ($flags & (1 << 1)) ? true : null;
         $audioPreloadNext = ($flags & (1 << 2)) ? true : null;
         $phonecallsLessData = ($flags & (1 << 3)) ? true : null;
         $storiesPreload = ($flags & (1 << 4)) ? true : null;
-        $photoSizeMax = $deserializer->int32($stream);
-        $videoSizeMax = $deserializer->int64($stream);
-        $fileSizeMax = $deserializer->int64($stream);
-        $videoUploadMaxbitrate = $deserializer->int32($stream);
-        $smallQueueActiveOperationsMax = $deserializer->int32($stream);
-        $largeQueueActiveOperationsMax = $deserializer->int32($stream);
+        $photoSizeMax = Deserializer::int32($stream);
+        $videoSizeMax = Deserializer::int64($stream);
+        $fileSizeMax = Deserializer::int64($stream);
+        $videoUploadMaxbitrate = Deserializer::int32($stream);
+        $smallQueueActiveOperationsMax = Deserializer::int32($stream);
+        $largeQueueActiveOperationsMax = Deserializer::int32($stream);
         return new self(
             $photoSizeMax,
             $videoSizeMax,

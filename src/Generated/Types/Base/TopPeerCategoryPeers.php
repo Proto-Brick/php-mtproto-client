@@ -25,25 +25,25 @@ final class TopPeerCategoryPeers extends TlObject
         public readonly array $peers
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->category->serialize($serializer);
-        $buffer .= $serializer->int32($this->count);
-        $buffer .= $serializer->vectorOfObjects($this->peers);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->category->serialize();
+        $buffer .= Serializer::int32($this->count);
+        $buffer .= Serializer::vectorOfObjects($this->peers);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $category = AbstractTopPeerCategory::deserialize($deserializer, $stream);
-        $count = $deserializer->int32($stream);
-        $peers = $deserializer->vectorOfObjects($stream, [TopPeer::class, 'deserialize']);
+        $category = AbstractTopPeerCategory::deserialize($stream);
+        $count = Deserializer::int32($stream);
+        $peers = Deserializer::vectorOfObjects($stream, [TopPeer::class, 'deserialize']);
         return new self(
             $category,
             $count,

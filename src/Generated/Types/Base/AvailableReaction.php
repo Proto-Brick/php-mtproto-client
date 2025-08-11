@@ -41,52 +41,52 @@ final class AvailableReaction extends TlObject
         public readonly ?AbstractDocument $centerIcon = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->inactive) $flags |= (1 << 0);
         if ($this->premium) $flags |= (1 << 2);
         if ($this->aroundAnimation !== null) $flags |= (1 << 1);
         if ($this->centerIcon !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->reaction);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $this->staticIcon->serialize($serializer);
-        $buffer .= $this->appearAnimation->serialize($serializer);
-        $buffer .= $this->selectAnimation->serialize($serializer);
-        $buffer .= $this->activateAnimation->serialize($serializer);
-        $buffer .= $this->effectAnimation->serialize($serializer);
+        $buffer .= Serializer::bytes($this->reaction);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= $this->staticIcon->serialize();
+        $buffer .= $this->appearAnimation->serialize();
+        $buffer .= $this->selectAnimation->serialize();
+        $buffer .= $this->activateAnimation->serialize();
+        $buffer .= $this->effectAnimation->serialize();
         if ($flags & (1 << 1)) {
-            $buffer .= $this->aroundAnimation->serialize($serializer);
+            $buffer .= $this->aroundAnimation->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->centerIcon->serialize($serializer);
+            $buffer .= $this->centerIcon->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $inactive = ($flags & (1 << 0)) ? true : null;
         $premium = ($flags & (1 << 2)) ? true : null;
-        $reaction = $deserializer->bytes($stream);
-        $title = $deserializer->bytes($stream);
-        $staticIcon = AbstractDocument::deserialize($deserializer, $stream);
-        $appearAnimation = AbstractDocument::deserialize($deserializer, $stream);
-        $selectAnimation = AbstractDocument::deserialize($deserializer, $stream);
-        $activateAnimation = AbstractDocument::deserialize($deserializer, $stream);
-        $effectAnimation = AbstractDocument::deserialize($deserializer, $stream);
-        $aroundAnimation = ($flags & (1 << 1)) ? AbstractDocument::deserialize($deserializer, $stream) : null;
-        $centerIcon = ($flags & (1 << 1)) ? AbstractDocument::deserialize($deserializer, $stream) : null;
+        $reaction = Deserializer::bytes($stream);
+        $title = Deserializer::bytes($stream);
+        $staticIcon = AbstractDocument::deserialize($stream);
+        $appearAnimation = AbstractDocument::deserialize($stream);
+        $selectAnimation = AbstractDocument::deserialize($stream);
+        $activateAnimation = AbstractDocument::deserialize($stream);
+        $effectAnimation = AbstractDocument::deserialize($stream);
+        $aroundAnimation = ($flags & (1 << 1)) ? AbstractDocument::deserialize($stream) : null;
+        $centerIcon = ($flags & (1 << 1)) ? AbstractDocument::deserialize($stream) : null;
         return new self(
             $reaction,
             $title,

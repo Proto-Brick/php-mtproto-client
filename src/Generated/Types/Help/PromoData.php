@@ -36,40 +36,40 @@ final class PromoData extends AbstractPromoData
         public readonly ?string $psaMessage = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->proxy) $flags |= (1 << 0);
         if ($this->psaType !== null) $flags |= (1 << 1);
         if ($this->psaMessage !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->expires);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::int32($this->expires);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->psaType);
+            $buffer .= Serializer::bytes($this->psaType);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->psaMessage);
+            $buffer .= Serializer::bytes($this->psaMessage);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $proxy = ($flags & (1 << 0)) ? true : null;
-        $expires = $deserializer->int32($stream);
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $psaType = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $psaMessage = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
+        $expires = Deserializer::int32($stream);
+        $peer = AbstractPeer::deserialize($stream);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $psaType = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $psaMessage = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
         return new self(
             $expires,
             $peer,

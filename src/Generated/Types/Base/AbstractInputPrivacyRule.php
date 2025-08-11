@@ -8,24 +8,24 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputPrivacyRule extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputPrivacyValueAllowContacts::CONSTRUCTOR_ID => InputPrivacyValueAllowContacts::deserialize($deserializer, $stream),
-            InputPrivacyValueAllowAll::CONSTRUCTOR_ID => InputPrivacyValueAllowAll::deserialize($deserializer, $stream),
-            InputPrivacyValueAllowUsers::CONSTRUCTOR_ID => InputPrivacyValueAllowUsers::deserialize($deserializer, $stream),
-            InputPrivacyValueDisallowContacts::CONSTRUCTOR_ID => InputPrivacyValueDisallowContacts::deserialize($deserializer, $stream),
-            InputPrivacyValueDisallowAll::CONSTRUCTOR_ID => InputPrivacyValueDisallowAll::deserialize($deserializer, $stream),
-            InputPrivacyValueDisallowUsers::CONSTRUCTOR_ID => InputPrivacyValueDisallowUsers::deserialize($deserializer, $stream),
-            InputPrivacyValueAllowChatParticipants::CONSTRUCTOR_ID => InputPrivacyValueAllowChatParticipants::deserialize($deserializer, $stream),
-            InputPrivacyValueDisallowChatParticipants::CONSTRUCTOR_ID => InputPrivacyValueDisallowChatParticipants::deserialize($deserializer, $stream),
-            InputPrivacyValueAllowCloseFriends::CONSTRUCTOR_ID => InputPrivacyValueAllowCloseFriends::deserialize($deserializer, $stream),
-            InputPrivacyValueAllowPremium::CONSTRUCTOR_ID => InputPrivacyValueAllowPremium::deserialize($deserializer, $stream),
-            InputPrivacyValueAllowBots::CONSTRUCTOR_ID => InputPrivacyValueAllowBots::deserialize($deserializer, $stream),
-            InputPrivacyValueDisallowBots::CONSTRUCTOR_ID => InputPrivacyValueDisallowBots::deserialize($deserializer, $stream),
+            InputPrivacyValueAllowContacts::CONSTRUCTOR_ID => InputPrivacyValueAllowContacts::deserialize($stream),
+            InputPrivacyValueAllowAll::CONSTRUCTOR_ID => InputPrivacyValueAllowAll::deserialize($stream),
+            InputPrivacyValueAllowUsers::CONSTRUCTOR_ID => InputPrivacyValueAllowUsers::deserialize($stream),
+            InputPrivacyValueDisallowContacts::CONSTRUCTOR_ID => InputPrivacyValueDisallowContacts::deserialize($stream),
+            InputPrivacyValueDisallowAll::CONSTRUCTOR_ID => InputPrivacyValueDisallowAll::deserialize($stream),
+            InputPrivacyValueDisallowUsers::CONSTRUCTOR_ID => InputPrivacyValueDisallowUsers::deserialize($stream),
+            InputPrivacyValueAllowChatParticipants::CONSTRUCTOR_ID => InputPrivacyValueAllowChatParticipants::deserialize($stream),
+            InputPrivacyValueDisallowChatParticipants::CONSTRUCTOR_ID => InputPrivacyValueDisallowChatParticipants::deserialize($stream),
+            InputPrivacyValueAllowCloseFriends::CONSTRUCTOR_ID => InputPrivacyValueAllowCloseFriends::deserialize($stream),
+            InputPrivacyValueAllowPremium::CONSTRUCTOR_ID => InputPrivacyValueAllowPremium::deserialize($stream),
+            InputPrivacyValueAllowBots::CONSTRUCTOR_ID => InputPrivacyValueAllowBots::deserialize($stream),
+            InputPrivacyValueDisallowBots::CONSTRUCTOR_ID => InputPrivacyValueDisallowBots::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputPrivacyRule. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

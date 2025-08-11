@@ -25,25 +25,25 @@ final class InputBusinessGreetingMessage extends TlObject
         public readonly int $noActivityDays
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->shortcutId);
-        $buffer .= $this->recipients->serialize($serializer);
-        $buffer .= $serializer->int32($this->noActivityDays);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->shortcutId);
+        $buffer .= $this->recipients->serialize();
+        $buffer .= Serializer::int32($this->noActivityDays);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $shortcutId = $deserializer->int32($stream);
-        $recipients = InputBusinessRecipients::deserialize($deserializer, $stream);
-        $noActivityDays = $deserializer->int32($stream);
+        $shortcutId = Deserializer::int32($stream);
+        $recipients = InputBusinessRecipients::deserialize($stream);
+        $noActivityDays = Deserializer::int32($stream);
         return new self(
             $shortcutId,
             $recipients,

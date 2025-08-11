@@ -23,23 +23,23 @@ final class PopularContact extends TlObject
         public readonly int $importers
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->clientId);
-        $buffer .= $serializer->int32($this->importers);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->clientId);
+        $buffer .= Serializer::int32($this->importers);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $clientId = $deserializer->int64($stream);
-        $importers = $deserializer->int32($stream);
+        $clientId = Deserializer::int64($stream);
+        $importers = Deserializer::int32($stream);
         return new self(
             $clientId,
             $importers

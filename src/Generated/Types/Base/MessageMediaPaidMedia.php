@@ -23,19 +23,19 @@ final class MessageMediaPaidMedia extends AbstractMessageMedia
         public readonly array $extendedMedia
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->starsAmount);
-        $buffer .= $serializer->vectorOfObjects($this->extendedMedia);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->starsAmount);
+        $buffer .= Serializer::vectorOfObjects($this->extendedMedia);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $starsAmount = $deserializer->int64($stream);
-        $extendedMedia = $deserializer->vectorOfObjects($stream, [AbstractMessageExtendedMedia::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $starsAmount = Deserializer::int64($stream);
+        $extendedMedia = Deserializer::vectorOfObjects($stream, [AbstractMessageExtendedMedia::class, 'deserialize']);
         return new self(
             $starsAmount,
             $extendedMedia

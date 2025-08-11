@@ -23,19 +23,19 @@ final class MessageActionGameScore extends AbstractMessageAction
         public readonly int $score
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->gameId);
-        $buffer .= $serializer->int32($this->score);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->gameId);
+        $buffer .= Serializer::int32($this->score);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $gameId = $deserializer->int64($stream);
-        $score = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $gameId = Deserializer::int64($stream);
+        $score = Deserializer::int32($stream);
         return new self(
             $gameId,
             $score

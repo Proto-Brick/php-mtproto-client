@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractGroupCall extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            GroupCallDiscarded::CONSTRUCTOR_ID => GroupCallDiscarded::deserialize($deserializer, $stream),
-            GroupCall::CONSTRUCTOR_ID => GroupCall::deserialize($deserializer, $stream),
+            GroupCallDiscarded::CONSTRUCTOR_ID => GroupCallDiscarded::deserialize($stream),
+            GroupCall::CONSTRUCTOR_ID => GroupCall::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type GroupCall. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -61,9 +61,9 @@ final class StoryItem extends AbstractStoryItem
         public readonly ?AbstractReaction $sentReaction = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->pinned) $flags |= (1 << 5);
         if ($this->public) $flags |= (1 << 7);
@@ -82,43 +82,43 @@ final class StoryItem extends AbstractStoryItem
         if ($this->privacy !== null) $flags |= (1 << 2);
         if ($this->views !== null) $flags |= (1 << 3);
         if ($this->sentReaction !== null) $flags |= (1 << 15);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->id);
-        $buffer .= $serializer->int32($this->date);
+        $buffer .= Serializer::int32($this->id);
+        $buffer .= Serializer::int32($this->date);
         if ($flags & (1 << 18)) {
-            $buffer .= $this->fromId->serialize($serializer);
+            $buffer .= $this->fromId->serialize();
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $this->fwdFrom->serialize($serializer);
+            $buffer .= $this->fwdFrom->serialize();
         }
-        $buffer .= $serializer->int32($this->expireDate);
+        $buffer .= Serializer::int32($this->expireDate);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->caption);
+            $buffer .= Serializer::bytes($this->caption);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
-        $buffer .= $this->media->serialize($serializer);
+        $buffer .= $this->media->serialize();
         if ($flags & (1 << 14)) {
-            $buffer .= $serializer->vectorOfObjects($this->mediaAreas);
+            $buffer .= Serializer::vectorOfObjects($this->mediaAreas);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->vectorOfObjects($this->privacy);
+            $buffer .= Serializer::vectorOfObjects($this->privacy);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->views->serialize($serializer);
+            $buffer .= $this->views->serialize();
         }
         if ($flags & (1 << 15)) {
-            $buffer .= $this->sentReaction->serialize($serializer);
+            $buffer .= $this->sentReaction->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $pinned = ($flags & (1 << 5)) ? true : null;
         $public = ($flags & (1 << 7)) ? true : null;
@@ -129,18 +129,18 @@ final class StoryItem extends AbstractStoryItem
         $contacts = ($flags & (1 << 12)) ? true : null;
         $selectedContacts = ($flags & (1 << 13)) ? true : null;
         $out = ($flags & (1 << 16)) ? true : null;
-        $id = $deserializer->int32($stream);
-        $date = $deserializer->int32($stream);
-        $fromId = ($flags & (1 << 18)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $fwdFrom = ($flags & (1 << 17)) ? StoryFwdHeader::deserialize($deserializer, $stream) : null;
-        $expireDate = $deserializer->int32($stream);
-        $caption = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $entities = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $media = AbstractMessageMedia::deserialize($deserializer, $stream);
-        $mediaAreas = ($flags & (1 << 14)) ? $deserializer->vectorOfObjects($stream, [AbstractMediaArea::class, 'deserialize']) : null;
-        $privacy = ($flags & (1 << 2)) ? $deserializer->vectorOfObjects($stream, [AbstractPrivacyRule::class, 'deserialize']) : null;
-        $views = ($flags & (1 << 3)) ? StoryViews::deserialize($deserializer, $stream) : null;
-        $sentReaction = ($flags & (1 << 15)) ? AbstractReaction::deserialize($deserializer, $stream) : null;
+        $id = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
+        $fromId = ($flags & (1 << 18)) ? AbstractPeer::deserialize($stream) : null;
+        $fwdFrom = ($flags & (1 << 17)) ? StoryFwdHeader::deserialize($stream) : null;
+        $expireDate = Deserializer::int32($stream);
+        $caption = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $entities = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $media = AbstractMessageMedia::deserialize($stream);
+        $mediaAreas = ($flags & (1 << 14)) ? Deserializer::vectorOfObjects($stream, [AbstractMediaArea::class, 'deserialize']) : null;
+        $privacy = ($flags & (1 << 2)) ? Deserializer::vectorOfObjects($stream, [AbstractPrivacyRule::class, 'deserialize']) : null;
+        $views = ($flags & (1 << 3)) ? StoryViews::deserialize($stream) : null;
+        $sentReaction = ($flags & (1 << 15)) ? AbstractReaction::deserialize($stream) : null;
         return new self(
             $id,
             $date,

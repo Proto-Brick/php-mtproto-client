@@ -33,37 +33,37 @@ final class EncryptedChatRequested extends AbstractEncryptedChat
         public readonly ?int $folderId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->folderId !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->folderId);
+            $buffer .= Serializer::int32($this->folderId);
         }
-        $buffer .= $serializer->int32($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int64($this->adminId);
-        $buffer .= $serializer->int64($this->participantId);
-        $buffer .= $serializer->bytes($this->gA);
+        $buffer .= Serializer::int32($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int64($this->adminId);
+        $buffer .= Serializer::int64($this->participantId);
+        $buffer .= Serializer::bytes($this->gA);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $folderId = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $id = $deserializer->int32($stream);
-        $accessHash = $deserializer->int64($stream);
-        $date = $deserializer->int32($stream);
-        $adminId = $deserializer->int64($stream);
-        $participantId = $deserializer->int64($stream);
-        $gA = $deserializer->bytes($stream);
+        $folderId = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $id = Deserializer::int32($stream);
+        $accessHash = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
+        $adminId = Deserializer::int64($stream);
+        $participantId = Deserializer::int64($stream);
+        $gA = Deserializer::bytes($stream);
         return new self(
             $id,
             $accessHash,

@@ -43,9 +43,9 @@ final class InitTakeoutSessionRequest extends TlObject
         public readonly ?int $fileMaxSize = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->contacts) $flags |= (1 << 0);
         if ($this->messageUsers) $flags |= (1 << 1);
@@ -54,15 +54,15 @@ final class InitTakeoutSessionRequest extends TlObject
         if ($this->messageChannels) $flags |= (1 << 4);
         if ($this->files) $flags |= (1 << 5);
         if ($this->fileMaxSize !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int64($this->fileMaxSize);
+            $buffer .= Serializer::int64($this->fileMaxSize);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

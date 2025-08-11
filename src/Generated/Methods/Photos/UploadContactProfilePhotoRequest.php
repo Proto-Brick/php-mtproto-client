@@ -46,9 +46,9 @@ final class UploadContactProfilePhotoRequest extends TlObject
         public readonly ?AbstractVideoSize $videoEmojiMarkup = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->suggest) $flags |= (1 << 3);
         if ($this->save) $flags |= (1 << 4);
@@ -56,25 +56,25 @@ final class UploadContactProfilePhotoRequest extends TlObject
         if ($this->video !== null) $flags |= (1 << 1);
         if ($this->videoStartTs !== null) $flags |= (1 << 2);
         if ($this->videoEmojiMarkup !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->userId->serialize($serializer);
+        $buffer .= $this->userId->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $this->file->serialize($serializer);
+            $buffer .= $this->file->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->video->serialize($serializer);
+            $buffer .= $this->video->serialize();
         }
         if ($flags & (1 << 2)) {
             $buffer .= pack('d', $this->videoStartTs);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $this->videoEmojiMarkup->serialize($serializer);
+            $buffer .= $this->videoEmojiMarkup->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

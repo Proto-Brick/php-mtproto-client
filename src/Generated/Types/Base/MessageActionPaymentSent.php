@@ -31,38 +31,38 @@ final class MessageActionPaymentSent extends AbstractMessageAction
         public readonly ?int $subscriptionUntilDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->recurringInit) $flags |= (1 << 2);
         if ($this->recurringUsed) $flags |= (1 << 3);
         if ($this->invoiceSlug !== null) $flags |= (1 << 0);
         if ($this->subscriptionUntilDate !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->totalAmount);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->totalAmount);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->invoiceSlug);
+            $buffer .= Serializer::bytes($this->invoiceSlug);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->subscriptionUntilDate);
+            $buffer .= Serializer::int32($this->subscriptionUntilDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $recurringInit = ($flags & (1 << 2)) ? true : null;
         $recurringUsed = ($flags & (1 << 3)) ? true : null;
-        $currency = $deserializer->bytes($stream);
-        $totalAmount = $deserializer->int64($stream);
-        $invoiceSlug = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $subscriptionUntilDate = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
+        $currency = Deserializer::bytes($stream);
+        $totalAmount = Deserializer::int64($stream);
+        $invoiceSlug = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $subscriptionUntilDate = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
         return new self(
             $currency,
             $totalAmount,

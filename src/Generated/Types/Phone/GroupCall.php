@@ -33,29 +33,29 @@ final class GroupCall extends TlObject
         public readonly array $users
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->call->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->participants);
-        $buffer .= $serializer->bytes($this->participantsNextOffset);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->call->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->participants);
+        $buffer .= Serializer::bytes($this->participantsNextOffset);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $call = AbstractGroupCall::deserialize($deserializer, $stream);
-        $participants = $deserializer->vectorOfObjects($stream, [GroupCallParticipant::class, 'deserialize']);
-        $participantsNextOffset = $deserializer->bytes($stream);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $call = AbstractGroupCall::deserialize($stream);
+        $participants = Deserializer::vectorOfObjects($stream, [GroupCallParticipant::class, 'deserialize']);
+        $participantsNextOffset = Deserializer::bytes($stream);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $call,
             $participants,

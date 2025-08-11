@@ -8,19 +8,19 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractBotInlineMessage extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            BotInlineMessageMediaAuto::CONSTRUCTOR_ID => BotInlineMessageMediaAuto::deserialize($deserializer, $stream),
-            BotInlineMessageText::CONSTRUCTOR_ID => BotInlineMessageText::deserialize($deserializer, $stream),
-            BotInlineMessageMediaGeo::CONSTRUCTOR_ID => BotInlineMessageMediaGeo::deserialize($deserializer, $stream),
-            BotInlineMessageMediaVenue::CONSTRUCTOR_ID => BotInlineMessageMediaVenue::deserialize($deserializer, $stream),
-            BotInlineMessageMediaContact::CONSTRUCTOR_ID => BotInlineMessageMediaContact::deserialize($deserializer, $stream),
-            BotInlineMessageMediaInvoice::CONSTRUCTOR_ID => BotInlineMessageMediaInvoice::deserialize($deserializer, $stream),
-            BotInlineMessageMediaWebPage::CONSTRUCTOR_ID => BotInlineMessageMediaWebPage::deserialize($deserializer, $stream),
+            BotInlineMessageMediaAuto::CONSTRUCTOR_ID => BotInlineMessageMediaAuto::deserialize($stream),
+            BotInlineMessageText::CONSTRUCTOR_ID => BotInlineMessageText::deserialize($stream),
+            BotInlineMessageMediaGeo::CONSTRUCTOR_ID => BotInlineMessageMediaGeo::deserialize($stream),
+            BotInlineMessageMediaVenue::CONSTRUCTOR_ID => BotInlineMessageMediaVenue::deserialize($stream),
+            BotInlineMessageMediaContact::CONSTRUCTOR_ID => BotInlineMessageMediaContact::deserialize($stream),
+            BotInlineMessageMediaInvoice::CONSTRUCTOR_ID => BotInlineMessageMediaInvoice::deserialize($stream),
+            BotInlineMessageMediaWebPage::CONSTRUCTOR_ID => BotInlineMessageMediaWebPage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type BotInlineMessage. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

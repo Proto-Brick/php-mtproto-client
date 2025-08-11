@@ -27,34 +27,34 @@ final class InputMediaDocument extends AbstractInputMedia
         public readonly ?string $query = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->spoiler) $flags |= (1 << 2);
         if ($this->ttlSeconds !== null) $flags |= (1 << 0);
         if ($this->query !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->id->serialize($serializer);
+        $buffer .= $this->id->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->ttlSeconds);
+            $buffer .= Serializer::int32($this->ttlSeconds);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->query);
+            $buffer .= Serializer::bytes($this->query);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $spoiler = ($flags & (1 << 2)) ? true : null;
-        $id = AbstractInputDocument::deserialize($deserializer, $stream);
-        $ttlSeconds = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $query = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
+        $id = AbstractInputDocument::deserialize($stream);
+        $ttlSeconds = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $query = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
         return new self(
             $id,
             $spoiler,

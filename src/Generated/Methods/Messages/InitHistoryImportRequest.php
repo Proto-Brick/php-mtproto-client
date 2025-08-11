@@ -37,16 +37,16 @@ final class InitHistoryImportRequest extends TlObject
         public readonly int $mediaCount
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->file->serialize($serializer);
-        $buffer .= $serializer->int32($this->mediaCount);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->file->serialize();
+        $buffer .= Serializer::int32($this->mediaCount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

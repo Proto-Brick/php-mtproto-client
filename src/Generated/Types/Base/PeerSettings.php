@@ -51,9 +51,9 @@ final class PeerSettings extends TlObject
         public readonly ?string $businessBotManageUrl = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->reportSpam) $flags |= (1 << 0);
         if ($this->addContact) $flags |= (1 << 1);
@@ -71,34 +71,34 @@ final class PeerSettings extends TlObject
         if ($this->requestChatDate !== null) $flags |= (1 << 9);
         if ($this->businessBotId !== null) $flags |= (1 << 13);
         if ($this->businessBotManageUrl !== null) $flags |= (1 << 13);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->int32($this->geoDistance);
+            $buffer .= Serializer::int32($this->geoDistance);
         }
         if ($flags & (1 << 9)) {
-            $buffer .= $serializer->bytes($this->requestChatTitle);
+            $buffer .= Serializer::bytes($this->requestChatTitle);
         }
         if ($flags & (1 << 9)) {
-            $buffer .= $serializer->int32($this->requestChatDate);
+            $buffer .= Serializer::int32($this->requestChatDate);
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $serializer->int64($this->businessBotId);
+            $buffer .= Serializer::int64($this->businessBotId);
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $serializer->bytes($this->businessBotManageUrl);
+            $buffer .= Serializer::bytes($this->businessBotManageUrl);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $reportSpam = ($flags & (1 << 0)) ? true : null;
         $addContact = ($flags & (1 << 1)) ? true : null;
@@ -111,11 +111,11 @@ final class PeerSettings extends TlObject
         $requestChatBroadcast = ($flags & (1 << 10)) ? true : null;
         $businessBotPaused = ($flags & (1 << 11)) ? true : null;
         $businessBotCanReply = ($flags & (1 << 12)) ? true : null;
-        $geoDistance = ($flags & (1 << 6)) ? $deserializer->int32($stream) : null;
-        $requestChatTitle = ($flags & (1 << 9)) ? $deserializer->bytes($stream) : null;
-        $requestChatDate = ($flags & (1 << 9)) ? $deserializer->int32($stream) : null;
-        $businessBotId = ($flags & (1 << 13)) ? $deserializer->int64($stream) : null;
-        $businessBotManageUrl = ($flags & (1 << 13)) ? $deserializer->bytes($stream) : null;
+        $geoDistance = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
+        $requestChatTitle = ($flags & (1 << 9)) ? Deserializer::bytes($stream) : null;
+        $requestChatDate = ($flags & (1 << 9)) ? Deserializer::int32($stream) : null;
+        $businessBotId = ($flags & (1 << 13)) ? Deserializer::int64($stream) : null;
+        $businessBotManageUrl = ($flags & (1 << 13)) ? Deserializer::bytes($stream) : null;
         return new self(
             $reportSpam,
             $addContact,

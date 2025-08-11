@@ -24,19 +24,19 @@ final class EmojiStatuses extends AbstractEmojiStatuses
         public readonly array $statuses
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->hash);
-        $buffer .= $serializer->vectorOfObjects($this->statuses);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->hash);
+        $buffer .= Serializer::vectorOfObjects($this->statuses);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $hash = $deserializer->int64($stream);
-        $statuses = $deserializer->vectorOfObjects($stream, [AbstractEmojiStatus::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $hash = Deserializer::int64($stream);
+        $statuses = Deserializer::vectorOfObjects($stream, [AbstractEmojiStatus::class, 'deserialize']);
         return new self(
             $hash,
             $statuses

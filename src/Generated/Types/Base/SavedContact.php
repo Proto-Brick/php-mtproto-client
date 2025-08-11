@@ -27,27 +27,27 @@ final class SavedContact extends TlObject
         public readonly int $date
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->phone);
-        $buffer .= $serializer->bytes($this->firstName);
-        $buffer .= $serializer->bytes($this->lastName);
-        $buffer .= $serializer->int32($this->date);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->phone);
+        $buffer .= Serializer::bytes($this->firstName);
+        $buffer .= Serializer::bytes($this->lastName);
+        $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $phone = $deserializer->bytes($stream);
-        $firstName = $deserializer->bytes($stream);
-        $lastName = $deserializer->bytes($stream);
-        $date = $deserializer->int32($stream);
+        $phone = Deserializer::bytes($stream);
+        $firstName = Deserializer::bytes($stream);
+        $lastName = Deserializer::bytes($stream);
+        $date = Deserializer::int32($stream);
         return new self(
             $phone,
             $firstName,

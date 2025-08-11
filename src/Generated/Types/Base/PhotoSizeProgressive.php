@@ -27,23 +27,23 @@ final class PhotoSizeProgressive extends AbstractPhotoSize
         public readonly array $sizes
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->type);
-        $buffer .= $serializer->int32($this->w);
-        $buffer .= $serializer->int32($this->h);
-        $buffer .= $serializer->vectorOfInts($this->sizes);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->type);
+        $buffer .= Serializer::int32($this->w);
+        $buffer .= Serializer::int32($this->h);
+        $buffer .= Serializer::vectorOfInts($this->sizes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $type = $deserializer->bytes($stream);
-        $w = $deserializer->int32($stream);
-        $h = $deserializer->int32($stream);
-        $sizes = $deserializer->vectorOfInts($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $type = Deserializer::bytes($stream);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
+        $sizes = Deserializer::vectorOfInts($stream);
         return new self(
             $type,
             $w,

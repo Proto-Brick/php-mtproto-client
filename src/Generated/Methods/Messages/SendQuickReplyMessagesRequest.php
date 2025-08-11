@@ -38,17 +38,17 @@ final class SendQuickReplyMessagesRequest extends TlObject
         public readonly array $randomId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->shortcutId);
-        $buffer .= $serializer->vectorOfInts($this->id);
-        $buffer .= $serializer->vectorOfLongs($this->randomId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->shortcutId);
+        $buffer .= Serializer::vectorOfInts($this->id);
+        $buffer .= Serializer::vectorOfLongs($this->randomId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

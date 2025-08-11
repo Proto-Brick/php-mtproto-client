@@ -35,16 +35,16 @@ final class CheckDownloadFileParamsRequest extends TlObject
         public readonly string $url
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->bot->serialize($serializer);
-        $buffer .= $serializer->bytes($this->fileName);
-        $buffer .= $serializer->bytes($this->url);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->bot->serialize();
+        $buffer .= Serializer::bytes($this->fileName);
+        $buffer .= Serializer::bytes($this->url);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

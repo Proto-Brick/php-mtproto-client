@@ -27,21 +27,21 @@ final class ExportedChatInviteReplaced extends AbstractExportedChatInvite
         public readonly array $users
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->invite->serialize($serializer);
-        $buffer .= $this->newInvite->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->invite->serialize();
+        $buffer .= $this->newInvite->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $invite = BaseAbstractExportedChatInvite::deserialize($deserializer, $stream);
-        $newInvite = BaseAbstractExportedChatInvite::deserialize($deserializer, $stream);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $invite = BaseAbstractExportedChatInvite::deserialize($stream);
+        $newInvite = BaseAbstractExportedChatInvite::deserialize($stream);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $invite,
             $newInvite,

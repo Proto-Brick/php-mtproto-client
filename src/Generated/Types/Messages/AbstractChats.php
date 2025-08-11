@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractChats extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            Chats::CONSTRUCTOR_ID => Chats::deserialize($deserializer, $stream),
-            ChatsSlice::CONSTRUCTOR_ID => ChatsSlice::deserialize($deserializer, $stream),
+            Chats::CONSTRUCTOR_ID => Chats::deserialize($stream),
+            ChatsSlice::CONSTRUCTOR_ID => ChatsSlice::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.Chats. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

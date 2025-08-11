@@ -23,24 +23,24 @@ final class ChannelAdminLogEventActionParticipantJoinByInvite extends AbstractCh
         public readonly ?bool $viaChatlist = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->viaChatlist) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->invite->serialize($serializer);
+        $buffer .= $this->invite->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $viaChatlist = ($flags & (1 << 0)) ? true : null;
-        $invite = AbstractExportedChatInvite::deserialize($deserializer, $stream);
+        $invite = AbstractExportedChatInvite::deserialize($stream);
         return new self(
             $invite,
             $viaChatlist

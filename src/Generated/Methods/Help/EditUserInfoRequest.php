@@ -37,16 +37,16 @@ final class EditUserInfoRequest extends TlObject
         public readonly array $entities
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->userId->serialize($serializer);
-        $buffer .= $serializer->bytes($this->message);
-        $buffer .= $serializer->vectorOfObjects($this->entities);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->userId->serialize();
+        $buffer .= Serializer::bytes($this->message);
+        $buffer .= Serializer::vectorOfObjects($this->entities);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

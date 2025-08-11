@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractCdnFile extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            CdnFileReuploadNeeded::CONSTRUCTOR_ID => CdnFileReuploadNeeded::deserialize($deserializer, $stream),
-            CdnFile::CONSTRUCTOR_ID => CdnFile::deserialize($deserializer, $stream),
+            CdnFileReuploadNeeded::CONSTRUCTOR_ID => CdnFileReuploadNeeded::deserialize($stream),
+            CdnFile::CONSTRUCTOR_ID => CdnFile::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type upload.CdnFile. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

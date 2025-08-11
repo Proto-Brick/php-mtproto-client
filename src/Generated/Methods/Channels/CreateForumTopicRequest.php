@@ -43,31 +43,31 @@ final class CreateForumTopicRequest extends TlObject
         public readonly ?AbstractInputPeer $sendAs = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->iconColor !== null) $flags |= (1 << 0);
         if ($this->iconEmojiId !== null) $flags |= (1 << 3);
         if ($this->sendAs !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->channel->serialize($serializer);
-        $buffer .= $serializer->bytes($this->title);
+        $buffer .= $this->channel->serialize();
+        $buffer .= Serializer::bytes($this->title);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->iconColor);
+            $buffer .= Serializer::int32($this->iconColor);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int64($this->iconEmojiId);
+            $buffer .= Serializer::int64($this->iconEmojiId);
         }
-        $buffer .= $serializer->int64($this->randomId);
+        $buffer .= Serializer::int64($this->randomId);
         if ($flags & (1 << 2)) {
-            $buffer .= $this->sendAs->serialize($serializer);
+            $buffer .= $this->sendAs->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractEmojiGroup extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            EmojiGroup::CONSTRUCTOR_ID => EmojiGroup::deserialize($deserializer, $stream),
-            EmojiGroupGreeting::CONSTRUCTOR_ID => EmojiGroupGreeting::deserialize($deserializer, $stream),
-            EmojiGroupPremium::CONSTRUCTOR_ID => EmojiGroupPremium::deserialize($deserializer, $stream),
+            EmojiGroup::CONSTRUCTOR_ID => EmojiGroup::deserialize($stream),
+            EmojiGroupGreeting::CONSTRUCTOR_ID => EmojiGroupGreeting::deserialize($stream),
+            EmojiGroupPremium::CONSTRUCTOR_ID => EmojiGroupPremium::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type EmojiGroup. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -29,40 +29,40 @@ final class BusinessChatLink extends TlObject
         public readonly ?string $title = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->entities !== null) $flags |= (1 << 0);
         if ($this->title !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->link);
-        $buffer .= $serializer->bytes($this->message);
+        $buffer .= Serializer::bytes($this->link);
+        $buffer .= Serializer::bytes($this->message);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
-        $buffer .= $serializer->int32($this->views);
+        $buffer .= Serializer::int32($this->views);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $link = $deserializer->bytes($stream);
-        $message = $deserializer->bytes($stream);
-        $entities = ($flags & (1 << 0)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $title = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $views = $deserializer->int32($stream);
+        $link = Deserializer::bytes($stream);
+        $message = Deserializer::bytes($stream);
+        $entities = ($flags & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $title = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $views = Deserializer::int32($stream);
         return new self(
             $link,
             $message,

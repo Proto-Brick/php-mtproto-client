@@ -27,23 +27,23 @@ final class UpdateBotDeleteBusinessMessage extends AbstractUpdate
         public readonly int $qts
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->connectionId);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->vectorOfInts($this->messages);
-        $buffer .= $serializer->int32($this->qts);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->connectionId);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::vectorOfInts($this->messages);
+        $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $connectionId = $deserializer->bytes($stream);
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $messages = $deserializer->vectorOfInts($stream);
-        $qts = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $connectionId = Deserializer::bytes($stream);
+        $peer = AbstractPeer::deserialize($stream);
+        $messages = Deserializer::vectorOfInts($stream);
+        $qts = Deserializer::int32($stream);
         return new self(
             $connectionId,
             $peer,

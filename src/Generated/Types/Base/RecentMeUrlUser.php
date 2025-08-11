@@ -23,19 +23,19 @@ final class RecentMeUrlUser extends AbstractRecentMeUrl
         public readonly int $userId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->int64($this->userId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::int64($this->userId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $url = $deserializer->bytes($stream);
-        $userId = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $url = Deserializer::bytes($stream);
+        $userId = Deserializer::int64($stream);
         return new self(
             $url,
             $userId

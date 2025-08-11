@@ -25,30 +25,30 @@ final class SavedDialog extends TlObject
         public readonly ?bool $pinned = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->pinned) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->topMessage);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->topMessage);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $pinned = ($flags & (1 << 2)) ? true : null;
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $topMessage = $deserializer->int32($stream);
+        $peer = AbstractPeer::deserialize($stream);
+        $topMessage = Deserializer::int32($stream);
         return new self(
             $peer,
             $topMessage,

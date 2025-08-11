@@ -8,16 +8,16 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractPhoneCallDiscardReason extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PhoneCallDiscardReasonMissed::CONSTRUCTOR_ID => PhoneCallDiscardReasonMissed::deserialize($deserializer, $stream),
-            PhoneCallDiscardReasonDisconnect::CONSTRUCTOR_ID => PhoneCallDiscardReasonDisconnect::deserialize($deserializer, $stream),
-            PhoneCallDiscardReasonHangup::CONSTRUCTOR_ID => PhoneCallDiscardReasonHangup::deserialize($deserializer, $stream),
-            PhoneCallDiscardReasonBusy::CONSTRUCTOR_ID => PhoneCallDiscardReasonBusy::deserialize($deserializer, $stream),
+            PhoneCallDiscardReasonMissed::CONSTRUCTOR_ID => PhoneCallDiscardReasonMissed::deserialize($stream),
+            PhoneCallDiscardReasonDisconnect::CONSTRUCTOR_ID => PhoneCallDiscardReasonDisconnect::deserialize($stream),
+            PhoneCallDiscardReasonHangup::CONSTRUCTOR_ID => PhoneCallDiscardReasonHangup::deserialize($stream),
+            PhoneCallDiscardReasonBusy::CONSTRUCTOR_ID => PhoneCallDiscardReasonBusy::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PhoneCallDiscardReason. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

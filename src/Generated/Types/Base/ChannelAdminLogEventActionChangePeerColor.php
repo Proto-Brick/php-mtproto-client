@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionChangePeerColor extends AbstractChannelAdm
         public readonly PeerColor $newValue
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->prevValue->serialize($serializer);
-        $buffer .= $this->newValue->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->prevValue->serialize();
+        $buffer .= $this->newValue->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevValue = PeerColor::deserialize($deserializer, $stream);
-        $newValue = PeerColor::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevValue = PeerColor::deserialize($stream);
+        $newValue = PeerColor::deserialize($stream);
         return new self(
             $prevValue,
             $newValue

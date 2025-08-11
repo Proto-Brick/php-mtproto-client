@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractEncryptedFile extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            EncryptedFileEmpty::CONSTRUCTOR_ID => EncryptedFileEmpty::deserialize($deserializer, $stream),
-            EncryptedFile::CONSTRUCTOR_ID => EncryptedFile::deserialize($deserializer, $stream),
+            EncryptedFileEmpty::CONSTRUCTOR_ID => EncryptedFileEmpty::deserialize($stream),
+            EncryptedFile::CONSTRUCTOR_ID => EncryptedFile::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type EncryptedFile. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

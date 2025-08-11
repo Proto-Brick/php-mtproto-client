@@ -30,29 +30,29 @@ final class WebFile extends TlObject
         public readonly string $bytes
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->size);
-        $buffer .= $serializer->bytes($this->mimeType);
-        $buffer .= $this->fileType->serialize($serializer);
-        $buffer .= $serializer->int32($this->mtime);
-        $buffer .= $serializer->bytes($this->bytes);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->size);
+        $buffer .= Serializer::bytes($this->mimeType);
+        $buffer .= $this->fileType->serialize();
+        $buffer .= Serializer::int32($this->mtime);
+        $buffer .= Serializer::bytes($this->bytes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $size = $deserializer->int32($stream);
-        $mimeType = $deserializer->bytes($stream);
-        $fileType = AbstractFileType::deserialize($deserializer, $stream);
-        $mtime = $deserializer->int32($stream);
-        $bytes = $deserializer->bytes($stream);
+        $size = Deserializer::int32($stream);
+        $mimeType = Deserializer::bytes($stream);
+        $fileType = AbstractFileType::deserialize($stream);
+        $mtime = Deserializer::int32($stream);
+        $bytes = Deserializer::bytes($stream);
         return new self(
             $size,
             $mimeType,

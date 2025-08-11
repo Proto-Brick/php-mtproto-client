@@ -46,21 +46,21 @@ final class GetHistoryRequest extends TlObject
         public readonly int $hash
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->offsetId);
-        $buffer .= $serializer->int32($this->offsetDate);
-        $buffer .= $serializer->int32($this->addOffset);
-        $buffer .= $serializer->int32($this->limit);
-        $buffer .= $serializer->int32($this->maxId);
-        $buffer .= $serializer->int32($this->minId);
-        $buffer .= $serializer->int64($this->hash);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->offsetId);
+        $buffer .= Serializer::int32($this->offsetDate);
+        $buffer .= Serializer::int32($this->addOffset);
+        $buffer .= Serializer::int32($this->limit);
+        $buffer .= Serializer::int32($this->maxId);
+        $buffer .= Serializer::int32($this->minId);
+        $buffer .= Serializer::int64($this->hash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

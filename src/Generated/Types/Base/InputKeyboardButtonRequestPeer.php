@@ -33,34 +33,34 @@ final class InputKeyboardButtonRequestPeer extends AbstractKeyboardButton
         public readonly ?bool $photoRequested = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->nameRequested) $flags |= (1 << 0);
         if ($this->usernameRequested) $flags |= (1 << 1);
         if ($this->photoRequested) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->text);
-        $buffer .= $serializer->int32($this->buttonId);
-        $buffer .= $this->peerType->serialize($serializer);
-        $buffer .= $serializer->int32($this->maxQuantity);
+        $buffer .= Serializer::bytes($this->text);
+        $buffer .= Serializer::int32($this->buttonId);
+        $buffer .= $this->peerType->serialize();
+        $buffer .= Serializer::int32($this->maxQuantity);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $nameRequested = ($flags & (1 << 0)) ? true : null;
         $usernameRequested = ($flags & (1 << 1)) ? true : null;
         $photoRequested = ($flags & (1 << 2)) ? true : null;
-        $text = $deserializer->bytes($stream);
-        $buttonId = $deserializer->int32($stream);
-        $peerType = AbstractRequestPeerType::deserialize($deserializer, $stream);
-        $maxQuantity = $deserializer->int32($stream);
+        $text = Deserializer::bytes($stream);
+        $buttonId = Deserializer::int32($stream);
+        $peerType = AbstractRequestPeerType::deserialize($stream);
+        $maxQuantity = Deserializer::int32($stream);
         return new self(
             $text,
             $buttonId,

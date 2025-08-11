@@ -57,9 +57,9 @@ final class GroupCallParticipant extends TlObject
         public readonly ?GroupCallParticipantVideo $presentation = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->muted) $flags |= (1 << 0);
         if ($this->left) $flags |= (1 << 1);
@@ -77,40 +77,40 @@ final class GroupCallParticipant extends TlObject
         if ($this->raiseHandRating !== null) $flags |= (1 << 13);
         if ($this->video !== null) $flags |= (1 << 6);
         if ($this->presentation !== null) $flags |= (1 << 14);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->date);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->date);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int32($this->activeDate);
+            $buffer .= Serializer::int32($this->activeDate);
         }
-        $buffer .= $serializer->int32($this->source);
+        $buffer .= Serializer::int32($this->source);
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->int32($this->volume);
+            $buffer .= Serializer::int32($this->volume);
         }
         if ($flags & (1 << 11)) {
-            $buffer .= $serializer->bytes($this->about);
+            $buffer .= Serializer::bytes($this->about);
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $serializer->int64($this->raiseHandRating);
+            $buffer .= Serializer::int64($this->raiseHandRating);
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $this->video->serialize($serializer);
+            $buffer .= $this->video->serialize();
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $this->presentation->serialize($serializer);
+            $buffer .= $this->presentation->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $muted = ($flags & (1 << 0)) ? true : null;
         $left = ($flags & (1 << 1)) ? true : null;
@@ -122,15 +122,15 @@ final class GroupCallParticipant extends TlObject
         $volumeByAdmin = ($flags & (1 << 10)) ? true : null;
         $self = ($flags & (1 << 12)) ? true : null;
         $videoJoined = ($flags & (1 << 15)) ? true : null;
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $date = $deserializer->int32($stream);
-        $activeDate = ($flags & (1 << 3)) ? $deserializer->int32($stream) : null;
-        $source = $deserializer->int32($stream);
-        $volume = ($flags & (1 << 7)) ? $deserializer->int32($stream) : null;
-        $about = ($flags & (1 << 11)) ? $deserializer->bytes($stream) : null;
-        $raiseHandRating = ($flags & (1 << 13)) ? $deserializer->int64($stream) : null;
-        $video = ($flags & (1 << 6)) ? GroupCallParticipantVideo::deserialize($deserializer, $stream) : null;
-        $presentation = ($flags & (1 << 14)) ? GroupCallParticipantVideo::deserialize($deserializer, $stream) : null;
+        $peer = AbstractPeer::deserialize($stream);
+        $date = Deserializer::int32($stream);
+        $activeDate = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $source = Deserializer::int32($stream);
+        $volume = ($flags & (1 << 7)) ? Deserializer::int32($stream) : null;
+        $about = ($flags & (1 << 11)) ? Deserializer::bytes($stream) : null;
+        $raiseHandRating = ($flags & (1 << 13)) ? Deserializer::int64($stream) : null;
+        $video = ($flags & (1 << 6)) ? GroupCallParticipantVideo::deserialize($stream) : null;
+        $presentation = ($flags & (1 << 14)) ? GroupCallParticipantVideo::deserialize($stream) : null;
         return new self(
             $peer,
             $date,

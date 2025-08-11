@@ -47,33 +47,33 @@ final class SetInlineBotResultsRequest extends TlObject
         public readonly ?InlineBotWebView $switchWebview = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->gallery) $flags |= (1 << 0);
         if ($this->private) $flags |= (1 << 1);
         if ($this->nextOffset !== null) $flags |= (1 << 2);
         if ($this->switchPm !== null) $flags |= (1 << 3);
         if ($this->switchWebview !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->queryId);
-        $buffer .= $serializer->vectorOfObjects($this->results);
-        $buffer .= $serializer->int32($this->cacheTime);
+        $buffer .= Serializer::int64($this->queryId);
+        $buffer .= Serializer::vectorOfObjects($this->results);
+        $buffer .= Serializer::int32($this->cacheTime);
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->nextOffset);
+            $buffer .= Serializer::bytes($this->nextOffset);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->switchPm->serialize($serializer);
+            $buffer .= $this->switchPm->serialize();
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $this->switchWebview->serialize($serializer);
+            $buffer .= $this->switchWebview->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

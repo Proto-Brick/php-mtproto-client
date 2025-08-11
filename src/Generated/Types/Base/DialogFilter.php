@@ -49,9 +49,9 @@ final class DialogFilter extends AbstractDialogFilter
         public readonly ?int $color = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->contacts) $flags |= (1 << 0);
         if ($this->nonContacts) $flags |= (1 << 1);
@@ -63,26 +63,26 @@ final class DialogFilter extends AbstractDialogFilter
         if ($this->excludeArchived) $flags |= (1 << 13);
         if ($this->emoticon !== null) $flags |= (1 << 25);
         if ($this->color !== null) $flags |= (1 << 27);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->id);
-        $buffer .= $serializer->bytes($this->title);
+        $buffer .= Serializer::int32($this->id);
+        $buffer .= Serializer::bytes($this->title);
         if ($flags & (1 << 25)) {
-            $buffer .= $serializer->bytes($this->emoticon);
+            $buffer .= Serializer::bytes($this->emoticon);
         }
         if ($flags & (1 << 27)) {
-            $buffer .= $serializer->int32($this->color);
+            $buffer .= Serializer::int32($this->color);
         }
-        $buffer .= $serializer->vectorOfObjects($this->pinnedPeers);
-        $buffer .= $serializer->vectorOfObjects($this->includePeers);
-        $buffer .= $serializer->vectorOfObjects($this->excludePeers);
+        $buffer .= Serializer::vectorOfObjects($this->pinnedPeers);
+        $buffer .= Serializer::vectorOfObjects($this->includePeers);
+        $buffer .= Serializer::vectorOfObjects($this->excludePeers);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $contacts = ($flags & (1 << 0)) ? true : null;
         $nonContacts = ($flags & (1 << 1)) ? true : null;
@@ -92,13 +92,13 @@ final class DialogFilter extends AbstractDialogFilter
         $excludeMuted = ($flags & (1 << 11)) ? true : null;
         $excludeRead = ($flags & (1 << 12)) ? true : null;
         $excludeArchived = ($flags & (1 << 13)) ? true : null;
-        $id = $deserializer->int32($stream);
-        $title = $deserializer->bytes($stream);
-        $emoticon = ($flags & (1 << 25)) ? $deserializer->bytes($stream) : null;
-        $color = ($flags & (1 << 27)) ? $deserializer->int32($stream) : null;
-        $pinnedPeers = $deserializer->vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
-        $includePeers = $deserializer->vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
-        $excludePeers = $deserializer->vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
+        $id = Deserializer::int32($stream);
+        $title = Deserializer::bytes($stream);
+        $emoticon = ($flags & (1 << 25)) ? Deserializer::bytes($stream) : null;
+        $color = ($flags & (1 << 27)) ? Deserializer::int32($stream) : null;
+        $pinnedPeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
+        $includePeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
+        $excludePeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
         return new self(
             $id,
             $title,

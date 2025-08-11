@@ -43,53 +43,53 @@ final class InputStorePaymentStarsGiveaway extends AbstractInputStorePaymentPurp
         public readonly ?string $prizeDescription = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->onlyNewSubscribers) $flags |= (1 << 0);
         if ($this->winnersAreVisible) $flags |= (1 << 3);
         if ($this->additionalPeers !== null) $flags |= (1 << 1);
         if ($this->countriesIso2 !== null) $flags |= (1 << 2);
         if ($this->prizeDescription !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->stars);
-        $buffer .= $this->boostPeer->serialize($serializer);
+        $buffer .= Serializer::int64($this->stars);
+        $buffer .= $this->boostPeer->serialize();
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->additionalPeers);
+            $buffer .= Serializer::vectorOfObjects($this->additionalPeers);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->vectorOfStrings($this->countriesIso2);
+            $buffer .= Serializer::vectorOfStrings($this->countriesIso2);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->prizeDescription);
+            $buffer .= Serializer::bytes($this->prizeDescription);
         }
-        $buffer .= $serializer->int64($this->randomId);
-        $buffer .= $serializer->int32($this->untilDate);
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->amount);
-        $buffer .= $serializer->int32($this->users);
+        $buffer .= Serializer::int64($this->randomId);
+        $buffer .= Serializer::int32($this->untilDate);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->amount);
+        $buffer .= Serializer::int32($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $onlyNewSubscribers = ($flags & (1 << 0)) ? true : null;
         $winnersAreVisible = ($flags & (1 << 3)) ? true : null;
-        $stars = $deserializer->int64($stream);
-        $boostPeer = AbstractInputPeer::deserialize($deserializer, $stream);
-        $additionalPeers = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']) : null;
-        $countriesIso2 = ($flags & (1 << 2)) ? $deserializer->vectorOfStrings($stream) : null;
-        $prizeDescription = ($flags & (1 << 4)) ? $deserializer->bytes($stream) : null;
-        $randomId = $deserializer->int64($stream);
-        $untilDate = $deserializer->int32($stream);
-        $currency = $deserializer->bytes($stream);
-        $amount = $deserializer->int64($stream);
-        $users = $deserializer->int32($stream);
+        $stars = Deserializer::int64($stream);
+        $boostPeer = AbstractInputPeer::deserialize($stream);
+        $additionalPeers = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']) : null;
+        $countriesIso2 = ($flags & (1 << 2)) ? Deserializer::vectorOfStrings($stream) : null;
+        $prizeDescription = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
+        $randomId = Deserializer::int64($stream);
+        $untilDate = Deserializer::int32($stream);
+        $currency = Deserializer::bytes($stream);
+        $amount = Deserializer::int64($stream);
+        $users = Deserializer::int32($stream);
         return new self(
             $stars,
             $boostPeer,

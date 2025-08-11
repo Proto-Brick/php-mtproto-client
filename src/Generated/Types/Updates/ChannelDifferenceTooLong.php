@@ -35,35 +35,35 @@ final class ChannelDifferenceTooLong extends AbstractChannelDifference
         public readonly ?int $timeout = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->final_) $flags |= (1 << 0);
         if ($this->timeout !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->timeout);
+            $buffer .= Serializer::int32($this->timeout);
         }
-        $buffer .= $this->dialog->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->messages);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= $this->dialog->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->messages);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $final_ = ($flags & (1 << 0)) ? true : null;
-        $timeout = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $dialog = AbstractDialog::deserialize($deserializer, $stream);
-        $messages = $deserializer->vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $timeout = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $dialog = AbstractDialog::deserialize($stream);
+        $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $dialog,
             $messages,

@@ -27,23 +27,23 @@ final class EncryptedMessageService extends AbstractEncryptedMessage
         public readonly string $bytes
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->randomId);
-        $buffer .= $serializer->int32($this->chatId);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->bytes($this->bytes);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->randomId);
+        $buffer .= Serializer::int32($this->chatId);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::bytes($this->bytes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $randomId = $deserializer->int64($stream);
-        $chatId = $deserializer->int32($stream);
-        $date = $deserializer->int32($stream);
-        $bytes = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $randomId = Deserializer::int64($stream);
+        $chatId = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
+        $bytes = Deserializer::bytes($stream);
         return new self(
             $randomId,
             $chatId,

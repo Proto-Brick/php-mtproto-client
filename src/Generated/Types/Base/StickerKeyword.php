@@ -23,23 +23,23 @@ final class StickerKeyword extends TlObject
         public readonly array $keyword
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->documentId);
-        $buffer .= $serializer->vectorOfStrings($this->keyword);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->documentId);
+        $buffer .= Serializer::vectorOfStrings($this->keyword);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $documentId = $deserializer->int64($stream);
-        $keyword = $deserializer->vectorOfStrings($stream);
+        $documentId = Deserializer::int64($stream);
+        $keyword = Deserializer::vectorOfStrings($stream);
         return new self(
             $documentId,
             $keyword

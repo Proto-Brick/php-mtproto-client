@@ -25,25 +25,25 @@ final class GroupCallStreamChannel extends TlObject
         public readonly int $lastTimestampMs
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->channel);
-        $buffer .= $serializer->int32($this->scale);
-        $buffer .= $serializer->int64($this->lastTimestampMs);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->channel);
+        $buffer .= Serializer::int32($this->scale);
+        $buffer .= Serializer::int64($this->lastTimestampMs);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $channel = $deserializer->int32($stream);
-        $scale = $deserializer->int32($stream);
-        $lastTimestampMs = $deserializer->int64($stream);
+        $channel = Deserializer::int32($stream);
+        $scale = Deserializer::int32($stream);
+        $lastTimestampMs = Deserializer::int64($stream);
         return new self(
             $channel,
             $scale,

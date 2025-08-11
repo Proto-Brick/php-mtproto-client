@@ -39,29 +39,29 @@ final class ChangeStickerRequest extends TlObject
         public readonly ?string $keywords = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->emoji !== null) $flags |= (1 << 0);
         if ($this->maskCoords !== null) $flags |= (1 << 1);
         if ($this->keywords !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->sticker->serialize($serializer);
+        $buffer .= $this->sticker->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->emoji);
+            $buffer .= Serializer::bytes($this->emoji);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->maskCoords->serialize($serializer);
+            $buffer .= $this->maskCoords->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->keywords);
+            $buffer .= Serializer::bytes($this->keywords);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

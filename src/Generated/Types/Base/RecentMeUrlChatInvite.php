@@ -23,19 +23,19 @@ final class RecentMeUrlChatInvite extends AbstractRecentMeUrl
         public readonly AbstractChatInvite $chatInvite
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $this->chatInvite->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= $this->chatInvite->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $url = $deserializer->bytes($stream);
-        $chatInvite = AbstractChatInvite::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $url = Deserializer::bytes($stream);
+        $chatInvite = AbstractChatInvite::deserialize($stream);
         return new self(
             $url,
             $chatInvite

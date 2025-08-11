@@ -40,21 +40,21 @@ final class GetFileRequest extends TlObject
         public readonly ?bool $cdnSupported = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->precise) $flags |= (1 << 0);
         if ($this->cdnSupported) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->location->serialize($serializer);
-        $buffer .= $serializer->int64($this->offset);
-        $buffer .= $serializer->int32($this->limit);
+        $buffer .= $this->location->serialize();
+        $buffer .= Serializer::int64($this->offset);
+        $buffer .= Serializer::int32($this->limit);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

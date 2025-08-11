@@ -41,45 +41,45 @@ final class SearchResultsCalendar extends TlObject
         public readonly ?int $offsetIdOffset = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->inexact) $flags |= (1 << 0);
         if ($this->offsetIdOffset !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->count);
-        $buffer .= $serializer->int32($this->minDate);
-        $buffer .= $serializer->int32($this->minMsgId);
+        $buffer .= Serializer::int32($this->count);
+        $buffer .= Serializer::int32($this->minDate);
+        $buffer .= Serializer::int32($this->minMsgId);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->offsetIdOffset);
+            $buffer .= Serializer::int32($this->offsetIdOffset);
         }
-        $buffer .= $serializer->vectorOfObjects($this->periods);
-        $buffer .= $serializer->vectorOfObjects($this->messages);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::vectorOfObjects($this->periods);
+        $buffer .= Serializer::vectorOfObjects($this->messages);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $inexact = ($flags & (1 << 0)) ? true : null;
-        $count = $deserializer->int32($stream);
-        $minDate = $deserializer->int32($stream);
-        $minMsgId = $deserializer->int32($stream);
-        $offsetIdOffset = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $periods = $deserializer->vectorOfObjects($stream, [SearchResultsCalendarPeriod::class, 'deserialize']);
-        $messages = $deserializer->vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $count = Deserializer::int32($stream);
+        $minDate = Deserializer::int32($stream);
+        $minMsgId = Deserializer::int32($stream);
+        $offsetIdOffset = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $periods = Deserializer::vectorOfObjects($stream, [SearchResultsCalendarPeriod::class, 'deserialize']);
+        $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $count,
             $minDate,

@@ -31,12 +31,12 @@ final class MediaAreaCoordinates extends TlObject
         public readonly ?float $radius = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->radius !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         $buffer .= pack('d', $this->x);
         $buffer .= pack('d', $this->y);
@@ -49,21 +49,21 @@ final class MediaAreaCoordinates extends TlObject
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $x = $deserializer->double($stream);
-        $y = $deserializer->double($stream);
-        $w = $deserializer->double($stream);
-        $h = $deserializer->double($stream);
-        $rotation = $deserializer->double($stream);
-        $radius = ($flags & (1 << 0)) ? $deserializer->double($stream) : null;
+        $x = Deserializer::double($stream);
+        $y = Deserializer::double($stream);
+        $w = Deserializer::double($stream);
+        $h = Deserializer::double($stream);
+        $rotation = Deserializer::double($stream);
+        $radius = ($flags & (1 << 0)) ? Deserializer::double($stream) : null;
         return new self(
             $x,
             $y,

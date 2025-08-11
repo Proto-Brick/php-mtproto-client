@@ -21,29 +21,29 @@ final class WebViewMessageSent extends TlObject
         public readonly ?AbstractInputBotInlineMessageID $msgId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->msgId !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->msgId->serialize($serializer);
+            $buffer .= $this->msgId->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $msgId = ($flags & (1 << 0)) ? AbstractInputBotInlineMessageID::deserialize($deserializer, $stream) : null;
+        $msgId = ($flags & (1 << 0)) ? AbstractInputBotInlineMessageID::deserialize($stream) : null;
         return new self(
             $msgId
         );

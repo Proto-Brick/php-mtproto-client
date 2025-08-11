@@ -31,32 +31,32 @@ final class PhoneConnection extends AbstractPhoneConnection
         public readonly ?bool $tcp = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->tcp) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->bytes($this->ip);
-        $buffer .= $serializer->bytes($this->ipv6);
-        $buffer .= $serializer->int32($this->port);
-        $buffer .= $serializer->bytes($this->peerTag);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::bytes($this->ip);
+        $buffer .= Serializer::bytes($this->ipv6);
+        $buffer .= Serializer::int32($this->port);
+        $buffer .= Serializer::bytes($this->peerTag);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $tcp = ($flags & (1 << 0)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $ip = $deserializer->bytes($stream);
-        $ipv6 = $deserializer->bytes($stream);
-        $port = $deserializer->int32($stream);
-        $peerTag = $deserializer->bytes($stream);
+        $id = Deserializer::int64($stream);
+        $ip = Deserializer::bytes($stream);
+        $ipv6 = Deserializer::bytes($stream);
+        $port = Deserializer::int32($stream);
+        $peerTag = Deserializer::bytes($stream);
         return new self(
             $id,
             $ip,

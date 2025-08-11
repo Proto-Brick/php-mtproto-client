@@ -25,21 +25,21 @@ final class UpdateBotCommands extends AbstractUpdate
         public readonly array $commands
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int64($this->botId);
-        $buffer .= $serializer->vectorOfObjects($this->commands);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int64($this->botId);
+        $buffer .= Serializer::vectorOfObjects($this->commands);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $botId = $deserializer->int64($stream);
-        $commands = $deserializer->vectorOfObjects($stream, [BotCommand::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractPeer::deserialize($stream);
+        $botId = Deserializer::int64($stream);
+        $commands = Deserializer::vectorOfObjects($stream, [BotCommand::class, 'deserialize']);
         return new self(
             $peer,
             $botId,

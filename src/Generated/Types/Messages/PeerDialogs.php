@@ -34,29 +34,29 @@ final class PeerDialogs extends TlObject
         public readonly State $state
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->dialogs);
-        $buffer .= $serializer->vectorOfObjects($this->messages);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
-        $buffer .= $this->state->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->dialogs);
+        $buffer .= Serializer::vectorOfObjects($this->messages);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
+        $buffer .= $this->state->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $dialogs = $deserializer->vectorOfObjects($stream, [AbstractDialog::class, 'deserialize']);
-        $messages = $deserializer->vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $state = State::deserialize($deserializer, $stream);
+        $dialogs = Deserializer::vectorOfObjects($stream, [AbstractDialog::class, 'deserialize']);
+        $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $state = State::deserialize($stream);
         return new self(
             $dialogs,
             $messages,

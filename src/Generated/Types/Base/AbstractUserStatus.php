@@ -8,18 +8,18 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractUserStatus extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            UserStatusEmpty::CONSTRUCTOR_ID => UserStatusEmpty::deserialize($deserializer, $stream),
-            UserStatusOnline::CONSTRUCTOR_ID => UserStatusOnline::deserialize($deserializer, $stream),
-            UserStatusOffline::CONSTRUCTOR_ID => UserStatusOffline::deserialize($deserializer, $stream),
-            UserStatusRecently::CONSTRUCTOR_ID => UserStatusRecently::deserialize($deserializer, $stream),
-            UserStatusLastWeek::CONSTRUCTOR_ID => UserStatusLastWeek::deserialize($deserializer, $stream),
-            UserStatusLastMonth::CONSTRUCTOR_ID => UserStatusLastMonth::deserialize($deserializer, $stream),
+            UserStatusEmpty::CONSTRUCTOR_ID => UserStatusEmpty::deserialize($stream),
+            UserStatusOnline::CONSTRUCTOR_ID => UserStatusOnline::deserialize($stream),
+            UserStatusOffline::CONSTRUCTOR_ID => UserStatusOffline::deserialize($stream),
+            UserStatusRecently::CONSTRUCTOR_ID => UserStatusRecently::deserialize($stream),
+            UserStatusLastWeek::CONSTRUCTOR_ID => UserStatusLastWeek::deserialize($stream),
+            UserStatusLastMonth::CONSTRUCTOR_ID => UserStatusLastMonth::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type UserStatus. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

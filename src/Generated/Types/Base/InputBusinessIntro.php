@@ -25,33 +25,33 @@ final class InputBusinessIntro extends TlObject
         public readonly ?AbstractInputDocument $sticker = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->sticker !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->description);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->description);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->sticker->serialize($serializer);
+            $buffer .= $this->sticker->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $title = $deserializer->bytes($stream);
-        $description = $deserializer->bytes($stream);
-        $sticker = ($flags & (1 << 0)) ? AbstractInputDocument::deserialize($deserializer, $stream) : null;
+        $title = Deserializer::bytes($stream);
+        $description = Deserializer::bytes($stream);
+        $sticker = ($flags & (1 << 0)) ? AbstractInputDocument::deserialize($stream) : null;
         return new self(
             $title,
             $description,

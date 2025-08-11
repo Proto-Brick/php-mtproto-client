@@ -29,36 +29,36 @@ final class UpdateReadChannelDiscussionInbox extends AbstractUpdate
         public readonly ?int $broadcastPost = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->broadcastId !== null) $flags |= (1 << 0);
         if ($this->broadcastPost !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->channelId);
-        $buffer .= $serializer->int32($this->topMsgId);
-        $buffer .= $serializer->int32($this->readMaxId);
+        $buffer .= Serializer::int64($this->channelId);
+        $buffer .= Serializer::int32($this->topMsgId);
+        $buffer .= Serializer::int32($this->readMaxId);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->broadcastId);
+            $buffer .= Serializer::int64($this->broadcastId);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->broadcastPost);
+            $buffer .= Serializer::int32($this->broadcastPost);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $channelId = $deserializer->int64($stream);
-        $topMsgId = $deserializer->int32($stream);
-        $readMaxId = $deserializer->int32($stream);
-        $broadcastId = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $broadcastPost = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
+        $channelId = Deserializer::int64($stream);
+        $topMsgId = Deserializer::int32($stream);
+        $readMaxId = Deserializer::int32($stream);
+        $broadcastId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $broadcastPost = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
         return new self(
             $channelId,
             $topMsgId,

@@ -27,37 +27,37 @@ final class InputWebFileAudioAlbumThumbLocation extends AbstractInputWebFileLoca
         public readonly ?string $performer = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->small) $flags |= (1 << 2);
         if ($this->document !== null) $flags |= (1 << 0);
         if ($this->title !== null) $flags |= (1 << 1);
         if ($this->performer !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->document->serialize($serializer);
+            $buffer .= $this->document->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->performer);
+            $buffer .= Serializer::bytes($this->performer);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $small = ($flags & (1 << 2)) ? true : null;
-        $document = ($flags & (1 << 0)) ? AbstractInputDocument::deserialize($deserializer, $stream) : null;
-        $title = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $performer = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
+        $document = ($flags & (1 << 0)) ? AbstractInputDocument::deserialize($stream) : null;
+        $title = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $performer = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
         return new self(
             $small,
             $document,

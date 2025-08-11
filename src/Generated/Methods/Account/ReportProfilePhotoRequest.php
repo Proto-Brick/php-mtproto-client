@@ -39,17 +39,17 @@ final class ReportProfilePhotoRequest extends TlObject
         public readonly string $message
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->photoId->serialize($serializer);
-        $buffer .= $this->reason->serialize($serializer);
-        $buffer .= $serializer->bytes($this->message);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->photoId->serialize();
+        $buffer .= $this->reason->serialize();
+        $buffer .= Serializer::bytes($this->message);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

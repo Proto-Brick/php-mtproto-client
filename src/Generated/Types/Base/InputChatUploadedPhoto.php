@@ -27,40 +27,40 @@ final class InputChatUploadedPhoto extends AbstractInputChatPhoto
         public readonly ?AbstractVideoSize $videoEmojiMarkup = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->file !== null) $flags |= (1 << 0);
         if ($this->video !== null) $flags |= (1 << 1);
         if ($this->videoStartTs !== null) $flags |= (1 << 2);
         if ($this->videoEmojiMarkup !== null) $flags |= (1 << 3);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->file->serialize($serializer);
+            $buffer .= $this->file->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->video->serialize($serializer);
+            $buffer .= $this->video->serialize();
         }
         if ($flags & (1 << 2)) {
             $buffer .= pack('d', $this->videoStartTs);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->videoEmojiMarkup->serialize($serializer);
+            $buffer .= $this->videoEmojiMarkup->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $file = ($flags & (1 << 0)) ? AbstractInputFile::deserialize($deserializer, $stream) : null;
-        $video = ($flags & (1 << 1)) ? AbstractInputFile::deserialize($deserializer, $stream) : null;
-        $videoStartTs = ($flags & (1 << 2)) ? $deserializer->double($stream) : null;
-        $videoEmojiMarkup = ($flags & (1 << 3)) ? AbstractVideoSize::deserialize($deserializer, $stream) : null;
+        $file = ($flags & (1 << 0)) ? AbstractInputFile::deserialize($stream) : null;
+        $video = ($flags & (1 << 1)) ? AbstractInputFile::deserialize($stream) : null;
+        $videoStartTs = ($flags & (1 << 2)) ? Deserializer::double($stream) : null;
+        $videoEmojiMarkup = ($flags & (1 << 3)) ? AbstractVideoSize::deserialize($stream) : null;
         return new self(
             $file,
             $video,

@@ -23,19 +23,19 @@ final class MessageMediaDice extends AbstractMessageMedia
         public readonly string $emoticon
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->value);
-        $buffer .= $serializer->bytes($this->emoticon);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->value);
+        $buffer .= Serializer::bytes($this->emoticon);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $value = $deserializer->int32($stream);
-        $emoticon = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $value = Deserializer::int32($stream);
+        $emoticon = Deserializer::bytes($stream);
         return new self(
             $value,
             $emoticon

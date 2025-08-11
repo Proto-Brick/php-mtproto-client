@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractDialogs extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            Dialogs::CONSTRUCTOR_ID => Dialogs::deserialize($deserializer, $stream),
-            DialogsSlice::CONSTRUCTOR_ID => DialogsSlice::deserialize($deserializer, $stream),
-            DialogsNotModified::CONSTRUCTOR_ID => DialogsNotModified::deserialize($deserializer, $stream),
+            Dialogs::CONSTRUCTOR_ID => Dialogs::deserialize($stream),
+            DialogsSlice::CONSTRUCTOR_ID => DialogsSlice::deserialize($stream),
+            DialogsNotModified::CONSTRUCTOR_ID => DialogsNotModified::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.Dialogs. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -28,23 +28,23 @@ final class UserInfo extends AbstractUserInfo
         public readonly int $date
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->message);
-        $buffer .= $serializer->vectorOfObjects($this->entities);
-        $buffer .= $serializer->bytes($this->author);
-        $buffer .= $serializer->int32($this->date);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->message);
+        $buffer .= Serializer::vectorOfObjects($this->entities);
+        $buffer .= Serializer::bytes($this->author);
+        $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $message = $deserializer->bytes($stream);
-        $entities = $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
-        $author = $deserializer->bytes($stream);
-        $date = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $message = Deserializer::bytes($stream);
+        $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
+        $author = Deserializer::bytes($stream);
+        $date = Deserializer::int32($stream);
         return new self(
             $message,
             $entities,

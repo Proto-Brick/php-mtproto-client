@@ -23,23 +23,23 @@ final class ExportedAuthorization extends TlObject
         public readonly string $bytes
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->bytes($this->bytes);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::bytes($this->bytes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $id = $deserializer->int64($stream);
-        $bytes = $deserializer->bytes($stream);
+        $id = Deserializer::int64($stream);
+        $bytes = Deserializer::bytes($stream);
         return new self(
             $id,
             $bytes

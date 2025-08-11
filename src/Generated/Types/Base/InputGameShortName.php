@@ -23,19 +23,19 @@ final class InputGameShortName extends AbstractInputGame
         public readonly string $shortName
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->botId->serialize($serializer);
-        $buffer .= $serializer->bytes($this->shortName);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->botId->serialize();
+        $buffer .= Serializer::bytes($this->shortName);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $botId = AbstractInputUser::deserialize($deserializer, $stream);
-        $shortName = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $botId = AbstractInputUser::deserialize($stream);
+        $shortName = Deserializer::bytes($stream);
         return new self(
             $botId,
             $shortName

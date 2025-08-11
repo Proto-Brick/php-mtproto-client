@@ -37,47 +37,47 @@ final class MessageActionPaymentSentMe extends AbstractMessageAction
         public readonly ?int $subscriptionUntilDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->recurringInit) $flags |= (1 << 2);
         if ($this->recurringUsed) $flags |= (1 << 3);
         if ($this->info !== null) $flags |= (1 << 0);
         if ($this->shippingOptionId !== null) $flags |= (1 << 1);
         if ($this->subscriptionUntilDate !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->totalAmount);
-        $buffer .= $serializer->bytes($this->payload);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->totalAmount);
+        $buffer .= Serializer::bytes($this->payload);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->info->serialize($serializer);
+            $buffer .= $this->info->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->shippingOptionId);
+            $buffer .= Serializer::bytes($this->shippingOptionId);
         }
-        $buffer .= $this->charge->serialize($serializer);
+        $buffer .= $this->charge->serialize();
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->subscriptionUntilDate);
+            $buffer .= Serializer::int32($this->subscriptionUntilDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $recurringInit = ($flags & (1 << 2)) ? true : null;
         $recurringUsed = ($flags & (1 << 3)) ? true : null;
-        $currency = $deserializer->bytes($stream);
-        $totalAmount = $deserializer->int64($stream);
-        $payload = $deserializer->bytes($stream);
-        $info = ($flags & (1 << 0)) ? PaymentRequestedInfo::deserialize($deserializer, $stream) : null;
-        $shippingOptionId = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $charge = PaymentCharge::deserialize($deserializer, $stream);
-        $subscriptionUntilDate = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
+        $currency = Deserializer::bytes($stream);
+        $totalAmount = Deserializer::int64($stream);
+        $payload = Deserializer::bytes($stream);
+        $info = ($flags & (1 << 0)) ? PaymentRequestedInfo::deserialize($stream) : null;
+        $shippingOptionId = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $charge = PaymentCharge::deserialize($stream);
+        $subscriptionUntilDate = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
         return new self(
             $currency,
             $totalAmount,

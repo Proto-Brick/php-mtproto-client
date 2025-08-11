@@ -48,38 +48,38 @@ final class EditStoryRequest extends TlObject
         public readonly ?array $privacyRules = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->media !== null) $flags |= (1 << 0);
         if ($this->mediaAreas !== null) $flags |= (1 << 3);
         if ($this->caption !== null) $flags |= (1 << 1);
         if ($this->entities !== null) $flags |= (1 << 1);
         if ($this->privacyRules !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->id);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->id);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->media->serialize($serializer);
+            $buffer .= $this->media->serialize();
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->mediaAreas);
+            $buffer .= Serializer::vectorOfObjects($this->mediaAreas);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->caption);
+            $buffer .= Serializer::bytes($this->caption);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->vectorOfObjects($this->privacyRules);
+            $buffer .= Serializer::vectorOfObjects($this->privacyRules);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

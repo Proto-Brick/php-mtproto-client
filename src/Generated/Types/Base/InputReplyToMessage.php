@@ -31,47 +31,47 @@ final class InputReplyToMessage extends AbstractInputReplyTo
         public readonly ?int $quoteOffset = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->topMsgId !== null) $flags |= (1 << 0);
         if ($this->replyToPeerId !== null) $flags |= (1 << 1);
         if ($this->quoteText !== null) $flags |= (1 << 2);
         if ($this->quoteEntities !== null) $flags |= (1 << 3);
         if ($this->quoteOffset !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->replyToMsgId);
+        $buffer .= Serializer::int32($this->replyToMsgId);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->topMsgId);
+            $buffer .= Serializer::int32($this->topMsgId);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->replyToPeerId->serialize($serializer);
+            $buffer .= $this->replyToPeerId->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->quoteText);
+            $buffer .= Serializer::bytes($this->quoteText);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->quoteEntities);
+            $buffer .= Serializer::vectorOfObjects($this->quoteEntities);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->quoteOffset);
+            $buffer .= Serializer::int32($this->quoteOffset);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $replyToMsgId = $deserializer->int32($stream);
-        $topMsgId = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $replyToPeerId = ($flags & (1 << 1)) ? AbstractInputPeer::deserialize($deserializer, $stream) : null;
-        $quoteText = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $quoteEntities = ($flags & (1 << 3)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $quoteOffset = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
+        $replyToMsgId = Deserializer::int32($stream);
+        $topMsgId = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $replyToPeerId = ($flags & (1 << 1)) ? AbstractInputPeer::deserialize($stream) : null;
+        $quoteText = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $quoteEntities = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $quoteOffset = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
         return new self(
             $replyToMsgId,
             $topMsgId,

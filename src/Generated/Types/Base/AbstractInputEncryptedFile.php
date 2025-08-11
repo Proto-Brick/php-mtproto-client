@@ -8,16 +8,16 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputEncryptedFile extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputEncryptedFileEmpty::CONSTRUCTOR_ID => InputEncryptedFileEmpty::deserialize($deserializer, $stream),
-            InputEncryptedFileUploaded::CONSTRUCTOR_ID => InputEncryptedFileUploaded::deserialize($deserializer, $stream),
-            InputEncryptedFile::CONSTRUCTOR_ID => InputEncryptedFile::deserialize($deserializer, $stream),
-            InputEncryptedFileBigUploaded::CONSTRUCTOR_ID => InputEncryptedFileBigUploaded::deserialize($deserializer, $stream),
+            InputEncryptedFileEmpty::CONSTRUCTOR_ID => InputEncryptedFileEmpty::deserialize($stream),
+            InputEncryptedFileUploaded::CONSTRUCTOR_ID => InputEncryptedFileUploaded::deserialize($stream),
+            InputEncryptedFile::CONSTRUCTOR_ID => InputEncryptedFile::deserialize($stream),
+            InputEncryptedFileBigUploaded::CONSTRUCTOR_ID => InputEncryptedFileBigUploaded::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputEncryptedFile. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

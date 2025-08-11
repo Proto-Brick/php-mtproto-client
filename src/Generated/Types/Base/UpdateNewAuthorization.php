@@ -29,39 +29,39 @@ final class UpdateNewAuthorization extends AbstractUpdate
         public readonly ?string $location = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->unconfirmed) $flags |= (1 << 0);
         if ($this->date !== null) $flags |= (1 << 0);
         if ($this->device !== null) $flags |= (1 << 0);
         if ($this->location !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->hash);
+        $buffer .= Serializer::int64($this->hash);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->date);
+            $buffer .= Serializer::int32($this->date);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->device);
+            $buffer .= Serializer::bytes($this->device);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->location);
+            $buffer .= Serializer::bytes($this->location);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $unconfirmed = ($flags & (1 << 0)) ? true : null;
-        $hash = $deserializer->int64($stream);
-        $date = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $device = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $location = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
+        $hash = Deserializer::int64($stream);
+        $date = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $device = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $location = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
         return new self(
             $hash,
             $unconfirmed,

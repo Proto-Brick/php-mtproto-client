@@ -25,21 +25,21 @@ final class ChatParticipants extends AbstractChatParticipants
         public readonly int $version
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->chatId);
-        $buffer .= $serializer->vectorOfObjects($this->participants);
-        $buffer .= $serializer->int32($this->version);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->chatId);
+        $buffer .= Serializer::vectorOfObjects($this->participants);
+        $buffer .= Serializer::int32($this->version);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $chatId = $deserializer->int64($stream);
-        $participants = $deserializer->vectorOfObjects($stream, [AbstractChatParticipant::class, 'deserialize']);
-        $version = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $chatId = Deserializer::int64($stream);
+        $participants = Deserializer::vectorOfObjects($stream, [AbstractChatParticipant::class, 'deserialize']);
+        $version = Deserializer::int32($stream);
         return new self(
             $chatId,
             $participants,

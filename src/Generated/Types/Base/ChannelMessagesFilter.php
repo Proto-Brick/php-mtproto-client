@@ -23,24 +23,24 @@ final class ChannelMessagesFilter extends AbstractChannelMessagesFilter
         public readonly ?bool $excludeNewMessages = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->excludeNewMessages) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->vectorOfObjects($this->ranges);
+        $buffer .= Serializer::vectorOfObjects($this->ranges);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $excludeNewMessages = ($flags & (1 << 1)) ? true : null;
-        $ranges = $deserializer->vectorOfObjects($stream, [MessageRange::class, 'deserialize']);
+        $ranges = Deserializer::vectorOfObjects($stream, [MessageRange::class, 'deserialize']);
         return new self(
             $ranges,
             $excludeNewMessages

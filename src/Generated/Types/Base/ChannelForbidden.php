@@ -31,35 +31,35 @@ final class ChannelForbidden extends AbstractChat
         public readonly ?int $untilDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->broadcast) $flags |= (1 << 5);
         if ($this->megagroup) $flags |= (1 << 8);
         if ($this->untilDate !== null) $flags |= (1 << 16);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->bytes($this->title);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::bytes($this->title);
         if ($flags & (1 << 16)) {
-            $buffer .= $serializer->int32($this->untilDate);
+            $buffer .= Serializer::int32($this->untilDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $broadcast = ($flags & (1 << 5)) ? true : null;
         $megagroup = ($flags & (1 << 8)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
-        $title = $deserializer->bytes($stream);
-        $untilDate = ($flags & (1 << 16)) ? $deserializer->int32($stream) : null;
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $title = Deserializer::bytes($stream);
+        $untilDate = ($flags & (1 << 16)) ? Deserializer::int32($stream) : null;
         return new self(
             $id,
             $accessHash,

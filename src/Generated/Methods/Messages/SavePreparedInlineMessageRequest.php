@@ -38,22 +38,22 @@ final class SavePreparedInlineMessageRequest extends TlObject
         public readonly ?array $peerTypes = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->peerTypes !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->result->serialize($serializer);
-        $buffer .= $this->userId->serialize($serializer);
+        $buffer .= $this->result->serialize();
+        $buffer .= $this->userId->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->peerTypes);
+            $buffer .= Serializer::vectorOfObjects($this->peerTypes);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

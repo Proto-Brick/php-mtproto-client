@@ -68,63 +68,63 @@ final class BroadcastStats extends TlObject
         public readonly array $recentPostsInteractions
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->period->serialize($serializer);
-        $buffer .= $this->followers->serialize($serializer);
-        $buffer .= $this->viewsPerPost->serialize($serializer);
-        $buffer .= $this->sharesPerPost->serialize($serializer);
-        $buffer .= $this->reactionsPerPost->serialize($serializer);
-        $buffer .= $this->viewsPerStory->serialize($serializer);
-        $buffer .= $this->sharesPerStory->serialize($serializer);
-        $buffer .= $this->reactionsPerStory->serialize($serializer);
-        $buffer .= $this->enabledNotifications->serialize($serializer);
-        $buffer .= $this->growthGraph->serialize($serializer);
-        $buffer .= $this->followersGraph->serialize($serializer);
-        $buffer .= $this->muteGraph->serialize($serializer);
-        $buffer .= $this->topHoursGraph->serialize($serializer);
-        $buffer .= $this->interactionsGraph->serialize($serializer);
-        $buffer .= $this->ivInteractionsGraph->serialize($serializer);
-        $buffer .= $this->viewsBySourceGraph->serialize($serializer);
-        $buffer .= $this->newFollowersBySourceGraph->serialize($serializer);
-        $buffer .= $this->languagesGraph->serialize($serializer);
-        $buffer .= $this->reactionsByEmotionGraph->serialize($serializer);
-        $buffer .= $this->storyInteractionsGraph->serialize($serializer);
-        $buffer .= $this->storyReactionsByEmotionGraph->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->recentPostsInteractions);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->period->serialize();
+        $buffer .= $this->followers->serialize();
+        $buffer .= $this->viewsPerPost->serialize();
+        $buffer .= $this->sharesPerPost->serialize();
+        $buffer .= $this->reactionsPerPost->serialize();
+        $buffer .= $this->viewsPerStory->serialize();
+        $buffer .= $this->sharesPerStory->serialize();
+        $buffer .= $this->reactionsPerStory->serialize();
+        $buffer .= $this->enabledNotifications->serialize();
+        $buffer .= $this->growthGraph->serialize();
+        $buffer .= $this->followersGraph->serialize();
+        $buffer .= $this->muteGraph->serialize();
+        $buffer .= $this->topHoursGraph->serialize();
+        $buffer .= $this->interactionsGraph->serialize();
+        $buffer .= $this->ivInteractionsGraph->serialize();
+        $buffer .= $this->viewsBySourceGraph->serialize();
+        $buffer .= $this->newFollowersBySourceGraph->serialize();
+        $buffer .= $this->languagesGraph->serialize();
+        $buffer .= $this->reactionsByEmotionGraph->serialize();
+        $buffer .= $this->storyInteractionsGraph->serialize();
+        $buffer .= $this->storyReactionsByEmotionGraph->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->recentPostsInteractions);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $period = StatsDateRangeDays::deserialize($deserializer, $stream);
-        $followers = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $viewsPerPost = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $sharesPerPost = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $reactionsPerPost = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $viewsPerStory = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $sharesPerStory = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $reactionsPerStory = StatsAbsValueAndPrev::deserialize($deserializer, $stream);
-        $enabledNotifications = StatsPercentValue::deserialize($deserializer, $stream);
-        $growthGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $followersGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $muteGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $topHoursGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $interactionsGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $ivInteractionsGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $viewsBySourceGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $newFollowersBySourceGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $languagesGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $reactionsByEmotionGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $storyInteractionsGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $storyReactionsByEmotionGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $recentPostsInteractions = $deserializer->vectorOfObjects($stream, [AbstractPostInteractionCounters::class, 'deserialize']);
+        $period = StatsDateRangeDays::deserialize($stream);
+        $followers = StatsAbsValueAndPrev::deserialize($stream);
+        $viewsPerPost = StatsAbsValueAndPrev::deserialize($stream);
+        $sharesPerPost = StatsAbsValueAndPrev::deserialize($stream);
+        $reactionsPerPost = StatsAbsValueAndPrev::deserialize($stream);
+        $viewsPerStory = StatsAbsValueAndPrev::deserialize($stream);
+        $sharesPerStory = StatsAbsValueAndPrev::deserialize($stream);
+        $reactionsPerStory = StatsAbsValueAndPrev::deserialize($stream);
+        $enabledNotifications = StatsPercentValue::deserialize($stream);
+        $growthGraph = AbstractStatsGraph::deserialize($stream);
+        $followersGraph = AbstractStatsGraph::deserialize($stream);
+        $muteGraph = AbstractStatsGraph::deserialize($stream);
+        $topHoursGraph = AbstractStatsGraph::deserialize($stream);
+        $interactionsGraph = AbstractStatsGraph::deserialize($stream);
+        $ivInteractionsGraph = AbstractStatsGraph::deserialize($stream);
+        $viewsBySourceGraph = AbstractStatsGraph::deserialize($stream);
+        $newFollowersBySourceGraph = AbstractStatsGraph::deserialize($stream);
+        $languagesGraph = AbstractStatsGraph::deserialize($stream);
+        $reactionsByEmotionGraph = AbstractStatsGraph::deserialize($stream);
+        $storyInteractionsGraph = AbstractStatsGraph::deserialize($stream);
+        $storyReactionsByEmotionGraph = AbstractStatsGraph::deserialize($stream);
+        $recentPostsInteractions = Deserializer::vectorOfObjects($stream, [AbstractPostInteractionCounters::class, 'deserialize']);
         return new self(
             $period,
             $followers,

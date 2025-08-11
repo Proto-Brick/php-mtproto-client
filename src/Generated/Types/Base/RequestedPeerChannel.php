@@ -27,37 +27,37 @@ final class RequestedPeerChannel extends AbstractRequestedPeer
         public readonly ?AbstractPhoto $photo = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->title !== null) $flags |= (1 << 0);
         if ($this->username !== null) $flags |= (1 << 1);
         if ($this->photo !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->channelId);
+        $buffer .= Serializer::int64($this->channelId);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->username);
+            $buffer .= Serializer::bytes($this->username);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $channelId = $deserializer->int64($stream);
-        $title = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $username = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $photo = ($flags & (1 << 2)) ? AbstractPhoto::deserialize($deserializer, $stream) : null;
+        $channelId = Deserializer::int64($stream);
+        $title = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $username = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $photo = ($flags & (1 << 2)) ? AbstractPhoto::deserialize($stream) : null;
         return new self(
             $channelId,
             $title,

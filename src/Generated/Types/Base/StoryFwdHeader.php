@@ -27,41 +27,41 @@ final class StoryFwdHeader extends TlObject
         public readonly ?int $storyId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->modified) $flags |= (1 << 3);
         if ($this->from !== null) $flags |= (1 << 0);
         if ($this->fromName !== null) $flags |= (1 << 1);
         if ($this->storyId !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $this->from->serialize($serializer);
+            $buffer .= $this->from->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->fromName);
+            $buffer .= Serializer::bytes($this->fromName);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->storyId);
+            $buffer .= Serializer::int32($this->storyId);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $modified = ($flags & (1 << 3)) ? true : null;
-        $from = ($flags & (1 << 0)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $fromName = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $storyId = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
+        $from = ($flags & (1 << 0)) ? AbstractPeer::deserialize($stream) : null;
+        $fromName = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $storyId = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
         return new self(
             $modified,
             $from,

@@ -51,9 +51,9 @@ final class UpdateShortChatMessage extends AbstractUpdates
         public readonly ?int $ttlPeriod = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->out) $flags |= (1 << 1);
         if ($this->mentioned) $flags |= (1 << 4);
@@ -64,54 +64,54 @@ final class UpdateShortChatMessage extends AbstractUpdates
         if ($this->replyTo !== null) $flags |= (1 << 3);
         if ($this->entities !== null) $flags |= (1 << 7);
         if ($this->ttlPeriod !== null) $flags |= (1 << 25);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->id);
-        $buffer .= $serializer->int64($this->fromId);
-        $buffer .= $serializer->int64($this->chatId);
-        $buffer .= $serializer->bytes($this->message);
-        $buffer .= $serializer->int32($this->pts);
-        $buffer .= $serializer->int32($this->ptsCount);
-        $buffer .= $serializer->int32($this->date);
+        $buffer .= Serializer::int32($this->id);
+        $buffer .= Serializer::int64($this->fromId);
+        $buffer .= Serializer::int64($this->chatId);
+        $buffer .= Serializer::bytes($this->message);
+        $buffer .= Serializer::int32($this->pts);
+        $buffer .= Serializer::int32($this->ptsCount);
+        $buffer .= Serializer::int32($this->date);
         if ($flags & (1 << 2)) {
-            $buffer .= $this->fwdFrom->serialize($serializer);
+            $buffer .= $this->fwdFrom->serialize();
         }
         if ($flags & (1 << 11)) {
-            $buffer .= $serializer->int64($this->viaBotId);
+            $buffer .= Serializer::int64($this->viaBotId);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->replyTo->serialize($serializer);
+            $buffer .= $this->replyTo->serialize();
         }
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         if ($flags & (1 << 25)) {
-            $buffer .= $serializer->int32($this->ttlPeriod);
+            $buffer .= Serializer::int32($this->ttlPeriod);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $out = ($flags & (1 << 1)) ? true : null;
         $mentioned = ($flags & (1 << 4)) ? true : null;
         $mediaUnread = ($flags & (1 << 5)) ? true : null;
         $silent = ($flags & (1 << 13)) ? true : null;
-        $id = $deserializer->int32($stream);
-        $fromId = $deserializer->int64($stream);
-        $chatId = $deserializer->int64($stream);
-        $message = $deserializer->bytes($stream);
-        $pts = $deserializer->int32($stream);
-        $ptsCount = $deserializer->int32($stream);
-        $date = $deserializer->int32($stream);
-        $fwdFrom = ($flags & (1 << 2)) ? MessageFwdHeader::deserialize($deserializer, $stream) : null;
-        $viaBotId = ($flags & (1 << 11)) ? $deserializer->int64($stream) : null;
-        $replyTo = ($flags & (1 << 3)) ? AbstractMessageReplyHeader::deserialize($deserializer, $stream) : null;
-        $entities = ($flags & (1 << 7)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $ttlPeriod = ($flags & (1 << 25)) ? $deserializer->int32($stream) : null;
+        $id = Deserializer::int32($stream);
+        $fromId = Deserializer::int64($stream);
+        $chatId = Deserializer::int64($stream);
+        $message = Deserializer::bytes($stream);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
+        $fwdFrom = ($flags & (1 << 2)) ? MessageFwdHeader::deserialize($stream) : null;
+        $viaBotId = ($flags & (1 << 11)) ? Deserializer::int64($stream) : null;
+        $replyTo = ($flags & (1 << 3)) ? AbstractMessageReplyHeader::deserialize($stream) : null;
+        $entities = ($flags & (1 << 7)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $ttlPeriod = ($flags & (1 << 25)) ? Deserializer::int32($stream) : null;
         return new self(
             $id,
             $fromId,

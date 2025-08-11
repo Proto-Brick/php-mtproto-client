@@ -39,46 +39,46 @@ final class Document extends AbstractDocument
         public readonly ?array $videoThumbs = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->thumbs !== null) $flags |= (1 << 0);
         if ($this->videoThumbs !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->bytes($this->fileReference);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->bytes($this->mimeType);
-        $buffer .= $serializer->int64($this->size);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::bytes($this->fileReference);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::bytes($this->mimeType);
+        $buffer .= Serializer::int64($this->size);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->thumbs);
+            $buffer .= Serializer::vectorOfObjects($this->thumbs);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->videoThumbs);
+            $buffer .= Serializer::vectorOfObjects($this->videoThumbs);
         }
-        $buffer .= $serializer->int32($this->dcId);
-        $buffer .= $serializer->vectorOfObjects($this->attributes);
+        $buffer .= Serializer::int32($this->dcId);
+        $buffer .= Serializer::vectorOfObjects($this->attributes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $id = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
-        $fileReference = $deserializer->bytes($stream);
-        $date = $deserializer->int32($stream);
-        $mimeType = $deserializer->bytes($stream);
-        $size = $deserializer->int64($stream);
-        $thumbs = ($flags & (1 << 0)) ? $deserializer->vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']) : null;
-        $videoThumbs = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [AbstractVideoSize::class, 'deserialize']) : null;
-        $dcId = $deserializer->int32($stream);
-        $attributes = $deserializer->vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $fileReference = Deserializer::bytes($stream);
+        $date = Deserializer::int32($stream);
+        $mimeType = Deserializer::bytes($stream);
+        $size = Deserializer::int64($stream);
+        $thumbs = ($flags & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']) : null;
+        $videoThumbs = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractVideoSize::class, 'deserialize']) : null;
+        $dcId = Deserializer::int32($stream);
+        $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
         return new self(
             $id,
             $accessHash,

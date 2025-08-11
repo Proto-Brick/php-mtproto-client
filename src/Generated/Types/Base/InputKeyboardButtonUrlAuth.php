@@ -29,33 +29,33 @@ final class InputKeyboardButtonUrlAuth extends AbstractKeyboardButton
         public readonly ?string $fwdText = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->requestWriteAccess) $flags |= (1 << 0);
         if ($this->fwdText !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->text);
+        $buffer .= Serializer::bytes($this->text);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->fwdText);
+            $buffer .= Serializer::bytes($this->fwdText);
         }
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $this->bot->serialize($serializer);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= $this->bot->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $requestWriteAccess = ($flags & (1 << 0)) ? true : null;
-        $text = $deserializer->bytes($stream);
-        $fwdText = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $url = $deserializer->bytes($stream);
-        $bot = AbstractInputUser::deserialize($deserializer, $stream);
+        $text = Deserializer::bytes($stream);
+        $fwdText = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $url = Deserializer::bytes($stream);
+        $bot = AbstractInputUser::deserialize($stream);
         return new self(
             $text,
             $url,

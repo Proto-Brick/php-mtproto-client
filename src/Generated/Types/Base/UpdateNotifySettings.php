@@ -23,19 +23,19 @@ final class UpdateNotifySettings extends AbstractUpdate
         public readonly PeerNotifySettings $notifySettings
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->notifySettings->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->notifySettings->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractNotifyPeer::deserialize($deserializer, $stream);
-        $notifySettings = PeerNotifySettings::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractNotifyPeer::deserialize($stream);
+        $notifySettings = PeerNotifySettings::deserialize($stream);
         return new self(
             $peer,
             $notifySettings

@@ -27,23 +27,23 @@ final class UpdateUserName extends AbstractUpdate
         public readonly array $usernames
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->bytes($this->firstName);
-        $buffer .= $serializer->bytes($this->lastName);
-        $buffer .= $serializer->vectorOfObjects($this->usernames);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::bytes($this->firstName);
+        $buffer .= Serializer::bytes($this->lastName);
+        $buffer .= Serializer::vectorOfObjects($this->usernames);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $userId = $deserializer->int64($stream);
-        $firstName = $deserializer->bytes($stream);
-        $lastName = $deserializer->bytes($stream);
-        $usernames = $deserializer->vectorOfObjects($stream, [Username::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $userId = Deserializer::int64($stream);
+        $firstName = Deserializer::bytes($stream);
+        $lastName = Deserializer::bytes($stream);
+        $usernames = Deserializer::vectorOfObjects($stream, [Username::class, 'deserialize']);
         return new self(
             $userId,
             $firstName,

@@ -33,15 +33,15 @@ final class ResetBotCommandsRequest extends TlObject
         public readonly string $langCode
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->scope->serialize($serializer);
-        $buffer .= $serializer->bytes($this->langCode);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->scope->serialize();
+        $buffer .= Serializer::bytes($this->langCode);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

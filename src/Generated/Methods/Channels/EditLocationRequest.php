@@ -36,16 +36,16 @@ final class EditLocationRequest extends TlObject
         public readonly string $address
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->channel->serialize($serializer);
-        $buffer .= $this->geoPoint->serialize($serializer);
-        $buffer .= $serializer->bytes($this->address);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->channel->serialize();
+        $buffer .= $this->geoPoint->serialize();
+        $buffer .= Serializer::bytes($this->address);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

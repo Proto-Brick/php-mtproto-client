@@ -37,17 +37,17 @@ final class RateTranscribedAudioRequest extends TlObject
         public readonly bool $good
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->msgId);
-        $buffer .= $serializer->int64($this->transcriptionId);
-        $buffer .= ($this->good ? $serializer->int32(0x997275b5) : $serializer->int32(0xbc799737));
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->msgId);
+        $buffer .= Serializer::int64($this->transcriptionId);
+        $buffer .= ($this->good ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

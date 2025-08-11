@@ -29,42 +29,42 @@ final class InputBotInlineMessageMediaGeo extends AbstractInputBotInlineMessage
         public readonly ?AbstractReplyMarkup $replyMarkup = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->heading !== null) $flags |= (1 << 0);
         if ($this->period !== null) $flags |= (1 << 1);
         if ($this->proximityNotificationRadius !== null) $flags |= (1 << 3);
         if ($this->replyMarkup !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->geoPoint->serialize($serializer);
+        $buffer .= $this->geoPoint->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->heading);
+            $buffer .= Serializer::int32($this->heading);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->period);
+            $buffer .= Serializer::int32($this->period);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int32($this->proximityNotificationRadius);
+            $buffer .= Serializer::int32($this->proximityNotificationRadius);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->replyMarkup->serialize($serializer);
+            $buffer .= $this->replyMarkup->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $geoPoint = AbstractInputGeoPoint::deserialize($deserializer, $stream);
-        $heading = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $period = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $proximityNotificationRadius = ($flags & (1 << 3)) ? $deserializer->int32($stream) : null;
-        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($deserializer, $stream) : null;
+        $geoPoint = AbstractInputGeoPoint::deserialize($stream);
+        $heading = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $period = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $proximityNotificationRadius = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($stream) : null;
         return new self(
             $geoPoint,
             $heading,

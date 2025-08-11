@@ -36,27 +36,27 @@ final class DifferenceSlice extends AbstractDifference
         public readonly State $intermediateState
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->newMessages);
-        $buffer .= $serializer->vectorOfObjects($this->newEncryptedMessages);
-        $buffer .= $serializer->vectorOfObjects($this->otherUpdates);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
-        $buffer .= $this->intermediateState->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->newMessages);
+        $buffer .= Serializer::vectorOfObjects($this->newEncryptedMessages);
+        $buffer .= Serializer::vectorOfObjects($this->otherUpdates);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
+        $buffer .= $this->intermediateState->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $newMessages = $deserializer->vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $newEncryptedMessages = $deserializer->vectorOfObjects($stream, [AbstractEncryptedMessage::class, 'deserialize']);
-        $otherUpdates = $deserializer->vectorOfObjects($stream, [AbstractUpdate::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $intermediateState = State::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $newMessages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
+        $newEncryptedMessages = Deserializer::vectorOfObjects($stream, [AbstractEncryptedMessage::class, 'deserialize']);
+        $otherUpdates = Deserializer::vectorOfObjects($stream, [AbstractUpdate::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $intermediateState = State::deserialize($stream);
         return new self(
             $newMessages,
             $newEncryptedMessages,

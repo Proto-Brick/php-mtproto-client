@@ -8,20 +8,20 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputBotInlineMessage extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputBotInlineMessageMediaAuto::CONSTRUCTOR_ID => InputBotInlineMessageMediaAuto::deserialize($deserializer, $stream),
-            InputBotInlineMessageText::CONSTRUCTOR_ID => InputBotInlineMessageText::deserialize($deserializer, $stream),
-            InputBotInlineMessageMediaGeo::CONSTRUCTOR_ID => InputBotInlineMessageMediaGeo::deserialize($deserializer, $stream),
-            InputBotInlineMessageMediaVenue::CONSTRUCTOR_ID => InputBotInlineMessageMediaVenue::deserialize($deserializer, $stream),
-            InputBotInlineMessageMediaContact::CONSTRUCTOR_ID => InputBotInlineMessageMediaContact::deserialize($deserializer, $stream),
-            InputBotInlineMessageGame::CONSTRUCTOR_ID => InputBotInlineMessageGame::deserialize($deserializer, $stream),
-            InputBotInlineMessageMediaInvoice::CONSTRUCTOR_ID => InputBotInlineMessageMediaInvoice::deserialize($deserializer, $stream),
-            InputBotInlineMessageMediaWebPage::CONSTRUCTOR_ID => InputBotInlineMessageMediaWebPage::deserialize($deserializer, $stream),
+            InputBotInlineMessageMediaAuto::CONSTRUCTOR_ID => InputBotInlineMessageMediaAuto::deserialize($stream),
+            InputBotInlineMessageText::CONSTRUCTOR_ID => InputBotInlineMessageText::deserialize($stream),
+            InputBotInlineMessageMediaGeo::CONSTRUCTOR_ID => InputBotInlineMessageMediaGeo::deserialize($stream),
+            InputBotInlineMessageMediaVenue::CONSTRUCTOR_ID => InputBotInlineMessageMediaVenue::deserialize($stream),
+            InputBotInlineMessageMediaContact::CONSTRUCTOR_ID => InputBotInlineMessageMediaContact::deserialize($stream),
+            InputBotInlineMessageGame::CONSTRUCTOR_ID => InputBotInlineMessageGame::deserialize($stream),
+            InputBotInlineMessageMediaInvoice::CONSTRUCTOR_ID => InputBotInlineMessageMediaInvoice::deserialize($stream),
+            InputBotInlineMessageMediaWebPage::CONSTRUCTOR_ID => InputBotInlineMessageMediaWebPage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputBotInlineMessage. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

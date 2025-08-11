@@ -29,37 +29,37 @@ final class Country extends TlObject
         public readonly ?string $name = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->hidden) $flags |= (1 << 0);
         if ($this->name !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->iso2);
-        $buffer .= $serializer->bytes($this->defaultName);
+        $buffer .= Serializer::bytes($this->iso2);
+        $buffer .= Serializer::bytes($this->defaultName);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->name);
+            $buffer .= Serializer::bytes($this->name);
         }
-        $buffer .= $serializer->vectorOfObjects($this->countryCodes);
+        $buffer .= Serializer::vectorOfObjects($this->countryCodes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $hidden = ($flags & (1 << 0)) ? true : null;
-        $iso2 = $deserializer->bytes($stream);
-        $defaultName = $deserializer->bytes($stream);
-        $name = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $countryCodes = $deserializer->vectorOfObjects($stream, [CountryCode::class, 'deserialize']);
+        $iso2 = Deserializer::bytes($stream);
+        $defaultName = Deserializer::bytes($stream);
+        $name = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $countryCodes = Deserializer::vectorOfObjects($stream, [CountryCode::class, 'deserialize']);
         return new self(
             $iso2,
             $defaultName,

@@ -25,26 +25,26 @@ final class PageBlockDetails extends AbstractPageBlock
         public readonly ?bool $open = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->open) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->vectorOfObjects($this->blocks);
-        $buffer .= $this->title->serialize($serializer);
+        $buffer .= Serializer::vectorOfObjects($this->blocks);
+        $buffer .= $this->title->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $open = ($flags & (1 << 0)) ? true : null;
-        $blocks = $deserializer->vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
-        $title = AbstractRichText::deserialize($deserializer, $stream);
+        $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
+        $title = AbstractRichText::deserialize($stream);
         return new self(
             $blocks,
             $title,

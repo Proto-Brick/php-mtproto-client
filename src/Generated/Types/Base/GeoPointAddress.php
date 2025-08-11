@@ -27,41 +27,41 @@ final class GeoPointAddress extends TlObject
         public readonly ?string $street = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->state !== null) $flags |= (1 << 0);
         if ($this->city !== null) $flags |= (1 << 1);
         if ($this->street !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->countryIso2);
+        $buffer .= Serializer::bytes($this->countryIso2);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->state);
+            $buffer .= Serializer::bytes($this->state);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->city);
+            $buffer .= Serializer::bytes($this->city);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->street);
+            $buffer .= Serializer::bytes($this->street);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $countryIso2 = $deserializer->bytes($stream);
-        $state = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $city = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $street = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
+        $countryIso2 = Deserializer::bytes($stream);
+        $state = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $city = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $street = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
         return new self(
             $countryIso2,
             $state,

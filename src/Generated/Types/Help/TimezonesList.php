@@ -24,19 +24,19 @@ final class TimezonesList extends AbstractTimezonesList
         public readonly int $hash
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->timezones);
-        $buffer .= $serializer->int32($this->hash);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->timezones);
+        $buffer .= Serializer::int32($this->hash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $timezones = $deserializer->vectorOfObjects($stream, [Timezone::class, 'deserialize']);
-        $hash = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $timezones = Deserializer::vectorOfObjects($stream, [Timezone::class, 'deserialize']);
+        $hash = Deserializer::int32($stream);
         return new self(
             $timezones,
             $hash

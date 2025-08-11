@@ -47,9 +47,9 @@ final class ChatInviteExported extends AbstractExportedChatInvite
         public readonly ?StarsSubscriptionPricing $subscriptionPricing = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->revoked) $flags |= (1 << 0);
         if ($this->permanent) $flags |= (1 << 5);
@@ -62,57 +62,57 @@ final class ChatInviteExported extends AbstractExportedChatInvite
         if ($this->subscriptionExpired !== null) $flags |= (1 << 10);
         if ($this->title !== null) $flags |= (1 << 8);
         if ($this->subscriptionPricing !== null) $flags |= (1 << 9);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->link);
-        $buffer .= $serializer->int64($this->adminId);
-        $buffer .= $serializer->int32($this->date);
+        $buffer .= Serializer::bytes($this->link);
+        $buffer .= Serializer::int64($this->adminId);
+        $buffer .= Serializer::int32($this->date);
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->startDate);
+            $buffer .= Serializer::int32($this->startDate);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->expireDate);
+            $buffer .= Serializer::int32($this->expireDate);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->usageLimit);
+            $buffer .= Serializer::int32($this->usageLimit);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int32($this->usage);
+            $buffer .= Serializer::int32($this->usage);
         }
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->int32($this->requested);
+            $buffer .= Serializer::int32($this->requested);
         }
         if ($flags & (1 << 10)) {
-            $buffer .= $serializer->int32($this->subscriptionExpired);
+            $buffer .= Serializer::int32($this->subscriptionExpired);
         }
         if ($flags & (1 << 8)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 9)) {
-            $buffer .= $this->subscriptionPricing->serialize($serializer);
+            $buffer .= $this->subscriptionPricing->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $revoked = ($flags & (1 << 0)) ? true : null;
         $permanent = ($flags & (1 << 5)) ? true : null;
         $requestNeeded = ($flags & (1 << 6)) ? true : null;
-        $link = $deserializer->bytes($stream);
-        $adminId = $deserializer->int64($stream);
-        $date = $deserializer->int32($stream);
-        $startDate = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $expireDate = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $usageLimit = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $usage = ($flags & (1 << 3)) ? $deserializer->int32($stream) : null;
-        $requested = ($flags & (1 << 7)) ? $deserializer->int32($stream) : null;
-        $subscriptionExpired = ($flags & (1 << 10)) ? $deserializer->int32($stream) : null;
-        $title = ($flags & (1 << 8)) ? $deserializer->bytes($stream) : null;
-        $subscriptionPricing = ($flags & (1 << 9)) ? StarsSubscriptionPricing::deserialize($deserializer, $stream) : null;
+        $link = Deserializer::bytes($stream);
+        $adminId = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
+        $startDate = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $expireDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $usageLimit = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $usage = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $requested = ($flags & (1 << 7)) ? Deserializer::int32($stream) : null;
+        $subscriptionExpired = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
+        $title = ($flags & (1 << 8)) ? Deserializer::bytes($stream) : null;
+        $subscriptionPricing = ($flags & (1 << 9)) ? StarsSubscriptionPricing::deserialize($stream) : null;
         return new self(
             $link,
             $adminId,

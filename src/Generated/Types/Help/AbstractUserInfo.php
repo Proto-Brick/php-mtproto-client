@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractUserInfo extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            UserInfoEmpty::CONSTRUCTOR_ID => UserInfoEmpty::deserialize($deserializer, $stream),
-            UserInfo::CONSTRUCTOR_ID => UserInfo::deserialize($deserializer, $stream),
+            UserInfoEmpty::CONSTRUCTOR_ID => UserInfoEmpty::deserialize($stream),
+            UserInfo::CONSTRUCTOR_ID => UserInfo::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.UserInfo. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

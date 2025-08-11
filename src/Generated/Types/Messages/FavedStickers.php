@@ -27,21 +27,21 @@ final class FavedStickers extends AbstractFavedStickers
         public readonly array $stickers
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->hash);
-        $buffer .= $serializer->vectorOfObjects($this->packs);
-        $buffer .= $serializer->vectorOfObjects($this->stickers);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->hash);
+        $buffer .= Serializer::vectorOfObjects($this->packs);
+        $buffer .= Serializer::vectorOfObjects($this->stickers);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $hash = $deserializer->int64($stream);
-        $packs = $deserializer->vectorOfObjects($stream, [StickerPack::class, 'deserialize']);
-        $stickers = $deserializer->vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $hash = Deserializer::int64($stream);
+        $packs = Deserializer::vectorOfObjects($stream, [StickerPack::class, 'deserialize']);
+        $stickers = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
         return new self(
             $hash,
             $packs,

@@ -29,36 +29,36 @@ final class InputStorePaymentPremiumGiftCode extends AbstractInputStorePaymentPu
         public readonly ?TextWithEntities $message = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->boostPeer !== null) $flags |= (1 << 0);
         if ($this->message !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->boostPeer->serialize($serializer);
+            $buffer .= $this->boostPeer->serialize();
         }
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->amount);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->amount);
         if ($flags & (1 << 1)) {
-            $buffer .= $this->message->serialize($serializer);
+            $buffer .= $this->message->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $users = $deserializer->vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']);
-        $boostPeer = ($flags & (1 << 0)) ? AbstractInputPeer::deserialize($deserializer, $stream) : null;
-        $currency = $deserializer->bytes($stream);
-        $amount = $deserializer->int64($stream);
-        $message = ($flags & (1 << 1)) ? TextWithEntities::deserialize($deserializer, $stream) : null;
+        $users = Deserializer::vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']);
+        $boostPeer = ($flags & (1 << 0)) ? AbstractInputPeer::deserialize($stream) : null;
+        $currency = Deserializer::bytes($stream);
+        $amount = Deserializer::int64($stream);
+        $message = ($flags & (1 << 1)) ? TextWithEntities::deserialize($stream) : null;
         return new self(
             $users,
             $currency,

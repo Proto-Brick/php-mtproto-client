@@ -23,27 +23,27 @@ final class WebPageEmpty extends AbstractWebPage
         public readonly ?string $url = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->url !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
+        $buffer .= Serializer::int64($this->id);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->url);
+            $buffer .= Serializer::bytes($this->url);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $id = $deserializer->int64($stream);
-        $url = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
+        $id = Deserializer::int64($stream);
+        $url = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
         return new self(
             $id,
             $url

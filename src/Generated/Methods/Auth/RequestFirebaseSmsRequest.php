@@ -38,30 +38,30 @@ final class RequestFirebaseSmsRequest extends TlObject
         public readonly ?string $iosPushSecret = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->safetyNetToken !== null) $flags |= (1 << 0);
         if ($this->playIntegrityToken !== null) $flags |= (1 << 2);
         if ($this->iosPushSecret !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->phoneNumber);
-        $buffer .= $serializer->bytes($this->phoneCodeHash);
+        $buffer .= Serializer::bytes($this->phoneNumber);
+        $buffer .= Serializer::bytes($this->phoneCodeHash);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->safetyNetToken);
+            $buffer .= Serializer::bytes($this->safetyNetToken);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->playIntegrityToken);
+            $buffer .= Serializer::bytes($this->playIntegrityToken);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->iosPushSecret);
+            $buffer .= Serializer::bytes($this->iosPushSecret);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

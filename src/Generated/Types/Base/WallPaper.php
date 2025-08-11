@@ -37,41 +37,41 @@ final class WallPaper extends AbstractWallPaper
         public readonly ?WallPaperSettings $settings = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->creator) $flags |= (1 << 0);
         if ($this->default_) $flags |= (1 << 1);
         if ($this->pattern) $flags |= (1 << 3);
         if ($this->dark) $flags |= (1 << 4);
         if ($this->settings !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->bytes($this->slug);
-        $buffer .= $this->document->serialize($serializer);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::bytes($this->slug);
+        $buffer .= $this->document->serialize();
         if ($flags & (1 << 2)) {
-            $buffer .= $this->settings->serialize($serializer);
+            $buffer .= $this->settings->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $id = $deserializer->int64($stream);
+        $id = Deserializer::int64($stream);
         $creator = ($flags & (1 << 0)) ? true : null;
         $default_ = ($flags & (1 << 1)) ? true : null;
         $pattern = ($flags & (1 << 3)) ? true : null;
         $dark = ($flags & (1 << 4)) ? true : null;
-        $accessHash = $deserializer->int64($stream);
-        $slug = $deserializer->bytes($stream);
-        $document = AbstractDocument::deserialize($deserializer, $stream);
-        $settings = ($flags & (1 << 2)) ? WallPaperSettings::deserialize($deserializer, $stream) : null;
+        $accessHash = Deserializer::int64($stream);
+        $slug = Deserializer::bytes($stream);
+        $document = AbstractDocument::deserialize($stream);
+        $settings = ($flags & (1 << 2)) ? WallPaperSettings::deserialize($stream) : null;
         return new self(
             $id,
             $accessHash,

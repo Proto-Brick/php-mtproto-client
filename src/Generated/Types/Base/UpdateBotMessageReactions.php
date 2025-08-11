@@ -29,25 +29,25 @@ final class UpdateBotMessageReactions extends AbstractUpdate
         public readonly int $qts
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->msgId);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->vectorOfObjects($this->reactions);
-        $buffer .= $serializer->int32($this->qts);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->msgId);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::vectorOfObjects($this->reactions);
+        $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $msgId = $deserializer->int32($stream);
-        $date = $deserializer->int32($stream);
-        $reactions = $deserializer->vectorOfObjects($stream, [ReactionCount::class, 'deserialize']);
-        $qts = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractPeer::deserialize($stream);
+        $msgId = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
+        $reactions = Deserializer::vectorOfObjects($stream, [ReactionCount::class, 'deserialize']);
+        $qts = Deserializer::int32($stream);
         return new self(
             $peer,
             $msgId,

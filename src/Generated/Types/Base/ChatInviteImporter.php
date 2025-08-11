@@ -31,42 +31,42 @@ final class ChatInviteImporter extends TlObject
         public readonly ?int $approvedBy = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->requested) $flags |= (1 << 0);
         if ($this->viaChatlist) $flags |= (1 << 3);
         if ($this->about !== null) $flags |= (1 << 2);
         if ($this->approvedBy !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->int32($this->date);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::int32($this->date);
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->about);
+            $buffer .= Serializer::bytes($this->about);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int64($this->approvedBy);
+            $buffer .= Serializer::int64($this->approvedBy);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $requested = ($flags & (1 << 0)) ? true : null;
         $viaChatlist = ($flags & (1 << 3)) ? true : null;
-        $userId = $deserializer->int64($stream);
-        $date = $deserializer->int32($stream);
-        $about = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $approvedBy = ($flags & (1 << 1)) ? $deserializer->int64($stream) : null;
+        $userId = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
+        $about = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $approvedBy = ($flags & (1 << 1)) ? Deserializer::int64($stream) : null;
         return new self(
             $userId,
             $date,

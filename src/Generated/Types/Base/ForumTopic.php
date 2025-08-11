@@ -57,9 +57,9 @@ final class ForumTopic extends AbstractForumTopic
         public readonly ?AbstractDraftMessage $draft = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->my) $flags |= (1 << 1);
         if ($this->closed) $flags |= (1 << 2);
@@ -68,53 +68,53 @@ final class ForumTopic extends AbstractForumTopic
         if ($this->hidden) $flags |= (1 << 6);
         if ($this->iconEmojiId !== null) $flags |= (1 << 0);
         if ($this->draft !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->id);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->int32($this->iconColor);
+        $buffer .= Serializer::int32($this->id);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::int32($this->iconColor);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->iconEmojiId);
+            $buffer .= Serializer::int64($this->iconEmojiId);
         }
-        $buffer .= $serializer->int32($this->topMessage);
-        $buffer .= $serializer->int32($this->readInboxMaxId);
-        $buffer .= $serializer->int32($this->readOutboxMaxId);
-        $buffer .= $serializer->int32($this->unreadCount);
-        $buffer .= $serializer->int32($this->unreadMentionsCount);
-        $buffer .= $serializer->int32($this->unreadReactionsCount);
-        $buffer .= $this->fromId->serialize($serializer);
-        $buffer .= $this->notifySettings->serialize($serializer);
+        $buffer .= Serializer::int32($this->topMessage);
+        $buffer .= Serializer::int32($this->readInboxMaxId);
+        $buffer .= Serializer::int32($this->readOutboxMaxId);
+        $buffer .= Serializer::int32($this->unreadCount);
+        $buffer .= Serializer::int32($this->unreadMentionsCount);
+        $buffer .= Serializer::int32($this->unreadReactionsCount);
+        $buffer .= $this->fromId->serialize();
+        $buffer .= $this->notifySettings->serialize();
         if ($flags & (1 << 4)) {
-            $buffer .= $this->draft->serialize($serializer);
+            $buffer .= $this->draft->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $my = ($flags & (1 << 1)) ? true : null;
         $closed = ($flags & (1 << 2)) ? true : null;
         $pinned = ($flags & (1 << 3)) ? true : null;
         $short = ($flags & (1 << 5)) ? true : null;
         $hidden = ($flags & (1 << 6)) ? true : null;
-        $id = $deserializer->int32($stream);
-        $date = $deserializer->int32($stream);
-        $title = $deserializer->bytes($stream);
-        $iconColor = $deserializer->int32($stream);
-        $iconEmojiId = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $topMessage = $deserializer->int32($stream);
-        $readInboxMaxId = $deserializer->int32($stream);
-        $readOutboxMaxId = $deserializer->int32($stream);
-        $unreadCount = $deserializer->int32($stream);
-        $unreadMentionsCount = $deserializer->int32($stream);
-        $unreadReactionsCount = $deserializer->int32($stream);
-        $fromId = AbstractPeer::deserialize($deserializer, $stream);
-        $notifySettings = PeerNotifySettings::deserialize($deserializer, $stream);
-        $draft = ($flags & (1 << 4)) ? AbstractDraftMessage::deserialize($deserializer, $stream) : null;
+        $id = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
+        $title = Deserializer::bytes($stream);
+        $iconColor = Deserializer::int32($stream);
+        $iconEmojiId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $topMessage = Deserializer::int32($stream);
+        $readInboxMaxId = Deserializer::int32($stream);
+        $readOutboxMaxId = Deserializer::int32($stream);
+        $unreadCount = Deserializer::int32($stream);
+        $unreadMentionsCount = Deserializer::int32($stream);
+        $unreadReactionsCount = Deserializer::int32($stream);
+        $fromId = AbstractPeer::deserialize($stream);
+        $notifySettings = PeerNotifySettings::deserialize($stream);
+        $draft = ($flags & (1 << 4)) ? AbstractDraftMessage::deserialize($stream) : null;
         return new self(
             $id,
             $date,

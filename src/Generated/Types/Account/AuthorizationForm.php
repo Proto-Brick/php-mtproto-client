@@ -33,37 +33,37 @@ final class AuthorizationForm extends TlObject
         public readonly ?string $privacyPolicyUrl = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->privacyPolicyUrl !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->vectorOfObjects($this->requiredTypes);
-        $buffer .= $serializer->vectorOfObjects($this->values);
-        $buffer .= $serializer->vectorOfObjects($this->errors);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::vectorOfObjects($this->requiredTypes);
+        $buffer .= Serializer::vectorOfObjects($this->values);
+        $buffer .= Serializer::vectorOfObjects($this->errors);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->privacyPolicyUrl);
+            $buffer .= Serializer::bytes($this->privacyPolicyUrl);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $requiredTypes = $deserializer->vectorOfObjects($stream, [AbstractSecureRequiredType::class, 'deserialize']);
-        $values = $deserializer->vectorOfObjects($stream, [SecureValue::class, 'deserialize']);
-        $errors = $deserializer->vectorOfObjects($stream, [AbstractSecureValueError::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $privacyPolicyUrl = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
+        $requiredTypes = Deserializer::vectorOfObjects($stream, [AbstractSecureRequiredType::class, 'deserialize']);
+        $values = Deserializer::vectorOfObjects($stream, [SecureValue::class, 'deserialize']);
+        $errors = Deserializer::vectorOfObjects($stream, [AbstractSecureValueError::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $privacyPolicyUrl = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
         return new self(
             $requiredTypes,
             $values,

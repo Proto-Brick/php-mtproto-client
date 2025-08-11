@@ -8,18 +8,18 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractJSONValue extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            JsonNull::CONSTRUCTOR_ID => JsonNull::deserialize($deserializer, $stream),
-            JsonBool::CONSTRUCTOR_ID => JsonBool::deserialize($deserializer, $stream),
-            JsonNumber::CONSTRUCTOR_ID => JsonNumber::deserialize($deserializer, $stream),
-            JsonString::CONSTRUCTOR_ID => JsonString::deserialize($deserializer, $stream),
-            JsonArray::CONSTRUCTOR_ID => JsonArray::deserialize($deserializer, $stream),
-            JsonObject::CONSTRUCTOR_ID => JsonObject::deserialize($deserializer, $stream),
+            JsonNull::CONSTRUCTOR_ID => JsonNull::deserialize($stream),
+            JsonBool::CONSTRUCTOR_ID => JsonBool::deserialize($stream),
+            JsonNumber::CONSTRUCTOR_ID => JsonNumber::deserialize($stream),
+            JsonString::CONSTRUCTOR_ID => JsonString::deserialize($stream),
+            JsonArray::CONSTRUCTOR_ID => JsonArray::deserialize($stream),
+            JsonObject::CONSTRUCTOR_ID => JsonObject::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type JSONValue. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

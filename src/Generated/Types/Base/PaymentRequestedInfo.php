@@ -27,44 +27,44 @@ final class PaymentRequestedInfo extends TlObject
         public readonly ?PostAddress $shippingAddress = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->name !== null) $flags |= (1 << 0);
         if ($this->phone !== null) $flags |= (1 << 1);
         if ($this->email !== null) $flags |= (1 << 2);
         if ($this->shippingAddress !== null) $flags |= (1 << 3);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->name);
+            $buffer .= Serializer::bytes($this->name);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->phone);
+            $buffer .= Serializer::bytes($this->phone);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->email);
+            $buffer .= Serializer::bytes($this->email);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->shippingAddress->serialize($serializer);
+            $buffer .= $this->shippingAddress->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $name = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $phone = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $email = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $shippingAddress = ($flags & (1 << 3)) ? PostAddress::deserialize($deserializer, $stream) : null;
+        $name = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $phone = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $email = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $shippingAddress = ($flags & (1 << 3)) ? PostAddress::deserialize($stream) : null;
         return new self(
             $name,
             $phone,

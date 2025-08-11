@@ -25,30 +25,30 @@ final class ExportedChatlistInvite extends TlObject
         public readonly array $peers
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->url);
-        $buffer .= $serializer->vectorOfObjects($this->peers);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->url);
+        $buffer .= Serializer::vectorOfObjects($this->peers);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $title = $deserializer->bytes($stream);
-        $url = $deserializer->bytes($stream);
-        $peers = $deserializer->vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
+        $title = Deserializer::bytes($stream);
+        $url = Deserializer::bytes($stream);
+        $peers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
         return new self(
             $title,
             $url,

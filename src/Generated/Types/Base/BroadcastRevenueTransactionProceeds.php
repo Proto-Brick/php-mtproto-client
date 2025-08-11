@@ -25,21 +25,21 @@ final class BroadcastRevenueTransactionProceeds extends AbstractBroadcastRevenue
         public readonly int $toDate
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->amount);
-        $buffer .= $serializer->int32($this->fromDate);
-        $buffer .= $serializer->int32($this->toDate);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->amount);
+        $buffer .= Serializer::int32($this->fromDate);
+        $buffer .= Serializer::int32($this->toDate);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $amount = $deserializer->int64($stream);
-        $fromDate = $deserializer->int32($stream);
-        $toDate = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $amount = Deserializer::int64($stream);
+        $fromDate = Deserializer::int32($stream);
+        $toDate = Deserializer::int32($stream);
         return new self(
             $amount,
             $fromDate,

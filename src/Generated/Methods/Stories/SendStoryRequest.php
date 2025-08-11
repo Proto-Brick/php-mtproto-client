@@ -60,9 +60,9 @@ final class SendStoryRequest extends TlObject
         public readonly ?int $fwdFromStory = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->pinned) $flags |= (1 << 2);
         if ($this->noforwards) $flags |= (1 << 4);
@@ -73,34 +73,34 @@ final class SendStoryRequest extends TlObject
         if ($this->period !== null) $flags |= (1 << 3);
         if ($this->fwdFromId !== null) $flags |= (1 << 6);
         if ($this->fwdFromStory !== null) $flags |= (1 << 6);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->media->serialize($serializer);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->media->serialize();
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->vectorOfObjects($this->mediaAreas);
+            $buffer .= Serializer::vectorOfObjects($this->mediaAreas);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->caption);
+            $buffer .= Serializer::bytes($this->caption);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
-        $buffer .= $serializer->vectorOfObjects($this->privacyRules);
-        $buffer .= $serializer->int64($this->randomId);
+        $buffer .= Serializer::vectorOfObjects($this->privacyRules);
+        $buffer .= Serializer::int64($this->randomId);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int32($this->period);
+            $buffer .= Serializer::int32($this->period);
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $this->fwdFromId->serialize($serializer);
+            $buffer .= $this->fwdFromId->serialize();
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->int32($this->fwdFromStory);
+            $buffer .= Serializer::int32($this->fwdFromStory);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

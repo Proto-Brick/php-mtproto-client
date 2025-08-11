@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractDeepLinkInfo extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            DeepLinkInfoEmpty::CONSTRUCTOR_ID => DeepLinkInfoEmpty::deserialize($deserializer, $stream),
-            DeepLinkInfo::CONSTRUCTOR_ID => DeepLinkInfo::deserialize($deserializer, $stream),
+            DeepLinkInfoEmpty::CONSTRUCTOR_ID => DeepLinkInfoEmpty::deserialize($stream),
+            DeepLinkInfo::CONSTRUCTOR_ID => DeepLinkInfo::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.DeepLinkInfo. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

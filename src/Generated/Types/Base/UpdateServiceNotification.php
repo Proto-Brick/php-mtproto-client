@@ -33,37 +33,37 @@ final class UpdateServiceNotification extends AbstractUpdate
         public readonly ?int $inboxDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->popup) $flags |= (1 << 0);
         if ($this->invertMedia) $flags |= (1 << 2);
         if ($this->inboxDate !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->inboxDate);
+            $buffer .= Serializer::int32($this->inboxDate);
         }
-        $buffer .= $serializer->bytes($this->type);
-        $buffer .= $serializer->bytes($this->message);
-        $buffer .= $this->media->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->entities);
+        $buffer .= Serializer::bytes($this->type);
+        $buffer .= Serializer::bytes($this->message);
+        $buffer .= $this->media->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->entities);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $popup = ($flags & (1 << 0)) ? true : null;
         $invertMedia = ($flags & (1 << 2)) ? true : null;
-        $inboxDate = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $type = $deserializer->bytes($stream);
-        $message = $deserializer->bytes($stream);
-        $media = AbstractMessageMedia::deserialize($deserializer, $stream);
-        $entities = $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
+        $inboxDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $type = Deserializer::bytes($stream);
+        $message = Deserializer::bytes($stream);
+        $media = AbstractMessageMedia::deserialize($stream);
+        $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
         return new self(
             $type,
             $message,

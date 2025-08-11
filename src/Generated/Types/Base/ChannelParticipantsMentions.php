@@ -23,30 +23,30 @@ final class ChannelParticipantsMentions extends AbstractChannelParticipantsFilte
         public readonly ?int $topMsgId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->q !== null) $flags |= (1 << 0);
         if ($this->topMsgId !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->q);
+            $buffer .= Serializer::bytes($this->q);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->topMsgId);
+            $buffer .= Serializer::int32($this->topMsgId);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $q = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $topMsgId = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
+        $q = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $topMsgId = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
         return new self(
             $q,
             $topMsgId

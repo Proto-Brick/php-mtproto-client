@@ -49,9 +49,9 @@ final class RequestSimpleWebViewRequest extends TlObject
         public readonly ?array $themeParams = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->fromSwitchWebview) $flags |= (1 << 1);
         if ($this->fromSideMenu) $flags |= (1 << 2);
@@ -60,23 +60,23 @@ final class RequestSimpleWebViewRequest extends TlObject
         if ($this->url !== null) $flags |= (1 << 3);
         if ($this->startParam !== null) $flags |= (1 << 4);
         if ($this->themeParams !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->bot->serialize($serializer);
+        $buffer .= $this->bot->serialize();
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->url);
+            $buffer .= Serializer::bytes($this->url);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->startParam);
+            $buffer .= Serializer::bytes($this->startParam);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes(json_encode($this->themeParams, JSON_FORCE_OBJECT));
+            $buffer .= Serializer::bytes(json_encode($this->themeParams, JSON_FORCE_OBJECT));
         }
-        $buffer .= $serializer->bytes($this->platform);
+        $buffer .= Serializer::bytes($this->platform);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

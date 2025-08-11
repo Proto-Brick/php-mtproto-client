@@ -25,21 +25,21 @@ final class InputBotInlineResultGame extends AbstractInputBotInlineResult
         public readonly AbstractInputBotInlineMessage $sendMessage
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $serializer->bytes($this->shortName);
-        $buffer .= $this->sendMessage->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= Serializer::bytes($this->shortName);
+        $buffer .= $this->sendMessage->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $id = $deserializer->bytes($stream);
-        $shortName = $deserializer->bytes($stream);
-        $sendMessage = AbstractInputBotInlineMessage::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $id = Deserializer::bytes($stream);
+        $shortName = Deserializer::bytes($stream);
+        $sendMessage = AbstractInputBotInlineMessage::deserialize($stream);
         return new self(
             $id,
             $shortName,

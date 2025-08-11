@@ -26,25 +26,25 @@ final class AutoDownloadSettings extends TlObject
         public readonly BaseAutoDownloadSettings $high
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->low->serialize($serializer);
-        $buffer .= $this->medium->serialize($serializer);
-        $buffer .= $this->high->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->low->serialize();
+        $buffer .= $this->medium->serialize();
+        $buffer .= $this->high->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $low = BaseAutoDownloadSettings::deserialize($deserializer, $stream);
-        $medium = BaseAutoDownloadSettings::deserialize($deserializer, $stream);
-        $high = BaseAutoDownloadSettings::deserialize($deserializer, $stream);
+        $low = BaseAutoDownloadSettings::deserialize($stream);
+        $medium = BaseAutoDownloadSettings::deserialize($stream);
+        $high = BaseAutoDownloadSettings::deserialize($stream);
         return new self(
             $low,
             $medium,

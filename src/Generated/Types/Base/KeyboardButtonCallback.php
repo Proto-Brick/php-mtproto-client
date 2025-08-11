@@ -25,26 +25,26 @@ final class KeyboardButtonCallback extends AbstractKeyboardButton
         public readonly ?bool $requiresPassword = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->requiresPassword) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->text);
-        $buffer .= $serializer->bytes($this->data);
+        $buffer .= Serializer::bytes($this->text);
+        $buffer .= Serializer::bytes($this->data);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $requiresPassword = ($flags & (1 << 0)) ? true : null;
-        $text = $deserializer->bytes($stream);
-        $data = $deserializer->bytes($stream);
+        $text = Deserializer::bytes($stream);
+        $data = Deserializer::bytes($stream);
         return new self(
             $text,
             $data,

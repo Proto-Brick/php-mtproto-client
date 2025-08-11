@@ -41,9 +41,9 @@ final class Boost extends TlObject
         public readonly ?int $stars = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->gift) $flags |= (1 << 1);
         if ($this->giveaway) $flags |= (1 << 2);
@@ -53,49 +53,49 @@ final class Boost extends TlObject
         if ($this->usedGiftSlug !== null) $flags |= (1 << 4);
         if ($this->multiplier !== null) $flags |= (1 << 5);
         if ($this->stars !== null) $flags |= (1 << 6);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->id);
+        $buffer .= Serializer::bytes($this->id);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->userId);
+            $buffer .= Serializer::int64($this->userId);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->giveawayMsgId);
+            $buffer .= Serializer::int32($this->giveawayMsgId);
         }
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int32($this->expires);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int32($this->expires);
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->usedGiftSlug);
+            $buffer .= Serializer::bytes($this->usedGiftSlug);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int32($this->multiplier);
+            $buffer .= Serializer::int32($this->multiplier);
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->int64($this->stars);
+            $buffer .= Serializer::int64($this->stars);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $gift = ($flags & (1 << 1)) ? true : null;
         $giveaway = ($flags & (1 << 2)) ? true : null;
         $unclaimed = ($flags & (1 << 3)) ? true : null;
-        $id = $deserializer->bytes($stream);
-        $userId = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $giveawayMsgId = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $date = $deserializer->int32($stream);
-        $expires = $deserializer->int32($stream);
-        $usedGiftSlug = ($flags & (1 << 4)) ? $deserializer->bytes($stream) : null;
-        $multiplier = ($flags & (1 << 5)) ? $deserializer->int32($stream) : null;
-        $stars = ($flags & (1 << 6)) ? $deserializer->int64($stream) : null;
+        $id = Deserializer::bytes($stream);
+        $userId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $giveawayMsgId = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $date = Deserializer::int32($stream);
+        $expires = Deserializer::int32($stream);
+        $usedGiftSlug = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
+        $multiplier = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $stars = ($flags & (1 << 6)) ? Deserializer::int64($stream) : null;
         return new self(
             $id,
             $date,

@@ -27,34 +27,34 @@ final class MessageActionPhoneCall extends AbstractMessageAction
         public readonly ?int $duration = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->video) $flags |= (1 << 2);
         if ($this->reason !== null) $flags |= (1 << 0);
         if ($this->duration !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->callId);
+        $buffer .= Serializer::int64($this->callId);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->reason->serialize($serializer);
+            $buffer .= $this->reason->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->duration);
+            $buffer .= Serializer::int32($this->duration);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $video = ($flags & (1 << 2)) ? true : null;
-        $callId = $deserializer->int64($stream);
-        $reason = ($flags & (1 << 0)) ? AbstractPhoneCallDiscardReason::deserialize($deserializer, $stream) : null;
-        $duration = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
+        $callId = Deserializer::int64($stream);
+        $reason = ($flags & (1 << 0)) ? AbstractPhoneCallDiscardReason::deserialize($stream) : null;
+        $duration = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
         return new self(
             $callId,
             $video,

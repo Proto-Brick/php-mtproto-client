@@ -27,34 +27,34 @@ final class MessageMediaGeoLive extends AbstractMessageMedia
         public readonly ?int $proximityNotificationRadius = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->heading !== null) $flags |= (1 << 0);
         if ($this->proximityNotificationRadius !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->geo->serialize($serializer);
+        $buffer .= $this->geo->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->heading);
+            $buffer .= Serializer::int32($this->heading);
         }
-        $buffer .= $serializer->int32($this->period);
+        $buffer .= Serializer::int32($this->period);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->proximityNotificationRadius);
+            $buffer .= Serializer::int32($this->proximityNotificationRadius);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $geo = AbstractGeoPoint::deserialize($deserializer, $stream);
-        $heading = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $period = $deserializer->int32($stream);
-        $proximityNotificationRadius = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
+        $geo = AbstractGeoPoint::deserialize($stream);
+        $heading = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $period = Deserializer::int32($stream);
+        $proximityNotificationRadius = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
         return new self(
             $geo,
             $period,

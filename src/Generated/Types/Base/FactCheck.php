@@ -27,38 +27,38 @@ final class FactCheck extends TlObject
         public readonly ?TextWithEntities $text = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->needCheck) $flags |= (1 << 0);
         if ($this->country !== null) $flags |= (1 << 1);
         if ($this->text !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->country);
+            $buffer .= Serializer::bytes($this->country);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->text->serialize($serializer);
+            $buffer .= $this->text->serialize();
         }
-        $buffer .= $serializer->int64($this->hash);
+        $buffer .= Serializer::int64($this->hash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $needCheck = ($flags & (1 << 0)) ? true : null;
-        $country = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $text = ($flags & (1 << 1)) ? TextWithEntities::deserialize($deserializer, $stream) : null;
-        $hash = $deserializer->int64($stream);
+        $country = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $text = ($flags & (1 << 1)) ? TextWithEntities::deserialize($stream) : null;
+        $hash = Deserializer::int64($stream);
         return new self(
             $hash,
             $needCheck,

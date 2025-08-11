@@ -27,31 +27,31 @@ final class MessageMediaStory extends AbstractMessageMedia
         public readonly ?AbstractStoryItem $story = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->viaMention) $flags |= (1 << 1);
         if ($this->story !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->id);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->id);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->story->serialize($serializer);
+            $buffer .= $this->story->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $viaMention = ($flags & (1 << 1)) ? true : null;
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $id = $deserializer->int32($stream);
-        $story = ($flags & (1 << 0)) ? AbstractStoryItem::deserialize($deserializer, $stream) : null;
+        $peer = AbstractPeer::deserialize($stream);
+        $id = Deserializer::int32($stream);
+        $story = ($flags & (1 << 0)) ? AbstractStoryItem::deserialize($stream) : null;
         return new self(
             $peer,
             $id,

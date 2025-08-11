@@ -49,9 +49,9 @@ final class Dialog extends AbstractDialog
         public readonly ?int $ttlPeriod = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->pinned) $flags |= (1 << 2);
         if ($this->unreadMark) $flags |= (1 << 3);
@@ -60,51 +60,51 @@ final class Dialog extends AbstractDialog
         if ($this->draft !== null) $flags |= (1 << 1);
         if ($this->folderId !== null) $flags |= (1 << 4);
         if ($this->ttlPeriod !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->topMessage);
-        $buffer .= $serializer->int32($this->readInboxMaxId);
-        $buffer .= $serializer->int32($this->readOutboxMaxId);
-        $buffer .= $serializer->int32($this->unreadCount);
-        $buffer .= $serializer->int32($this->unreadMentionsCount);
-        $buffer .= $serializer->int32($this->unreadReactionsCount);
-        $buffer .= $this->notifySettings->serialize($serializer);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->topMessage);
+        $buffer .= Serializer::int32($this->readInboxMaxId);
+        $buffer .= Serializer::int32($this->readOutboxMaxId);
+        $buffer .= Serializer::int32($this->unreadCount);
+        $buffer .= Serializer::int32($this->unreadMentionsCount);
+        $buffer .= Serializer::int32($this->unreadReactionsCount);
+        $buffer .= $this->notifySettings->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->pts);
+            $buffer .= Serializer::int32($this->pts);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->draft->serialize($serializer);
+            $buffer .= $this->draft->serialize();
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->folderId);
+            $buffer .= Serializer::int32($this->folderId);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int32($this->ttlPeriod);
+            $buffer .= Serializer::int32($this->ttlPeriod);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $pinned = ($flags & (1 << 2)) ? true : null;
         $unreadMark = ($flags & (1 << 3)) ? true : null;
         $viewForumAsMessages = ($flags & (1 << 6)) ? true : null;
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $topMessage = $deserializer->int32($stream);
-        $readInboxMaxId = $deserializer->int32($stream);
-        $readOutboxMaxId = $deserializer->int32($stream);
-        $unreadCount = $deserializer->int32($stream);
-        $unreadMentionsCount = $deserializer->int32($stream);
-        $unreadReactionsCount = $deserializer->int32($stream);
-        $notifySettings = PeerNotifySettings::deserialize($deserializer, $stream);
-        $pts = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $draft = ($flags & (1 << 1)) ? AbstractDraftMessage::deserialize($deserializer, $stream) : null;
-        $folderId = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $ttlPeriod = ($flags & (1 << 5)) ? $deserializer->int32($stream) : null;
+        $peer = AbstractPeer::deserialize($stream);
+        $topMessage = Deserializer::int32($stream);
+        $readInboxMaxId = Deserializer::int32($stream);
+        $readOutboxMaxId = Deserializer::int32($stream);
+        $unreadCount = Deserializer::int32($stream);
+        $unreadMentionsCount = Deserializer::int32($stream);
+        $unreadReactionsCount = Deserializer::int32($stream);
+        $notifySettings = PeerNotifySettings::deserialize($stream);
+        $pts = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $draft = ($flags & (1 << 1)) ? AbstractDraftMessage::deserialize($stream) : null;
+        $folderId = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $ttlPeriod = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
         return new self(
             $peer,
             $topMessage,

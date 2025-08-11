@@ -25,21 +25,21 @@ final class UpdateChatDefaultBannedRights extends AbstractUpdate
         public readonly int $version
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->defaultBannedRights->serialize($serializer);
-        $buffer .= $serializer->int32($this->version);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->defaultBannedRights->serialize();
+        $buffer .= Serializer::int32($this->version);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $defaultBannedRights = ChatBannedRights::deserialize($deserializer, $stream);
-        $version = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractPeer::deserialize($stream);
+        $defaultBannedRights = ChatBannedRights::deserialize($stream);
+        $version = Deserializer::int32($stream);
         return new self(
             $peer,
             $defaultBannedRights,

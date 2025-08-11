@@ -35,15 +35,15 @@ final class JoinGroupCallPresentationRequest extends TlObject
         public readonly array $params
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->call->serialize($serializer);
-        $buffer .= $serializer->bytes(json_encode($this->params, JSON_FORCE_OBJECT));
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->call->serialize();
+        $buffer .= Serializer::bytes(json_encode($this->params, JSON_FORCE_OBJECT));
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

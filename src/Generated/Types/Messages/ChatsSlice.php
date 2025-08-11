@@ -24,19 +24,19 @@ final class ChatsSlice extends AbstractChats
         public readonly array $chats
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->count);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->count);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $count = $deserializer->int32($stream);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $count = Deserializer::int32($stream);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         return new self(
             $count,
             $chats

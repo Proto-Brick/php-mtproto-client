@@ -49,9 +49,9 @@ final class Chat extends AbstractChat
         public readonly ?ChatBannedRights $defaultBannedRights = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->creator) $flags |= (1 << 0);
         if ($this->left) $flags |= (1 << 2);
@@ -62,30 +62,30 @@ final class Chat extends AbstractChat
         if ($this->migratedTo !== null) $flags |= (1 << 6);
         if ($this->adminRights !== null) $flags |= (1 << 14);
         if ($this->defaultBannedRights !== null) $flags |= (1 << 18);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $this->photo->serialize($serializer);
-        $buffer .= $serializer->int32($this->participantsCount);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int32($this->version);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= $this->photo->serialize();
+        $buffer .= Serializer::int32($this->participantsCount);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int32($this->version);
         if ($flags & (1 << 6)) {
-            $buffer .= $this->migratedTo->serialize($serializer);
+            $buffer .= $this->migratedTo->serialize();
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $this->adminRights->serialize($serializer);
+            $buffer .= $this->adminRights->serialize();
         }
         if ($flags & (1 << 18)) {
-            $buffer .= $this->defaultBannedRights->serialize($serializer);
+            $buffer .= $this->defaultBannedRights->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $creator = ($flags & (1 << 0)) ? true : null;
         $left = ($flags & (1 << 2)) ? true : null;
@@ -93,15 +93,15 @@ final class Chat extends AbstractChat
         $callActive = ($flags & (1 << 23)) ? true : null;
         $callNotEmpty = ($flags & (1 << 24)) ? true : null;
         $noforwards = ($flags & (1 << 25)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $title = $deserializer->bytes($stream);
-        $photo = AbstractChatPhoto::deserialize($deserializer, $stream);
-        $participantsCount = $deserializer->int32($stream);
-        $date = $deserializer->int32($stream);
-        $version = $deserializer->int32($stream);
-        $migratedTo = ($flags & (1 << 6)) ? AbstractInputChannel::deserialize($deserializer, $stream) : null;
-        $adminRights = ($flags & (1 << 14)) ? ChatAdminRights::deserialize($deserializer, $stream) : null;
-        $defaultBannedRights = ($flags & (1 << 18)) ? ChatBannedRights::deserialize($deserializer, $stream) : null;
+        $id = Deserializer::int64($stream);
+        $title = Deserializer::bytes($stream);
+        $photo = AbstractChatPhoto::deserialize($stream);
+        $participantsCount = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
+        $version = Deserializer::int32($stream);
+        $migratedTo = ($flags & (1 << 6)) ? AbstractInputChannel::deserialize($stream) : null;
+        $adminRights = ($flags & (1 << 14)) ? ChatAdminRights::deserialize($stream) : null;
+        $defaultBannedRights = ($flags & (1 << 18)) ? ChatBannedRights::deserialize($stream) : null;
         return new self(
             $id,
             $title,

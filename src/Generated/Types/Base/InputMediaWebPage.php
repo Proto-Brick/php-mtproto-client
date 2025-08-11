@@ -27,28 +27,28 @@ final class InputMediaWebPage extends AbstractInputMedia
         public readonly ?bool $optional = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->forceLargeMedia) $flags |= (1 << 0);
         if ($this->forceSmallMedia) $flags |= (1 << 1);
         if ($this->optional) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->url);
+        $buffer .= Serializer::bytes($this->url);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $forceLargeMedia = ($flags & (1 << 0)) ? true : null;
         $forceSmallMedia = ($flags & (1 << 1)) ? true : null;
         $optional = ($flags & (1 << 2)) ? true : null;
-        $url = $deserializer->bytes($stream);
+        $url = Deserializer::bytes($stream);
         return new self(
             $url,
             $forceLargeMedia,

@@ -29,27 +29,27 @@ final class BroadcastRevenueStats extends TlObject
         public readonly float $usdRate
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->topHoursGraph->serialize($serializer);
-        $buffer .= $this->revenueGraph->serialize($serializer);
-        $buffer .= $this->balances->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->topHoursGraph->serialize();
+        $buffer .= $this->revenueGraph->serialize();
+        $buffer .= $this->balances->serialize();
         $buffer .= pack('d', $this->usdRate);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $topHoursGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $revenueGraph = AbstractStatsGraph::deserialize($deserializer, $stream);
-        $balances = BroadcastRevenueBalances::deserialize($deserializer, $stream);
-        $usdRate = $deserializer->double($stream);
+        $topHoursGraph = AbstractStatsGraph::deserialize($stream);
+        $revenueGraph = AbstractStatsGraph::deserialize($stream);
+        $balances = BroadcastRevenueBalances::deserialize($stream);
+        $usdRate = Deserializer::double($stream);
         return new self(
             $topHoursGraph,
             $revenueGraph,

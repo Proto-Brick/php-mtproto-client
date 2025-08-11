@@ -33,29 +33,29 @@ final class SecureFile extends AbstractSecureFile
         public readonly string $secret
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->int64($this->size);
-        $buffer .= $serializer->int32($this->dcId);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->bytes($this->fileHash);
-        $buffer .= $serializer->bytes($this->secret);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::int64($this->size);
+        $buffer .= Serializer::int32($this->dcId);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::bytes($this->fileHash);
+        $buffer .= Serializer::bytes($this->secret);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $id = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
-        $size = $deserializer->int64($stream);
-        $dcId = $deserializer->int32($stream);
-        $date = $deserializer->int32($stream);
-        $fileHash = $deserializer->bytes($stream);
-        $secret = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $size = Deserializer::int64($stream);
+        $dcId = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
+        $fileHash = Deserializer::bytes($stream);
+        $secret = Deserializer::bytes($stream);
         return new self(
             $id,
             $accessHash,

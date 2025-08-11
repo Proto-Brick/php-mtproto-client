@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionEditTopic extends AbstractChannelAdminLogE
         public readonly AbstractForumTopic $newTopic
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->prevTopic->serialize($serializer);
-        $buffer .= $this->newTopic->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->prevTopic->serialize();
+        $buffer .= $this->newTopic->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevTopic = AbstractForumTopic::deserialize($deserializer, $stream);
-        $newTopic = AbstractForumTopic::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevTopic = AbstractForumTopic::deserialize($stream);
+        $newTopic = AbstractForumTopic::deserialize($stream);
         return new self(
             $prevTopic,
             $newTopic

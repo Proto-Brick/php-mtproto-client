@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionDefaultBannedRights extends AbstractChanne
         public readonly ChatBannedRights $newBannedRights
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->prevBannedRights->serialize($serializer);
-        $buffer .= $this->newBannedRights->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->prevBannedRights->serialize();
+        $buffer .= $this->newBannedRights->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevBannedRights = ChatBannedRights::deserialize($deserializer, $stream);
-        $newBannedRights = ChatBannedRights::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevBannedRights = ChatBannedRights::deserialize($stream);
+        $newBannedRights = ChatBannedRights::deserialize($stream);
         return new self(
             $prevBannedRights,
             $newBannedRights

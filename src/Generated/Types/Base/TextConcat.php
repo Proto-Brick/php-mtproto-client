@@ -21,17 +21,17 @@ final class TextConcat extends AbstractRichText
         public readonly array $texts
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->texts);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->texts);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $texts = $deserializer->vectorOfObjects($stream, [AbstractRichText::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $texts = Deserializer::vectorOfObjects($stream, [AbstractRichText::class, 'deserialize']);
         return new self(
             $texts
         );

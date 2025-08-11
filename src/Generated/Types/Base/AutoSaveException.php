@@ -23,23 +23,23 @@ final class AutoSaveException extends TlObject
         public readonly AutoSaveSettings $settings
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->settings->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->settings->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $settings = AutoSaveSettings::deserialize($deserializer, $stream);
+        $peer = AbstractPeer::deserialize($stream);
+        $settings = AutoSaveSettings::deserialize($stream);
         return new self(
             $peer,
             $settings

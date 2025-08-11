@@ -53,9 +53,9 @@ final class EditMessageRequest extends TlObject
         public readonly ?int $quickReplyShortcutId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->noWebpage) $flags |= (1 << 1);
         if ($this->invertMedia) $flags |= (1 << 16);
@@ -65,32 +65,32 @@ final class EditMessageRequest extends TlObject
         if ($this->entities !== null) $flags |= (1 << 3);
         if ($this->scheduleDate !== null) $flags |= (1 << 15);
         if ($this->quickReplyShortcutId !== null) $flags |= (1 << 17);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->id);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->id);
         if ($flags & (1 << 11)) {
-            $buffer .= $serializer->bytes($this->message);
+            $buffer .= Serializer::bytes($this->message);
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $this->media->serialize($serializer);
+            $buffer .= $this->media->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->replyMarkup->serialize($serializer);
+            $buffer .= $this->replyMarkup->serialize();
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         if ($flags & (1 << 15)) {
-            $buffer .= $serializer->int32($this->scheduleDate);
+            $buffer .= Serializer::int32($this->scheduleDate);
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $serializer->int32($this->quickReplyShortcutId);
+            $buffer .= Serializer::int32($this->quickReplyShortcutId);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

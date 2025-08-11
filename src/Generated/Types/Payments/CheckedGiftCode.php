@@ -40,54 +40,54 @@ final class CheckedGiftCode extends TlObject
         public readonly ?int $usedDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->viaGiveaway) $flags |= (1 << 2);
         if ($this->fromId !== null) $flags |= (1 << 4);
         if ($this->giveawayMsgId !== null) $flags |= (1 << 3);
         if ($this->toId !== null) $flags |= (1 << 0);
         if ($this->usedDate !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 4)) {
-            $buffer .= $this->fromId->serialize($serializer);
+            $buffer .= $this->fromId->serialize();
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int32($this->giveawayMsgId);
+            $buffer .= Serializer::int32($this->giveawayMsgId);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->toId);
+            $buffer .= Serializer::int64($this->toId);
         }
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int32($this->months);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int32($this->months);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->usedDate);
+            $buffer .= Serializer::int32($this->usedDate);
         }
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $viaGiveaway = ($flags & (1 << 2)) ? true : null;
-        $fromId = ($flags & (1 << 4)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $giveawayMsgId = ($flags & (1 << 3)) ? $deserializer->int32($stream) : null;
-        $toId = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $date = $deserializer->int32($stream);
-        $months = $deserializer->int32($stream);
-        $usedDate = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $fromId = ($flags & (1 << 4)) ? AbstractPeer::deserialize($stream) : null;
+        $giveawayMsgId = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $toId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $date = Deserializer::int32($stream);
+        $months = Deserializer::int32($stream);
+        $usedDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $date,
             $months,

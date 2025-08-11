@@ -25,21 +25,21 @@ final class SecureValueErrorSelfie extends AbstractSecureValueError
         public readonly string $text
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->type->serialize($serializer);
-        $buffer .= $serializer->bytes($this->fileHash);
-        $buffer .= $serializer->bytes($this->text);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->type->serialize();
+        $buffer .= Serializer::bytes($this->fileHash);
+        $buffer .= Serializer::bytes($this->text);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $type = AbstractSecureValueType::deserialize($deserializer, $stream);
-        $fileHash = $deserializer->bytes($stream);
-        $text = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $type = AbstractSecureValueType::deserialize($stream);
+        $fileHash = Deserializer::bytes($stream);
+        $text = Deserializer::bytes($stream);
         return new self(
             $type,
             $fileHash,

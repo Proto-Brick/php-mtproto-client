@@ -38,26 +38,26 @@ final class SignInRequest extends TlObject
         public readonly ?AbstractEmailVerification $emailVerification = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->phoneCode !== null) $flags |= (1 << 0);
         if ($this->emailVerification !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->phoneNumber);
-        $buffer .= $serializer->bytes($this->phoneCodeHash);
+        $buffer .= Serializer::bytes($this->phoneNumber);
+        $buffer .= Serializer::bytes($this->phoneCodeHash);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->phoneCode);
+            $buffer .= Serializer::bytes($this->phoneCode);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->emailVerification->serialize($serializer);
+            $buffer .= $this->emailVerification->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

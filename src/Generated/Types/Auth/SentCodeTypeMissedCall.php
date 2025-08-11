@@ -23,19 +23,19 @@ final class SentCodeTypeMissedCall extends AbstractSentCodeType
         public readonly int $length
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->prefix);
-        $buffer .= $serializer->int32($this->length);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->prefix);
+        $buffer .= Serializer::int32($this->length);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prefix = $deserializer->bytes($stream);
-        $length = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prefix = Deserializer::bytes($stream);
+        $length = Deserializer::int32($stream);
         return new self(
             $prefix,
             $length

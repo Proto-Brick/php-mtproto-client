@@ -30,25 +30,25 @@ final class FileCdnRedirect extends AbstractFile
         public readonly array $fileHashes
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->dcId);
-        $buffer .= $serializer->bytes($this->fileToken);
-        $buffer .= $serializer->bytes($this->encryptionKey);
-        $buffer .= $serializer->bytes($this->encryptionIv);
-        $buffer .= $serializer->vectorOfObjects($this->fileHashes);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->dcId);
+        $buffer .= Serializer::bytes($this->fileToken);
+        $buffer .= Serializer::bytes($this->encryptionKey);
+        $buffer .= Serializer::bytes($this->encryptionIv);
+        $buffer .= Serializer::vectorOfObjects($this->fileHashes);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $dcId = $deserializer->int32($stream);
-        $fileToken = $deserializer->bytes($stream);
-        $encryptionKey = $deserializer->bytes($stream);
-        $encryptionIv = $deserializer->bytes($stream);
-        $fileHashes = $deserializer->vectorOfObjects($stream, [FileHash::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $dcId = Deserializer::int32($stream);
+        $fileToken = Deserializer::bytes($stream);
+        $encryptionKey = Deserializer::bytes($stream);
+        $encryptionIv = Deserializer::bytes($stream);
+        $fileHashes = Deserializer::vectorOfObjects($stream, [FileHash::class, 'deserialize']);
         return new self(
             $dcId,
             $fileToken,

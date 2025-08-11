@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionChangeTitle extends AbstractChannelAdminLo
         public readonly string $newValue
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->prevValue);
-        $buffer .= $serializer->bytes($this->newValue);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->prevValue);
+        $buffer .= Serializer::bytes($this->newValue);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevValue = $deserializer->bytes($stream);
-        $newValue = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevValue = Deserializer::bytes($stream);
+        $newValue = Deserializer::bytes($stream);
         return new self(
             $prevValue,
             $newValue

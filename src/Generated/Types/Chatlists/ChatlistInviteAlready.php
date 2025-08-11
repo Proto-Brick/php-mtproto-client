@@ -32,25 +32,25 @@ final class ChatlistInviteAlready extends AbstractChatlistInvite
         public readonly array $users
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->filterId);
-        $buffer .= $serializer->vectorOfObjects($this->missingPeers);
-        $buffer .= $serializer->vectorOfObjects($this->alreadyPeers);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->filterId);
+        $buffer .= Serializer::vectorOfObjects($this->missingPeers);
+        $buffer .= Serializer::vectorOfObjects($this->alreadyPeers);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $filterId = $deserializer->int32($stream);
-        $missingPeers = $deserializer->vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
-        $alreadyPeers = $deserializer->vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $filterId = Deserializer::int32($stream);
+        $missingPeers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
+        $alreadyPeers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $filterId,
             $missingPeers,

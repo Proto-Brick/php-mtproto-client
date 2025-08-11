@@ -8,16 +8,16 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractReaction extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ReactionEmpty::CONSTRUCTOR_ID => ReactionEmpty::deserialize($deserializer, $stream),
-            ReactionEmoji::CONSTRUCTOR_ID => ReactionEmoji::deserialize($deserializer, $stream),
-            ReactionCustomEmoji::CONSTRUCTOR_ID => ReactionCustomEmoji::deserialize($deserializer, $stream),
-            ReactionPaid::CONSTRUCTOR_ID => ReactionPaid::deserialize($deserializer, $stream),
+            ReactionEmpty::CONSTRUCTOR_ID => ReactionEmpty::deserialize($stream),
+            ReactionEmoji::CONSTRUCTOR_ID => ReactionEmoji::deserialize($stream),
+            ReactionCustomEmoji::CONSTRUCTOR_ID => ReactionCustomEmoji::deserialize($stream),
+            ReactionPaid::CONSTRUCTOR_ID => ReactionPaid::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type Reaction. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

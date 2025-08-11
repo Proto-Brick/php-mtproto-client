@@ -8,18 +8,18 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractChannelParticipant extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ChannelParticipant::CONSTRUCTOR_ID => ChannelParticipant::deserialize($deserializer, $stream),
-            ChannelParticipantSelf::CONSTRUCTOR_ID => ChannelParticipantSelf::deserialize($deserializer, $stream),
-            ChannelParticipantCreator::CONSTRUCTOR_ID => ChannelParticipantCreator::deserialize($deserializer, $stream),
-            ChannelParticipantAdmin::CONSTRUCTOR_ID => ChannelParticipantAdmin::deserialize($deserializer, $stream),
-            ChannelParticipantBanned::CONSTRUCTOR_ID => ChannelParticipantBanned::deserialize($deserializer, $stream),
-            ChannelParticipantLeft::CONSTRUCTOR_ID => ChannelParticipantLeft::deserialize($deserializer, $stream),
+            ChannelParticipant::CONSTRUCTOR_ID => ChannelParticipant::deserialize($stream),
+            ChannelParticipantSelf::CONSTRUCTOR_ID => ChannelParticipantSelf::deserialize($stream),
+            ChannelParticipantCreator::CONSTRUCTOR_ID => ChannelParticipantCreator::deserialize($stream),
+            ChannelParticipantAdmin::CONSTRUCTOR_ID => ChannelParticipantAdmin::deserialize($stream),
+            ChannelParticipantBanned::CONSTRUCTOR_ID => ChannelParticipantBanned::deserialize($stream),
+            ChannelParticipantLeft::CONSTRUCTOR_ID => ChannelParticipantLeft::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ChannelParticipant. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

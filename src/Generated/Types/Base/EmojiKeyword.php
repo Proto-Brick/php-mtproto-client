@@ -23,19 +23,19 @@ final class EmojiKeyword extends AbstractEmojiKeyword
         public readonly array $emoticons
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->keyword);
-        $buffer .= $serializer->vectorOfStrings($this->emoticons);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->keyword);
+        $buffer .= Serializer::vectorOfStrings($this->emoticons);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $keyword = $deserializer->bytes($stream);
-        $emoticons = $deserializer->vectorOfStrings($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $keyword = Deserializer::bytes($stream);
+        $emoticons = Deserializer::vectorOfStrings($stream);
         return new self(
             $keyword,
             $emoticons

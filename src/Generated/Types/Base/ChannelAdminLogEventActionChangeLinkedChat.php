@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionChangeLinkedChat extends AbstractChannelAd
         public readonly int $newValue
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->prevValue);
-        $buffer .= $serializer->int64($this->newValue);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->prevValue);
+        $buffer .= Serializer::int64($this->newValue);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevValue = $deserializer->int64($stream);
-        $newValue = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevValue = Deserializer::int64($stream);
+        $newValue = Deserializer::int64($stream);
         return new self(
             $prevValue,
             $newValue

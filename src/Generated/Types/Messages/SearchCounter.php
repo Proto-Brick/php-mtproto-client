@@ -26,30 +26,30 @@ final class SearchCounter extends TlObject
         public readonly ?bool $inexact = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->inexact) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->filter->serialize($serializer);
-        $buffer .= $serializer->int32($this->count);
+        $buffer .= $this->filter->serialize();
+        $buffer .= Serializer::int32($this->count);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $inexact = ($flags & (1 << 1)) ? true : null;
-        $filter = AbstractMessagesFilter::deserialize($deserializer, $stream);
-        $count = $deserializer->int32($stream);
+        $filter = AbstractMessagesFilter::deserialize($stream);
+        $count = Deserializer::int32($stream);
         return new self(
             $filter,
             $count,

@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionEditMessage extends AbstractChannelAdminLo
         public readonly AbstractMessage $newMessage
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->prevMessage->serialize($serializer);
-        $buffer .= $this->newMessage->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->prevMessage->serialize();
+        $buffer .= $this->newMessage->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevMessage = AbstractMessage::deserialize($deserializer, $stream);
-        $newMessage = AbstractMessage::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevMessage = AbstractMessage::deserialize($stream);
+        $newMessage = AbstractMessage::deserialize($stream);
         return new self(
             $prevMessage,
             $newMessage

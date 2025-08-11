@@ -25,29 +25,29 @@ final class MediaAreaGeoPoint extends AbstractMediaArea
         public readonly ?GeoPointAddress $address = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->address !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->coordinates->serialize($serializer);
-        $buffer .= $this->geo->serialize($serializer);
+        $buffer .= $this->coordinates->serialize();
+        $buffer .= $this->geo->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $this->address->serialize($serializer);
+            $buffer .= $this->address->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $coordinates = MediaAreaCoordinates::deserialize($deserializer, $stream);
-        $geo = AbstractGeoPoint::deserialize($deserializer, $stream);
-        $address = ($flags & (1 << 0)) ? GeoPointAddress::deserialize($deserializer, $stream) : null;
+        $coordinates = MediaAreaCoordinates::deserialize($stream);
+        $geo = AbstractGeoPoint::deserialize($stream);
+        $address = ($flags & (1 << 0)) ? GeoPointAddress::deserialize($stream) : null;
         return new self(
             $coordinates,
             $geo,

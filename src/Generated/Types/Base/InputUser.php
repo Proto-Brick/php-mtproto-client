@@ -23,19 +23,19 @@ final class InputUser extends AbstractInputUser
         public readonly int $accessHash
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->int64($this->accessHash);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::int64($this->accessHash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $userId = $deserializer->int64($stream);
-        $accessHash = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $userId = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
         return new self(
             $userId,
             $accessHash

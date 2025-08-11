@@ -44,25 +44,25 @@ final class JoinGroupCallRequest extends TlObject
         public readonly ?string $inviteHash = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->muted) $flags |= (1 << 0);
         if ($this->videoStopped) $flags |= (1 << 2);
         if ($this->inviteHash !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->call->serialize($serializer);
-        $buffer .= $this->joinAs->serialize($serializer);
+        $buffer .= $this->call->serialize();
+        $buffer .= $this->joinAs->serialize();
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->inviteHash);
+            $buffer .= Serializer::bytes($this->inviteHash);
         }
-        $buffer .= $serializer->bytes(json_encode($this->params, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::bytes(json_encode($this->params, JSON_FORCE_OBJECT));
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

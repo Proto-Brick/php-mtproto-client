@@ -8,19 +8,19 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputStorePaymentPurpose extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputStorePaymentPremiumSubscription::CONSTRUCTOR_ID => InputStorePaymentPremiumSubscription::deserialize($deserializer, $stream),
-            InputStorePaymentGiftPremium::CONSTRUCTOR_ID => InputStorePaymentGiftPremium::deserialize($deserializer, $stream),
-            InputStorePaymentPremiumGiftCode::CONSTRUCTOR_ID => InputStorePaymentPremiumGiftCode::deserialize($deserializer, $stream),
-            InputStorePaymentPremiumGiveaway::CONSTRUCTOR_ID => InputStorePaymentPremiumGiveaway::deserialize($deserializer, $stream),
-            InputStorePaymentStarsTopup::CONSTRUCTOR_ID => InputStorePaymentStarsTopup::deserialize($deserializer, $stream),
-            InputStorePaymentStarsGift::CONSTRUCTOR_ID => InputStorePaymentStarsGift::deserialize($deserializer, $stream),
-            InputStorePaymentStarsGiveaway::CONSTRUCTOR_ID => InputStorePaymentStarsGiveaway::deserialize($deserializer, $stream),
+            InputStorePaymentPremiumSubscription::CONSTRUCTOR_ID => InputStorePaymentPremiumSubscription::deserialize($stream),
+            InputStorePaymentGiftPremium::CONSTRUCTOR_ID => InputStorePaymentGiftPremium::deserialize($stream),
+            InputStorePaymentPremiumGiftCode::CONSTRUCTOR_ID => InputStorePaymentPremiumGiftCode::deserialize($stream),
+            InputStorePaymentPremiumGiveaway::CONSTRUCTOR_ID => InputStorePaymentPremiumGiveaway::deserialize($stream),
+            InputStorePaymentStarsTopup::CONSTRUCTOR_ID => InputStorePaymentStarsTopup::deserialize($stream),
+            InputStorePaymentStarsGift::CONSTRUCTOR_ID => InputStorePaymentStarsGift::deserialize($stream),
+            InputStorePaymentStarsGiveaway::CONSTRUCTOR_ID => InputStorePaymentStarsGiveaway::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputStorePaymentPurpose. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

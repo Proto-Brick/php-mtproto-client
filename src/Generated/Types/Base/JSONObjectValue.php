@@ -23,23 +23,23 @@ final class JSONObjectValue extends TlObject
         public readonly array $value
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->key);
-        $buffer .= (new DataJSON(json_encode($this->value, JSON_FORCE_OBJECT)))->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->key);
+        $buffer .= (new DataJSON(json_encode($this->value, JSON_FORCE_OBJECT)))->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $key = $deserializer->bytes($stream);
-        $value = $deserializer->deserializeJsonValue($stream);
+        $key = Deserializer::bytes($stream);
+        $value = Deserializer::deserializeJsonValue($stream);
         return new self(
             $key,
             $value

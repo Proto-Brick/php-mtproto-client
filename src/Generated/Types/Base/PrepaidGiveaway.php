@@ -27,23 +27,23 @@ final class PrepaidGiveaway extends AbstractPrepaidGiveaway
         public readonly int $date
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->id);
-        $buffer .= $serializer->int32($this->months);
-        $buffer .= $serializer->int32($this->quantity);
-        $buffer .= $serializer->int32($this->date);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int32($this->months);
+        $buffer .= Serializer::int32($this->quantity);
+        $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $id = $deserializer->int64($stream);
-        $months = $deserializer->int32($stream);
-        $quantity = $deserializer->int32($stream);
-        $date = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $id = Deserializer::int64($stream);
+        $months = Deserializer::int32($stream);
+        $quantity = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
         return new self(
             $id,
             $months,

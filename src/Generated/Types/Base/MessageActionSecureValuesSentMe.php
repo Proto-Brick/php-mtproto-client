@@ -23,19 +23,19 @@ final class MessageActionSecureValuesSentMe extends AbstractMessageAction
         public readonly SecureCredentialsEncrypted $credentials
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->values);
-        $buffer .= $this->credentials->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->values);
+        $buffer .= $this->credentials->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $values = $deserializer->vectorOfObjects($stream, [SecureValue::class, 'deserialize']);
-        $credentials = SecureCredentialsEncrypted::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $values = Deserializer::vectorOfObjects($stream, [SecureValue::class, 'deserialize']);
+        $credentials = SecureCredentialsEncrypted::deserialize($stream);
         return new self(
             $values,
             $credentials

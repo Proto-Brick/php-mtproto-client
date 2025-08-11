@@ -27,27 +27,27 @@ final class InputAppEvent extends TlObject
         public readonly array $data
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= pack('d', $this->time);
-        $buffer .= $serializer->bytes($this->type);
-        $buffer .= $serializer->int64($this->peer);
-        $buffer .= (new DataJSON(json_encode($this->data, JSON_FORCE_OBJECT)))->serialize($serializer);
+        $buffer .= Serializer::bytes($this->type);
+        $buffer .= Serializer::int64($this->peer);
+        $buffer .= (new DataJSON(json_encode($this->data, JSON_FORCE_OBJECT)))->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $time = $deserializer->double($stream);
-        $type = $deserializer->bytes($stream);
-        $peer = $deserializer->int64($stream);
-        $data = $deserializer->deserializeJsonValue($stream);
+        $time = Deserializer::double($stream);
+        $type = Deserializer::bytes($stream);
+        $peer = Deserializer::int64($stream);
+        $data = Deserializer::deserializeJsonValue($stream);
         return new self(
             $time,
             $type,

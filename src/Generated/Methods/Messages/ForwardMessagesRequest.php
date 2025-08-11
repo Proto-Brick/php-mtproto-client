@@ -61,9 +61,9 @@ final class ForwardMessagesRequest extends TlObject
         public readonly ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->silent) $flags |= (1 << 5);
         if ($this->background) $flags |= (1 << 6);
@@ -76,28 +76,28 @@ final class ForwardMessagesRequest extends TlObject
         if ($this->scheduleDate !== null) $flags |= (1 << 10);
         if ($this->sendAs !== null) $flags |= (1 << 13);
         if ($this->quickReplyShortcut !== null) $flags |= (1 << 17);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->fromPeer->serialize($serializer);
-        $buffer .= $serializer->vectorOfInts($this->id);
-        $buffer .= $serializer->vectorOfLongs($this->randomId);
-        $buffer .= $this->toPeer->serialize($serializer);
+        $buffer .= $this->fromPeer->serialize();
+        $buffer .= Serializer::vectorOfInts($this->id);
+        $buffer .= Serializer::vectorOfLongs($this->randomId);
+        $buffer .= $this->toPeer->serialize();
         if ($flags & (1 << 9)) {
-            $buffer .= $serializer->int32($this->topMsgId);
+            $buffer .= Serializer::int32($this->topMsgId);
         }
         if ($flags & (1 << 10)) {
-            $buffer .= $serializer->int32($this->scheduleDate);
+            $buffer .= Serializer::int32($this->scheduleDate);
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $this->sendAs->serialize($serializer);
+            $buffer .= $this->sendAs->serialize();
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $this->quickReplyShortcut->serialize($serializer);
+            $buffer .= $this->quickReplyShortcut->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -105,9 +105,9 @@ final class User extends AbstractUser
         public readonly ?int $botActiveUsers = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->self) $flags |= (1 << 10);
         if ($this->contact) $flags |= (1 << 11);
@@ -139,7 +139,7 @@ final class User extends AbstractUser
         if ($this->botInlinePlaceholder !== null) $flags |= (1 << 19);
         if ($this->langCode !== null) $flags |= (1 << 22);
         if ($this->emojiStatus !== null) $flags |= (1 << 30);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
         $flags2 = 0;
         if ($this->botCanEdit) $flags2 |= (1 << 1);
         if ($this->closeFriend) $flags2 |= (1 << 2);
@@ -153,68 +153,68 @@ final class User extends AbstractUser
         if ($this->color !== null) $flags2 |= (1 << 8);
         if ($this->profileColor !== null) $flags2 |= (1 << 9);
         if ($this->botActiveUsers !== null) $flags2 |= (1 << 12);
-        $buffer .= $serializer->int32($flags2);
+        $buffer .= Serializer::int32($flags2);
 
-        $buffer .= $serializer->int64($this->id);
+        $buffer .= Serializer::int64($this->id);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->accessHash);
+            $buffer .= Serializer::int64($this->accessHash);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->firstName);
+            $buffer .= Serializer::bytes($this->firstName);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->lastName);
+            $buffer .= Serializer::bytes($this->lastName);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->username);
+            $buffer .= Serializer::bytes($this->username);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->bytes($this->phone);
+            $buffer .= Serializer::bytes($this->phone);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $this->status->serialize($serializer);
+            $buffer .= $this->status->serialize();
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $serializer->int32($this->botInfoVersion);
+            $buffer .= Serializer::int32($this->botInfoVersion);
         }
         if ($flags & (1 << 18)) {
-            $buffer .= $serializer->vectorOfObjects($this->restrictionReason);
+            $buffer .= Serializer::vectorOfObjects($this->restrictionReason);
         }
         if ($flags & (1 << 19)) {
-            $buffer .= $serializer->bytes($this->botInlinePlaceholder);
+            $buffer .= Serializer::bytes($this->botInlinePlaceholder);
         }
         if ($flags & (1 << 22)) {
-            $buffer .= $serializer->bytes($this->langCode);
+            $buffer .= Serializer::bytes($this->langCode);
         }
         if ($flags & (1 << 30)) {
-            $buffer .= $this->emojiStatus->serialize($serializer);
+            $buffer .= $this->emojiStatus->serialize();
         }
         if ($flags2 & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->usernames);
+            $buffer .= Serializer::vectorOfObjects($this->usernames);
         }
         if ($flags2 & (1 << 5)) {
-            $buffer .= $serializer->int32($this->storiesMaxId);
+            $buffer .= Serializer::int32($this->storiesMaxId);
         }
         if ($flags2 & (1 << 8)) {
-            $buffer .= $this->color->serialize($serializer);
+            $buffer .= $this->color->serialize();
         }
         if ($flags2 & (1 << 9)) {
-            $buffer .= $this->profileColor->serialize($serializer);
+            $buffer .= $this->profileColor->serialize();
         }
         if ($flags2 & (1 << 12)) {
-            $buffer .= $serializer->int32($this->botActiveUsers);
+            $buffer .= Serializer::int32($this->botActiveUsers);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
-        $flags2 = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
+        $flags2 = Deserializer::int32($stream);
 
         $self = ($flags & (1 << 10)) ? true : null;
         $contact = ($flags & (1 << 11)) ? true : null;
@@ -241,24 +241,24 @@ final class User extends AbstractUser
         $contactRequirePremium = ($flags2 & (1 << 10)) ? true : null;
         $botBusiness = ($flags2 & (1 << 11)) ? true : null;
         $botHasMainApp = ($flags2 & (1 << 13)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $accessHash = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $firstName = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $lastName = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $username = ($flags & (1 << 3)) ? $deserializer->bytes($stream) : null;
-        $phone = ($flags & (1 << 4)) ? $deserializer->bytes($stream) : null;
-        $photo = ($flags & (1 << 5)) ? AbstractUserProfilePhoto::deserialize($deserializer, $stream) : null;
-        $status = ($flags & (1 << 6)) ? AbstractUserStatus::deserialize($deserializer, $stream) : null;
-        $botInfoVersion = ($flags & (1 << 14)) ? $deserializer->int32($stream) : null;
-        $restrictionReason = ($flags & (1 << 18)) ? $deserializer->vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
-        $botInlinePlaceholder = ($flags & (1 << 19)) ? $deserializer->bytes($stream) : null;
-        $langCode = ($flags & (1 << 22)) ? $deserializer->bytes($stream) : null;
-        $emojiStatus = ($flags & (1 << 30)) ? AbstractEmojiStatus::deserialize($deserializer, $stream) : null;
-        $usernames = ($flags2 & (1 << 0)) ? $deserializer->vectorOfObjects($stream, [Username::class, 'deserialize']) : null;
-        $storiesMaxId = ($flags2 & (1 << 5)) ? $deserializer->int32($stream) : null;
-        $color = ($flags2 & (1 << 8)) ? PeerColor::deserialize($deserializer, $stream) : null;
-        $profileColor = ($flags2 & (1 << 9)) ? PeerColor::deserialize($deserializer, $stream) : null;
-        $botActiveUsers = ($flags2 & (1 << 12)) ? $deserializer->int32($stream) : null;
+        $id = Deserializer::int64($stream);
+        $accessHash = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $firstName = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $lastName = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $username = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $phone = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
+        $photo = ($flags & (1 << 5)) ? AbstractUserProfilePhoto::deserialize($stream) : null;
+        $status = ($flags & (1 << 6)) ? AbstractUserStatus::deserialize($stream) : null;
+        $botInfoVersion = ($flags & (1 << 14)) ? Deserializer::int32($stream) : null;
+        $restrictionReason = ($flags & (1 << 18)) ? Deserializer::vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
+        $botInlinePlaceholder = ($flags & (1 << 19)) ? Deserializer::bytes($stream) : null;
+        $langCode = ($flags & (1 << 22)) ? Deserializer::bytes($stream) : null;
+        $emojiStatus = ($flags & (1 << 30)) ? AbstractEmojiStatus::deserialize($stream) : null;
+        $usernames = ($flags2 & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [Username::class, 'deserialize']) : null;
+        $storiesMaxId = ($flags2 & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $color = ($flags2 & (1 << 8)) ? PeerColor::deserialize($stream) : null;
+        $profileColor = ($flags2 & (1 << 9)) ? PeerColor::deserialize($stream) : null;
+        $botActiveUsers = ($flags2 & (1 << 12)) ? Deserializer::int32($stream) : null;
         return new self(
             $id,
             $self,

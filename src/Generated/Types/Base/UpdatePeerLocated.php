@@ -21,17 +21,17 @@ final class UpdatePeerLocated extends AbstractUpdate
         public readonly array $peers
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->peers);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->peers);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peers = $deserializer->vectorOfObjects($stream, [AbstractPeerLocated::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peers = Deserializer::vectorOfObjects($stream, [AbstractPeerLocated::class, 'deserialize']);
         return new self(
             $peers
         );

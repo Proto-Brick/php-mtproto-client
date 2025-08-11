@@ -36,37 +36,37 @@ final class PaymentFormStars extends AbstractPaymentForm
         public readonly ?AbstractWebDocument $photo = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->photo !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->formId);
-        $buffer .= $serializer->int64($this->botId);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->description);
+        $buffer .= Serializer::int64($this->formId);
+        $buffer .= Serializer::int64($this->botId);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->description);
         if ($flags & (1 << 5)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
-        $buffer .= $this->invoice->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= $this->invoice->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $formId = $deserializer->int64($stream);
-        $botId = $deserializer->int64($stream);
-        $title = $deserializer->bytes($stream);
-        $description = $deserializer->bytes($stream);
-        $photo = ($flags & (1 << 5)) ? AbstractWebDocument::deserialize($deserializer, $stream) : null;
-        $invoice = Invoice::deserialize($deserializer, $stream);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $formId = Deserializer::int64($stream);
+        $botId = Deserializer::int64($stream);
+        $title = Deserializer::bytes($stream);
+        $description = Deserializer::bytes($stream);
+        $photo = ($flags & (1 << 5)) ? AbstractWebDocument::deserialize($stream) : null;
+        $invoice = Invoice::deserialize($stream);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $formId,
             $botId,

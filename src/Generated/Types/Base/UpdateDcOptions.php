@@ -21,17 +21,17 @@ final class UpdateDcOptions extends AbstractUpdate
         public readonly array $dcOptions
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->dcOptions);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->dcOptions);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $dcOptions = $deserializer->vectorOfObjects($stream, [DcOption::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $dcOptions = Deserializer::vectorOfObjects($stream, [DcOption::class, 'deserialize']);
         return new self(
             $dcOptions
         );

@@ -8,16 +8,16 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractReplyMarkup extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ReplyKeyboardHide::CONSTRUCTOR_ID => ReplyKeyboardHide::deserialize($deserializer, $stream),
-            ReplyKeyboardForceReply::CONSTRUCTOR_ID => ReplyKeyboardForceReply::deserialize($deserializer, $stream),
-            ReplyKeyboardMarkup::CONSTRUCTOR_ID => ReplyKeyboardMarkup::deserialize($deserializer, $stream),
-            ReplyInlineMarkup::CONSTRUCTOR_ID => ReplyInlineMarkup::deserialize($deserializer, $stream),
+            ReplyKeyboardHide::CONSTRUCTOR_ID => ReplyKeyboardHide::deserialize($stream),
+            ReplyKeyboardForceReply::CONSTRUCTOR_ID => ReplyKeyboardForceReply::deserialize($stream),
+            ReplyKeyboardMarkup::CONSTRUCTOR_ID => ReplyKeyboardMarkup::deserialize($stream),
+            ReplyInlineMarkup::CONSTRUCTOR_ID => ReplyInlineMarkup::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ReplyMarkup. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

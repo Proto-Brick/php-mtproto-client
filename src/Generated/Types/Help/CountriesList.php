@@ -23,19 +23,19 @@ final class CountriesList extends AbstractCountriesList
         public readonly int $hash
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->countries);
-        $buffer .= $serializer->int32($this->hash);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->countries);
+        $buffer .= Serializer::int32($this->hash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $countries = $deserializer->vectorOfObjects($stream, [Country::class, 'deserialize']);
-        $hash = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $countries = Deserializer::vectorOfObjects($stream, [Country::class, 'deserialize']);
+        $hash = Deserializer::int32($stream);
         return new self(
             $countries,
             $hash

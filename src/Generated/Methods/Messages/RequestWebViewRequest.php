@@ -57,9 +57,9 @@ final class RequestWebViewRequest extends TlObject
         public readonly ?AbstractInputPeer $sendAs = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->fromBotMenu) $flags |= (1 << 4);
         if ($this->silent) $flags |= (1 << 5);
@@ -70,30 +70,30 @@ final class RequestWebViewRequest extends TlObject
         if ($this->themeParams !== null) $flags |= (1 << 2);
         if ($this->replyTo !== null) $flags |= (1 << 0);
         if ($this->sendAs !== null) $flags |= (1 << 13);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $this->bot->serialize($serializer);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->bot->serialize();
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->url);
+            $buffer .= Serializer::bytes($this->url);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->bytes($this->startParam);
+            $buffer .= Serializer::bytes($this->startParam);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes(json_encode($this->themeParams, JSON_FORCE_OBJECT));
+            $buffer .= Serializer::bytes(json_encode($this->themeParams, JSON_FORCE_OBJECT));
         }
-        $buffer .= $serializer->bytes($this->platform);
+        $buffer .= Serializer::bytes($this->platform);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->replyTo->serialize($serializer);
+            $buffer .= $this->replyTo->serialize();
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $this->sendAs->serialize($serializer);
+            $buffer .= $this->sendAs->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

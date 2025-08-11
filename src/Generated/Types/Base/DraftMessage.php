@@ -35,9 +35,9 @@ final class DraftMessage extends AbstractDraftMessage
         public readonly ?int $effect = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->noWebpage) $flags |= (1 << 1);
         if ($this->invertMedia) $flags |= (1 << 6);
@@ -45,38 +45,38 @@ final class DraftMessage extends AbstractDraftMessage
         if ($this->entities !== null) $flags |= (1 << 3);
         if ($this->media !== null) $flags |= (1 << 5);
         if ($this->effect !== null) $flags |= (1 << 7);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 4)) {
-            $buffer .= $this->replyTo->serialize($serializer);
+            $buffer .= $this->replyTo->serialize();
         }
-        $buffer .= $serializer->bytes($this->message);
+        $buffer .= Serializer::bytes($this->message);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->entities);
+            $buffer .= Serializer::vectorOfObjects($this->entities);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $this->media->serialize($serializer);
+            $buffer .= $this->media->serialize();
         }
-        $buffer .= $serializer->int32($this->date);
+        $buffer .= Serializer::int32($this->date);
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->int64($this->effect);
+            $buffer .= Serializer::int64($this->effect);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $noWebpage = ($flags & (1 << 1)) ? true : null;
         $invertMedia = ($flags & (1 << 6)) ? true : null;
-        $replyTo = ($flags & (1 << 4)) ? AbstractInputReplyTo::deserialize($deserializer, $stream) : null;
-        $message = $deserializer->bytes($stream);
-        $entities = ($flags & (1 << 3)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $media = ($flags & (1 << 5)) ? AbstractInputMedia::deserialize($deserializer, $stream) : null;
-        $date = $deserializer->int32($stream);
-        $effect = ($flags & (1 << 7)) ? $deserializer->int64($stream) : null;
+        $replyTo = ($flags & (1 << 4)) ? AbstractInputReplyTo::deserialize($stream) : null;
+        $message = Deserializer::bytes($stream);
+        $entities = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $media = ($flags & (1 << 5)) ? AbstractInputMedia::deserialize($stream) : null;
+        $date = Deserializer::int32($stream);
+        $effect = ($flags & (1 << 7)) ? Deserializer::int64($stream) : null;
         return new self(
             $message,
             $date,

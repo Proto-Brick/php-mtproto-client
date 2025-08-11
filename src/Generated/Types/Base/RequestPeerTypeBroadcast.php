@@ -27,37 +27,37 @@ final class RequestPeerTypeBroadcast extends AbstractRequestPeerType
         public readonly ?ChatAdminRights $botAdminRights = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->creator) $flags |= (1 << 0);
         if ($this->hasUsername !== null) $flags |= (1 << 3);
         if ($this->userAdminRights !== null) $flags |= (1 << 1);
         if ($this->botAdminRights !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 3)) {
-            $buffer .= ($this->hasUsername ? $serializer->int32(0x997275b5) : $serializer->int32(0xbc799737));
+            $buffer .= ($this->hasUsername ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->userAdminRights->serialize($serializer);
+            $buffer .= $this->userAdminRights->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $this->botAdminRights->serialize($serializer);
+            $buffer .= $this->botAdminRights->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $creator = ($flags & (1 << 0)) ? true : null;
-        $hasUsername = ($flags & (1 << 3)) ? ($deserializer->int32($stream) === 0x997275b5) : null;
-        $userAdminRights = ($flags & (1 << 1)) ? ChatAdminRights::deserialize($deserializer, $stream) : null;
-        $botAdminRights = ($flags & (1 << 2)) ? ChatAdminRights::deserialize($deserializer, $stream) : null;
+        $hasUsername = ($flags & (1 << 3)) ? (Deserializer::int32($stream) === 0x997275b5) : null;
+        $userAdminRights = ($flags & (1 << 1)) ? ChatAdminRights::deserialize($stream) : null;
+        $botAdminRights = ($flags & (1 << 2)) ? ChatAdminRights::deserialize($stream) : null;
         return new self(
             $creator,
             $hasUsername,

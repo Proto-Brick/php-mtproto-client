@@ -31,41 +31,41 @@ final class MessageActionGiftStars extends AbstractMessageAction
         public readonly ?string $transactionId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->cryptoCurrency !== null) $flags |= (1 << 0);
         if ($this->cryptoAmount !== null) $flags |= (1 << 0);
         if ($this->transactionId !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->amount);
-        $buffer .= $serializer->int64($this->stars);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->amount);
+        $buffer .= Serializer::int64($this->stars);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->cryptoCurrency);
+            $buffer .= Serializer::bytes($this->cryptoCurrency);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->cryptoAmount);
+            $buffer .= Serializer::int64($this->cryptoAmount);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->transactionId);
+            $buffer .= Serializer::bytes($this->transactionId);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $currency = $deserializer->bytes($stream);
-        $amount = $deserializer->int64($stream);
-        $stars = $deserializer->int64($stream);
-        $cryptoCurrency = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $cryptoAmount = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
-        $transactionId = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
+        $currency = Deserializer::bytes($stream);
+        $amount = Deserializer::int64($stream);
+        $stars = Deserializer::int64($stream);
+        $cryptoCurrency = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $cryptoAmount = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $transactionId = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
         return new self(
             $currency,
             $amount,

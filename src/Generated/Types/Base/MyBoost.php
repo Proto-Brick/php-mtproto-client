@@ -29,40 +29,40 @@ final class MyBoost extends TlObject
         public readonly ?int $cooldownUntilDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->peer !== null) $flags |= (1 << 0);
         if ($this->cooldownUntilDate !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->slot);
+        $buffer .= Serializer::int32($this->slot);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->peer->serialize($serializer);
+            $buffer .= $this->peer->serialize();
         }
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int32($this->expires);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int32($this->expires);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->cooldownUntilDate);
+            $buffer .= Serializer::int32($this->cooldownUntilDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $slot = $deserializer->int32($stream);
-        $peer = ($flags & (1 << 0)) ? AbstractPeer::deserialize($deserializer, $stream) : null;
-        $date = $deserializer->int32($stream);
-        $expires = $deserializer->int32($stream);
-        $cooldownUntilDate = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
+        $slot = Deserializer::int32($stream);
+        $peer = ($flags & (1 << 0)) ? AbstractPeer::deserialize($stream) : null;
+        $date = Deserializer::int32($stream);
+        $expires = Deserializer::int32($stream);
+        $cooldownUntilDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
         return new self(
             $slot,
             $date,

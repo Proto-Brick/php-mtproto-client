@@ -27,40 +27,40 @@ final class MessageExtendedMediaPreview extends AbstractMessageExtendedMedia
         public readonly ?int $videoDuration = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->w !== null) $flags |= (1 << 0);
         if ($this->h !== null) $flags |= (1 << 0);
         if ($this->thumb !== null) $flags |= (1 << 1);
         if ($this->videoDuration !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->w);
+            $buffer .= Serializer::int32($this->w);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->h);
+            $buffer .= Serializer::int32($this->h);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->thumb->serialize($serializer);
+            $buffer .= $this->thumb->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->videoDuration);
+            $buffer .= Serializer::int32($this->videoDuration);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $w = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $h = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $thumb = ($flags & (1 << 1)) ? AbstractPhotoSize::deserialize($deserializer, $stream) : null;
-        $videoDuration = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
+        $w = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $h = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $thumb = ($flags & (1 << 1)) ? AbstractPhotoSize::deserialize($stream) : null;
+        $videoDuration = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
         return new self(
             $w,
             $h,

@@ -27,23 +27,23 @@ final class PasswordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow ex
         public readonly string $p
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->salt1);
-        $buffer .= $serializer->bytes($this->salt2);
-        $buffer .= $serializer->int32($this->g);
-        $buffer .= $serializer->bytes($this->p);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->salt1);
+        $buffer .= Serializer::bytes($this->salt2);
+        $buffer .= Serializer::int32($this->g);
+        $buffer .= Serializer::bytes($this->p);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $salt1 = $deserializer->bytes($stream);
-        $salt2 = $deserializer->bytes($stream);
-        $g = $deserializer->int32($stream);
-        $p = $deserializer->bytes($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $salt1 = Deserializer::bytes($stream);
+        $salt2 = Deserializer::bytes($stream);
+        $g = Deserializer::int32($stream);
+        $p = Deserializer::bytes($stream);
         return new self(
             $salt1,
             $salt2,

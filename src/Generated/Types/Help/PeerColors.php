@@ -23,19 +23,19 @@ final class PeerColors extends AbstractPeerColors
         public readonly array $colors
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->hash);
-        $buffer .= $serializer->vectorOfObjects($this->colors);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->hash);
+        $buffer .= Serializer::vectorOfObjects($this->colors);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $hash = $deserializer->int32($stream);
-        $colors = $deserializer->vectorOfObjects($stream, [PeerColorOption::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $hash = Deserializer::int32($stream);
+        $colors = Deserializer::vectorOfObjects($stream, [PeerColorOption::class, 'deserialize']);
         return new self(
             $hash,
             $colors

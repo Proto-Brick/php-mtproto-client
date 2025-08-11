@@ -8,16 +8,16 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputBotInlineResult extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputBotInlineResult::CONSTRUCTOR_ID => InputBotInlineResult::deserialize($deserializer, $stream),
-            InputBotInlineResultPhoto::CONSTRUCTOR_ID => InputBotInlineResultPhoto::deserialize($deserializer, $stream),
-            InputBotInlineResultDocument::CONSTRUCTOR_ID => InputBotInlineResultDocument::deserialize($deserializer, $stream),
-            InputBotInlineResultGame::CONSTRUCTOR_ID => InputBotInlineResultGame::deserialize($deserializer, $stream),
+            InputBotInlineResult::CONSTRUCTOR_ID => InputBotInlineResult::deserialize($stream),
+            InputBotInlineResultPhoto::CONSTRUCTOR_ID => InputBotInlineResultPhoto::deserialize($stream),
+            InputBotInlineResultDocument::CONSTRUCTOR_ID => InputBotInlineResultDocument::deserialize($stream),
+            InputBotInlineResultGame::CONSTRUCTOR_ID => InputBotInlineResultGame::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputBotInlineResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

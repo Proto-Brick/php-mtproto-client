@@ -36,47 +36,47 @@ final class DiscussionMessage extends TlObject
         public readonly ?int $readOutboxMaxId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->maxId !== null) $flags |= (1 << 0);
         if ($this->readInboxMaxId !== null) $flags |= (1 << 1);
         if ($this->readOutboxMaxId !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->vectorOfObjects($this->messages);
+        $buffer .= Serializer::vectorOfObjects($this->messages);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->maxId);
+            $buffer .= Serializer::int32($this->maxId);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->readInboxMaxId);
+            $buffer .= Serializer::int32($this->readInboxMaxId);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->readOutboxMaxId);
+            $buffer .= Serializer::int32($this->readOutboxMaxId);
         }
-        $buffer .= $serializer->int32($this->unreadCount);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::int32($this->unreadCount);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $messages = $deserializer->vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $maxId = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $readInboxMaxId = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $readOutboxMaxId = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $unreadCount = $deserializer->int32($stream);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
+        $maxId = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $readInboxMaxId = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $readOutboxMaxId = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $unreadCount = Deserializer::int32($stream);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $messages,
             $unreadCount,

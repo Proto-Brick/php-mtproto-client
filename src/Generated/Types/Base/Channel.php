@@ -103,9 +103,9 @@ final class Channel extends AbstractChat
         public readonly ?int $subscriptionUntilDate = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->creator) $flags |= (1 << 0);
         if ($this->left) $flags |= (1 << 2);
@@ -134,7 +134,7 @@ final class Channel extends AbstractChat
         if ($this->bannedRights !== null) $flags |= (1 << 15);
         if ($this->defaultBannedRights !== null) $flags |= (1 << 18);
         if ($this->participantsCount !== null) $flags |= (1 << 17);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
         $flags2 = 0;
         if ($this->storiesHidden) $flags2 |= (1 << 1);
         if ($this->storiesHiddenMin) $flags2 |= (1 << 2);
@@ -147,62 +147,62 @@ final class Channel extends AbstractChat
         if ($this->emojiStatus !== null) $flags2 |= (1 << 9);
         if ($this->level !== null) $flags2 |= (1 << 10);
         if ($this->subscriptionUntilDate !== null) $flags2 |= (1 << 11);
-        $buffer .= $serializer->int32($flags2);
+        $buffer .= Serializer::int32($flags2);
 
-        $buffer .= $serializer->int64($this->id);
+        $buffer .= Serializer::int64($this->id);
         if ($flags & (1 << 13)) {
-            $buffer .= $serializer->int64($this->accessHash);
+            $buffer .= Serializer::int64($this->accessHash);
         }
-        $buffer .= $serializer->bytes($this->title);
+        $buffer .= Serializer::bytes($this->title);
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->bytes($this->username);
+            $buffer .= Serializer::bytes($this->username);
         }
-        $buffer .= $this->photo->serialize($serializer);
-        $buffer .= $serializer->int32($this->date);
+        $buffer .= $this->photo->serialize();
+        $buffer .= Serializer::int32($this->date);
         if ($flags & (1 << 9)) {
-            $buffer .= $serializer->vectorOfObjects($this->restrictionReason);
+            $buffer .= Serializer::vectorOfObjects($this->restrictionReason);
         }
         if ($flags & (1 << 14)) {
-            $buffer .= $this->adminRights->serialize($serializer);
+            $buffer .= $this->adminRights->serialize();
         }
         if ($flags & (1 << 15)) {
-            $buffer .= $this->bannedRights->serialize($serializer);
+            $buffer .= $this->bannedRights->serialize();
         }
         if ($flags & (1 << 18)) {
-            $buffer .= $this->defaultBannedRights->serialize($serializer);
+            $buffer .= $this->defaultBannedRights->serialize();
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $serializer->int32($this->participantsCount);
+            $buffer .= Serializer::int32($this->participantsCount);
         }
         if ($flags2 & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->usernames);
+            $buffer .= Serializer::vectorOfObjects($this->usernames);
         }
         if ($flags2 & (1 << 4)) {
-            $buffer .= $serializer->int32($this->storiesMaxId);
+            $buffer .= Serializer::int32($this->storiesMaxId);
         }
         if ($flags2 & (1 << 7)) {
-            $buffer .= $this->color->serialize($serializer);
+            $buffer .= $this->color->serialize();
         }
         if ($flags2 & (1 << 8)) {
-            $buffer .= $this->profileColor->serialize($serializer);
+            $buffer .= $this->profileColor->serialize();
         }
         if ($flags2 & (1 << 9)) {
-            $buffer .= $this->emojiStatus->serialize($serializer);
+            $buffer .= $this->emojiStatus->serialize();
         }
         if ($flags2 & (1 << 10)) {
-            $buffer .= $serializer->int32($this->level);
+            $buffer .= Serializer::int32($this->level);
         }
         if ($flags2 & (1 << 11)) {
-            $buffer .= $serializer->int32($this->subscriptionUntilDate);
+            $buffer .= Serializer::int32($this->subscriptionUntilDate);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
-        $flags2 = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
+        $flags2 = Deserializer::int32($stream);
 
         $creator = ($flags & (1 << 0)) ? true : null;
         $left = ($flags & (1 << 2)) ? true : null;
@@ -228,24 +228,24 @@ final class Channel extends AbstractChat
         $storiesHiddenMin = ($flags2 & (1 << 2)) ? true : null;
         $storiesUnavailable = ($flags2 & (1 << 3)) ? true : null;
         $signatureProfiles = ($flags2 & (1 << 12)) ? true : null;
-        $id = $deserializer->int64($stream);
-        $accessHash = ($flags & (1 << 13)) ? $deserializer->int64($stream) : null;
-        $title = $deserializer->bytes($stream);
-        $username = ($flags & (1 << 6)) ? $deserializer->bytes($stream) : null;
-        $photo = AbstractChatPhoto::deserialize($deserializer, $stream);
-        $date = $deserializer->int32($stream);
-        $restrictionReason = ($flags & (1 << 9)) ? $deserializer->vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
-        $adminRights = ($flags & (1 << 14)) ? ChatAdminRights::deserialize($deserializer, $stream) : null;
-        $bannedRights = ($flags & (1 << 15)) ? ChatBannedRights::deserialize($deserializer, $stream) : null;
-        $defaultBannedRights = ($flags & (1 << 18)) ? ChatBannedRights::deserialize($deserializer, $stream) : null;
-        $participantsCount = ($flags & (1 << 17)) ? $deserializer->int32($stream) : null;
-        $usernames = ($flags2 & (1 << 0)) ? $deserializer->vectorOfObjects($stream, [Username::class, 'deserialize']) : null;
-        $storiesMaxId = ($flags2 & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $color = ($flags2 & (1 << 7)) ? PeerColor::deserialize($deserializer, $stream) : null;
-        $profileColor = ($flags2 & (1 << 8)) ? PeerColor::deserialize($deserializer, $stream) : null;
-        $emojiStatus = ($flags2 & (1 << 9)) ? AbstractEmojiStatus::deserialize($deserializer, $stream) : null;
-        $level = ($flags2 & (1 << 10)) ? $deserializer->int32($stream) : null;
-        $subscriptionUntilDate = ($flags2 & (1 << 11)) ? $deserializer->int32($stream) : null;
+        $id = Deserializer::int64($stream);
+        $accessHash = ($flags & (1 << 13)) ? Deserializer::int64($stream) : null;
+        $title = Deserializer::bytes($stream);
+        $username = ($flags & (1 << 6)) ? Deserializer::bytes($stream) : null;
+        $photo = AbstractChatPhoto::deserialize($stream);
+        $date = Deserializer::int32($stream);
+        $restrictionReason = ($flags & (1 << 9)) ? Deserializer::vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
+        $adminRights = ($flags & (1 << 14)) ? ChatAdminRights::deserialize($stream) : null;
+        $bannedRights = ($flags & (1 << 15)) ? ChatBannedRights::deserialize($stream) : null;
+        $defaultBannedRights = ($flags & (1 << 18)) ? ChatBannedRights::deserialize($stream) : null;
+        $participantsCount = ($flags & (1 << 17)) ? Deserializer::int32($stream) : null;
+        $usernames = ($flags2 & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [Username::class, 'deserialize']) : null;
+        $storiesMaxId = ($flags2 & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $color = ($flags2 & (1 << 7)) ? PeerColor::deserialize($stream) : null;
+        $profileColor = ($flags2 & (1 << 8)) ? PeerColor::deserialize($stream) : null;
+        $emojiStatus = ($flags2 & (1 << 9)) ? AbstractEmojiStatus::deserialize($stream) : null;
+        $level = ($flags2 & (1 << 10)) ? Deserializer::int32($stream) : null;
+        $subscriptionUntilDate = ($flags2 & (1 << 11)) ? Deserializer::int32($stream) : null;
         return new self(
             $id,
             $title,

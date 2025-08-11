@@ -8,18 +8,18 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputInvoice extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputInvoiceMessage::CONSTRUCTOR_ID => InputInvoiceMessage::deserialize($deserializer, $stream),
-            InputInvoiceSlug::CONSTRUCTOR_ID => InputInvoiceSlug::deserialize($deserializer, $stream),
-            InputInvoicePremiumGiftCode::CONSTRUCTOR_ID => InputInvoicePremiumGiftCode::deserialize($deserializer, $stream),
-            InputInvoiceStars::CONSTRUCTOR_ID => InputInvoiceStars::deserialize($deserializer, $stream),
-            InputInvoiceChatInviteSubscription::CONSTRUCTOR_ID => InputInvoiceChatInviteSubscription::deserialize($deserializer, $stream),
-            InputInvoiceStarGift::CONSTRUCTOR_ID => InputInvoiceStarGift::deserialize($deserializer, $stream),
+            InputInvoiceMessage::CONSTRUCTOR_ID => InputInvoiceMessage::deserialize($stream),
+            InputInvoiceSlug::CONSTRUCTOR_ID => InputInvoiceSlug::deserialize($stream),
+            InputInvoicePremiumGiftCode::CONSTRUCTOR_ID => InputInvoicePremiumGiftCode::deserialize($stream),
+            InputInvoiceStars::CONSTRUCTOR_ID => InputInvoiceStars::deserialize($stream),
+            InputInvoiceChatInviteSubscription::CONSTRUCTOR_ID => InputInvoiceChatInviteSubscription::deserialize($stream),
+            InputInvoiceStarGift::CONSTRUCTOR_ID => InputInvoiceStarGift::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputInvoice. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

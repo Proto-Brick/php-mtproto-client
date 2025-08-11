@@ -42,24 +42,24 @@ final class GetInlineBotResultsRequest extends TlObject
         public readonly ?AbstractInputGeoPoint $geoPoint = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->geoPoint !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->bot->serialize($serializer);
-        $buffer .= $this->peer->serialize($serializer);
+        $buffer .= $this->bot->serialize();
+        $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $this->geoPoint->serialize($serializer);
+            $buffer .= $this->geoPoint->serialize();
         }
-        $buffer .= $serializer->bytes($this->query);
-        $buffer .= $serializer->bytes($this->offset);
+        $buffer .= Serializer::bytes($this->query);
+        $buffer .= Serializer::bytes($this->offset);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

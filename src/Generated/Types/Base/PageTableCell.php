@@ -35,9 +35,9 @@ final class PageTableCell extends TlObject
         public readonly ?int $rowspan = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->header) $flags |= (1 << 0);
         if ($this->alignCenter) $flags |= (1 << 3);
@@ -47,37 +47,37 @@ final class PageTableCell extends TlObject
         if ($this->text !== null) $flags |= (1 << 7);
         if ($this->colspan !== null) $flags |= (1 << 1);
         if ($this->rowspan !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 7)) {
-            $buffer .= $this->text->serialize($serializer);
+            $buffer .= $this->text->serialize();
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->colspan);
+            $buffer .= Serializer::int32($this->colspan);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->rowspan);
+            $buffer .= Serializer::int32($this->rowspan);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $header = ($flags & (1 << 0)) ? true : null;
         $alignCenter = ($flags & (1 << 3)) ? true : null;
         $alignRight = ($flags & (1 << 4)) ? true : null;
         $valignMiddle = ($flags & (1 << 5)) ? true : null;
         $valignBottom = ($flags & (1 << 6)) ? true : null;
-        $text = ($flags & (1 << 7)) ? AbstractRichText::deserialize($deserializer, $stream) : null;
-        $colspan = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
-        $rowspan = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
+        $text = ($flags & (1 << 7)) ? AbstractRichText::deserialize($stream) : null;
+        $colspan = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $rowspan = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
         return new self(
             $header,
             $alignCenter,

@@ -29,36 +29,36 @@ final class UpdateBotInlineSend extends AbstractUpdate
         public readonly ?AbstractInputBotInlineMessageID $msgId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->geo !== null) $flags |= (1 << 0);
         if ($this->msgId !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->userId);
-        $buffer .= $serializer->bytes($this->query);
+        $buffer .= Serializer::int64($this->userId);
+        $buffer .= Serializer::bytes($this->query);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->geo->serialize($serializer);
+            $buffer .= $this->geo->serialize();
         }
-        $buffer .= $serializer->bytes($this->id);
+        $buffer .= Serializer::bytes($this->id);
         if ($flags & (1 << 1)) {
-            $buffer .= $this->msgId->serialize($serializer);
+            $buffer .= $this->msgId->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $userId = $deserializer->int64($stream);
-        $query = $deserializer->bytes($stream);
-        $geo = ($flags & (1 << 0)) ? AbstractGeoPoint::deserialize($deserializer, $stream) : null;
-        $id = $deserializer->bytes($stream);
-        $msgId = ($flags & (1 << 1)) ? AbstractInputBotInlineMessageID::deserialize($deserializer, $stream) : null;
+        $userId = Deserializer::int64($stream);
+        $query = Deserializer::bytes($stream);
+        $geo = ($flags & (1 << 0)) ? AbstractGeoPoint::deserialize($stream) : null;
+        $id = Deserializer::bytes($stream);
+        $msgId = ($flags & (1 << 1)) ? AbstractInputBotInlineMessageID::deserialize($stream) : null;
         return new self(
             $userId,
             $query,

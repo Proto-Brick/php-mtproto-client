@@ -33,29 +33,29 @@ final class EncryptedChat extends AbstractEncryptedChat
         public readonly int $keyFingerprint
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->id);
-        $buffer .= $serializer->int64($this->accessHash);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int64($this->adminId);
-        $buffer .= $serializer->int64($this->participantId);
-        $buffer .= $serializer->bytes($this->gAOrB);
-        $buffer .= $serializer->int64($this->keyFingerprint);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->id);
+        $buffer .= Serializer::int64($this->accessHash);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int64($this->adminId);
+        $buffer .= Serializer::int64($this->participantId);
+        $buffer .= Serializer::bytes($this->gAOrB);
+        $buffer .= Serializer::int64($this->keyFingerprint);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $id = $deserializer->int32($stream);
-        $accessHash = $deserializer->int64($stream);
-        $date = $deserializer->int32($stream);
-        $adminId = $deserializer->int64($stream);
-        $participantId = $deserializer->int64($stream);
-        $gAOrB = $deserializer->bytes($stream);
-        $keyFingerprint = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $id = Deserializer::int32($stream);
+        $accessHash = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
+        $adminId = Deserializer::int64($stream);
+        $participantId = Deserializer::int64($stream);
+        $gAOrB = Deserializer::bytes($stream);
+        $keyFingerprint = Deserializer::int64($stream);
         return new self(
             $id,
             $accessHash,

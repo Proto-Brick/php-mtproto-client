@@ -8,15 +8,15 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractTopPeers extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            TopPeersNotModified::CONSTRUCTOR_ID => TopPeersNotModified::deserialize($deserializer, $stream),
-            TopPeers::CONSTRUCTOR_ID => TopPeers::deserialize($deserializer, $stream),
-            TopPeersDisabled::CONSTRUCTOR_ID => TopPeersDisabled::deserialize($deserializer, $stream),
+            TopPeersNotModified::CONSTRUCTOR_ID => TopPeersNotModified::deserialize($stream),
+            TopPeers::CONSTRUCTOR_ID => TopPeers::deserialize($stream),
+            TopPeersDisabled::CONSTRUCTOR_ID => TopPeersDisabled::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type contacts.TopPeers. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

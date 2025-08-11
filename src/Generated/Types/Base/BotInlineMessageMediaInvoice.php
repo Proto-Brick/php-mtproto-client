@@ -35,42 +35,42 @@ final class BotInlineMessageMediaInvoice extends AbstractBotInlineMessage
         public readonly ?AbstractReplyMarkup $replyMarkup = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->shippingAddressRequested) $flags |= (1 << 1);
         if ($this->test) $flags |= (1 << 3);
         if ($this->photo !== null) $flags |= (1 << 0);
         if ($this->replyMarkup !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->bytes($this->description);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->description);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->photo->serialize($serializer);
+            $buffer .= $this->photo->serialize();
         }
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->totalAmount);
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->totalAmount);
         if ($flags & (1 << 2)) {
-            $buffer .= $this->replyMarkup->serialize($serializer);
+            $buffer .= $this->replyMarkup->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $shippingAddressRequested = ($flags & (1 << 1)) ? true : null;
         $test = ($flags & (1 << 3)) ? true : null;
-        $title = $deserializer->bytes($stream);
-        $description = $deserializer->bytes($stream);
-        $photo = ($flags & (1 << 0)) ? AbstractWebDocument::deserialize($deserializer, $stream) : null;
-        $currency = $deserializer->bytes($stream);
-        $totalAmount = $deserializer->int64($stream);
-        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($deserializer, $stream) : null;
+        $title = Deserializer::bytes($stream);
+        $description = Deserializer::bytes($stream);
+        $photo = ($flags & (1 << 0)) ? AbstractWebDocument::deserialize($stream) : null;
+        $currency = Deserializer::bytes($stream);
+        $totalAmount = Deserializer::int64($stream);
+        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($stream) : null;
         return new self(
             $title,
             $description,

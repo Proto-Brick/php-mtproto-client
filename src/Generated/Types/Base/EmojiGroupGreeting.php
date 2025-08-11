@@ -25,21 +25,21 @@ final class EmojiGroupGreeting extends AbstractEmojiGroup
         public readonly array $emoticons
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->int64($this->iconEmojiId);
-        $buffer .= $serializer->vectorOfStrings($this->emoticons);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::int64($this->iconEmojiId);
+        $buffer .= Serializer::vectorOfStrings($this->emoticons);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $title = $deserializer->bytes($stream);
-        $iconEmojiId = $deserializer->int64($stream);
-        $emoticons = $deserializer->vectorOfStrings($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $title = Deserializer::bytes($stream);
+        $iconEmojiId = Deserializer::int64($stream);
+        $emoticons = Deserializer::vectorOfStrings($stream);
         return new self(
             $title,
             $iconEmojiId,

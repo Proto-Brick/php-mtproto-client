@@ -37,9 +37,9 @@ final class DocumentAttributeVideo extends AbstractDocumentAttribute
         public readonly ?string $videoCodec = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->roundMessage) $flags |= (1 << 0);
         if ($this->supportsStreaming) $flags |= (1 << 1);
@@ -47,37 +47,37 @@ final class DocumentAttributeVideo extends AbstractDocumentAttribute
         if ($this->preloadPrefixSize !== null) $flags |= (1 << 2);
         if ($this->videoStartTs !== null) $flags |= (1 << 4);
         if ($this->videoCodec !== null) $flags |= (1 << 5);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         $buffer .= pack('d', $this->duration);
-        $buffer .= $serializer->int32($this->w);
-        $buffer .= $serializer->int32($this->h);
+        $buffer .= Serializer::int32($this->w);
+        $buffer .= Serializer::int32($this->h);
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->preloadPrefixSize);
+            $buffer .= Serializer::int32($this->preloadPrefixSize);
         }
         if ($flags & (1 << 4)) {
             $buffer .= pack('d', $this->videoStartTs);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->bytes($this->videoCodec);
+            $buffer .= Serializer::bytes($this->videoCodec);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $roundMessage = ($flags & (1 << 0)) ? true : null;
         $supportsStreaming = ($flags & (1 << 1)) ? true : null;
         $nosound = ($flags & (1 << 3)) ? true : null;
-        $duration = $deserializer->double($stream);
-        $w = $deserializer->int32($stream);
-        $h = $deserializer->int32($stream);
-        $preloadPrefixSize = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $videoStartTs = ($flags & (1 << 4)) ? $deserializer->double($stream) : null;
-        $videoCodec = ($flags & (1 << 5)) ? $deserializer->bytes($stream) : null;
+        $duration = Deserializer::double($stream);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
+        $preloadPrefixSize = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $videoStartTs = ($flags & (1 << 4)) ? Deserializer::double($stream) : null;
+        $videoCodec = ($flags & (1 << 5)) ? Deserializer::bytes($stream) : null;
         return new self(
             $duration,
             $w,

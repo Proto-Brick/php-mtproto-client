@@ -35,36 +35,36 @@ final class DialogFolder extends AbstractDialog
         public readonly ?bool $pinned = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->pinned) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->folder->serialize($serializer);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->topMessage);
-        $buffer .= $serializer->int32($this->unreadMutedPeersCount);
-        $buffer .= $serializer->int32($this->unreadUnmutedPeersCount);
-        $buffer .= $serializer->int32($this->unreadMutedMessagesCount);
-        $buffer .= $serializer->int32($this->unreadUnmutedMessagesCount);
+        $buffer .= $this->folder->serialize();
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->topMessage);
+        $buffer .= Serializer::int32($this->unreadMutedPeersCount);
+        $buffer .= Serializer::int32($this->unreadUnmutedPeersCount);
+        $buffer .= Serializer::int32($this->unreadMutedMessagesCount);
+        $buffer .= Serializer::int32($this->unreadUnmutedMessagesCount);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $pinned = ($flags & (1 << 2)) ? true : null;
-        $folder = Folder::deserialize($deserializer, $stream);
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $topMessage = $deserializer->int32($stream);
-        $unreadMutedPeersCount = $deserializer->int32($stream);
-        $unreadUnmutedPeersCount = $deserializer->int32($stream);
-        $unreadMutedMessagesCount = $deserializer->int32($stream);
-        $unreadUnmutedMessagesCount = $deserializer->int32($stream);
+        $folder = Folder::deserialize($stream);
+        $peer = AbstractPeer::deserialize($stream);
+        $topMessage = Deserializer::int32($stream);
+        $unreadMutedPeersCount = Deserializer::int32($stream);
+        $unreadUnmutedPeersCount = Deserializer::int32($stream);
+        $unreadMutedMessagesCount = Deserializer::int32($stream);
+        $unreadUnmutedMessagesCount = Deserializer::int32($stream);
         return new self(
             $folder,
             $peer,

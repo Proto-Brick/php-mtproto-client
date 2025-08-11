@@ -31,38 +31,38 @@ final class MessageActionStarGift extends AbstractMessageAction
         public readonly ?int $convertStars = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->nameHidden) $flags |= (1 << 0);
         if ($this->saved) $flags |= (1 << 2);
         if ($this->converted) $flags |= (1 << 3);
         if ($this->message !== null) $flags |= (1 << 1);
         if ($this->convertStars !== null) $flags |= (1 << 4);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->gift->serialize($serializer);
+        $buffer .= $this->gift->serialize();
         if ($flags & (1 << 1)) {
-            $buffer .= $this->message->serialize($serializer);
+            $buffer .= $this->message->serialize();
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int64($this->convertStars);
+            $buffer .= Serializer::int64($this->convertStars);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $nameHidden = ($flags & (1 << 0)) ? true : null;
         $saved = ($flags & (1 << 2)) ? true : null;
         $converted = ($flags & (1 << 3)) ? true : null;
-        $gift = StarGift::deserialize($deserializer, $stream);
-        $message = ($flags & (1 << 1)) ? TextWithEntities::deserialize($deserializer, $stream) : null;
-        $convertStars = ($flags & (1 << 4)) ? $deserializer->int64($stream) : null;
+        $gift = StarGift::deserialize($stream);
+        $message = ($flags & (1 << 1)) ? TextWithEntities::deserialize($stream) : null;
+        $convertStars = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;
         return new self(
             $gift,
             $nameHidden,

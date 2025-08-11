@@ -23,19 +23,19 @@ final class ChannelAdminLogEventActionChangeStickerSet extends AbstractChannelAd
         public readonly AbstractInputStickerSet $newStickerset
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->prevStickerset->serialize($serializer);
-        $buffer .= $this->newStickerset->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->prevStickerset->serialize();
+        $buffer .= $this->newStickerset->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $prevStickerset = AbstractInputStickerSet::deserialize($deserializer, $stream);
-        $newStickerset = AbstractInputStickerSet::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $prevStickerset = AbstractInputStickerSet::deserialize($stream);
+        $newStickerset = AbstractInputStickerSet::deserialize($stream);
         return new self(
             $prevStickerset,
             $newStickerset

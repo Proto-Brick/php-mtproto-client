@@ -39,39 +39,39 @@ final class ChannelMessages extends AbstractMessages
         public readonly ?int $offsetIdOffset = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->inexact) $flags |= (1 << 1);
         if ($this->offsetIdOffset !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->pts);
-        $buffer .= $serializer->int32($this->count);
+        $buffer .= Serializer::int32($this->pts);
+        $buffer .= Serializer::int32($this->count);
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->int32($this->offsetIdOffset);
+            $buffer .= Serializer::int32($this->offsetIdOffset);
         }
-        $buffer .= $serializer->vectorOfObjects($this->messages);
-        $buffer .= $serializer->vectorOfObjects($this->topics);
-        $buffer .= $serializer->vectorOfObjects($this->chats);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::vectorOfObjects($this->messages);
+        $buffer .= Serializer::vectorOfObjects($this->topics);
+        $buffer .= Serializer::vectorOfObjects($this->chats);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $inexact = ($flags & (1 << 1)) ? true : null;
-        $pts = $deserializer->int32($stream);
-        $count = $deserializer->int32($stream);
-        $offsetIdOffset = ($flags & (1 << 2)) ? $deserializer->int32($stream) : null;
-        $messages = $deserializer->vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $topics = $deserializer->vectorOfObjects($stream, [AbstractForumTopic::class, 'deserialize']);
-        $chats = $deserializer->vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $pts = Deserializer::int32($stream);
+        $count = Deserializer::int32($stream);
+        $offsetIdOffset = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
+        $topics = Deserializer::vectorOfObjects($stream, [AbstractForumTopic::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $pts,
             $count,

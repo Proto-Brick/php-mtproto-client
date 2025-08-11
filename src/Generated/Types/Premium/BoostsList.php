@@ -29,35 +29,35 @@ final class BoostsList extends TlObject
         public readonly ?string $nextOffset = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->nextOffset !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->count);
-        $buffer .= $serializer->vectorOfObjects($this->boosts);
+        $buffer .= Serializer::int32($this->count);
+        $buffer .= Serializer::vectorOfObjects($this->boosts);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->nextOffset);
+            $buffer .= Serializer::bytes($this->nextOffset);
         }
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $count = $deserializer->int32($stream);
-        $boosts = $deserializer->vectorOfObjects($stream, [Boost::class, 'deserialize']);
-        $nextOffset = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $count = Deserializer::int32($stream);
+        $boosts = Deserializer::vectorOfObjects($stream, [Boost::class, 'deserialize']);
+        $nextOffset = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $count,
             $boosts,

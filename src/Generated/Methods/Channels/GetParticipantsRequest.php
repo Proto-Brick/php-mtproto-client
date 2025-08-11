@@ -41,18 +41,18 @@ final class GetParticipantsRequest extends TlObject
         public readonly int $hash
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->channel->serialize($serializer);
-        $buffer .= $this->filter->serialize($serializer);
-        $buffer .= $serializer->int32($this->offset);
-        $buffer .= $serializer->int32($this->limit);
-        $buffer .= $serializer->int64($this->hash);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->channel->serialize();
+        $buffer .= $this->filter->serialize();
+        $buffer .= Serializer::int32($this->offset);
+        $buffer .= Serializer::int32($this->limit);
+        $buffer .= Serializer::int64($this->hash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

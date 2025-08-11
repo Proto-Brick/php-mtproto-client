@@ -23,23 +23,23 @@ final class DialogFilterSuggested extends TlObject
         public readonly string $description
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->filter->serialize($serializer);
-        $buffer .= $serializer->bytes($this->description);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->filter->serialize();
+        $buffer .= Serializer::bytes($this->description);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $filter = AbstractDialogFilter::deserialize($deserializer, $stream);
-        $description = $deserializer->bytes($stream);
+        $filter = AbstractDialogFilter::deserialize($stream);
+        $description = Deserializer::bytes($stream);
         return new self(
             $filter,
             $description

@@ -25,25 +25,25 @@ final class Timezone extends TlObject
         public readonly int $utcOffset
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $serializer->bytes($this->name);
-        $buffer .= $serializer->int32($this->utcOffset);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= Serializer::bytes($this->name);
+        $buffer .= Serializer::int32($this->utcOffset);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $id = $deserializer->bytes($stream);
-        $name = $deserializer->bytes($stream);
-        $utcOffset = $deserializer->int32($stream);
+        $id = Deserializer::bytes($stream);
+        $name = Deserializer::bytes($stream);
+        $utcOffset = Deserializer::int32($stream);
         return new self(
             $id,
             $name,

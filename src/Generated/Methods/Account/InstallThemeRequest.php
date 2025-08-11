@@ -38,29 +38,29 @@ final class InstallThemeRequest extends TlObject
         public readonly ?AbstractBaseTheme $baseTheme = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->dark) $flags |= (1 << 0);
         if ($this->theme !== null) $flags |= (1 << 1);
         if ($this->format !== null) $flags |= (1 << 2);
         if ($this->baseTheme !== null) $flags |= (1 << 3);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 1)) {
-            $buffer .= $this->theme->serialize($serializer);
+            $buffer .= $this->theme->serialize();
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->format);
+            $buffer .= Serializer::bytes($this->format);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $this->baseTheme->serialize($serializer);
+            $buffer .= $this->baseTheme->serialize();
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

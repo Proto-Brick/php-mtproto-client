@@ -25,29 +25,29 @@ final class MessageActionTopicCreate extends AbstractMessageAction
         public readonly ?int $iconEmojiId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->iconEmojiId !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->title);
-        $buffer .= $serializer->int32($this->iconColor);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::int32($this->iconColor);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int64($this->iconEmojiId);
+            $buffer .= Serializer::int64($this->iconEmojiId);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $title = $deserializer->bytes($stream);
-        $iconColor = $deserializer->int32($stream);
-        $iconEmojiId = ($flags & (1 << 0)) ? $deserializer->int64($stream) : null;
+        $title = Deserializer::bytes($stream);
+        $iconColor = Deserializer::int32($stream);
+        $iconEmojiId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
         return new self(
             $title,
             $iconColor,

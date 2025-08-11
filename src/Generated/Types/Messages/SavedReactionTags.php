@@ -24,19 +24,19 @@ final class SavedReactionTags extends AbstractSavedReactionTags
         public readonly int $hash
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->tags);
-        $buffer .= $serializer->int64($this->hash);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->tags);
+        $buffer .= Serializer::int64($this->hash);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $tags = $deserializer->vectorOfObjects($stream, [SavedReactionTag::class, 'deserialize']);
-        $hash = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $tags = Deserializer::vectorOfObjects($stream, [SavedReactionTag::class, 'deserialize']);
+        $hash = Deserializer::int64($stream);
         return new self(
             $tags,
             $hash

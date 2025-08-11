@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractSentEncryptedMessage extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SentEncryptedMessage::CONSTRUCTOR_ID => SentEncryptedMessage::deserialize($deserializer, $stream),
-            SentEncryptedFile::CONSTRUCTOR_ID => SentEncryptedFile::deserialize($deserializer, $stream),
+            SentEncryptedMessage::CONSTRUCTOR_ID => SentEncryptedMessage::deserialize($stream),
+            SentEncryptedFile::CONSTRUCTOR_ID => SentEncryptedFile::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.SentEncryptedMessage. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

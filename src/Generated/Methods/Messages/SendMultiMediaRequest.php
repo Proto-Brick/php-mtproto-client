@@ -61,9 +61,9 @@ final class SendMultiMediaRequest extends TlObject
         public readonly ?int $effect = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->silent) $flags |= (1 << 5);
         if ($this->background) $flags |= (1 << 6);
@@ -77,29 +77,29 @@ final class SendMultiMediaRequest extends TlObject
         if ($this->sendAs !== null) $flags |= (1 << 13);
         if ($this->quickReplyShortcut !== null) $flags |= (1 << 17);
         if ($this->effect !== null) $flags |= (1 << 18);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
+        $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $this->replyTo->serialize($serializer);
+            $buffer .= $this->replyTo->serialize();
         }
-        $buffer .= $serializer->vectorOfObjects($this->multiMedia);
+        $buffer .= Serializer::vectorOfObjects($this->multiMedia);
         if ($flags & (1 << 10)) {
-            $buffer .= $serializer->int32($this->scheduleDate);
+            $buffer .= Serializer::int32($this->scheduleDate);
         }
         if ($flags & (1 << 13)) {
-            $buffer .= $this->sendAs->serialize($serializer);
+            $buffer .= $this->sendAs->serialize();
         }
         if ($flags & (1 << 17)) {
-            $buffer .= $this->quickReplyShortcut->serialize($serializer);
+            $buffer .= $this->quickReplyShortcut->serialize();
         }
         if ($flags & (1 << 18)) {
-            $buffer .= $serializer->int64($this->effect);
+            $buffer .= Serializer::int64($this->effect);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -29,33 +29,33 @@ final class MessageActionPaymentRefunded extends AbstractMessageAction
         public readonly ?string $payload = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->payload !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->bytes($this->currency);
-        $buffer .= $serializer->int64($this->totalAmount);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->totalAmount);
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->payload);
+            $buffer .= Serializer::bytes($this->payload);
         }
-        $buffer .= $this->charge->serialize($serializer);
+        $buffer .= $this->charge->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $currency = $deserializer->bytes($stream);
-        $totalAmount = $deserializer->int64($stream);
-        $payload = ($flags & (1 << 0)) ? $deserializer->bytes($stream) : null;
-        $charge = PaymentCharge::deserialize($deserializer, $stream);
+        $peer = AbstractPeer::deserialize($stream);
+        $currency = Deserializer::bytes($stream);
+        $totalAmount = Deserializer::int64($stream);
+        $payload = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $charge = PaymentCharge::deserialize($stream);
         return new self(
             $peer,
             $currency,

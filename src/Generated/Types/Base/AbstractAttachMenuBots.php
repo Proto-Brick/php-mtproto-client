@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractAttachMenuBots extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            AttachMenuBotsNotModified::CONSTRUCTOR_ID => AttachMenuBotsNotModified::deserialize($deserializer, $stream),
-            AttachMenuBots::CONSTRUCTOR_ID => AttachMenuBots::deserialize($deserializer, $stream),
+            AttachMenuBotsNotModified::CONSTRUCTOR_ID => AttachMenuBotsNotModified::deserialize($stream),
+            AttachMenuBots::CONSTRUCTOR_ID => AttachMenuBots::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type AttachMenuBots. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -25,29 +25,29 @@ final class UpdateMessagePoll extends AbstractUpdate
         public readonly ?Poll $poll = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->poll !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int64($this->pollId);
+        $buffer .= Serializer::int64($this->pollId);
         if ($flags & (1 << 0)) {
-            $buffer .= $this->poll->serialize($serializer);
+            $buffer .= $this->poll->serialize();
         }
-        $buffer .= $this->results->serialize($serializer);
+        $buffer .= $this->results->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $pollId = $deserializer->int64($stream);
-        $poll = ($flags & (1 << 0)) ? Poll::deserialize($deserializer, $stream) : null;
-        $results = PollResults::deserialize($deserializer, $stream);
+        $pollId = Deserializer::int64($stream);
+        $poll = ($flags & (1 << 0)) ? Poll::deserialize($stream) : null;
+        $results = PollResults::deserialize($stream);
         return new self(
             $pollId,
             $results,

@@ -37,9 +37,9 @@ final class WallPaperSettings extends TlObject
         public readonly ?string $emoticon = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->blur) $flags |= (1 << 1);
         if ($this->motion) $flags |= (1 << 2);
@@ -50,50 +50,50 @@ final class WallPaperSettings extends TlObject
         if ($this->intensity !== null) $flags |= (1 << 3);
         if ($this->rotation !== null) $flags |= (1 << 4);
         if ($this->emoticon !== null) $flags |= (1 << 7);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->backgroundColor);
+            $buffer .= Serializer::int32($this->backgroundColor);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->secondBackgroundColor);
+            $buffer .= Serializer::int32($this->secondBackgroundColor);
         }
         if ($flags & (1 << 5)) {
-            $buffer .= $serializer->int32($this->thirdBackgroundColor);
+            $buffer .= Serializer::int32($this->thirdBackgroundColor);
         }
         if ($flags & (1 << 6)) {
-            $buffer .= $serializer->int32($this->fourthBackgroundColor);
+            $buffer .= Serializer::int32($this->fourthBackgroundColor);
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->int32($this->intensity);
+            $buffer .= Serializer::int32($this->intensity);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->rotation);
+            $buffer .= Serializer::int32($this->rotation);
         }
         if ($flags & (1 << 7)) {
-            $buffer .= $serializer->bytes($this->emoticon);
+            $buffer .= Serializer::bytes($this->emoticon);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $blur = ($flags & (1 << 1)) ? true : null;
         $motion = ($flags & (1 << 2)) ? true : null;
-        $backgroundColor = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $secondBackgroundColor = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $thirdBackgroundColor = ($flags & (1 << 5)) ? $deserializer->int32($stream) : null;
-        $fourthBackgroundColor = ($flags & (1 << 6)) ? $deserializer->int32($stream) : null;
-        $intensity = ($flags & (1 << 3)) ? $deserializer->int32($stream) : null;
-        $rotation = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $emoticon = ($flags & (1 << 7)) ? $deserializer->bytes($stream) : null;
+        $backgroundColor = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $secondBackgroundColor = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $thirdBackgroundColor = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $fourthBackgroundColor = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
+        $intensity = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $rotation = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $emoticon = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
         return new self(
             $blur,
             $motion,

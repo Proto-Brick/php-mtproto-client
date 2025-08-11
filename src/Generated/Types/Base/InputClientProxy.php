@@ -23,23 +23,23 @@ final class InputClientProxy extends TlObject
         public readonly int $port
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->bytes($this->address);
-        $buffer .= $serializer->int32($this->port);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->address);
+        $buffer .= Serializer::int32($this->port);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $address = $deserializer->bytes($stream);
-        $port = $deserializer->int32($stream);
+        $address = Deserializer::bytes($stream);
+        $port = Deserializer::int32($stream);
         return new self(
             $address,
             $port

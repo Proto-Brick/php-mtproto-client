@@ -27,34 +27,34 @@ final class InputMediaUploadedPhoto extends AbstractInputMedia
         public readonly ?int $ttlSeconds = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->spoiler) $flags |= (1 << 2);
         if ($this->stickers !== null) $flags |= (1 << 0);
         if ($this->ttlSeconds !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->file->serialize($serializer);
+        $buffer .= $this->file->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfObjects($this->stickers);
+            $buffer .= Serializer::vectorOfObjects($this->stickers);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->int32($this->ttlSeconds);
+            $buffer .= Serializer::int32($this->ttlSeconds);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $spoiler = ($flags & (1 << 2)) ? true : null;
-        $file = AbstractInputFile::deserialize($deserializer, $stream);
-        $stickers = ($flags & (1 << 0)) ? $deserializer->vectorOfObjects($stream, [AbstractInputDocument::class, 'deserialize']) : null;
-        $ttlSeconds = ($flags & (1 << 1)) ? $deserializer->int32($stream) : null;
+        $file = AbstractInputFile::deserialize($stream);
+        $stickers = ($flags & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [AbstractInputDocument::class, 'deserialize']) : null;
+        $ttlSeconds = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
         return new self(
             $file,
             $spoiler,

@@ -21,17 +21,17 @@ final class ChatReactionsSome extends AbstractChatReactions
         public readonly array $reactions
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->vectorOfObjects($this->reactions);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::vectorOfObjects($this->reactions);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $reactions = $deserializer->vectorOfObjects($stream, [AbstractReaction::class, 'deserialize']);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $reactions = Deserializer::vectorOfObjects($stream, [AbstractReaction::class, 'deserialize']);
         return new self(
             $reactions
         );

@@ -55,31 +55,31 @@ final class SearchGlobalRequest extends TlObject
         public readonly ?int $folderId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->broadcastsOnly) $flags |= (1 << 1);
         if ($this->groupsOnly) $flags |= (1 << 2);
         if ($this->usersOnly) $flags |= (1 << 3);
         if ($this->folderId !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->folderId);
+            $buffer .= Serializer::int32($this->folderId);
         }
-        $buffer .= $serializer->bytes($this->q);
-        $buffer .= $this->filter->serialize($serializer);
-        $buffer .= $serializer->int32($this->minDate);
-        $buffer .= $serializer->int32($this->maxDate);
-        $buffer .= $serializer->int32($this->offsetRate);
-        $buffer .= $this->offsetPeer->serialize($serializer);
-        $buffer .= $serializer->int32($this->offsetId);
-        $buffer .= $serializer->int32($this->limit);
+        $buffer .= Serializer::bytes($this->q);
+        $buffer .= $this->filter->serialize();
+        $buffer .= Serializer::int32($this->minDate);
+        $buffer .= Serializer::int32($this->maxDate);
+        $buffer .= Serializer::int32($this->offsetRate);
+        $buffer .= $this->offsetPeer->serialize();
+        $buffer .= Serializer::int32($this->offsetId);
+        $buffer .= Serializer::int32($this->limit);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

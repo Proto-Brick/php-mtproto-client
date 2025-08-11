@@ -25,33 +25,33 @@ final class PeerStories extends TlObject
         public readonly ?int $maxReadId = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->maxReadId !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->peer->serialize($serializer);
+        $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->maxReadId);
+            $buffer .= Serializer::int32($this->maxReadId);
         }
-        $buffer .= $serializer->vectorOfObjects($this->stories);
+        $buffer .= Serializer::vectorOfObjects($this->stories);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
-        $peer = AbstractPeer::deserialize($deserializer, $stream);
-        $maxReadId = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $stories = $deserializer->vectorOfObjects($stream, [AbstractStoryItem::class, 'deserialize']);
+        $peer = AbstractPeer::deserialize($stream);
+        $maxReadId = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $stories = Deserializer::vectorOfObjects($stream, [AbstractStoryItem::class, 'deserialize']);
         return new self(
             $peer,
             $stories,

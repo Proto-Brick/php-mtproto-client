@@ -27,37 +27,37 @@ final class InputMediaPoll extends AbstractInputMedia
         public readonly ?array $solutionEntities = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->correctAnswers !== null) $flags |= (1 << 0);
         if ($this->solution !== null) $flags |= (1 << 1);
         if ($this->solutionEntities !== null) $flags |= (1 << 1);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->poll->serialize($serializer);
+        $buffer .= $this->poll->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->vectorOfStrings($this->correctAnswers);
+            $buffer .= Serializer::vectorOfStrings($this->correctAnswers);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->solution);
+            $buffer .= Serializer::bytes($this->solution);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->vectorOfObjects($this->solutionEntities);
+            $buffer .= Serializer::vectorOfObjects($this->solutionEntities);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $poll = Poll::deserialize($deserializer, $stream);
-        $correctAnswers = ($flags & (1 << 0)) ? $deserializer->vectorOfStrings($stream) : null;
-        $solution = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $solutionEntities = ($flags & (1 << 1)) ? $deserializer->vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $poll = Poll::deserialize($stream);
+        $correctAnswers = ($flags & (1 << 0)) ? Deserializer::vectorOfStrings($stream) : null;
+        $solution = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $solutionEntities = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
         return new self(
             $poll,
             $correctAnswers,

@@ -23,19 +23,19 @@ final class UpdateBotMenuButton extends AbstractUpdate
         public readonly AbstractBotMenuButton $button
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->botId);
-        $buffer .= $this->button->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->botId);
+        $buffer .= $this->button->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $botId = $deserializer->int64($stream);
-        $button = AbstractBotMenuButton::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $botId = Deserializer::int64($stream);
+        $button = AbstractBotMenuButton::deserialize($stream);
         return new self(
             $botId,
             $button

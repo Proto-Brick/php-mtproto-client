@@ -31,38 +31,38 @@ final class InputBotInlineResultDocument extends AbstractInputBotInlineResult
         public readonly ?string $description = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->title !== null) $flags |= (1 << 1);
         if ($this->description !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->id);
-        $buffer .= $serializer->bytes($this->type);
+        $buffer .= Serializer::bytes($this->id);
+        $buffer .= Serializer::bytes($this->type);
         if ($flags & (1 << 1)) {
-            $buffer .= $serializer->bytes($this->title);
+            $buffer .= Serializer::bytes($this->title);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->bytes($this->description);
+            $buffer .= Serializer::bytes($this->description);
         }
-        $buffer .= $this->document->serialize($serializer);
-        $buffer .= $this->sendMessage->serialize($serializer);
+        $buffer .= $this->document->serialize();
+        $buffer .= $this->sendMessage->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
-        $id = $deserializer->bytes($stream);
-        $type = $deserializer->bytes($stream);
-        $title = ($flags & (1 << 1)) ? $deserializer->bytes($stream) : null;
-        $description = ($flags & (1 << 2)) ? $deserializer->bytes($stream) : null;
-        $document = AbstractInputDocument::deserialize($deserializer, $stream);
-        $sendMessage = AbstractInputBotInlineMessage::deserialize($deserializer, $stream);
+        $id = Deserializer::bytes($stream);
+        $type = Deserializer::bytes($stream);
+        $title = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $description = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $document = AbstractInputDocument::deserialize($stream);
+        $sendMessage = AbstractInputBotInlineMessage::deserialize($stream);
         return new self(
             $id,
             $type,

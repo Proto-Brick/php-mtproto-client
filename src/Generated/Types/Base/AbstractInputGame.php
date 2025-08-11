@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractInputGame extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputGameID::CONSTRUCTOR_ID => InputGameID::deserialize($deserializer, $stream),
-            InputGameShortName::CONSTRUCTOR_ID => InputGameShortName::deserialize($deserializer, $stream),
+            InputGameID::CONSTRUCTOR_ID => InputGameID::deserialize($stream),
+            InputGameShortName::CONSTRUCTOR_ID => InputGameShortName::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputGame. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

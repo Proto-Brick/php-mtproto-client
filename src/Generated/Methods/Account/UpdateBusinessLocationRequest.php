@@ -33,24 +33,24 @@ final class UpdateBusinessLocationRequest extends TlObject
         public readonly ?string $address = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->geoPoint !== null) $flags |= (1 << 1);
         if ($this->address !== null) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
         if ($flags & (1 << 1)) {
-            $buffer .= $this->geoPoint->serialize($serializer);
+            $buffer .= $this->geoPoint->serialize();
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->bytes($this->address);
+            $buffer .= Serializer::bytes($this->address);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

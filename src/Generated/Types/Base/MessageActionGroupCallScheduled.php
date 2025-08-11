@@ -23,19 +23,19 @@ final class MessageActionGroupCallScheduled extends AbstractMessageAction
         public readonly int $scheduleDate
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->call->serialize($serializer);
-        $buffer .= $serializer->int32($this->scheduleDate);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->call->serialize();
+        $buffer .= Serializer::int32($this->scheduleDate);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $call = InputGroupCall::deserialize($deserializer, $stream);
-        $scheduleDate = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $call = InputGroupCall::deserialize($stream);
+        $scheduleDate = Deserializer::int32($stream);
         return new self(
             $call,
             $scheduleDate

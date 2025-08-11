@@ -25,21 +25,21 @@ final class StoryReaction extends AbstractStoryReaction
         public readonly AbstractReaction $reaction
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peerId->serialize($serializer);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $this->reaction->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peerId->serialize();
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= $this->reaction->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peerId = AbstractPeer::deserialize($deserializer, $stream);
-        $date = $deserializer->int32($stream);
-        $reaction = AbstractReaction::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peerId = AbstractPeer::deserialize($stream);
+        $date = Deserializer::int32($stream);
+        $reaction = AbstractReaction::deserialize($stream);
         return new self(
             $peerId,
             $date,

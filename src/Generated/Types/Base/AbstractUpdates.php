@@ -8,19 +8,19 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractUpdates extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            UpdatesTooLong::CONSTRUCTOR_ID => UpdatesTooLong::deserialize($deserializer, $stream),
-            UpdateShortMessage::CONSTRUCTOR_ID => UpdateShortMessage::deserialize($deserializer, $stream),
-            UpdateShortChatMessage::CONSTRUCTOR_ID => UpdateShortChatMessage::deserialize($deserializer, $stream),
-            UpdateShort::CONSTRUCTOR_ID => UpdateShort::deserialize($deserializer, $stream),
-            UpdatesCombined::CONSTRUCTOR_ID => UpdatesCombined::deserialize($deserializer, $stream),
-            Updates::CONSTRUCTOR_ID => Updates::deserialize($deserializer, $stream),
-            UpdateShortSentMessage::CONSTRUCTOR_ID => UpdateShortSentMessage::deserialize($deserializer, $stream),
+            UpdatesTooLong::CONSTRUCTOR_ID => UpdatesTooLong::deserialize($stream),
+            UpdateShortMessage::CONSTRUCTOR_ID => UpdateShortMessage::deserialize($stream),
+            UpdateShortChatMessage::CONSTRUCTOR_ID => UpdateShortChatMessage::deserialize($stream),
+            UpdateShort::CONSTRUCTOR_ID => UpdateShort::deserialize($stream),
+            UpdatesCombined::CONSTRUCTOR_ID => UpdatesCombined::deserialize($stream),
+            Updates::CONSTRUCTOR_ID => Updates::deserialize($stream),
+            UpdateShortSentMessage::CONSTRUCTOR_ID => UpdateShortSentMessage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type Updates. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

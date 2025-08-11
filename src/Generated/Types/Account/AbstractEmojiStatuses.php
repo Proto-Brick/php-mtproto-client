@@ -8,14 +8,14 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 abstract class AbstractEmojiStatuses extends TlObject
 {
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = $deserializer->peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            EmojiStatusesNotModified::CONSTRUCTOR_ID => EmojiStatusesNotModified::deserialize($deserializer, $stream),
-            EmojiStatuses::CONSTRUCTOR_ID => EmojiStatuses::deserialize($deserializer, $stream),
+            EmojiStatusesNotModified::CONSTRUCTOR_ID => EmojiStatusesNotModified::deserialize($stream),
+            EmojiStatuses::CONSTRUCTOR_ID => EmojiStatuses::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type account.EmojiStatuses. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

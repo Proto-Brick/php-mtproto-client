@@ -27,28 +27,28 @@ final class StoryItemSkipped extends AbstractStoryItem
         public readonly ?bool $closeFriends = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->closeFriends) $flags |= (1 << 8);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->id);
-        $buffer .= $serializer->int32($this->date);
-        $buffer .= $serializer->int32($this->expireDate);
+        $buffer .= Serializer::int32($this->id);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int32($this->expireDate);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $flags = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $flags = Deserializer::int32($stream);
 
         $closeFriends = ($flags & (1 << 8)) ? true : null;
-        $id = $deserializer->int32($stream);
-        $date = $deserializer->int32($stream);
-        $expireDate = $deserializer->int32($stream);
+        $id = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
+        $expireDate = Deserializer::int32($stream);
         return new self(
             $id,
             $date,

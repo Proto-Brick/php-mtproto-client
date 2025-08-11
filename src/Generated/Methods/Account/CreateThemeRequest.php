@@ -39,26 +39,26 @@ final class CreateThemeRequest extends TlObject
         public readonly ?array $settings = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->document !== null) $flags |= (1 << 2);
         if ($this->settings !== null) $flags |= (1 << 3);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->bytes($this->slug);
-        $buffer .= $serializer->bytes($this->title);
+        $buffer .= Serializer::bytes($this->slug);
+        $buffer .= Serializer::bytes($this->title);
         if ($flags & (1 << 2)) {
-            $buffer .= $this->document->serialize($serializer);
+            $buffer .= $this->document->serialize();
         }
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->settings);
+            $buffer .= Serializer::vectorOfObjects($this->settings);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -41,9 +41,9 @@ final class BoostsStatus extends TlObject
         public readonly ?array $myBoostSlots = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->myBoost) $flags |= (1 << 2);
         if ($this->giftBoosts !== null) $flags |= (1 << 4);
@@ -51,49 +51,49 @@ final class BoostsStatus extends TlObject
         if ($this->premiumAudience !== null) $flags |= (1 << 1);
         if ($this->prepaidGiveaways !== null) $flags |= (1 << 3);
         if ($this->myBoostSlots !== null) $flags |= (1 << 2);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $serializer->int32($this->level);
-        $buffer .= $serializer->int32($this->currentLevelBoosts);
-        $buffer .= $serializer->int32($this->boosts);
+        $buffer .= Serializer::int32($this->level);
+        $buffer .= Serializer::int32($this->currentLevelBoosts);
+        $buffer .= Serializer::int32($this->boosts);
         if ($flags & (1 << 4)) {
-            $buffer .= $serializer->int32($this->giftBoosts);
+            $buffer .= Serializer::int32($this->giftBoosts);
         }
         if ($flags & (1 << 0)) {
-            $buffer .= $serializer->int32($this->nextLevelBoosts);
+            $buffer .= Serializer::int32($this->nextLevelBoosts);
         }
         if ($flags & (1 << 1)) {
-            $buffer .= $this->premiumAudience->serialize($serializer);
+            $buffer .= $this->premiumAudience->serialize();
         }
-        $buffer .= $serializer->bytes($this->boostUrl);
+        $buffer .= Serializer::bytes($this->boostUrl);
         if ($flags & (1 << 3)) {
-            $buffer .= $serializer->vectorOfObjects($this->prepaidGiveaways);
+            $buffer .= Serializer::vectorOfObjects($this->prepaidGiveaways);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= $serializer->vectorOfInts($this->myBoostSlots);
+            $buffer .= Serializer::vectorOfInts($this->myBoostSlots);
         }
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $flags = $deserializer->int32($stream);
+        $flags = Deserializer::int32($stream);
 
         $myBoost = ($flags & (1 << 2)) ? true : null;
-        $level = $deserializer->int32($stream);
-        $currentLevelBoosts = $deserializer->int32($stream);
-        $boosts = $deserializer->int32($stream);
-        $giftBoosts = ($flags & (1 << 4)) ? $deserializer->int32($stream) : null;
-        $nextLevelBoosts = ($flags & (1 << 0)) ? $deserializer->int32($stream) : null;
-        $premiumAudience = ($flags & (1 << 1)) ? StatsPercentValue::deserialize($deserializer, $stream) : null;
-        $boostUrl = $deserializer->bytes($stream);
-        $prepaidGiveaways = ($flags & (1 << 3)) ? $deserializer->vectorOfObjects($stream, [AbstractPrepaidGiveaway::class, 'deserialize']) : null;
-        $myBoostSlots = ($flags & (1 << 2)) ? $deserializer->vectorOfInts($stream) : null;
+        $level = Deserializer::int32($stream);
+        $currentLevelBoosts = Deserializer::int32($stream);
+        $boosts = Deserializer::int32($stream);
+        $giftBoosts = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $nextLevelBoosts = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $premiumAudience = ($flags & (1 << 1)) ? StatsPercentValue::deserialize($stream) : null;
+        $boostUrl = Deserializer::bytes($stream);
+        $prepaidGiveaways = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [AbstractPrepaidGiveaway::class, 'deserialize']) : null;
+        $myBoostSlots = ($flags & (1 << 2)) ? Deserializer::vectorOfInts($stream) : null;
         return new self(
             $level,
             $currentLevelBoosts,

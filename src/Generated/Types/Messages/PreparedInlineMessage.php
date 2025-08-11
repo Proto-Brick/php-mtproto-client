@@ -32,29 +32,29 @@ final class PreparedInlineMessage extends TlObject
         public readonly array $users
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int64($this->queryId);
-        $buffer .= $this->result->serialize($serializer);
-        $buffer .= $serializer->vectorOfObjects($this->peerTypes);
-        $buffer .= $serializer->int32($this->cacheTime);
-        $buffer .= $serializer->vectorOfObjects($this->users);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->queryId);
+        $buffer .= $this->result->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->peerTypes);
+        $buffer .= Serializer::int32($this->cacheTime);
+        $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $queryId = $deserializer->int64($stream);
-        $result = AbstractBotInlineResult::deserialize($deserializer, $stream);
-        $peerTypes = $deserializer->vectorOfObjects($stream, [AbstractInlineQueryPeerType::class, 'deserialize']);
-        $cacheTime = $deserializer->int32($stream);
-        $users = $deserializer->vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $queryId = Deserializer::int64($stream);
+        $result = AbstractBotInlineResult::deserialize($stream);
+        $peerTypes = Deserializer::vectorOfObjects($stream, [AbstractInlineQueryPeerType::class, 'deserialize']);
+        $cacheTime = Deserializer::int32($stream);
+        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         return new self(
             $queryId,
             $result,

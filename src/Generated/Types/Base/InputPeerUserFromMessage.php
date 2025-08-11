@@ -25,21 +25,21 @@ final class InputPeerUserFromMessage extends AbstractInputPeer
         public readonly int $userId
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize($serializer);
-        $buffer .= $serializer->int32($this->msgId);
-        $buffer .= $serializer->int64($this->userId);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::int32($this->msgId);
+        $buffer .= Serializer::int64($this->userId);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $peer = AbstractInputPeer::deserialize($deserializer, $stream);
-        $msgId = $deserializer->int32($stream);
-        $userId = $deserializer->int64($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $peer = AbstractInputPeer::deserialize($stream);
+        $msgId = Deserializer::int32($stream);
+        $userId = Deserializer::int64($stream);
         return new self(
             $peer,
             $msgId,

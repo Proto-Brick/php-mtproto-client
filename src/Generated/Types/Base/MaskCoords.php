@@ -27,27 +27,27 @@ final class MaskCoords extends TlObject
         public readonly float $zoom
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->n);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->n);
         $buffer .= pack('d', $this->x);
         $buffer .= pack('d', $this->y);
         $buffer .= pack('d', $this->zoom);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $constructorId = $deserializer->int32($stream);
+        $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex($constructorId)));
         }
 
-        $n = $deserializer->int32($stream);
-        $x = $deserializer->double($stream);
-        $y = $deserializer->double($stream);
-        $zoom = $deserializer->double($stream);
+        $n = Deserializer::int32($stream);
+        $x = Deserializer::double($stream);
+        $y = Deserializer::double($stream);
+        $zoom = Deserializer::double($stream);
         return new self(
             $n,
             $x,

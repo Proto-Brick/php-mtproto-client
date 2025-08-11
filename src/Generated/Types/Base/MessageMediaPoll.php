@@ -23,19 +23,19 @@ final class MessageMediaPoll extends AbstractMessageMedia
         public readonly PollResults $results
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->poll->serialize($serializer);
-        $buffer .= $this->results->serialize($serializer);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= $this->poll->serialize();
+        $buffer .= $this->results->serialize();
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $poll = Poll::deserialize($deserializer, $stream);
-        $results = PollResults::deserialize($deserializer, $stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $poll = Poll::deserialize($stream);
+        $results = PollResults::deserialize($stream);
         return new self(
             $poll,
             $results

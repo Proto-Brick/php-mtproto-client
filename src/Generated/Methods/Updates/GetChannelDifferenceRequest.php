@@ -41,21 +41,21 @@ final class GetChannelDifferenceRequest extends TlObject
         public readonly ?bool $force = null
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->force) $flags |= (1 << 0);
-        $buffer .= $serializer->int32($flags);
+        $buffer .= Serializer::int32($flags);
 
-        $buffer .= $this->channel->serialize($serializer);
-        $buffer .= $this->filter->serialize($serializer);
-        $buffer .= $serializer->int32($this->pts);
-        $buffer .= $serializer->int32($this->limit);
+        $buffer .= $this->channel->serialize();
+        $buffer .= $this->filter->serialize();
+        $buffer .= Serializer::int32($this->pts);
+        $buffer .= Serializer::int32($this->limit);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
         throw new \LogicException('Request objects are not deserializable');
     }

@@ -23,19 +23,19 @@ final class BusinessAwayMessageScheduleCustom extends AbstractBusinessAwayMessag
         public readonly int $endDate
     ) {}
     
-    public function serialize(Serializer $serializer): string
+    public function serialize(): string
     {
-        $buffer = $serializer->int32(self::CONSTRUCTOR_ID);
-        $buffer .= $serializer->int32($this->startDate);
-        $buffer .= $serializer->int32($this->endDate);
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int32($this->startDate);
+        $buffer .= Serializer::int32($this->endDate);
         return $buffer;
     }
 
-    public static function deserialize(Deserializer $deserializer, string &$stream): static
+    public static function deserialize(string &$stream): static
     {
-        $deserializer->int32($stream); // Constructor ID is consumed here.
-        $startDate = $deserializer->int32($stream);
-        $endDate = $deserializer->int32($stream);
+        Deserializer::int32($stream); // Constructor ID is consumed here.
+        $startDate = Deserializer::int32($stream);
+        $endDate = Deserializer::int32($stream);
         return new self(
             $startDate,
             $endDate
