@@ -1,5 +1,5 @@
 .idea/
-Tests/
+Tests/local/
 vendor/
 composer.phar
 composer.lock
