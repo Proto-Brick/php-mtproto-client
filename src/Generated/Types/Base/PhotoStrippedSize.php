@@ -1,0 +1,46 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/type/photoStrippedSize
+ */
+final class PhotoStrippedSize extends AbstractPhotoSize
+{
+    public const CONSTRUCTOR_ID = 0xe0b0bc2e;
+    
+    public string $predicate = 'photoStrippedSize';
+    
+    /**
+     * @param string $type
+     * @param string $bytes
+     */
+    public function __construct(
+        public readonly string $type,
+        public readonly string $bytes
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->type);
+        $buffer .= Serializer::bytes($this->bytes);
+
+        return $buffer;
+    }
+
+    public static function deserialize(string &$stream): static
+    {
+        Deserializer::int32($stream); // Constructor ID
+        $type = Deserializer::bytes($stream);
+        $bytes = Deserializer::bytes($stream);
+
+        return new self(
+            $type,
+            $bytes
+        );
+    }
+}

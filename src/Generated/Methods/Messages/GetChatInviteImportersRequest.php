@@ -1,0 +1,77 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
+use DigitalStars\MtprotoClient\Generated\Types\Messages\ChatInviteImporters;
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/method/messages.getChatInviteImporters
+ */
+final class GetChatInviteImportersRequest extends TlObject
+{
+    public const CONSTRUCTOR_ID = 0xdf04dd4e;
+    
+    public string $predicate = 'messages.getChatInviteImporters';
+    
+    public function getMethodName(): string
+    {
+        return 'messages.getChatInviteImporters';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return ChatInviteImporters::class;
+    }
+    /**
+     * @param AbstractInputPeer $peer
+     * @param int $offsetDate
+     * @param AbstractInputUser $offsetUser
+     * @param int $limit
+     * @param true|null $requested
+     * @param true|null $subscriptionExpired
+     * @param string|null $link
+     * @param string|null $q
+     */
+    public function __construct(
+        public readonly AbstractInputPeer $peer,
+        public readonly int $offsetDate,
+        public readonly AbstractInputUser $offsetUser,
+        public readonly int $limit,
+        public readonly ?true $requested = null,
+        public readonly ?true $subscriptionExpired = null,
+        public readonly ?string $link = null,
+        public readonly ?string $q = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->requested) $flags |= (1 << 0);
+        if ($this->subscriptionExpired) $flags |= (1 << 3);
+        if ($this->link !== null) $flags |= (1 << 1);
+        if ($this->q !== null) $flags |= (1 << 2);
+        $buffer .= Serializer::int32($flags);
+        $buffer .= $this->peer->serialize();
+        if ($flags & (1 << 1)) {
+            $buffer .= Serializer::bytes($this->link);
+        }
+        if ($flags & (1 << 2)) {
+            $buffer .= Serializer::bytes($this->q);
+        }
+        $buffer .= Serializer::int32($this->offsetDate);
+        $buffer .= $this->offsetUser->serialize();
+        $buffer .= Serializer::int32($this->limit);
+
+        return $buffer;
+    }
+
+    public static function deserialize(string &$stream): static
+    {
+        throw new \LogicException('Request objects are not deserializable');
+    }
+}

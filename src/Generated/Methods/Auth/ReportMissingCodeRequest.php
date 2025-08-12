@@ -1,0 +1,51 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Methods\Auth;
+
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/method/auth.reportMissingCode
+ */
+final class ReportMissingCodeRequest extends TlObject
+{
+    public const CONSTRUCTOR_ID = 0xcb9deff6;
+    
+    public string $predicate = 'auth.reportMissingCode';
+    
+    public function getMethodName(): string
+    {
+        return 'auth.reportMissingCode';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return 'bool';
+    }
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param string $mnc
+     */
+    public function __construct(
+        public readonly string $phoneNumber,
+        public readonly string $phoneCodeHash,
+        public readonly string $mnc
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::bytes($this->phoneNumber);
+        $buffer .= Serializer::bytes($this->phoneCodeHash);
+        $buffer .= Serializer::bytes($this->mnc);
+
+        return $buffer;
+    }
+
+    public static function deserialize(string &$stream): static
+    {
+        throw new \LogicException('Request objects are not deserializable');
+    }
+}

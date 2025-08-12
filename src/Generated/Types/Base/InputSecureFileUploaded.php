@@ -1,0 +1,61 @@
+<?php declare(strict_types=1);
+namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+
+use DigitalStars\MtprotoClient\TL\Deserializer;
+use DigitalStars\MtprotoClient\TL\Serializer;
+use DigitalStars\MtprotoClient\TL\TlObject;
+
+/**
+ * @see https://core.telegram.org/type/inputSecureFileUploaded
+ */
+final class InputSecureFileUploaded extends AbstractInputSecureFile
+{
+    public const CONSTRUCTOR_ID = 0x3334b0f0;
+    
+    public string $predicate = 'inputSecureFileUploaded';
+    
+    /**
+     * @param int $id
+     * @param int $parts
+     * @param string $md5Checksum
+     * @param string $fileHash
+     * @param string $secret
+     */
+    public function __construct(
+        public readonly int $id,
+        public readonly int $parts,
+        public readonly string $md5Checksum,
+        public readonly string $fileHash,
+        public readonly string $secret
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $buffer .= Serializer::int64($this->id);
+        $buffer .= Serializer::int32($this->parts);
+        $buffer .= Serializer::bytes($this->md5Checksum);
+        $buffer .= Serializer::bytes($this->fileHash);
+        $buffer .= Serializer::bytes($this->secret);
+
+        return $buffer;
+    }
+
+    public static function deserialize(string &$stream): static
+    {
+        Deserializer::int32($stream); // Constructor ID
+        $id = Deserializer::int64($stream);
+        $parts = Deserializer::int32($stream);
+        $md5Checksum = Deserializer::bytes($stream);
+        $fileHash = Deserializer::bytes($stream);
+        $secret = Deserializer::bytes($stream);
+
+        return new self(
+            $id,
+            $parts,
+            $md5Checksum,
+            $fileHash,
+            $secret
+        );
+    }
+}
