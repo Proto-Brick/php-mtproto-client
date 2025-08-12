@@ -23,7 +23,7 @@ abstract class TlObject implements TlObjectInterface, Serializable
     // Метод getPredicate() должен быть реализован в дочерних классах через свойство $_
     public function getPredicate(): string
     {
-        return $this->_;
+        return $this->predicate;
     }
 
     // Объявляем абстрактные методы, чтобы удовлетворить интерфейс Serializable

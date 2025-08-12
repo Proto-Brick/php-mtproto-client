@@ -127,6 +127,7 @@ class Deserializer
         $result = [];
 
         for ($i = 0; $i < $count; $i++) {
+//            var_dump(substr(bin2hex($payload), 0, 10));
             $result[] = $itemDeserializer($payload);
         }
 
