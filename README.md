@@ -1,16 +1,12 @@
 <p align="center">
     <img src="https://raw.githubusercontent.com/Proto-Brick/php-mtproto-client/master/.github/img/logo.jpg" alt="Proto Brick">
 </p>
-<p align="center">
-    <img src="https://raw.githubusercontent.com/Proto-Brick/php-mtproto-client/master/.github/img/logo.jpg" alt="Proto Brick">
-</p>
 
-<p align="center">
 [![Total Downloads](https://poser.pugx.org/phpunit/phpunit/downloads)](https://packagist.org/packages/phpunit/phpunit/stats)  
 [![License](https://poser.pugx.org/phpmailer/phpmailer/license.svg)](https://packagist.org/packages/phpmailer/phpmailer)  
-[![PHP Version Require](http://poser.pugx.org/phpunit/phpunit/require/php)](https://packagist.org/packages/phpunit/phpunit)  
-<a href="https://core.telegram.org/layer/195"><img src="https://img.shields.io/badge/TG_API_Layer-195-8992bb.svg" alt="Поддержка версии API"></a>  
-</p>
+[![PHP Version Require](http://poser.pugx.org/phpunit/phpunit/require/php)](https://packagist.org/packages/phpunit/phpunit)
+
+<a href="https://core.telegram.org/layer/195"><img src="https://img.shields.io/badge/TG_API_Layer-195-8992bb.svg" alt="Поддержка версии API"></a>
 
 <h1 align="center">Proto Brick</h1>
 <p>
