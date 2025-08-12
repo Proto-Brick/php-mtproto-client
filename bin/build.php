@@ -18,11 +18,12 @@ class Builder
         // Получаем нужные данные после анализа схемы
         $typeToConstructorsMap = $tlGenerator->typeToConstructorsMap;
         $abstractTypes = $tlGenerator->abstractTypes;
+        $enumTypes = $tlGenerator->enumTypes;
         echo "------------------------------------------\n";
 
         echo "Step 2: Running Fluent API generator...\n";
         // Передаем обе карты в конструктор
-        $apiGenerator = new ApiGenerator($typeToConstructorsMap, $abstractTypes);
+        $apiGenerator = new ApiGenerator($typeToConstructorsMap, $abstractTypes, $enumTypes);
         $apiGenerator->run();
         $generatedApiClasses = ApiGenerator::$generatedClasses;
         echo "------------------------------------------\n";

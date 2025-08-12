@@ -107,35 +107,44 @@ trait GeneratorHelpers
             'int', 'int32', 'long', 'int64' => 'int', // 32-битные числа - это int
             'int128', 'int256', 'string', 'bytes' => 'string', // 64-битные и больше - это бинарные строки
             'double' => 'float',
-            'Bool', 'bool', 'true' => 'bool',
+            'Bool', 'bool' => 'bool',
+            'true' => 'true',
             'Object' => 'array',
             '!X', 'X' => $this->escapeFqn(self::TL_OBJECT_FQN),
             default => $this->resolveCustomType($tlType),
         };
     }
 
-    private function mapTlTypeToPhpdoc(string $tlType): string
+    private function mapTlTypeToPhpdoc(string $tlType, string $currentClassName, ?string $parentFqcn): string
     {
         if (str_starts_with($tlType, 'Vector<')) {
             $innerType = substr($tlType, 7, -1);
             if ($innerType === 't') {
                 return 'array';
             }
-            // Получаем FQCN для внутреннего типа
-            $phpInnerTypeFqn = $this->mapTlTypeToPhp($innerType);
-            // Извлекаем только короткое имя класса
-            $phpInnerTypeShort = basename(str_replace('\\', '/', $phpInnerTypeFqn));
+            $innerDocType = $this->mapTlTypeToPhpdoc($innerType, $currentClassName, $parentFqcn);
 
-            return "list<{$phpInnerTypeShort}>";
+            return "list<{$innerDocType}>";
         }
 
         // Для не-векторных типов делаем то же самое
         $phpTypeFqn = $this->mapTlTypeToPhp($tlType);
-        return basename(str_replace('\\', '/', $phpTypeFqn));
+        if (!str_contains($phpTypeFqn, '\\')) {
+            return $phpTypeFqn; // Это примитив
+        }
+
+        // Для одиночных объектов тоже используем `registerUse`
+        return $this->registerUse($phpTypeFqn, $currentClassName, $parentFqcn);
     }
 
     private function resolveCustomType(string $tlType): string
     {
+        if (isset($this->enumTypes[$tlType])) {
+            [$namespace, $className] = $this->getNamespaceAndClassName($tlType);
+            return $this->escapeFqn(
+                self::GENERATED_TYPES_NAMESPACE . ($namespace ? '\\' . $namespace : '') . '\\' . $className
+            );
+        }
         if (str_starts_with($tlType, 'Vector<')) {
             return 'array';
         }
@@ -277,77 +286,37 @@ trait GeneratorHelpers
         $paramDefinitions = [];
         $propertyDocs = [];
         $paramDocs = [];
-        $useStatements = [];
+        // $useStatements больше не нужен
 
-        // --- Шаг 1: Разделяем параметры на обязательные и опциональные ---
+        // --- Шаг 1: Разделяем параметры ... (остается без изменений)
         $requiredParams = [];
         $optionalParams = [];
         foreach ($params as $param) {
-            if ($param['type'] === '#') {
-                continue;
-            }
-
-            if (str_contains($param['type'], '?')) {
-                $optionalParams[] = $param;
-            } else {
-                $requiredParams[] = $param;
-            }
+            if ($param['type'] === '#') { continue; }
+            if (str_contains($param['type'], '?')) { $optionalParams[] = $param; }
+            else { $requiredParams[] = $param; }
         }
-
-        // Объединяем их в правильном порядке: сначала обязательные, потом опциональные
         $sortedParams = array_merge($requiredParams, $optionalParams);
-        $sortedPropertyNames = []; // Сохраним порядок имен для вызова конструктора
+        $sortedPropertyNames = [];
 
         foreach ($sortedParams as $param) {
             $originalTlType = $param['type'];
             $isConditional = str_contains($originalTlType, '?');
             $actualType = $isConditional ? explode('?', $originalTlType)[1] : $originalTlType;
-            if ($actualType === 'true' || $actualType === 'Bool') {
-                $actualType = 'bool';
-            }
 
             $phpTypeFqn = $this->mapTlTypeToPhp($actualType);
-            $phpType = basename(str_replace('\\', '/', $phpTypeFqn));
-            $docType = $this->mapTlTypeToPhpdoc($actualType);
+            // Вызываем registerUse для php-типа, чтобы он был добавлен в use-блок
+            $phpType = $this->registerUse($phpTypeFqn, $currentClassName, $parentFqcn);
+            // mapTlTypeToPhpdoc тоже вызывает registerUse, но это не страшно, т.к. есть проверка
+            $docType = $this->mapTlTypeToPhpdoc($actualType, $currentClassName, $parentFqcn);
             $propertyName = $this->sanitizeParamName($param['name']);
 
             $sortedPropertyNames[] = $propertyName;
 
-            if (str_contains($phpTypeFqn, '\\')) {
-                $isConflict = false;
-                // Конфликт 1: Короткое имя типа совпадает с именем текущего класса
-                if ($phpType === $currentClassName) {
-                    $isConflict = true;
-                }
-
-                // Конфликт 2 (новый): Короткое имя типа совпадает с именем родителя
-                if (!$isConflict && $parentFqcn) {
-                    $parentShortName = basename(str_replace('\\', '/', $parentFqcn));
-                    if ($phpType === $parentShortName) {
-                        if ($this->escapeFqn($phpTypeFqn) !== $this->escapeFqn($parentFqcn)) {
-                            $isConflict = true;
-                        }
-                    }
-                }
-
-                if ($isConflict) {
-                    // Создаем алиас, например 'Base' + 'AutoDownloadSettings'
-                    $parts = explode('\\', $this->escapeFqn($phpTypeFqn));
-                    $namespacePart = $parts[count($parts) - 2] ?? 'Dto';
-                    $alias = ucfirst($namespacePart) . $phpType;
-
-                    $useStatements[$this->escapeFqn($phpTypeFqn)] = $alias;
-                    $phpType = $alias; // Используем алиас в type-hint
-                    $docType = $alias; // Используем алиас в phpdoc
-                } else {
-                    $useStatements[$this->escapeFqn($phpTypeFqn)] = true;
-                }
-            }
-
             $docTypeForParam = $isConditional ? "{$docType}|null" : $docType;
             $paramDocs[] = "     * @param {$docTypeForParam} \${$propertyName}";
 
-            if ($docType !== $phpTypeFqn && !in_array($docType, ['array', 'int', 'string', 'bool', 'float'], true)) {
+            if ($docType !== $phpType && !in_array($docType, ['array', 'int', 'string', 'bool', 'float'], true)) {
                 $propertyDocs[] = " * @property {$docType} \${$propertyName}";
             }
 
@@ -362,9 +331,9 @@ trait GeneratorHelpers
         return [
             'paramsString' => empty($paramDefinitions) ? '' : "\n        " . implode(",\n        ", $paramDefinitions) . "\n    ",
             'propertyDocs' => $propertyDocs,
-            'useStatements' => $useStatements,
+            // 'useStatements' УБРАЛИ
             'paramDocs' => $paramDocs,
-            'sortedPropertyNames' => $sortedPropertyNames, // Возвращаем отсортированные имена
+            'sortedPropertyNames' => $sortedPropertyNames,
         ];
     }
 
@@ -395,54 +364,40 @@ trait GeneratorHelpers
         };
     }
 
-    private function buildMethodSpecificContent(array $item): array
+    private function buildMethodSpecificContent(array $item, string $currentClassName, ?string $parentFqcn): string
     {
-        $useStatements = [];
-        $tlResponseType = $item['type']; // Например, "Vector<WallPaper>" или "Bool" или "DataJSON"
-
+        // $useStatements больше не нужен
+        $tlResponseType = $item['type'];
         $responseClassExpr = '';
 
         if ($special = $this->getSpecialTypeHandling($tlResponseType)) {
-            // Случай 1: Особый тип вроде DataJSON
             $responseClassExpr = "'" . $special['php_type'] . "'";
-
         } elseif (str_starts_with($tlResponseType, 'Vector<')) {
-            // Случай 2: Это вектор. Мы должны вернуть FQCN внутреннего типа.
-            // Клиент будет отвечать за вызов правильного десериализатора для векторов.
             $innerType = substr($tlResponseType, 7, -1);
             $phpInnerTypeFqn = $this->mapTlTypeToPhp($innerType);
-
-            // Проверяем, является ли внутренний тип примитивом
             $isPrimitiveInner = in_array($phpInnerTypeFqn, ['bool', 'int', 'float', 'string'], true);
+
             if ($isPrimitiveInner) {
-                // Если вектор примитивов, возвращаем специальную строку, например 'vector<int>'
                 $responseClassExpr = "'vector<{$phpInnerTypeFqn}>'";
             } else {
-                // Вектор объектов: 'vector<' . Full\Name\Space\To\Type::class . '>'
-                $innerTypeShortName = basename(str_replace('\\', '/', $phpInnerTypeFqn));
+                // Регистрируем тип и получаем его короткое имя или алиас
+                $innerTypeShortName = $this->registerUse($phpInnerTypeFqn, $currentClassName, $parentFqcn);
                 $responseClassExpr = "'vector<' . " . $innerTypeShortName . "::class . '>'";
-                // Добавляем FQCN в `use`, чтобы короткое имя было доступно
-                $useStatements[$this->escapeFqn($phpInnerTypeFqn)] = true;
             }
-
         } else {
-            // Случай 3: Обычный TL-объект или примитив вроде Bool
             $phpResponseTypeFqn = $this->mapTlTypeToPhp($tlResponseType);
             $isPrimitive = in_array($phpResponseTypeFqn, ['bool', 'int', 'float', 'string'], true);
 
             if ($isPrimitive) {
-                // Примитив: 'bool'
                 $responseClassExpr = "'" . $phpResponseTypeFqn . "'";
             } else {
-                // Объект: Full\Name\Space\To\Type::class
-                $responseTypeShortName = basename(str_replace('\\', '/', $phpResponseTypeFqn));
+                // Регистрируем тип и получаем его короткое имя или алиас
+                $responseTypeShortName = $this->registerUse($phpResponseTypeFqn, $currentClassName, $parentFqcn);
                 $responseClassExpr = $responseTypeShortName . '::class';
-                // Добавляем FQCN в `use`
-                $useStatements[$this->escapeFqn($phpResponseTypeFqn)] = true;
             }
         }
 
-        $content = <<<PHP
+        return <<<PHP
     
         public function getMethodName(): string
         {
@@ -454,8 +409,6 @@ trait GeneratorHelpers
             return {$responseClassExpr};
         }
     PHP;
-
-        return ['content' => $content, 'useStatements' => $useStatements];
     }
 
     private function buildFlagsLogic(array $params, array &$useStatements, $currentClassName, ?string $parentFqcn): array
@@ -536,65 +489,119 @@ trait GeneratorHelpers
         ];
     }
 
-    private function buildSerializerMethods(array $item, bool $isMethod, bool $isConcreteOfAbstract, array $sortedPropertyNames, string $currentClassName, ?string $parentFqcn): array
-    {
-        $useStatements = [];
+    private function buildSerializerMethods(
+        array $item,
+        bool $isMethod,
+        bool $isConcreteOfAbstract,
+        array $sortedPropertyNames,
+        string $currentClassName,
+        ?string $parentFqcn
+    ): string  {
+        $params = $item['params'];
 
-        // --- Сборка тела метода serialize() ---
+        // --- Тело serialize() ---
         $serializeBody = "        \$buffer = Serializer::int32(self::CONSTRUCTOR_ID);\n";
-        $logic = $this->buildFlagsLogic($item['params'], $useStatements, $currentClassName, $parentFqcn);
-        $serializeBody .= $logic['serializeBody'];
+        $flagCalculations = "";
+        $flagDefinitions = array_filter($params, static fn($p) => $p['type'] === '#');
 
-        // --- Сборка тела метода deserialize() ---
+        // Шаг 1: Инициализируем переменные для флагов
+        foreach ($flagDefinitions as $flagDef) {
+            $flagVarName = $this->sanitizeParamName($flagDef['name']);
+            $flagCalculations .= "        \${$flagVarName} = 0;\n";
+        }
+
+        // Шаг 2: Вычисляем значения флагов
+        if (!empty($flagDefinitions)) {
+            foreach ($params as $param) {
+                if (preg_match('/(flags\d*)\.(\d+)\?/', $param['type'], $m)) {
+                    $flagVarName = $this->sanitizeParamName($m[1]);
+                    $bit = $m[2];
+                    $propName = $this->sanitizeParamName($param['name']);
+                    $check = str_ends_with($param['type'], '?true')
+                        ? "\$this->{$propName}"
+                        : "\$this->{$propName} !== null";
+                    $flagCalculations .= "        if ({$check}) \${$flagVarName} |= (1 << {$bit});\n";
+                }
+            }
+            $serializeBody .= $flagCalculations;
+        }
+
+        // Шаг 3: Проходим по всем параметрам в их ИСХОДНОМ порядке и генерируем код сериализации
+        foreach ($params as $param) {
+            $propName = $this->sanitizeParamName($param['name']);
+
+            if ($param['type'] === '#') {
+                $serializeBody .= "        \$buffer .= Serializer::int32(\${$propName});\n";
+                continue;
+            }
+
+            if (str_contains($param['type'], '?')) {
+                preg_match('/(flags\d*)\.(\d+)\?(.+)/', $param['type'], $m);
+                $flagVarName = $this->sanitizeParamName($m[1]);
+                $actualType = $m[3];
+                if ($actualType !== 'true') {
+                    $serializeBody .= "        if (\${$flagVarName} & (1 << {$m[2]})) {\n";
+                    $serializeBody .= "            \$buffer .= " . $this->getSerializationCodeForType("\$this->{$propName}", $actualType) . ";\n";
+                    $serializeBody .= "        }\n";
+                }
+            } else {
+                $serializeBody .= "        \$buffer .= " . $this->getSerializationCodeForType("\$this->{$propName}", $param['type']) . ";\n";
+            }
+        }
+
+        // --- Тело deserialize() ---
         $deserializeBody = "";
-        $constructorCall = "";
-
         if ($isMethod) {
-            // --- Вариант 1: Это метод-запрос (Request) ---
-            // Его метод deserialize() должен просто бросать исключение.
             $deserializeBody = "        throw new \LogicException('Request objects are not deserializable');";
-
         } else {
-            // --- Вариант 2: Это тип-ответ (DTO) ---
             if ($isConcreteOfAbstract) {
-                $deserializeBody = "        Deserializer::int32(\$stream); // Constructor ID is consumed here.\n";
+                $deserializeBody = "        Deserializer::int32(\$stream); // Constructor ID\n";
             } else {
                 $deserializeBody = "        \$constructorId = Deserializer::int32(\$stream);\n" .
                     "        if (\$constructorId !== self::CONSTRUCTOR_ID) {\n" .
-                    "            throw new \Exception(sprintf('Invalid constructor ID for %s. Expected %s, got %s', __CLASS__, dechex(self::CONSTRUCTOR_ID), dechex(\$constructorId)));\n" .
-                    "        }\n\n";
+                    "            throw new \Exception('Invalid constructor ID for ' . self::class);\n" .
+                    "        }\n";
             }
-            $deserializeBody .= $logic['deserializeBody'];
 
-            // Собираем аргументы для new self(...) в правильном, отсортированном порядке
+            $localVars = [];
+            // Проходим по параметрам в ИСХОДНОМ порядке и генерируем код десериализации
+            foreach ($params as $param) {
+                $propName = $this->sanitizeParamName($param['name']);
+                $localVars[$propName] = '$' . $propName;
+
+                if ($param['type'] === '#') {
+                    $deserializeBody .= "        \${$propName} = Deserializer::int32(\$stream);\n";
+                    continue;
+                }
+
+                if (str_contains($param['type'], '?')) {
+                    preg_match('/(flags\d*)\.(\d+)\?(.+)/', $param['type'], $m);
+                    $flagVarName = $this->sanitizeParamName($m[1]);
+                    $actualType = $m[3];
+                    $expression = ($actualType === 'true')
+                        ? "true"
+                        : $this->getDeserializationCodeForType($actualType, $currentClassName, $parentFqcn);
+
+                    $deserializeBody .= "        \${$propName} = (\${$flagVarName} & (1 << {$m[2]})) ? {$expression} : null;\n";
+                } else {
+                    $deserializeBody .= "        \${$propName} = " . $this->getDeserializationCodeForType($param['type'], $currentClassName, $parentFqcn) . ";\n";
+                }
+            }
+
+            // Собираем вызов конструктора, используя $sortedPropertyNames, чтобы порядок аргументов совпал
             $constructorArgsForCall = [];
-            if (!empty($sortedPropertyNames)) {
-                $deserializedVars = [];
-                foreach ($logic['constructorArgs'] as $varNameWithDollar) {
-                    $propName = ltrim($varNameWithDollar, '$');
-                    $deserializedVars[$propName] = $varNameWithDollar;
-                }
-
-                foreach ($sortedPropertyNames as $propName) {
-                    // Обрабатываем возможное добавление `_` из-за зарезервированных слов
-                    $sanitizedPropName = $this->sanitizeParamName($propName);
-                    if (isset($deserializedVars[$sanitizedPropName])) {
-                        $constructorArgsForCall[] = $deserializedVars[$sanitizedPropName];
-                    } else {
-                        throw new \Exception("Could not map property '{$propName}' for constructor call.");
-                    }
+            foreach ($sortedPropertyNames as $propName) {
+                if (isset($localVars[$propName])) {
+                    $constructorArgsForCall[] = $localVars[$propName];
                 }
             }
-
             $constructorCall = empty($constructorArgsForCall)
                 ? ''
                 : "\n            " . implode(",\n            ", $constructorArgsForCall) . "\n        ";
 
-            // Добавляем финальный return для DTO
             $deserializeBody .= "\n        return new self({$constructorCall});";
         }
 
-        // --- Сборка финального PHP-кода для обоих методов ---
         $content = <<<PHP
     
         public function serialize(): string
@@ -609,7 +616,7 @@ trait GeneratorHelpers
         }
     PHP;
 
-        return ['content' => $content, 'useStatements' => $useStatements];
+        return $content;
     }
 
     private function getSerializationCodeForType(string $varName, string $tlType): string
@@ -649,14 +656,15 @@ trait GeneratorHelpers
         }
     }
 
-    private function getDeserializationCodeForType(string $tlType, array &$useStatements, $currentClassName, ?string $parentFqcn): string
+    private function getDeserializationCodeForType(string $tlType, $currentClassName, ?string $parentFqcn): string
     {
         if ($special = $this->getSpecialTypeHandling($tlType)) {
             if ($tlType === 'DataJSON' || $tlType === 'JSONValue') {
-                $useStatements['DigitalStars\\MtprotoClient\\Generated\\Types\\Base\\DataJSON'] = true;
+                $this->registerUse('DigitalStars\\MtprotoClient\\Generated\\Types\\Base\\DataJSON', $currentClassName, $parentFqcn);
             }
             return $special['deserialize_tpl'];
         }
+
         $tlTypeLower = strtolower($tlType);
         switch ($tlTypeLower) {
             case 'int':
@@ -687,56 +695,23 @@ trait GeneratorHelpers
                         return "Deserializer::vectorOfStrings(\$stream)";
                     }
 
-                    // Старая логика для векторов объектов
-                    $deserializationCode = $this->getDeserializationCodeForType($innerType, $useStatements, $currentClassName, $parentFqcn);
-                    // $deserializationCode будет выглядеть как `SomeClass::deserialize(...)`. Нам нужно извлечь `SomeClass::class`.
+                    // Рекурсивный вызов для векторов объектов. Это правильно.
+                    $deserializationCode = $this->getDeserializationCodeForType($innerType, $currentClassName, $parentFqcn);
+                    // Извлекаем имя класса (которое уже может быть алиасом)
                     $callableClass = explode('::', $deserializationCode)[0];
                     return "Deserializer::vectorOfObjects(\$stream, [{$callableClass}::class, 'deserialize'])";
                 }
 
-                // 4. Обработка одиночных TL-объектов
-                $originalTlType = $tlType;
-                [$ns, $class] = $this->getNamespaceAndClassName($originalTlType);
+                // --- ИСПРАВЛЕННАЯ ЛОГИКА ДЛЯ ОДИНОЧНЫХ ОБЪЕКТОВ ---
 
-                $isAbstract = isset($this->abstractTypes[$originalTlType]);
+                // 1. Получаем полное имя класса (FQCN) с помощью хелпера, который уже все умеет.
+                $fqcn = $this->resolveCustomType($tlType);
 
-                if (!$isAbstract && isset($this->concreteTypeToConstructorMap[$originalTlType])) {
-                    [$ns, $class] = $this->getNamespaceAndClassName($originalTlType);
-                }
+                // 2. Регистрируем FQCN. Эта функция сама разберется с конфликтами,
+                // создаст алиас если нужно, и вернет имя, которое можно использовать в коде.
+                $callableClass = $this->registerUse($fqcn, $currentClassName, $parentFqcn);
 
-                $shortClass = ($isAbstract ? 'Abstract' : '') . $class;
-                $fqcn = self::GENERATED_TYPES_NAMESPACE . '\\' . ($ns ? $ns . '\\' : '') . $shortClass;
-                $callableClass = $shortClass;
-
-                // --- НАЧАЛО: НОВАЯ ЛОГИКА ОПРЕДЕЛЕНИЯ КОНФЛИКТА ---
-                $isConflict = false;
-                // Конфликт 1: Короткое имя типа совпадает с именем текущего класса
-                if ($shortClass === $currentClassName) {
-                    $isConflict = true;
-                }
-
-                // Конфликт 2: Короткое имя совпадает с родительским...
-                if (!$isConflict && $parentFqcn) {
-                    $parentShortName = basename(str_replace('\\', '/', $parentFqcn));
-                    if ($shortClass === $parentShortName) {
-                        // ... но это настоящий конфликт, только если FQCN разные!
-                        if ($this->escapeFqn($fqcn) !== $this->escapeFqn($parentFqcn)) {
-                            $isConflict = true;
-                        }
-                    }
-                }
-                // --- КОНЕЦ: НОВОЙ ЛОГИКИ ОПРЕДЕЛЕНИЯ КОНФЛИКТА ---
-
-                if ($isConflict) {
-                    $parts = explode('\\', $this->escapeFqn($fqcn));
-                    $namespacePart = $parts[count($parts) - 2] ?? 'Dto';
-                    $alias = ucfirst($namespacePart) . $shortClass;
-                    $useStatements[$fqcn] = $alias;
-                    $callableClass = $alias;
-                } else {
-                    $useStatements[$fqcn] = true;
-                }
-
+                // 3. Возвращаем строку для десериализации.
                 return "{$callableClass}::deserialize(\$stream)";
         }
     }

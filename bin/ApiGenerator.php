@@ -16,10 +16,11 @@ class ApiGenerator
 
     private array $schema;
     private array $typeToConstructorsMap;
+    private array $enumTypes;
     private array $abstractTypes;
     public static array $generatedClasses = [];
 
-    public function __construct(array $typeToConstructorsMap, array $abstractTypes)
+    public function __construct(array $typeToConstructorsMap, array $abstractTypes, array $enumTypes)
     {
         if (!file_exists(self::API_SCHEMA_PATH)) {
             throw new RuntimeException("Schema file not found: " . self::API_SCHEMA_PATH);
@@ -30,6 +31,7 @@ class ApiGenerator
         }
         $this->typeToConstructorsMap = $typeToConstructorsMap;
         $this->abstractTypes = $abstractTypes;
+        $this->enumTypes = $enumTypes;
     }
 
     public function run(): void
