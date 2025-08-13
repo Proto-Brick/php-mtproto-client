@@ -150,7 +150,7 @@ class ApiGenerator
 
     private function getTypeInfo(string $tlType, string $currentClassName): array
     {
-        $fqn = $this->mapTlTypeToPhp($tlType);
+        $fqn = $this->mapTlTypeToPhp($tlType, $currentClassName);
         $isBuiltIn = in_array($fqn, ['bool', 'int', 'string', 'float', 'array'], true);
 
         $nativeType = $isBuiltIn ? $fqn : "?" . $this->registerUse($fqn, $currentClassName, null);
@@ -168,7 +168,7 @@ class ApiGenerator
             foreach ($this->typeToConstructorsMap[$tlType] as $constructor) {
                 $predicate = $constructor['predicate'];
                 if (in_array($predicate, ['boolFalse', 'boolTrue'], true)) continue;
-                $childFqn = $this->mapTlTypeToPhp($predicate);
+                $childFqn = $this->mapTlTypeToPhp($predicate, $currentClassName);
                 $phpdocTypes[] = $this->registerUse($childFqn, $currentClassName, null);
             }
         } else {

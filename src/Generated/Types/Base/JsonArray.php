@@ -32,7 +32,7 @@ final class JsonArray extends AbstractJSONValue
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $value = Deserializer::vectorOfObjects($stream, [AbstractJSONValue::class, 'deserialize']);
+        $value = Deserializer::vectorOfObjects($stream, [Deserializer::class, 'deserialize']);
 
         return new self(
             $value

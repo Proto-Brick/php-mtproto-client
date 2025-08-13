@@ -27,7 +27,7 @@ final class JSONObjectValue extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::bytes($this->key);
-        $buffer .= $this->value->serialize();
+        $buffer .= Serializer::serializeJsonValue($this->value);
 
         return $buffer;
     }
@@ -39,7 +39,7 @@ final class JSONObjectValue extends TlObject
             throw new \Exception('Invalid constructor ID for ' . self::class);
         }
         $key = Deserializer::bytes($stream);
-        $value = AbstractJSONValue::deserialize($stream);
+        $value = Deserializer::deserializeJsonValue($stream);
 
         return new self(
             $key,

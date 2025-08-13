@@ -58,11 +58,11 @@ trait GeneratorHelpers
                 $this->shortNameToFqnMap[$shortName] = $fqn;
             }
             return $alias;
-        } else {
-            $this->shortNameToFqnMap[$shortName] = $fqn;
-            $this->fqnToAliasMap[$fqn] = $shortName;
-            return $shortName;
         }
+
+        $this->shortNameToFqnMap[$shortName] = $fqn;
+        $this->fqnToAliasMap[$fqn] = $shortName;
+        return $shortName;
     }
 
     /**
@@ -93,10 +93,15 @@ trait GeneratorHelpers
         return [$namespace, $className];
     }
 
-    private function mapTlTypeToPhp(string $tlType): string
+    private function mapTlTypeToPhp(string $tlType, $currentClassName): string
     {
         if (preg_match('/flags\.\d+\?(.+)/', $tlType, $matches)) {
             $tlType = $matches[1];
+        }
+
+        $isInternalJsonClass = in_array($currentClassName, ['JSONObjectValue', 'JsonArray'], true);
+        if ($isInternalJsonClass && $tlType === 'JSONValue') {
+            return $this->resolveCustomType('JSONValue'); // Вернет FQN для AbstractJSONValue
         }
 
         if ($special = $this->getSpecialTypeHandling($tlType)) {
@@ -128,7 +133,7 @@ trait GeneratorHelpers
         }
 
         // Для не-векторных типов делаем то же самое
-        $phpTypeFqn = $this->mapTlTypeToPhp($tlType);
+        $phpTypeFqn = $this->mapTlTypeToPhp($tlType, $currentClassName);
         if (!str_contains($phpTypeFqn, '\\')) {
             return $phpTypeFqn; // Это примитив
         }
@@ -304,7 +309,7 @@ trait GeneratorHelpers
             $isConditional = str_contains($originalTlType, '?');
             $actualType = $isConditional ? explode('?', $originalTlType)[1] : $originalTlType;
 
-            $phpTypeFqn = $this->mapTlTypeToPhp($actualType);
+            $phpTypeFqn = $this->mapTlTypeToPhp($actualType, $currentClassName);
             // Вызываем registerUse для php-типа, чтобы он был добавлен в use-блок
             $phpType = $this->registerUse($phpTypeFqn, $currentClassName, $parentFqcn);
             // mapTlTypeToPhpdoc тоже вызывает registerUse, но это не страшно, т.к. есть проверка
@@ -344,20 +349,15 @@ trait GeneratorHelpers
             // Используется в bots.sendCustomRequest
             'DataJSON' => [
                 'php_type' => 'array',
-                'serialize_tpl' => 'Serializer::bytes(json_encode(%s, JSON_FORCE_OBJECT))',
+                'serialize_tpl' => 'Serializer::serializeDataJSON(%s)',
                 'deserialize_tpl' => 'Deserializer::deserializeDataJSON($stream)',
             ],
 
             // Обработчик для JSONValue: это сложный TL-объект, представляющий JSON.
             // Используется в help.getAppConfig
             'JSONValue' => [
-                'php_type' => 'array',
-
-                // При отправке мы не будем строить сложную TL-структуру, а отправим
-                // как DataJSON. В 99% случаев сервер это поймет.
-                'serialize_tpl' => '(new DataJSON(json_encode(%s, JSON_FORCE_OBJECT)))->serialize()',
-
-                // При получении мы должны вызвать специальный метод, который умеет парсить эту структуру.
+                'php_type' => 'array', // warning: по спецификации, тут должен json объект, но на практике пока в схеме только array
+                'serialize_tpl' => 'Serializer::serializeJsonValue(%s)',
                 'deserialize_tpl' => 'Deserializer::deserializeJsonValue($stream)',
             ],
             default => null,
@@ -374,7 +374,7 @@ trait GeneratorHelpers
             $responseClassExpr = "'" . $special['php_type'] . "'";
         } elseif (str_starts_with($tlResponseType, 'Vector<')) {
             $innerType = substr($tlResponseType, 7, -1);
-            $phpInnerTypeFqn = $this->mapTlTypeToPhp($innerType);
+            $phpInnerTypeFqn = $this->mapTlTypeToPhp($innerType, $currentClassName);
             $isPrimitiveInner = in_array($phpInnerTypeFqn, ['bool', 'int', 'float', 'string'], true);
 
             if ($isPrimitiveInner) {
@@ -385,7 +385,7 @@ trait GeneratorHelpers
                 $responseClassExpr = "'vector<' . " . $innerTypeShortName . "::class . '>'";
             }
         } else {
-            $phpResponseTypeFqn = $this->mapTlTypeToPhp($tlResponseType);
+            $phpResponseTypeFqn = $this->mapTlTypeToPhp($tlResponseType, $currentClassName);
             $isPrimitive = in_array($phpResponseTypeFqn, ['bool', 'int', 'float', 'string'], true);
 
             if ($isPrimitive) {

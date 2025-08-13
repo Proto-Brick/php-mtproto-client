@@ -4,6 +4,15 @@ declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\TL;
 
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractJSONValue;
+use DigitalStars\MtprotoClient\Generated\Types\Base\DataJSON;
+use DigitalStars\MtprotoClient\Generated\Types\Base\JsonArray;
+use DigitalStars\MtprotoClient\Generated\Types\Base\JsonBool;
+use DigitalStars\MtprotoClient\Generated\Types\Base\JsonNull;
+use DigitalStars\MtprotoClient\Generated\Types\Base\JsonNumber;
+use DigitalStars\MtprotoClient\Generated\Types\Base\JsonObject;
+use DigitalStars\MtprotoClient\Generated\Types\Base\JSONObjectValue;
+use DigitalStars\MtprotoClient\Generated\Types\Base\JsonString;
 use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
 
 class Serializer
@@ -120,6 +129,62 @@ class Serializer
             $buffer .= self::bytes($item);
         } // string и bytes сериализуются одинаково
         return $buffer;
+    }
+
+    /**
+     * Принимает PHP-массив (или другое значение) и сериализует его в бинарный TL-тип JSONValue.
+     */
+    public static function serializeJsonValue(mixed $value): string
+    {
+        if ($value instanceof AbstractJSONValue) {
+            return $value->serialize();
+        }
+        return self::phpValueToJsonValueObject($value)->serialize();
+    }
+
+    /**
+     * Вспомогательный метод, остается private.
+     */
+    public static function serializeDataJSON(array $data): string
+    {
+        // DataJSON всегда содержит строку, поэтому json_encode здесь правильный.
+        return (new DataJSON(json_encode($data, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)))->serialize();
+    }
+
+    /**
+     * ВСПОМОГАТЕЛЬНЫЙ МЕТОД: Рекурсивно преобразует PHP-значение в дерево
+     * соответствующих TL-объектов (JsonNull, JsonObject и т.д.).
+     */
+    private static function phpValueToJsonValueObject(mixed $value): AbstractJSONValue
+    {
+        if (is_null($value)) {
+            return new JsonNull();
+        }
+        if (is_bool($value)) {
+            return new JsonBool($value);
+        }
+        if (is_int($value) || is_float($value)) {
+            return new JsonNumber((float)$value);
+        }
+        if (is_string($value)) {
+            return new JsonString($value);
+        }
+        if (is_array($value)) {
+            // Проверяем, является ли массив списком (индексы 0, 1, 2...)
+            // или ассоциативным массивом (объектом)
+            if (array_is_list($value)) {
+                $items = array_map(static fn($v) => self::phpValueToJsonValueObject($v), $value);
+                return new JsonArray($items);
+            }
+
+            $items = [];
+            foreach ($value as $k => $v) {
+                $items[] = new JSONObjectValue((string)$k, self::phpValueToJsonValueObject($v));
+            }
+            return new JsonObject($items);
+        }
+        // Если тип не поддерживается, выбрасываем исключение
+        throw new \InvalidArgumentException("Unsupported PHP type for JSONValue serialization: " . gettype($value));
     }
 
     public static function serializeMsgsAck(array $msgIds): string
