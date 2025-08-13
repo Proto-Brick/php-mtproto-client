@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class GetUnreadReactionsRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x3223495b;
+    public const CONSTRUCTOR_ID = 0xbd7f90ac;
     
     public string $predicate = 'messages.getUnreadReactions';
     
@@ -33,6 +33,7 @@ final class GetUnreadReactionsRequest extends TlObject
      * @param int $maxId
      * @param int $minId
      * @param int|null $topMsgId
+     * @param AbstractInputPeer|null $savedPeerId
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
@@ -41,7 +42,8 @@ final class GetUnreadReactionsRequest extends TlObject
         public readonly int $limit,
         public readonly int $maxId,
         public readonly int $minId,
-        public readonly ?int $topMsgId = null
+        public readonly ?int $topMsgId = null,
+        public readonly ?AbstractInputPeer $savedPeerId = null
     ) {}
     
     public function serialize(): string
@@ -49,10 +51,14 @@ final class GetUnreadReactionsRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->topMsgId !== null) $flags |= (1 << 0);
+        if ($this->savedPeerId !== null) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->topMsgId);
+        }
+        if ($flags & (1 << 1)) {
+            $buffer .= $this->savedPeerId->serialize();
         }
         $buffer .= Serializer::int32($this->offsetId);
         $buffer .= Serializer::int32($this->addOffset);

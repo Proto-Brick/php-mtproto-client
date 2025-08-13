@@ -21,6 +21,7 @@ abstract class AbstractInputStorePaymentPurpose extends TlObject
             InputStorePaymentStarsTopup::CONSTRUCTOR_ID => InputStorePaymentStarsTopup::deserialize($stream),
             InputStorePaymentStarsGift::CONSTRUCTOR_ID => InputStorePaymentStarsGift::deserialize($stream),
             InputStorePaymentStarsGiveaway::CONSTRUCTOR_ID => InputStorePaymentStarsGiveaway::deserialize($stream),
+            InputStorePaymentAuthCode::CONSTRUCTOR_ID => InputStorePaymentAuthCode::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputStorePaymentPurpose. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

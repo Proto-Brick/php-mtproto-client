@@ -20,6 +20,11 @@ abstract class AbstractInputInvoice extends TlObject
             InputInvoiceStars::CONSTRUCTOR_ID => InputInvoiceStars::deserialize($stream),
             InputInvoiceChatInviteSubscription::CONSTRUCTOR_ID => InputInvoiceChatInviteSubscription::deserialize($stream),
             InputInvoiceStarGift::CONSTRUCTOR_ID => InputInvoiceStarGift::deserialize($stream),
+            InputInvoiceStarGiftUpgrade::CONSTRUCTOR_ID => InputInvoiceStarGiftUpgrade::deserialize($stream),
+            InputInvoiceStarGiftTransfer::CONSTRUCTOR_ID => InputInvoiceStarGiftTransfer::deserialize($stream),
+            InputInvoicePremiumGiftStars::CONSTRUCTOR_ID => InputInvoicePremiumGiftStars::deserialize($stream),
+            InputInvoiceBusinessBotTransferStars::CONSTRUCTOR_ID => InputInvoiceBusinessBotTransferStars::deserialize($stream),
+            InputInvoiceStarGiftResale::CONSTRUCTOR_ID => InputInvoiceStarGiftResale::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputInvoice. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -2,8 +2,8 @@
 namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
 
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractStarsAmount;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StarsAmount;
 use DigitalStars\MtprotoClient\Generated\Types\Base\StarsSubscription;
 use DigitalStars\MtprotoClient\Generated\Types\Base\StarsTransaction;
 use DigitalStars\MtprotoClient\TL\Deserializer;
@@ -20,7 +20,7 @@ final class StarsStatus extends TlObject
     public string $predicate = 'payments.starsStatus';
     
     /**
-     * @param StarsAmount $balance
+     * @param AbstractStarsAmount $balance
      * @param list<AbstractChat> $chats
      * @param list<AbstractUser> $users
      * @param list<StarsSubscription>|null $subscriptions
@@ -30,7 +30,7 @@ final class StarsStatus extends TlObject
      * @param string|null $nextOffset
      */
     public function __construct(
-        public readonly StarsAmount $balance,
+        public readonly AbstractStarsAmount $balance,
         public readonly array $chats,
         public readonly array $users,
         public readonly ?array $subscriptions = null,
@@ -79,7 +79,7 @@ final class StarsStatus extends TlObject
             throw new \Exception('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $balance = StarsAmount::deserialize($stream);
+        $balance = AbstractStarsAmount::deserialize($stream);
         $subscriptions = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [StarsSubscription::class, 'deserialize']) : null;
         $subscriptionsNextOffset = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
         $subscriptionsMissingBalance = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;

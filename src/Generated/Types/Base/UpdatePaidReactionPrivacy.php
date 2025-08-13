@@ -10,21 +10,21 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class UpdatePaidReactionPrivacy extends AbstractUpdate
 {
-    public const CONSTRUCTOR_ID = 0x51ca7aec;
+    public const CONSTRUCTOR_ID = 0x8b725fce;
     
     public string $predicate = 'updatePaidReactionPrivacy';
     
     /**
-     * @param bool $private
+     * @param AbstractPaidReactionPrivacy $private
      */
     public function __construct(
-        public readonly bool $private
+        public readonly AbstractPaidReactionPrivacy $private
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-        $buffer .= ($this->private ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
+        $buffer .= $this->private->serialize();
 
         return $buffer;
     }
@@ -32,7 +32,7 @@ final class UpdatePaidReactionPrivacy extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $private = (Deserializer::int32($stream) === 0x997275b5);
+        $private = AbstractPaidReactionPrivacy::deserialize($stream);
 
         return new self(
             $private

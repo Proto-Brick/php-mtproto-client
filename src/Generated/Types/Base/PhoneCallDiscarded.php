@@ -19,7 +19,7 @@ final class PhoneCallDiscarded extends AbstractPhoneCall
      * @param true|null $needRating
      * @param true|null $needDebug
      * @param true|null $video
-     * @param PhoneCallDiscardReason|null $reason
+     * @param AbstractPhoneCallDiscardReason|null $reason
      * @param int|null $duration
      */
     public function __construct(
@@ -27,7 +27,7 @@ final class PhoneCallDiscarded extends AbstractPhoneCall
         public readonly ?true $needRating = null,
         public readonly ?true $needDebug = null,
         public readonly ?true $video = null,
-        public readonly ?PhoneCallDiscardReason $reason = null,
+        public readonly ?AbstractPhoneCallDiscardReason $reason = null,
         public readonly ?int $duration = null
     ) {}
     
@@ -60,7 +60,7 @@ final class PhoneCallDiscarded extends AbstractPhoneCall
         $needDebug = ($flags & (1 << 3)) ? true : null;
         $video = ($flags & (1 << 6)) ? true : null;
         $id = Deserializer::int64($stream);
-        $reason = ($flags & (1 << 0)) ? PhoneCallDiscardReason::deserialize($stream) : null;
+        $reason = ($flags & (1 << 0)) ? AbstractPhoneCallDiscardReason::deserialize($stream) : null;
         $duration = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
 
         return new self(

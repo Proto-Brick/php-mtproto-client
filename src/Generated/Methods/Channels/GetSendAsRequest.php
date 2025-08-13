@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class GetSendAsRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xdc770ee;
+    public const CONSTRUCTOR_ID = 0xe785a43f;
     
     public string $predicate = 'channels.getSendAs';
     
@@ -27,14 +27,19 @@ final class GetSendAsRequest extends TlObject
     }
     /**
      * @param AbstractInputPeer $peer
+     * @param true|null $forPaidReactions
      */
     public function __construct(
-        public readonly AbstractInputPeer $peer
+        public readonly AbstractInputPeer $peer,
+        public readonly ?true $forPaidReactions = null
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->forPaidReactions) $flags |= (1 << 0);
+        $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
 
         return $buffer;

@@ -8,7 +8,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
 /**
  * @see https://core.telegram.org/type/starsAmount
  */
-final class StarsAmount extends TlObject
+final class StarsAmount extends AbstractStarsAmount
 {
     public const CONSTRUCTOR_ID = 0xbbb6b4a3;
     
@@ -34,10 +34,7 @@ final class StarsAmount extends TlObject
 
     public static function deserialize(string &$stream): static
     {
-        $constructorId = Deserializer::int32($stream);
-        if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
-        }
+        Deserializer::int32($stream); // Constructor ID
         $amount = Deserializer::int64($stream);
         $nanos = Deserializer::int32($stream);
 

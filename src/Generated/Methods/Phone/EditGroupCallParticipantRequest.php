@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
 
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputGroupCall;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputGroupCall;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -27,7 +27,7 @@ final class EditGroupCallParticipantRequest extends TlObject
         return AbstractUpdates::class;
     }
     /**
-     * @param InputGroupCall $call
+     * @param AbstractInputGroupCall $call
      * @param AbstractInputPeer $participant
      * @param bool|null $muted
      * @param int|null $volume
@@ -37,7 +37,7 @@ final class EditGroupCallParticipantRequest extends TlObject
      * @param bool|null $presentationPaused
      */
     public function __construct(
-        public readonly InputGroupCall $call,
+        public readonly AbstractInputGroupCall $call,
         public readonly AbstractInputPeer $participant,
         public readonly ?bool $muted = null,
         public readonly ?int $volume = null,

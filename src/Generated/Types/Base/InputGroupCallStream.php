@@ -15,14 +15,14 @@ final class InputGroupCallStream extends AbstractInputFileLocation
     public string $predicate = 'inputGroupCallStream';
     
     /**
-     * @param InputGroupCall $call
+     * @param AbstractInputGroupCall $call
      * @param int $timeMs
      * @param int $scale
      * @param int|null $videoChannel
      * @param int|null $videoQuality
      */
     public function __construct(
-        public readonly InputGroupCall $call,
+        public readonly AbstractInputGroupCall $call,
         public readonly int $timeMs,
         public readonly int $scale,
         public readonly ?int $videoChannel = null,
@@ -53,7 +53,7 @@ final class InputGroupCallStream extends AbstractInputFileLocation
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $call = InputGroupCall::deserialize($stream);
+        $call = AbstractInputGroupCall::deserialize($stream);
         $timeMs = Deserializer::int64($stream);
         $scale = Deserializer::int32($stream);
         $videoChannel = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;

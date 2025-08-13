@@ -15,7 +15,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class SendMultiMediaRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x37b74355;
+    public const CONSTRUCTOR_ID = 0x1bf89d74;
     
     public string $predicate = 'messages.sendMultiMedia';
     
@@ -43,6 +43,7 @@ final class SendMultiMediaRequest extends TlObject
      * @param AbstractInputPeer|null $sendAs
      * @param AbstractInputQuickReplyShortcut|null $quickReplyShortcut
      * @param int|null $effect
+     * @param int|null $allowPaidStars
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
@@ -58,7 +59,8 @@ final class SendMultiMediaRequest extends TlObject
         public readonly ?int $scheduleDate = null,
         public readonly ?AbstractInputPeer $sendAs = null,
         public readonly ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null,
-        public readonly ?int $effect = null
+        public readonly ?int $effect = null,
+        public readonly ?int $allowPaidStars = null
     ) {}
     
     public function serialize(): string
@@ -77,6 +79,7 @@ final class SendMultiMediaRequest extends TlObject
         if ($this->sendAs !== null) $flags |= (1 << 13);
         if ($this->quickReplyShortcut !== null) $flags |= (1 << 17);
         if ($this->effect !== null) $flags |= (1 << 18);
+        if ($this->allowPaidStars !== null) $flags |= (1 << 21);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
@@ -94,6 +97,9 @@ final class SendMultiMediaRequest extends TlObject
         }
         if ($flags & (1 << 18)) {
             $buffer .= Serializer::int64($this->effect);
+        }
+        if ($flags & (1 << 21)) {
+            $buffer .= Serializer::int64($this->allowPaidStars);
         }
 
         return $buffer;

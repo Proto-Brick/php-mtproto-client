@@ -5,6 +5,7 @@ use DigitalStars\MtprotoClient\Client;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\AcceptEncryptionRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\AcceptUrlAuthRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\AddChatUserRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Messages\AppendTodoListRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\CheckChatInviteRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\CheckHistoryImportPeerRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\CheckHistoryImportRequest;
@@ -109,6 +110,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Messages\GetRecentLocationsRequ
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\GetRecentReactionsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\GetRecentStickersRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\GetRepliesRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Messages\GetSavedDialogsByIDRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\GetSavedDialogsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\GetSavedGifsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\GetSavedHistoryRequest;
@@ -145,6 +147,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReadHistoryRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReadMentionsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReadMessageContentsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReadReactionsRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReadSavedHistoryRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReceivedMessagesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReceivedQueueRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReorderPinnedDialogsRequest;
@@ -152,6 +155,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReorderPinnedSavedDial
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReorderQuickRepliesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReorderStickerSetsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReportEncryptedSpamRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReportMessagesDeliveryRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReportReactionRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReportRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ReportSpamRequest;
@@ -214,6 +218,8 @@ use DigitalStars\MtprotoClient\Generated\Methods\Messages\TogglePaidReactionPriv
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\TogglePeerTranslationsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ToggleSavedDialogPinRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\ToggleStickerSetsRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Messages\ToggleSuggestedPostApprovalRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Messages\ToggleTodoCompletedRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\TranscribeAudioRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\TranslateTextRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Messages\UninstallStickerSetRequest;
@@ -258,6 +264,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputWallPaper;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageMedia;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessagesFilter;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPaidReactionPrivacy;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractReaction;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractReplyMarkup;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractReportResult;
@@ -344,6 +351,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaPhoto;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaPhotoExternal;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaPoll;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaStory;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaTodo;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaUploadedDocument;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaUploadedPhoto;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaVenue;
@@ -380,6 +388,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerUserFromMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputQuickReplyShortcut;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputQuickReplyShortcutId;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputReplyToMessage;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputReplyToMonoForum;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputReplyToStory;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputSingleMedia;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetAnimatedEmoji;
@@ -393,6 +402,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetID;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetPremiumGifts;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetShortName;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetTonGifts;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickeredMediaDocument;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickeredMediaPhoto;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUser;
@@ -436,11 +446,15 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\MessageMediaPaidMedia;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MessageMediaPhoto;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MessageMediaPoll;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MessageMediaStory;
+use DigitalStars\MtprotoClient\Generated\Types\Base\MessageMediaToDo;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MessageMediaUnsupported;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MessageMediaVenue;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MessageMediaWebPage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MessageRange;
 use DigitalStars\MtprotoClient\Generated\Types\Base\OutboxReadDate;
+use DigitalStars\MtprotoClient\Generated\Types\Base\PaidReactionPrivacyAnonymous;
+use DigitalStars\MtprotoClient\Generated\Types\Base\PaidReactionPrivacyDefault;
+use DigitalStars\MtprotoClient\Generated\Types\Base\PaidReactionPrivacyPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ReactionCustomEmoji;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ReactionEmoji;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ReactionEmpty;
@@ -478,7 +492,9 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\StickerSetCovered;
 use DigitalStars\MtprotoClient\Generated\Types\Base\StickerSetFullCovered;
 use DigitalStars\MtprotoClient\Generated\Types\Base\StickerSetMultiCovered;
 use DigitalStars\MtprotoClient\Generated\Types\Base\StickerSetNoCovered;
+use DigitalStars\MtprotoClient\Generated\Types\Base\SuggestedPost;
 use DigitalStars\MtprotoClient\Generated\Types\Base\TextWithEntities;
+use DigitalStars\MtprotoClient\Generated\Types\Base\TodoItem;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShort;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortChatMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortMessage;
@@ -605,6 +621,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Messages\TranscribedAudio;
 use DigitalStars\MtprotoClient\Generated\Types\Messages\TranslatedText;
 use DigitalStars\MtprotoClient\Generated\Types\Messages\VotesList;
 use DigitalStars\MtprotoClient\Generated\Types\Messages\WebPage;
+use DigitalStars\MtprotoClient\Generated\Types\Messages\WebPagePreview;
 
 
 /**
@@ -763,25 +780,27 @@ final readonly class MessagesMethods
      * @param bool|null $updateStickersetsOrder
      * @param bool|null $invertMedia
      * @param bool|null $allowPaidFloodskip
-     * @param InputReplyToMessage|InputReplyToStory|null $replyTo
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
      * @param ReplyKeyboardHide|ReplyKeyboardForceReply|ReplyKeyboardMarkup|ReplyInlineMarkup|null $replyMarkup
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
      * @param int|null $scheduleDate
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $sendAs
      * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
      * @param int|null $effect
+     * @param int|null $allowPaidStars
+     * @param SuggestedPost|null $suggestedPost
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/messages.sendMessage
      * @api
      */
-    public function sendMessage(AbstractInputPeer $peer, string $message, int $randomId, ?bool $noWebpage = null, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null): ?AbstractUpdates
+    public function sendMessage(AbstractInputPeer $peer, string $message, int $randomId, ?bool $noWebpage = null, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $allowPaidStars = null, ?SuggestedPost $suggestedPost = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new SendMessageRequest($peer, $message, $randomId, $noWebpage, $silent, $background, $clearDraft, $noforwards, $updateStickersetsOrder, $invertMedia, $allowPaidFloodskip, $replyTo, $replyMarkup, $entities, $scheduleDate, $sendAs, $quickReplyShortcut, $effect));
+        return $this->client->callSync(new SendMessageRequest($peer, $message, $randomId, $noWebpage, $silent, $background, $clearDraft, $noforwards, $updateStickersetsOrder, $invertMedia, $allowPaidFloodskip, $replyTo, $replyMarkup, $entities, $scheduleDate, $sendAs, $quickReplyShortcut, $effect, $allowPaidStars, $suggestedPost));
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia $media
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
      * @param string $message
      * @param int $randomId
      * @param bool|null $silent
@@ -791,20 +810,22 @@ final readonly class MessagesMethods
      * @param bool|null $updateStickersetsOrder
      * @param bool|null $invertMedia
      * @param bool|null $allowPaidFloodskip
-     * @param InputReplyToMessage|InputReplyToStory|null $replyTo
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
      * @param ReplyKeyboardHide|ReplyKeyboardForceReply|ReplyKeyboardMarkup|ReplyInlineMarkup|null $replyMarkup
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
      * @param int|null $scheduleDate
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $sendAs
      * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
      * @param int|null $effect
+     * @param int|null $allowPaidStars
+     * @param SuggestedPost|null $suggestedPost
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/messages.sendMedia
      * @api
      */
-    public function sendMedia(AbstractInputPeer $peer, AbstractInputMedia $media, string $message, int $randomId, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null): ?AbstractUpdates
+    public function sendMedia(AbstractInputPeer $peer, AbstractInputMedia $media, string $message, int $randomId, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $allowPaidStars = null, ?SuggestedPost $suggestedPost = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new SendMediaRequest($peer, $media, $message, $randomId, $silent, $background, $clearDraft, $noforwards, $updateStickersetsOrder, $invertMedia, $allowPaidFloodskip, $replyTo, $replyMarkup, $entities, $scheduleDate, $sendAs, $quickReplyShortcut, $effect));
+        return $this->client->callSync(new SendMediaRequest($peer, $media, $message, $randomId, $silent, $background, $clearDraft, $noforwards, $updateStickersetsOrder, $invertMedia, $allowPaidFloodskip, $replyTo, $replyMarkup, $entities, $scheduleDate, $sendAs, $quickReplyShortcut, $effect, $allowPaidStars, $suggestedPost));
     }
 
     /**
@@ -820,16 +841,20 @@ final readonly class MessagesMethods
      * @param bool|null $noforwards
      * @param bool|null $allowPaidFloodskip
      * @param int|null $topMsgId
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
      * @param int|null $scheduleDate
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $sendAs
      * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
+     * @param int|null $videoTimestamp
+     * @param int|null $allowPaidStars
+     * @param SuggestedPost|null $suggestedPost
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/messages.forwardMessages
      * @api
      */
-    public function forwardMessages(AbstractInputPeer $fromPeer, array $id, array $randomId, AbstractInputPeer $toPeer, ?bool $silent = null, ?bool $background = null, ?bool $withMyScore = null, ?bool $dropAuthor = null, ?bool $dropMediaCaptions = null, ?bool $noforwards = null, ?bool $allowPaidFloodskip = null, ?int $topMsgId = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null): ?AbstractUpdates
+    public function forwardMessages(AbstractInputPeer $fromPeer, array $id, array $randomId, AbstractInputPeer $toPeer, ?bool $silent = null, ?bool $background = null, ?bool $withMyScore = null, ?bool $dropAuthor = null, ?bool $dropMediaCaptions = null, ?bool $noforwards = null, ?bool $allowPaidFloodskip = null, ?int $topMsgId = null, ?AbstractInputReplyTo $replyTo = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $videoTimestamp = null, ?int $allowPaidStars = null, ?SuggestedPost $suggestedPost = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new ForwardMessagesRequest($fromPeer, $id, $randomId, $toPeer, $silent, $background, $withMyScore, $dropAuthor, $dropMediaCaptions, $noforwards, $allowPaidFloodskip, $topMsgId, $scheduleDate, $sendAs, $quickReplyShortcut));
+        return $this->client->callSync(new ForwardMessagesRequest($fromPeer, $id, $randomId, $toPeer, $silent, $background, $withMyScore, $dropAuthor, $dropMediaCaptions, $noforwards, $allowPaidFloodskip, $topMsgId, $replyTo, $scheduleDate, $sendAs, $quickReplyShortcut, $videoTimestamp, $allowPaidStars, $suggestedPost));
     }
 
     /**
@@ -1128,11 +1153,11 @@ final readonly class MessagesMethods
     /**
      * @param string $message
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
-     * @return MessageMediaEmpty|MessageMediaPhoto|MessageMediaGeo|MessageMediaContact|MessageMediaUnsupported|MessageMediaDocument|MessageMediaWebPage|MessageMediaVenue|MessageMediaGame|MessageMediaInvoice|MessageMediaGeoLive|MessageMediaPoll|MessageMediaDice|MessageMediaStory|MessageMediaGiveaway|MessageMediaGiveawayResults|MessageMediaPaidMedia|null
+     * @return WebPagePreview|null
      * @see https://core.telegram.org/method/messages.getWebPagePreview
      * @api
      */
-    public function getWebPagePreview(string $message, ?array $entities = null): ?AbstractMessageMedia
+    public function getWebPagePreview(string $message, ?array $entities = null): ?WebPagePreview
     {
         return $this->client->callSync(new GetWebPagePreviewRequest($message, $entities));
     }
@@ -1177,7 +1202,7 @@ final readonly class MessagesMethods
     }
 
     /**
-     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses $stickerset
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
      * @param int $hash
      * @return StickerSet|StickerSetNotModified|null
      * @see https://core.telegram.org/method/messages.getStickerSet
@@ -1189,7 +1214,7 @@ final readonly class MessagesMethods
     }
 
     /**
-     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses $stickerset
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
      * @param bool $archived
      * @return StickerSetInstallResultSuccess|StickerSetInstallResultArchive|null
      * @see https://core.telegram.org/method/messages.installStickerSet
@@ -1201,7 +1226,7 @@ final readonly class MessagesMethods
     }
 
     /**
-     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses $stickerset
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
      * @return bool
      * @see https://core.telegram.org/method/messages.uninstallStickerSet
      * @api
@@ -1375,17 +1400,18 @@ final readonly class MessagesMethods
      * @param bool|null $background
      * @param bool|null $clearDraft
      * @param bool|null $hideVia
-     * @param InputReplyToMessage|InputReplyToStory|null $replyTo
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
      * @param int|null $scheduleDate
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $sendAs
      * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
+     * @param int|null $allowPaidStars
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/messages.sendInlineBotResult
      * @api
      */
-    public function sendInlineBotResult(AbstractInputPeer $peer, int $randomId, int $queryId, string $id, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $hideVia = null, ?AbstractInputReplyTo $replyTo = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null): ?AbstractUpdates
+    public function sendInlineBotResult(AbstractInputPeer $peer, int $randomId, int $queryId, string $id, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $hideVia = null, ?AbstractInputReplyTo $replyTo = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $allowPaidStars = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new SendInlineBotResultRequest($peer, $randomId, $queryId, $id, $silent, $background, $clearDraft, $hideVia, $replyTo, $scheduleDate, $sendAs, $quickReplyShortcut));
+        return $this->client->callSync(new SendInlineBotResultRequest($peer, $randomId, $queryId, $id, $silent, $background, $clearDraft, $hideVia, $replyTo, $scheduleDate, $sendAs, $quickReplyShortcut, $allowPaidStars));
     }
 
     /**
@@ -1406,7 +1432,7 @@ final readonly class MessagesMethods
      * @param bool|null $noWebpage
      * @param bool|null $invertMedia
      * @param string|null $message
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|null $media
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo|null $media
      * @param ReplyKeyboardHide|ReplyKeyboardForceReply|ReplyKeyboardMarkup|ReplyInlineMarkup|null $replyMarkup
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
      * @param int|null $scheduleDate
@@ -1425,7 +1451,7 @@ final readonly class MessagesMethods
      * @param bool|null $noWebpage
      * @param bool|null $invertMedia
      * @param string|null $message
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|null $media
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo|null $media
      * @param ReplyKeyboardHide|ReplyKeyboardForceReply|ReplyKeyboardMarkup|ReplyInlineMarkup|null $replyMarkup
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
      * @return bool
@@ -1483,17 +1509,18 @@ final readonly class MessagesMethods
      * @param string $message
      * @param bool|null $noWebpage
      * @param bool|null $invertMedia
-     * @param InputReplyToMessage|InputReplyToStory|null $replyTo
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|null $media
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo|null $media
      * @param int|null $effect
+     * @param SuggestedPost|null $suggestedPost
      * @return bool
      * @see https://core.telegram.org/method/messages.saveDraft
      * @api
      */
-    public function saveDraft(AbstractInputPeer $peer, string $message, ?bool $noWebpage = null, ?bool $invertMedia = null, ?AbstractInputReplyTo $replyTo = null, ?array $entities = null, ?AbstractInputMedia $media = null, ?int $effect = null): bool
+    public function saveDraft(AbstractInputPeer $peer, string $message, ?bool $noWebpage = null, ?bool $invertMedia = null, ?AbstractInputReplyTo $replyTo = null, ?array $entities = null, ?AbstractInputMedia $media = null, ?int $effect = null, ?SuggestedPost $suggestedPost = null): bool
     {
-        return (bool) $this->client->callSync(new SaveDraftRequest($peer, $message, $noWebpage, $invertMedia, $replyTo, $entities, $media, $effect));
+        return (bool) $this->client->callSync(new SaveDraftRequest($peer, $message, $noWebpage, $invertMedia, $replyTo, $entities, $media, $effect, $suggestedPost));
     }
 
     /**
@@ -1745,9 +1772,9 @@ final readonly class MessagesMethods
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia $media
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
      * @param string|null $businessConnectionId
-     * @return MessageMediaEmpty|MessageMediaPhoto|MessageMediaGeo|MessageMediaContact|MessageMediaUnsupported|MessageMediaDocument|MessageMediaWebPage|MessageMediaVenue|MessageMediaGame|MessageMediaInvoice|MessageMediaGeoLive|MessageMediaPoll|MessageMediaDice|MessageMediaStory|MessageMediaGiveaway|MessageMediaGiveawayResults|MessageMediaPaidMedia|null
+     * @return MessageMediaEmpty|MessageMediaPhoto|MessageMediaGeo|MessageMediaContact|MessageMediaUnsupported|MessageMediaDocument|MessageMediaWebPage|MessageMediaVenue|MessageMediaGame|MessageMediaInvoice|MessageMediaGeoLive|MessageMediaPoll|MessageMediaDice|MessageMediaStory|MessageMediaGiveaway|MessageMediaGiveawayResults|MessageMediaPaidMedia|MessageMediaToDo|null
      * @see https://core.telegram.org/method/messages.uploadMedia
      * @api
      */
@@ -1758,7 +1785,7 @@ final readonly class MessagesMethods
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @param InputReplyToMessage|InputReplyToStory $replyTo
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum $replyTo
      * @param int $randomId
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/messages.sendScreenshotNotification
@@ -1844,18 +1871,19 @@ final readonly class MessagesMethods
      * @param bool|null $updateStickersetsOrder
      * @param bool|null $invertMedia
      * @param bool|null $allowPaidFloodskip
-     * @param InputReplyToMessage|InputReplyToStory|null $replyTo
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
      * @param int|null $scheduleDate
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $sendAs
      * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
      * @param int|null $effect
+     * @param int|null $allowPaidStars
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/messages.sendMultiMedia
      * @api
      */
-    public function sendMultiMedia(AbstractInputPeer $peer, array $multiMedia, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null): ?AbstractUpdates
+    public function sendMultiMedia(AbstractInputPeer $peer, array $multiMedia, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?int $scheduleDate = null, ?AbstractInputPeer $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $allowPaidStars = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new SendMultiMediaRequest($peer, $multiMedia, $silent, $background, $clearDraft, $noforwards, $updateStickersetsOrder, $invertMedia, $allowPaidFloodskip, $replyTo, $scheduleDate, $sendAs, $quickReplyShortcut, $effect));
+        return $this->client->callSync(new SendMultiMediaRequest($peer, $multiMedia, $silent, $background, $clearDraft, $noforwards, $updateStickersetsOrder, $invertMedia, $allowPaidFloodskip, $replyTo, $scheduleDate, $sendAs, $quickReplyShortcut, $effect, $allowPaidStars));
     }
 
     /**
@@ -1896,23 +1924,25 @@ final readonly class MessagesMethods
     /**
      * @param InputDialogPeer|InputDialogPeerFolder $peer
      * @param bool|null $unread
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
      * @return bool
      * @see https://core.telegram.org/method/messages.markDialogUnread
      * @api
      */
-    public function markDialogUnread(AbstractInputDialogPeer $peer, ?bool $unread = null): bool
+    public function markDialogUnread(AbstractInputDialogPeer $peer, ?bool $unread = null, ?AbstractInputPeer $parentPeer = null): bool
     {
-        return (bool) $this->client->callSync(new MarkDialogUnreadRequest($peer, $unread));
+        return (bool) $this->client->callSync(new MarkDialogUnreadRequest($peer, $unread, $parentPeer));
     }
 
     /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
      * @return list<DialogPeer|DialogPeerFolder>
      * @see https://core.telegram.org/method/messages.getDialogUnreadMarks
      * @api
      */
-    public function getDialogUnreadMarks(): array
+    public function getDialogUnreadMarks(?AbstractInputPeer $parentPeer = null): array
     {
-        return $this->client->callSync(new GetDialogUnreadMarksRequest());
+        return $this->client->callSync(new GetDialogUnreadMarksRequest($parentPeer));
     }
 
     /**
@@ -2163,7 +2193,7 @@ final readonly class MessagesMethods
     }
 
     /**
-     * @param list<InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses> $stickersets
+     * @param list<InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts> $stickersets
      * @param bool|null $uninstall
      * @param bool|null $archive
      * @param bool|null $unarchive
@@ -2279,13 +2309,14 @@ final readonly class MessagesMethods
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
      * @param int|null $topMsgId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $savedPeerId
      * @return AffectedHistory|null
      * @see https://core.telegram.org/method/messages.unpinAllMessages
      * @api
      */
-    public function unpinAllMessages(AbstractInputPeer $peer, ?int $topMsgId = null): ?AffectedHistory
+    public function unpinAllMessages(AbstractInputPeer $peer, ?int $topMsgId = null, ?AbstractInputPeer $savedPeerId = null): ?AffectedHistory
     {
-        return $this->client->callSync(new UnpinAllMessagesRequest($peer, $topMsgId));
+        return $this->client->callSync(new UnpinAllMessagesRequest($peer, $topMsgId, $savedPeerId));
     }
 
     /**
@@ -2338,8 +2369,8 @@ final readonly class MessagesMethods
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
      * @param int $importId
      * @param string $fileName
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia $media
-     * @return MessageMediaEmpty|MessageMediaPhoto|MessageMediaGeo|MessageMediaContact|MessageMediaUnsupported|MessageMediaDocument|MessageMediaWebPage|MessageMediaVenue|MessageMediaGame|MessageMediaInvoice|MessageMediaGeoLive|MessageMediaPoll|MessageMediaDice|MessageMediaStory|MessageMediaGiveaway|MessageMediaGiveawayResults|MessageMediaPaidMedia|null
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
+     * @return MessageMediaEmpty|MessageMediaPhoto|MessageMediaGeo|MessageMediaContact|MessageMediaUnsupported|MessageMediaDocument|MessageMediaWebPage|MessageMediaVenue|MessageMediaGame|MessageMediaInvoice|MessageMediaGeoLive|MessageMediaPoll|MessageMediaDice|MessageMediaStory|MessageMediaGiveaway|MessageMediaGiveawayResults|MessageMediaPaidMedia|MessageMediaToDo|null
      * @see https://core.telegram.org/method/messages.uploadImportedMedia
      * @api
      */
@@ -2685,25 +2716,27 @@ final readonly class MessagesMethods
      * @param int $maxId
      * @param int $minId
      * @param int|null $topMsgId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $savedPeerId
      * @return Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null
      * @see https://core.telegram.org/method/messages.getUnreadReactions
      * @api
      */
-    public function getUnreadReactions(AbstractInputPeer $peer, int $offsetId, int $addOffset, int $limit, int $maxId, int $minId, ?int $topMsgId = null): ?AbstractMessages
+    public function getUnreadReactions(AbstractInputPeer $peer, int $offsetId, int $addOffset, int $limit, int $maxId, int $minId, ?int $topMsgId = null, ?AbstractInputPeer $savedPeerId = null): ?AbstractMessages
     {
-        return $this->client->callSync(new GetUnreadReactionsRequest($peer, $offsetId, $addOffset, $limit, $maxId, $minId, $topMsgId));
+        return $this->client->callSync(new GetUnreadReactionsRequest($peer, $offsetId, $addOffset, $limit, $maxId, $minId, $topMsgId, $savedPeerId));
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
      * @param int|null $topMsgId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $savedPeerId
      * @return AffectedHistory|null
      * @see https://core.telegram.org/method/messages.readReactions
      * @api
      */
-    public function readReactions(AbstractInputPeer $peer, ?int $topMsgId = null): ?AffectedHistory
+    public function readReactions(AbstractInputPeer $peer, ?int $topMsgId = null, ?AbstractInputPeer $savedPeerId = null): ?AffectedHistory
     {
-        return $this->client->callSync(new ReadReactionsRequest($peer, $topMsgId));
+        return $this->client->callSync(new ReadReactionsRequest($peer, $topMsgId, $savedPeerId));
     }
 
     /**
@@ -2765,7 +2798,7 @@ final readonly class MessagesMethods
      * @param string|null $url
      * @param string|null $startParam
      * @param array|null $themeParams
-     * @param InputReplyToMessage|InputReplyToStory|null $replyTo
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $sendAs
      * @return WebViewResult|null
      * @see https://core.telegram.org/method/messages.requestWebView
@@ -2781,7 +2814,7 @@ final readonly class MessagesMethods
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
      * @param int $queryId
      * @param bool|null $silent
-     * @param InputReplyToMessage|InputReplyToStory|null $replyTo
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $sendAs
      * @return bool
      * @see https://core.telegram.org/method/messages.prolongWebView
@@ -3113,13 +3146,14 @@ final readonly class MessagesMethods
      * @param int $limit
      * @param int $hash
      * @param bool|null $excludePinned
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
      * @return SavedDialogs|SavedDialogsSlice|SavedDialogsNotModified|null
      * @see https://core.telegram.org/method/messages.getSavedDialogs
      * @api
      */
-    public function getSavedDialogs(int $offsetDate, int $offsetId, AbstractInputPeer $offsetPeer, int $limit, int $hash, ?bool $excludePinned = null): ?AbstractSavedDialogs
+    public function getSavedDialogs(int $offsetDate, int $offsetId, AbstractInputPeer $offsetPeer, int $limit, int $hash, ?bool $excludePinned = null, ?AbstractInputPeer $parentPeer = null): ?AbstractSavedDialogs
     {
-        return $this->client->callSync(new GetSavedDialogsRequest($offsetDate, $offsetId, $offsetPeer, $limit, $hash, $excludePinned));
+        return $this->client->callSync(new GetSavedDialogsRequest($offsetDate, $offsetId, $offsetPeer, $limit, $hash, $excludePinned, $parentPeer));
     }
 
     /**
@@ -3131,27 +3165,29 @@ final readonly class MessagesMethods
      * @param int $maxId
      * @param int $minId
      * @param int $hash
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
      * @return Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null
      * @see https://core.telegram.org/method/messages.getSavedHistory
      * @api
      */
-    public function getSavedHistory(AbstractInputPeer $peer, int $offsetId, int $offsetDate, int $addOffset, int $limit, int $maxId, int $minId, int $hash): ?AbstractMessages
+    public function getSavedHistory(AbstractInputPeer $peer, int $offsetId, int $offsetDate, int $addOffset, int $limit, int $maxId, int $minId, int $hash, ?AbstractInputPeer $parentPeer = null): ?AbstractMessages
     {
-        return $this->client->callSync(new GetSavedHistoryRequest($peer, $offsetId, $offsetDate, $addOffset, $limit, $maxId, $minId, $hash));
+        return $this->client->callSync(new GetSavedHistoryRequest($peer, $offsetId, $offsetDate, $addOffset, $limit, $maxId, $minId, $hash, $parentPeer));
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
      * @param int $maxId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
      * @param int|null $minDate
      * @param int|null $maxDate
      * @return AffectedHistory|null
      * @see https://core.telegram.org/method/messages.deleteSavedHistory
      * @api
      */
-    public function deleteSavedHistory(AbstractInputPeer $peer, int $maxId, ?int $minDate = null, ?int $maxDate = null): ?AffectedHistory
+    public function deleteSavedHistory(AbstractInputPeer $peer, int $maxId, ?AbstractInputPeer $parentPeer = null, ?int $minDate = null, ?int $maxDate = null): ?AffectedHistory
     {
-        return $this->client->callSync(new DeleteSavedHistoryRequest($peer, $maxId, $minDate, $maxDate));
+        return $this->client->callSync(new DeleteSavedHistoryRequest($peer, $maxId, $parentPeer, $minDate, $maxDate));
     }
 
     /**
@@ -3434,12 +3470,12 @@ final readonly class MessagesMethods
      * @param int $msgId
      * @param int $count
      * @param int $randomId
-     * @param bool|null $private
+     * @param PaidReactionPrivacyDefault|PaidReactionPrivacyAnonymous|PaidReactionPrivacyPeer|null $private
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/messages.sendPaidReaction
      * @api
      */
-    public function sendPaidReaction(AbstractInputPeer $peer, int $msgId, int $count, int $randomId, ?bool $private = null): ?AbstractUpdates
+    public function sendPaidReaction(AbstractInputPeer $peer, int $msgId, int $count, int $randomId, ?AbstractPaidReactionPrivacy $private = null): ?AbstractUpdates
     {
         return $this->client->callSync(new SendPaidReactionRequest($peer, $msgId, $count, $randomId, $private));
     }
@@ -3447,12 +3483,12 @@ final readonly class MessagesMethods
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
      * @param int $msgId
-     * @param bool $private
+     * @param PaidReactionPrivacyDefault|PaidReactionPrivacyAnonymous|PaidReactionPrivacyPeer $private
      * @return bool
      * @see https://core.telegram.org/method/messages.togglePaidReactionPrivacy
      * @api
      */
-    public function togglePaidReactionPrivacy(AbstractInputPeer $peer, int $msgId, bool $private): bool
+    public function togglePaidReactionPrivacy(AbstractInputPeer $peer, int $msgId, AbstractPaidReactionPrivacy $private): bool
     {
         return (bool) $this->client->callSync(new TogglePaidReactionPrivacyRequest($peer, $msgId, $private));
     }
@@ -3468,19 +3504,17 @@ final readonly class MessagesMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
      * @param string $randomId
      * @return bool
      * @see https://core.telegram.org/method/messages.viewSponsoredMessage
      * @api
      */
-    public function viewSponsoredMessage(AbstractInputPeer $peer, string $randomId): bool
+    public function viewSponsoredMessage(string $randomId): bool
     {
-        return (bool) $this->client->callSync(new ViewSponsoredMessageRequest($peer, $randomId));
+        return (bool) $this->client->callSync(new ViewSponsoredMessageRequest($randomId));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
      * @param string $randomId
      * @param bool|null $media
      * @param bool|null $fullscreen
@@ -3488,33 +3522,33 @@ final readonly class MessagesMethods
      * @see https://core.telegram.org/method/messages.clickSponsoredMessage
      * @api
      */
-    public function clickSponsoredMessage(AbstractInputPeer $peer, string $randomId, ?bool $media = null, ?bool $fullscreen = null): bool
+    public function clickSponsoredMessage(string $randomId, ?bool $media = null, ?bool $fullscreen = null): bool
     {
-        return (bool) $this->client->callSync(new ClickSponsoredMessageRequest($peer, $randomId, $media, $fullscreen));
+        return (bool) $this->client->callSync(new ClickSponsoredMessageRequest($randomId, $media, $fullscreen));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
      * @param string $randomId
      * @param string $option
      * @return SponsoredMessageReportResultChooseOption|SponsoredMessageReportResultAdsHidden|SponsoredMessageReportResultReported|null
      * @see https://core.telegram.org/method/messages.reportSponsoredMessage
      * @api
      */
-    public function reportSponsoredMessage(AbstractInputPeer $peer, string $randomId, string $option): ?AbstractSponsoredMessageReportResult
+    public function reportSponsoredMessage(string $randomId, string $option): ?AbstractSponsoredMessageReportResult
     {
-        return $this->client->callSync(new ReportSponsoredMessageRequest($peer, $randomId, $option));
+        return $this->client->callSync(new ReportSponsoredMessageRequest($randomId, $option));
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param int|null $msgId
      * @return SponsoredMessages|SponsoredMessagesEmpty|null
      * @see https://core.telegram.org/method/messages.getSponsoredMessages
      * @api
      */
-    public function getSponsoredMessages(AbstractInputPeer $peer): ?AbstractSponsoredMessages
+    public function getSponsoredMessages(AbstractInputPeer $peer, ?int $msgId = null): ?AbstractSponsoredMessages
     {
-        return $this->client->callSync(new GetSponsoredMessagesRequest($peer));
+        return $this->client->callSync(new GetSponsoredMessagesRequest($peer, $msgId));
     }
 
     /**
@@ -3557,5 +3591,85 @@ final readonly class MessagesMethods
     public function searchStickers(string $q, string $emoticon, array $langCode, int $offset, int $limit, int $hash, ?bool $emojis = null): ?AbstractFoundStickers
     {
         return $this->client->callSync(new SearchStickersRequest($q, $emoticon, $langCode, $offset, $limit, $hash, $emojis));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param list<int> $id
+     * @param bool|null $push
+     * @return bool
+     * @see https://core.telegram.org/method/messages.reportMessagesDelivery
+     * @api
+     */
+    public function reportMessagesDelivery(AbstractInputPeer $peer, array $id, ?bool $push = null): bool
+    {
+        return (bool) $this->client->callSync(new ReportMessagesDeliveryRequest($peer, $id, $push));
+    }
+
+    /**
+     * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $ids
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
+     * @return SavedDialogs|SavedDialogsSlice|SavedDialogsNotModified|null
+     * @see https://core.telegram.org/method/messages.getSavedDialogsByID
+     * @api
+     */
+    public function getSavedDialogsByID(array $ids, ?AbstractInputPeer $parentPeer = null): ?AbstractSavedDialogs
+    {
+        return $this->client->callSync(new GetSavedDialogsByIDRequest($ids, $parentPeer));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $parentPeer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param int $maxId
+     * @return bool
+     * @see https://core.telegram.org/method/messages.readSavedHistory
+     * @api
+     */
+    public function readSavedHistory(AbstractInputPeer $parentPeer, AbstractInputPeer $peer, int $maxId): bool
+    {
+        return (bool) $this->client->callSync(new ReadSavedHistoryRequest($parentPeer, $peer, $maxId));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param int $msgId
+     * @param list<int> $completed
+     * @param list<int> $incompleted
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/messages.toggleTodoCompleted
+     * @api
+     */
+    public function toggleTodoCompleted(AbstractInputPeer $peer, int $msgId, array $completed, array $incompleted): ?AbstractUpdates
+    {
+        return $this->client->callSync(new ToggleTodoCompletedRequest($peer, $msgId, $completed, $incompleted));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param int $msgId
+     * @param list<TodoItem> $list_
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/messages.appendTodoList
+     * @api
+     */
+    public function appendTodoList(AbstractInputPeer $peer, int $msgId, array $list_): ?AbstractUpdates
+    {
+        return $this->client->callSync(new AppendTodoListRequest($peer, $msgId, $list_));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param int $msgId
+     * @param bool|null $reject
+     * @param int|null $scheduleDate
+     * @param string|null $rejectComment
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/messages.toggleSuggestedPostApproval
+     * @api
+     */
+    public function toggleSuggestedPostApproval(AbstractInputPeer $peer, int $msgId, ?bool $reject = null, ?int $scheduleDate = null, ?string $rejectComment = null): ?AbstractUpdates
+    {
+        return $this->client->callSync(new ToggleSuggestedPostApprovalRequest($peer, $msgId, $reject, $scheduleDate, $rejectComment));
     }
 }

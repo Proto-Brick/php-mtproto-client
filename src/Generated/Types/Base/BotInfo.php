@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class BotInfo extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x36607333;
+    public const CONSTRUCTOR_ID = 0x4d8a0299;
     
     public string $predicate = 'botInfo';
     
@@ -24,6 +24,7 @@ final class BotInfo extends TlObject
      * @param AbstractBotMenuButton|null $menuButton
      * @param string|null $privacyPolicyUrl
      * @param BotAppSettings|null $appSettings
+     * @param BotVerifierSettings|null $verifierSettings
      */
     public function __construct(
         public readonly ?true $hasPreviewMedias = null,
@@ -34,7 +35,8 @@ final class BotInfo extends TlObject
         public readonly ?array $commands = null,
         public readonly ?AbstractBotMenuButton $menuButton = null,
         public readonly ?string $privacyPolicyUrl = null,
-        public readonly ?BotAppSettings $appSettings = null
+        public readonly ?BotAppSettings $appSettings = null,
+        public readonly ?BotVerifierSettings $verifierSettings = null
     ) {}
     
     public function serialize(): string
@@ -50,6 +52,7 @@ final class BotInfo extends TlObject
         if ($this->menuButton !== null) $flags |= (1 << 3);
         if ($this->privacyPolicyUrl !== null) $flags |= (1 << 7);
         if ($this->appSettings !== null) $flags |= (1 << 8);
+        if ($this->verifierSettings !== null) $flags |= (1 << 9);
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int64($this->userId);
@@ -75,6 +78,9 @@ final class BotInfo extends TlObject
         if ($flags & (1 << 8)) {
             $buffer .= $this->appSettings->serialize();
         }
+        if ($flags & (1 << 9)) {
+            $buffer .= $this->verifierSettings->serialize();
+        }
 
         return $buffer;
     }
@@ -95,6 +101,7 @@ final class BotInfo extends TlObject
         $menuButton = ($flags & (1 << 3)) ? AbstractBotMenuButton::deserialize($stream) : null;
         $privacyPolicyUrl = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
         $appSettings = ($flags & (1 << 8)) ? BotAppSettings::deserialize($stream) : null;
+        $verifierSettings = ($flags & (1 << 9)) ? BotVerifierSettings::deserialize($stream) : null;
 
         return new self(
             $hasPreviewMedias,
@@ -105,7 +112,8 @@ final class BotInfo extends TlObject
             $commands,
             $menuButton,
             $privacyPolicyUrl,
-            $appSettings
+            $appSettings,
+            $verifierSettings
         );
     }
 }

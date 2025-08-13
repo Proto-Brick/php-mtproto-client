@@ -149,12 +149,16 @@ abstract class AbstractUpdate extends TlObject
             UpdateBotEditBusinessMessage::CONSTRUCTOR_ID => UpdateBotEditBusinessMessage::deserialize($stream),
             UpdateBotDeleteBusinessMessage::CONSTRUCTOR_ID => UpdateBotDeleteBusinessMessage::deserialize($stream),
             UpdateNewStoryReaction::CONSTRUCTOR_ID => UpdateNewStoryReaction::deserialize($stream),
-            UpdateBroadcastRevenueTransactions::CONSTRUCTOR_ID => UpdateBroadcastRevenueTransactions::deserialize($stream),
             UpdateStarsBalance::CONSTRUCTOR_ID => UpdateStarsBalance::deserialize($stream),
             UpdateBusinessBotCallbackQuery::CONSTRUCTOR_ID => UpdateBusinessBotCallbackQuery::deserialize($stream),
             UpdateStarsRevenueStatus::CONSTRUCTOR_ID => UpdateStarsRevenueStatus::deserialize($stream),
             UpdateBotPurchasedPaidMedia::CONSTRUCTOR_ID => UpdateBotPurchasedPaidMedia::deserialize($stream),
             UpdatePaidReactionPrivacy::CONSTRUCTOR_ID => UpdatePaidReactionPrivacy::deserialize($stream),
+            UpdateSentPhoneCode::CONSTRUCTOR_ID => UpdateSentPhoneCode::deserialize($stream),
+            UpdateGroupCallChainBlocks::CONSTRUCTOR_ID => UpdateGroupCallChainBlocks::deserialize($stream),
+            UpdateReadMonoForumInbox::CONSTRUCTOR_ID => UpdateReadMonoForumInbox::deserialize($stream),
+            UpdateReadMonoForumOutbox::CONSTRUCTOR_ID => UpdateReadMonoForumOutbox::deserialize($stream),
+            UpdateMonoForumNoPaidException::CONSTRUCTOR_ID => UpdateMonoForumNoPaidException::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type Update. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

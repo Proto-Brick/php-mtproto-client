@@ -2,6 +2,7 @@
 namespace DigitalStars\MtprotoClient\Generated\Api;
 
 use DigitalStars\MtprotoClient\Client;
+use DigitalStars\MtprotoClient\Generated\Methods\Channels\CheckSearchPostsFloodRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\CheckUsernameRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\ConvertToGigagroupRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\CreateChannelRequest;
@@ -30,6 +31,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Channels\GetFullChannelRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\GetGroupsForDiscussionRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\GetInactiveChannelsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\GetLeftChannelsRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Channels\GetMessageAuthorRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\GetMessagesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\GetParticipantRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\GetParticipantsRequest;
@@ -50,6 +52,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Channels\SetDiscussionGroupRequ
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\SetEmojiStickersRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\SetStickersRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\ToggleAntiSpamRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Channels\ToggleAutotranslationRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\ToggleForumRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\ToggleJoinRequestRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\ToggleJoinToSendRequest;
@@ -61,6 +64,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Channels\ToggleUsernameRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\ToggleViewForumAsMessagesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\UpdateColorRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\UpdateEmojiStatusRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Channels\UpdatePaidMessagesPriceRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\UpdatePinnedForumTopicRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Channels\UpdateUsernameRequest;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChannelParticipantsFilter;
@@ -74,6 +78,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputStickerSet;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ChannelAdminLogEventsFilter;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ChannelParticipantsAdmins;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ChannelParticipantsBanned;
@@ -86,8 +91,8 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\ChannelParticipantsSearch;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ChatAdminRights;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ChatBannedRights;
 use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatus;
+use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatusCollectible;
 use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatusEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatusUntil;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ExportedMessageLink;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputChannel;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputChannelEmpty;
@@ -97,6 +102,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputChatPhotoEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputChatUploadedPhoto;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputCheckPasswordEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputCheckPasswordSRP;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputEmojiStatusCollectible;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputGeoPoint;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputGeoPointEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMessageCallbackQuery;
@@ -121,10 +127,12 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetID;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetPremiumGifts;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetShortName;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetTonGifts;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUser;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserFromMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserSelf;
+use DigitalStars\MtprotoClient\Generated\Types\Base\SearchPostsFlood;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShort;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortChatMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortMessage;
@@ -132,6 +140,8 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortSentMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\Updates;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdatesCombined;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdatesTooLong;
+use DigitalStars\MtprotoClient\Generated\Types\Base\User;
+use DigitalStars\MtprotoClient\Generated\Types\Base\UserEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Channels\AbstractChannelParticipants;
 use DigitalStars\MtprotoClient\Generated\Types\Channels\AdminLogResults;
 use DigitalStars\MtprotoClient\Generated\Types\Channels\ChannelParticipant;
@@ -459,7 +469,7 @@ final readonly class ChannelsMethods
 
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
-     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses $stickerset
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
      * @return bool
      * @see https://core.telegram.org/method/channels.setStickers
      * @api
@@ -600,13 +610,14 @@ final readonly class ChannelsMethods
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param bool|null $forPaidReactions
      * @return SendAsPeers|null
      * @see https://core.telegram.org/method/channels.getSendAs
      * @api
      */
-    public function getSendAs(AbstractInputPeer $peer): ?SendAsPeers
+    public function getSendAs(AbstractInputPeer $peer, ?bool $forPaidReactions = null): ?SendAsPeers
     {
-        return $this->client->callSync(new GetSendAsRequest($peer));
+        return $this->client->callSync(new GetSendAsRequest($peer, $forPaidReactions));
     }
 
     /**
@@ -684,13 +695,14 @@ final readonly class ChannelsMethods
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
      * @param bool $enabled
+     * @param bool $tabs
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/channels.toggleForum
      * @api
      */
-    public function toggleForum(AbstractInputChannel $channel, bool $enabled): ?AbstractUpdates
+    public function toggleForum(AbstractInputChannel $channel, bool $enabled, bool $tabs): ?AbstractUpdates
     {
-        return $this->client->callSync(new ToggleForumRequest($channel, $enabled));
+        return $this->client->callSync(new ToggleForumRequest($channel, $enabled, $tabs));
     }
 
     /**
@@ -866,7 +878,7 @@ final readonly class ChannelsMethods
 
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
-     * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusUntil $emojiStatus
+     * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusCollectible|InputEmojiStatusCollectible $emojiStatus
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/channels.updateEmojiStatus
      * @api
@@ -890,7 +902,7 @@ final readonly class ChannelsMethods
 
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
-     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses $stickerset
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
      * @return bool
      * @see https://core.telegram.org/method/channels.setEmojiStickers
      * @api
@@ -913,17 +925,67 @@ final readonly class ChannelsMethods
     }
 
     /**
-     * @param string $hashtag
      * @param int $offsetRate
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $offsetPeer
      * @param int $offsetId
      * @param int $limit
+     * @param string|null $hashtag
+     * @param string|null $query
+     * @param int|null $allowPaidStars
      * @return Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null
      * @see https://core.telegram.org/method/channels.searchPosts
      * @api
      */
-    public function searchPosts(string $hashtag, int $offsetRate, AbstractInputPeer $offsetPeer, int $offsetId, int $limit): ?AbstractMessages
+    public function searchPosts(int $offsetRate, AbstractInputPeer $offsetPeer, int $offsetId, int $limit, ?string $hashtag = null, ?string $query = null, ?int $allowPaidStars = null): ?AbstractMessages
     {
-        return $this->client->callSync(new SearchPostsRequest($hashtag, $offsetRate, $offsetPeer, $offsetId, $limit));
+        return $this->client->callSync(new SearchPostsRequest($offsetRate, $offsetPeer, $offsetId, $limit, $hashtag, $query, $allowPaidStars));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
+     * @param int $sendPaidMessagesStars
+     * @param bool|null $broadcastMessagesAllowed
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/channels.updatePaidMessagesPrice
+     * @api
+     */
+    public function updatePaidMessagesPrice(AbstractInputChannel $channel, int $sendPaidMessagesStars, ?bool $broadcastMessagesAllowed = null): ?AbstractUpdates
+    {
+        return $this->client->callSync(new UpdatePaidMessagesPriceRequest($channel, $sendPaidMessagesStars, $broadcastMessagesAllowed));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
+     * @param bool $enabled
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/channels.toggleAutotranslation
+     * @api
+     */
+    public function toggleAutotranslation(AbstractInputChannel $channel, bool $enabled): ?AbstractUpdates
+    {
+        return $this->client->callSync(new ToggleAutotranslationRequest($channel, $enabled));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
+     * @param int $id
+     * @return UserEmpty|User|null
+     * @see https://core.telegram.org/method/channels.getMessageAuthor
+     * @api
+     */
+    public function getMessageAuthor(AbstractInputChannel $channel, int $id): ?AbstractUser
+    {
+        return $this->client->callSync(new GetMessageAuthorRequest($channel, $id));
+    }
+
+    /**
+     * @param string|null $query
+     * @return SearchPostsFlood|null
+     * @see https://core.telegram.org/method/channels.checkSearchPostsFlood
+     * @api
+     */
+    public function checkSearchPostsFlood(?string $query = null): ?SearchPostsFlood
+    {
+        return $this->client->callSync(new CheckSearchPostsFloodRequest($query));
     }
 }

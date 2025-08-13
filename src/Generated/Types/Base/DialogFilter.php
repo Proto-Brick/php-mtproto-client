@@ -10,13 +10,13 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class DialogFilter extends AbstractDialogFilter
 {
-    public const CONSTRUCTOR_ID = 0x5fb5523b;
+    public const CONSTRUCTOR_ID = 0xaa472651;
     
     public string $predicate = 'dialogFilter';
     
     /**
      * @param int $id
-     * @param string $title
+     * @param TextWithEntities $title
      * @param list<AbstractInputPeer> $pinnedPeers
      * @param list<AbstractInputPeer> $includePeers
      * @param list<AbstractInputPeer> $excludePeers
@@ -28,12 +28,13 @@ final class DialogFilter extends AbstractDialogFilter
      * @param true|null $excludeMuted
      * @param true|null $excludeRead
      * @param true|null $excludeArchived
+     * @param true|null $titleNoanimate
      * @param string|null $emoticon
      * @param int|null $color
      */
     public function __construct(
         public readonly int $id,
-        public readonly string $title,
+        public readonly TextWithEntities $title,
         public readonly array $pinnedPeers,
         public readonly array $includePeers,
         public readonly array $excludePeers,
@@ -45,6 +46,7 @@ final class DialogFilter extends AbstractDialogFilter
         public readonly ?true $excludeMuted = null,
         public readonly ?true $excludeRead = null,
         public readonly ?true $excludeArchived = null,
+        public readonly ?true $titleNoanimate = null,
         public readonly ?string $emoticon = null,
         public readonly ?int $color = null
     ) {}
@@ -61,11 +63,12 @@ final class DialogFilter extends AbstractDialogFilter
         if ($this->excludeMuted) $flags |= (1 << 11);
         if ($this->excludeRead) $flags |= (1 << 12);
         if ($this->excludeArchived) $flags |= (1 << 13);
+        if ($this->titleNoanimate) $flags |= (1 << 28);
         if ($this->emoticon !== null) $flags |= (1 << 25);
         if ($this->color !== null) $flags |= (1 << 27);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
-        $buffer .= Serializer::bytes($this->title);
+        $buffer .= $this->title->serialize();
         if ($flags & (1 << 25)) {
             $buffer .= Serializer::bytes($this->emoticon);
         }
@@ -91,8 +94,9 @@ final class DialogFilter extends AbstractDialogFilter
         $excludeMuted = ($flags & (1 << 11)) ? true : null;
         $excludeRead = ($flags & (1 << 12)) ? true : null;
         $excludeArchived = ($flags & (1 << 13)) ? true : null;
+        $titleNoanimate = ($flags & (1 << 28)) ? true : null;
         $id = Deserializer::int32($stream);
-        $title = Deserializer::bytes($stream);
+        $title = TextWithEntities::deserialize($stream);
         $emoticon = ($flags & (1 << 25)) ? Deserializer::bytes($stream) : null;
         $color = ($flags & (1 << 27)) ? Deserializer::int32($stream) : null;
         $pinnedPeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
@@ -113,6 +117,7 @@ final class DialogFilter extends AbstractDialogFilter
             $excludeMuted,
             $excludeRead,
             $excludeArchived,
+            $titleNoanimate,
             $emoticon,
             $color
         );

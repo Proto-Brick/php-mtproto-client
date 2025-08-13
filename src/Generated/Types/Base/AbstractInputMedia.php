@@ -32,6 +32,7 @@ abstract class AbstractInputMedia extends TlObject
             InputMediaStory::CONSTRUCTOR_ID => InputMediaStory::deserialize($stream),
             InputMediaWebPage::CONSTRUCTOR_ID => InputMediaWebPage::deserialize($stream),
             InputMediaPaidMedia::CONSTRUCTOR_ID => InputMediaPaidMedia::deserialize($stream),
+            InputMediaTodo::CONSTRUCTOR_ID => InputMediaTodo::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputMedia. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

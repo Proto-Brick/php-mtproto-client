@@ -13,7 +13,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class GetStarsRevenueWithdrawalUrlRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x13bbe8b3;
+    public const CONSTRUCTOR_ID = 0x2433dc92;
     
     public string $predicate = 'payments.getStarsRevenueWithdrawalUrl';
     
@@ -28,20 +28,28 @@ final class GetStarsRevenueWithdrawalUrlRequest extends TlObject
     }
     /**
      * @param AbstractInputPeer $peer
-     * @param int $stars
      * @param AbstractInputCheckPasswordSRP $password
+     * @param true|null $ton
+     * @param int|null $amount
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
-        public readonly int $stars,
-        public readonly AbstractInputCheckPasswordSRP $password
+        public readonly AbstractInputCheckPasswordSRP $password,
+        public readonly ?true $ton = null,
+        public readonly ?int $amount = null
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->ton) $flags |= (1 << 0);
+        if ($this->amount !== null) $flags |= (1 << 1);
+        $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
-        $buffer .= Serializer::int64($this->stars);
+        if ($flags & (1 << 1)) {
+            $buffer .= Serializer::int64($this->amount);
+        }
         $buffer .= $this->password->serialize();
 
         return $buffer;

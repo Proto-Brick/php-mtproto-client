@@ -15,10 +15,10 @@ final class ChannelAdminLogEventActionDiscardGroupCall extends AbstractChannelAd
     public string $predicate = 'channelAdminLogEventActionDiscardGroupCall';
     
     /**
-     * @param InputGroupCall $call
+     * @param AbstractInputGroupCall $call
      */
     public function __construct(
-        public readonly InputGroupCall $call
+        public readonly AbstractInputGroupCall $call
     ) {}
     
     public function serialize(): string
@@ -32,7 +32,7 @@ final class ChannelAdminLogEventActionDiscardGroupCall extends AbstractChannelAd
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $call = InputGroupCall::deserialize($stream);
+        $call = AbstractInputGroupCall::deserialize($stream);
 
         return new self(
             $call

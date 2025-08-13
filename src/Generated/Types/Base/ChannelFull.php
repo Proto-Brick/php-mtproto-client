@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class ChannelFull extends AbstractChatFull
 {
-    public const CONSTRUCTOR_ID = 0xbbab348d;
+    public const CONSTRUCTOR_ID = 0xe07429de;
     
     public string $predicate = 'channelFull';
     
@@ -43,6 +43,8 @@ final class ChannelFull extends AbstractChatFull
      * @param true|null $paidMediaAllowed
      * @param true|null $canViewStarsRevenue
      * @param true|null $paidReactionsAvailable
+     * @param true|null $stargiftsAvailable
+     * @param true|null $paidMessagesAvailable
      * @param int|null $participantsCount
      * @param int|null $adminsCount
      * @param int|null $kickedCount
@@ -60,7 +62,7 @@ final class ChannelFull extends AbstractChatFull
      * @param int|null $slowmodeSeconds
      * @param int|null $slowmodeNextSendDate
      * @param int|null $statsDc
-     * @param InputGroupCall|null $call
+     * @param AbstractInputGroupCall|null $call
      * @param int|null $ttlPeriod
      * @param list<string>|null $pendingSuggestions
      * @param AbstractPeer|null $groupcallDefaultJoinAs
@@ -75,6 +77,9 @@ final class ChannelFull extends AbstractChatFull
      * @param int|null $boostsApplied
      * @param int|null $boostsUnrestrict
      * @param StickerSet|null $emojiset
+     * @param BotVerification|null $botVerification
+     * @param int|null $stargiftsCount
+     * @param int|null $sendPaidMessagesStars
      */
     public function __construct(
         public readonly int $id,
@@ -105,6 +110,8 @@ final class ChannelFull extends AbstractChatFull
         public readonly ?true $paidMediaAllowed = null,
         public readonly ?true $canViewStarsRevenue = null,
         public readonly ?true $paidReactionsAvailable = null,
+        public readonly ?true $stargiftsAvailable = null,
+        public readonly ?true $paidMessagesAvailable = null,
         public readonly ?int $participantsCount = null,
         public readonly ?int $adminsCount = null,
         public readonly ?int $kickedCount = null,
@@ -122,7 +129,7 @@ final class ChannelFull extends AbstractChatFull
         public readonly ?int $slowmodeSeconds = null,
         public readonly ?int $slowmodeNextSendDate = null,
         public readonly ?int $statsDc = null,
-        public readonly ?InputGroupCall $call = null,
+        public readonly ?AbstractInputGroupCall $call = null,
         public readonly ?int $ttlPeriod = null,
         public readonly ?array $pendingSuggestions = null,
         public readonly ?AbstractPeer $groupcallDefaultJoinAs = null,
@@ -136,7 +143,10 @@ final class ChannelFull extends AbstractChatFull
         public readonly ?AbstractWallPaper $wallpaper = null,
         public readonly ?int $boostsApplied = null,
         public readonly ?int $boostsUnrestrict = null,
-        public readonly ?StickerSet $emojiset = null
+        public readonly ?StickerSet $emojiset = null,
+        public readonly ?BotVerification $botVerification = null,
+        public readonly ?int $stargiftsCount = null,
+        public readonly ?int $sendPaidMessagesStars = null
     ) {}
     
     public function serialize(): string
@@ -163,6 +173,8 @@ final class ChannelFull extends AbstractChatFull
         if ($this->paidMediaAllowed) $flags2 |= (1 << 14);
         if ($this->canViewStarsRevenue) $flags2 |= (1 << 15);
         if ($this->paidReactionsAvailable) $flags2 |= (1 << 16);
+        if ($this->stargiftsAvailable) $flags2 |= (1 << 19);
+        if ($this->paidMessagesAvailable) $flags2 |= (1 << 20);
         if ($this->participantsCount !== null) $flags |= (1 << 0);
         if ($this->adminsCount !== null) $flags |= (1 << 1);
         if ($this->kickedCount !== null) $flags |= (1 << 2);
@@ -195,6 +207,9 @@ final class ChannelFull extends AbstractChatFull
         if ($this->boostsApplied !== null) $flags2 |= (1 << 8);
         if ($this->boostsUnrestrict !== null) $flags2 |= (1 << 9);
         if ($this->emojiset !== null) $flags2 |= (1 << 10);
+        if ($this->botVerification !== null) $flags2 |= (1 << 17);
+        if ($this->stargiftsCount !== null) $flags2 |= (1 << 18);
+        if ($this->sendPaidMessagesStars !== null) $flags2 |= (1 << 21);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int64($this->id);
@@ -302,6 +317,15 @@ final class ChannelFull extends AbstractChatFull
         if ($flags2 & (1 << 10)) {
             $buffer .= $this->emojiset->serialize();
         }
+        if ($flags2 & (1 << 17)) {
+            $buffer .= $this->botVerification->serialize();
+        }
+        if ($flags2 & (1 << 18)) {
+            $buffer .= Serializer::int32($this->stargiftsCount);
+        }
+        if ($flags2 & (1 << 21)) {
+            $buffer .= Serializer::int64($this->sendPaidMessagesStars);
+        }
 
         return $buffer;
     }
@@ -330,6 +354,8 @@ final class ChannelFull extends AbstractChatFull
         $paidMediaAllowed = ($flags2 & (1 << 14)) ? true : null;
         $canViewStarsRevenue = ($flags2 & (1 << 15)) ? true : null;
         $paidReactionsAvailable = ($flags2 & (1 << 16)) ? true : null;
+        $stargiftsAvailable = ($flags2 & (1 << 19)) ? true : null;
+        $paidMessagesAvailable = ($flags2 & (1 << 20)) ? true : null;
         $id = Deserializer::int64($stream);
         $about = Deserializer::bytes($stream);
         $participantsCount = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
@@ -356,7 +382,7 @@ final class ChannelFull extends AbstractChatFull
         $slowmodeNextSendDate = ($flags & (1 << 18)) ? Deserializer::int32($stream) : null;
         $statsDc = ($flags & (1 << 12)) ? Deserializer::int32($stream) : null;
         $pts = Deserializer::int32($stream);
-        $call = ($flags & (1 << 21)) ? InputGroupCall::deserialize($stream) : null;
+        $call = ($flags & (1 << 21)) ? AbstractInputGroupCall::deserialize($stream) : null;
         $ttlPeriod = ($flags & (1 << 24)) ? Deserializer::int32($stream) : null;
         $pendingSuggestions = ($flags & (1 << 25)) ? Deserializer::vectorOfStrings($stream) : null;
         $groupcallDefaultJoinAs = ($flags & (1 << 26)) ? AbstractPeer::deserialize($stream) : null;
@@ -371,6 +397,9 @@ final class ChannelFull extends AbstractChatFull
         $boostsApplied = ($flags2 & (1 << 8)) ? Deserializer::int32($stream) : null;
         $boostsUnrestrict = ($flags2 & (1 << 9)) ? Deserializer::int32($stream) : null;
         $emojiset = ($flags2 & (1 << 10)) ? StickerSet::deserialize($stream) : null;
+        $botVerification = ($flags2 & (1 << 17)) ? BotVerification::deserialize($stream) : null;
+        $stargiftsCount = ($flags2 & (1 << 18)) ? Deserializer::int32($stream) : null;
+        $sendPaidMessagesStars = ($flags2 & (1 << 21)) ? Deserializer::int64($stream) : null;
 
         return new self(
             $id,
@@ -401,6 +430,8 @@ final class ChannelFull extends AbstractChatFull
             $paidMediaAllowed,
             $canViewStarsRevenue,
             $paidReactionsAvailable,
+            $stargiftsAvailable,
+            $paidMessagesAvailable,
             $participantsCount,
             $adminsCount,
             $kickedCount,
@@ -432,7 +463,10 @@ final class ChannelFull extends AbstractChatFull
             $wallpaper,
             $boostsApplied,
             $boostsUnrestrict,
-            $emojiset
+            $emojiset,
+            $botVerification,
+            $stargiftsCount,
+            $sendPaidMessagesStars
         );
     }
 }

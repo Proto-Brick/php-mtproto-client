@@ -7,6 +7,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputReplyTo;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractReplyMarkup;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
+use DigitalStars\MtprotoClient\Generated\Types\Base\SuggestedPost;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -16,7 +17,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class SendMessageRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x983f9745;
+    public const CONSTRUCTOR_ID = 0xfe05dc9a;
     
     public string $predicate = 'messages.sendMessage';
     
@@ -48,6 +49,8 @@ final class SendMessageRequest extends TlObject
      * @param AbstractInputPeer|null $sendAs
      * @param AbstractInputQuickReplyShortcut|null $quickReplyShortcut
      * @param int|null $effect
+     * @param int|null $allowPaidStars
+     * @param SuggestedPost|null $suggestedPost
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
@@ -67,7 +70,9 @@ final class SendMessageRequest extends TlObject
         public readonly ?int $scheduleDate = null,
         public readonly ?AbstractInputPeer $sendAs = null,
         public readonly ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null,
-        public readonly ?int $effect = null
+        public readonly ?int $effect = null,
+        public readonly ?int $allowPaidStars = null,
+        public readonly ?SuggestedPost $suggestedPost = null
     ) {}
     
     public function serialize(): string
@@ -89,6 +94,8 @@ final class SendMessageRequest extends TlObject
         if ($this->sendAs !== null) $flags |= (1 << 13);
         if ($this->quickReplyShortcut !== null) $flags |= (1 << 17);
         if ($this->effect !== null) $flags |= (1 << 18);
+        if ($this->allowPaidStars !== null) $flags |= (1 << 21);
+        if ($this->suggestedPost !== null) $flags |= (1 << 22);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
@@ -113,6 +120,12 @@ final class SendMessageRequest extends TlObject
         }
         if ($flags & (1 << 18)) {
             $buffer .= Serializer::int64($this->effect);
+        }
+        if ($flags & (1 << 21)) {
+            $buffer .= Serializer::int64($this->allowPaidStars);
+        }
+        if ($flags & (1 << 22)) {
+            $buffer .= $this->suggestedPost->serialize();
         }
 
         return $buffer;

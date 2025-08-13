@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class StarsRevenueStats extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xc92bb73b;
+    public const CONSTRUCTOR_ID = 0x6c207376;
     
     public string $predicate = 'payments.starsRevenueStats';
     
@@ -20,16 +20,24 @@ final class StarsRevenueStats extends TlObject
      * @param AbstractStatsGraph $revenueGraph
      * @param StarsRevenueStatus $status
      * @param float $usdRate
+     * @param AbstractStatsGraph|null $topHoursGraph
      */
     public function __construct(
         public readonly AbstractStatsGraph $revenueGraph,
         public readonly StarsRevenueStatus $status,
-        public readonly float $usdRate
+        public readonly float $usdRate,
+        public readonly ?AbstractStatsGraph $topHoursGraph = null
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->topHoursGraph !== null) $flags |= (1 << 0);
+        $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 0)) {
+            $buffer .= $this->topHoursGraph->serialize();
+        }
         $buffer .= $this->revenueGraph->serialize();
         $buffer .= $this->status->serialize();
         $buffer .= pack('d', $this->usdRate);
@@ -43,6 +51,8 @@ final class StarsRevenueStats extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new \Exception('Invalid constructor ID for ' . self::class);
         }
+        $flags = Deserializer::int32($stream);
+        $topHoursGraph = ($flags & (1 << 0)) ? AbstractStatsGraph::deserialize($stream) : null;
         $revenueGraph = AbstractStatsGraph::deserialize($stream);
         $status = StarsRevenueStatus::deserialize($stream);
         $usdRate = Deserializer::double($stream);
@@ -50,7 +60,8 @@ final class StarsRevenueStats extends TlObject
         return new self(
             $revenueGraph,
             $status,
-            $usdRate
+            $usdRate,
+            $topHoursGraph
         );
     }
 }

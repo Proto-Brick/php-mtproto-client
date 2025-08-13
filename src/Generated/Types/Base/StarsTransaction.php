@@ -10,13 +10,13 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class StarsTransaction extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x64dfc926;
+    public const CONSTRUCTOR_ID = 0x13659eb0;
     
     public string $predicate = 'starsTransaction';
     
     /**
      * @param string $id
-     * @param StarsAmount $stars
+     * @param AbstractStarsAmount $amount
      * @param int $date
      * @param AbstractStarsTransactionPeer $peer
      * @param true|null $refund
@@ -24,6 +24,9 @@ final class StarsTransaction extends TlObject
      * @param true|null $failed
      * @param true|null $gift
      * @param true|null $reaction
+     * @param true|null $stargiftUpgrade
+     * @param true|null $businessTransfer
+     * @param true|null $stargiftResale
      * @param string|null $title
      * @param string|null $description
      * @param AbstractWebDocument|null $photo
@@ -34,15 +37,19 @@ final class StarsTransaction extends TlObject
      * @param list<AbstractMessageMedia>|null $extendedMedia
      * @param int|null $subscriptionPeriod
      * @param int|null $giveawayPostId
-     * @param StarGift|null $stargift
+     * @param AbstractStarGift|null $stargift
      * @param int|null $floodskipNumber
      * @param int|null $starrefCommissionPermille
      * @param AbstractPeer|null $starrefPeer
-     * @param StarsAmount|null $starrefAmount
+     * @param AbstractStarsAmount|null $starrefAmount
+     * @param int|null $paidMessages
+     * @param int|null $premiumGiftMonths
+     * @param int|null $adsProceedsFromDate
+     * @param int|null $adsProceedsToDate
      */
     public function __construct(
         public readonly string $id,
-        public readonly StarsAmount $stars,
+        public readonly AbstractStarsAmount $amount,
         public readonly int $date,
         public readonly AbstractStarsTransactionPeer $peer,
         public readonly ?true $refund = null,
@@ -50,6 +57,9 @@ final class StarsTransaction extends TlObject
         public readonly ?true $failed = null,
         public readonly ?true $gift = null,
         public readonly ?true $reaction = null,
+        public readonly ?true $stargiftUpgrade = null,
+        public readonly ?true $businessTransfer = null,
+        public readonly ?true $stargiftResale = null,
         public readonly ?string $title = null,
         public readonly ?string $description = null,
         public readonly ?AbstractWebDocument $photo = null,
@@ -60,11 +70,15 @@ final class StarsTransaction extends TlObject
         public readonly ?array $extendedMedia = null,
         public readonly ?int $subscriptionPeriod = null,
         public readonly ?int $giveawayPostId = null,
-        public readonly ?StarGift $stargift = null,
+        public readonly ?AbstractStarGift $stargift = null,
         public readonly ?int $floodskipNumber = null,
         public readonly ?int $starrefCommissionPermille = null,
         public readonly ?AbstractPeer $starrefPeer = null,
-        public readonly ?StarsAmount $starrefAmount = null
+        public readonly ?AbstractStarsAmount $starrefAmount = null,
+        public readonly ?int $paidMessages = null,
+        public readonly ?int $premiumGiftMonths = null,
+        public readonly ?int $adsProceedsFromDate = null,
+        public readonly ?int $adsProceedsToDate = null
     ) {}
     
     public function serialize(): string
@@ -76,6 +90,9 @@ final class StarsTransaction extends TlObject
         if ($this->failed) $flags |= (1 << 6);
         if ($this->gift) $flags |= (1 << 10);
         if ($this->reaction) $flags |= (1 << 11);
+        if ($this->stargiftUpgrade) $flags |= (1 << 18);
+        if ($this->businessTransfer) $flags |= (1 << 21);
+        if ($this->stargiftResale) $flags |= (1 << 22);
         if ($this->title !== null) $flags |= (1 << 0);
         if ($this->description !== null) $flags |= (1 << 1);
         if ($this->photo !== null) $flags |= (1 << 2);
@@ -91,9 +108,13 @@ final class StarsTransaction extends TlObject
         if ($this->starrefCommissionPermille !== null) $flags |= (1 << 16);
         if ($this->starrefPeer !== null) $flags |= (1 << 17);
         if ($this->starrefAmount !== null) $flags |= (1 << 17);
+        if ($this->paidMessages !== null) $flags |= (1 << 19);
+        if ($this->premiumGiftMonths !== null) $flags |= (1 << 20);
+        if ($this->adsProceedsFromDate !== null) $flags |= (1 << 23);
+        if ($this->adsProceedsToDate !== null) $flags |= (1 << 23);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->id);
-        $buffer .= $this->stars->serialize();
+        $buffer .= $this->amount->serialize();
         $buffer .= Serializer::int32($this->date);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
@@ -141,6 +162,18 @@ final class StarsTransaction extends TlObject
         if ($flags & (1 << 17)) {
             $buffer .= $this->starrefAmount->serialize();
         }
+        if ($flags & (1 << 19)) {
+            $buffer .= Serializer::int32($this->paidMessages);
+        }
+        if ($flags & (1 << 20)) {
+            $buffer .= Serializer::int32($this->premiumGiftMonths);
+        }
+        if ($flags & (1 << 23)) {
+            $buffer .= Serializer::int32($this->adsProceedsFromDate);
+        }
+        if ($flags & (1 << 23)) {
+            $buffer .= Serializer::int32($this->adsProceedsToDate);
+        }
 
         return $buffer;
     }
@@ -157,8 +190,11 @@ final class StarsTransaction extends TlObject
         $failed = ($flags & (1 << 6)) ? true : null;
         $gift = ($flags & (1 << 10)) ? true : null;
         $reaction = ($flags & (1 << 11)) ? true : null;
+        $stargiftUpgrade = ($flags & (1 << 18)) ? true : null;
+        $businessTransfer = ($flags & (1 << 21)) ? true : null;
+        $stargiftResale = ($flags & (1 << 22)) ? true : null;
         $id = Deserializer::bytes($stream);
-        $stars = StarsAmount::deserialize($stream);
+        $amount = AbstractStarsAmount::deserialize($stream);
         $date = Deserializer::int32($stream);
         $peer = AbstractStarsTransactionPeer::deserialize($stream);
         $title = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
@@ -171,15 +207,19 @@ final class StarsTransaction extends TlObject
         $extendedMedia = ($flags & (1 << 9)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageMedia::class, 'deserialize']) : null;
         $subscriptionPeriod = ($flags & (1 << 12)) ? Deserializer::int32($stream) : null;
         $giveawayPostId = ($flags & (1 << 13)) ? Deserializer::int32($stream) : null;
-        $stargift = ($flags & (1 << 14)) ? StarGift::deserialize($stream) : null;
+        $stargift = ($flags & (1 << 14)) ? AbstractStarGift::deserialize($stream) : null;
         $floodskipNumber = ($flags & (1 << 15)) ? Deserializer::int32($stream) : null;
         $starrefCommissionPermille = ($flags & (1 << 16)) ? Deserializer::int32($stream) : null;
         $starrefPeer = ($flags & (1 << 17)) ? AbstractPeer::deserialize($stream) : null;
-        $starrefAmount = ($flags & (1 << 17)) ? StarsAmount::deserialize($stream) : null;
+        $starrefAmount = ($flags & (1 << 17)) ? AbstractStarsAmount::deserialize($stream) : null;
+        $paidMessages = ($flags & (1 << 19)) ? Deserializer::int32($stream) : null;
+        $premiumGiftMonths = ($flags & (1 << 20)) ? Deserializer::int32($stream) : null;
+        $adsProceedsFromDate = ($flags & (1 << 23)) ? Deserializer::int32($stream) : null;
+        $adsProceedsToDate = ($flags & (1 << 23)) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,
-            $stars,
+            $amount,
             $date,
             $peer,
             $refund,
@@ -187,6 +227,9 @@ final class StarsTransaction extends TlObject
             $failed,
             $gift,
             $reaction,
+            $stargiftUpgrade,
+            $businessTransfer,
+            $stargiftResale,
             $title,
             $description,
             $photo,
@@ -201,7 +244,11 @@ final class StarsTransaction extends TlObject
             $floodskipNumber,
             $starrefCommissionPermille,
             $starrefPeer,
-            $starrefAmount
+            $starrefAmount,
+            $paidMessages,
+            $premiumGiftMonths,
+            $adsProceedsFromDate,
+            $adsProceedsToDate
         );
     }
 }

@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class ChatInvite extends AbstractChatInvite
 {
-    public const CONSTRUCTOR_ID = 0xfe65389d;
+    public const CONSTRUCTOR_ID = 0x5c9d3702;
     
     public string $predicate = 'chatInvite';
     
@@ -32,6 +32,7 @@ final class ChatInvite extends AbstractChatInvite
      * @param list<AbstractUser>|null $participants
      * @param StarsSubscriptionPricing|null $subscriptionPricing
      * @param int|null $subscriptionFormId
+     * @param BotVerification|null $botVerification
      */
     public function __construct(
         public readonly string $title,
@@ -50,7 +51,8 @@ final class ChatInvite extends AbstractChatInvite
         public readonly ?string $about = null,
         public readonly ?array $participants = null,
         public readonly ?StarsSubscriptionPricing $subscriptionPricing = null,
-        public readonly ?int $subscriptionFormId = null
+        public readonly ?int $subscriptionFormId = null,
+        public readonly ?BotVerification $botVerification = null
     ) {}
     
     public function serialize(): string
@@ -70,6 +72,7 @@ final class ChatInvite extends AbstractChatInvite
         if ($this->participants !== null) $flags |= (1 << 4);
         if ($this->subscriptionPricing !== null) $flags |= (1 << 10);
         if ($this->subscriptionFormId !== null) $flags |= (1 << 12);
+        if ($this->botVerification !== null) $flags |= (1 << 13);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->title);
         if ($flags & (1 << 5)) {
@@ -86,6 +89,9 @@ final class ChatInvite extends AbstractChatInvite
         }
         if ($flags & (1 << 12)) {
             $buffer .= Serializer::int64($this->subscriptionFormId);
+        }
+        if ($flags & (1 << 13)) {
+            $buffer .= $this->botVerification->serialize();
         }
 
         return $buffer;
@@ -112,6 +118,7 @@ final class ChatInvite extends AbstractChatInvite
         $color = Deserializer::int32($stream);
         $subscriptionPricing = ($flags & (1 << 10)) ? StarsSubscriptionPricing::deserialize($stream) : null;
         $subscriptionFormId = ($flags & (1 << 12)) ? Deserializer::int64($stream) : null;
+        $botVerification = ($flags & (1 << 13)) ? BotVerification::deserialize($stream) : null;
 
         return new self(
             $title,
@@ -130,7 +137,8 @@ final class ChatInvite extends AbstractChatInvite
             $about,
             $participants,
             $subscriptionPricing,
-            $subscriptionFormId
+            $subscriptionFormId,
+            $botVerification
         );
     }
 }

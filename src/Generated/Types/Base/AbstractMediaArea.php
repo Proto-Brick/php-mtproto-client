@@ -22,6 +22,7 @@ abstract class AbstractMediaArea extends TlObject
             InputMediaAreaChannelPost::CONSTRUCTOR_ID => InputMediaAreaChannelPost::deserialize($stream),
             MediaAreaUrl::CONSTRUCTOR_ID => MediaAreaUrl::deserialize($stream),
             MediaAreaWeather::CONSTRUCTOR_ID => MediaAreaWeather::deserialize($stream),
+            MediaAreaStarGift::CONSTRUCTOR_ID => MediaAreaStarGift::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type MediaArea. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

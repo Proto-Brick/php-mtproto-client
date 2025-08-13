@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class GetSavedDialogsRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x5381d21a;
+    public const CONSTRUCTOR_ID = 0x1e91fc99;
     
     public string $predicate = 'messages.getSavedDialogs';
     
@@ -32,6 +32,7 @@ final class GetSavedDialogsRequest extends TlObject
      * @param int $limit
      * @param int $hash
      * @param true|null $excludePinned
+     * @param AbstractInputPeer|null $parentPeer
      */
     public function __construct(
         public readonly int $offsetDate,
@@ -39,7 +40,8 @@ final class GetSavedDialogsRequest extends TlObject
         public readonly AbstractInputPeer $offsetPeer,
         public readonly int $limit,
         public readonly int $hash,
-        public readonly ?true $excludePinned = null
+        public readonly ?true $excludePinned = null,
+        public readonly ?AbstractInputPeer $parentPeer = null
     ) {}
     
     public function serialize(): string
@@ -47,7 +49,11 @@ final class GetSavedDialogsRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->excludePinned) $flags |= (1 << 0);
+        if ($this->parentPeer !== null) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 1)) {
+            $buffer .= $this->parentPeer->serialize();
+        }
         $buffer .= Serializer::int32($this->offsetDate);
         $buffer .= Serializer::int32($this->offsetId);
         $buffer .= $this->offsetPeer->serialize();

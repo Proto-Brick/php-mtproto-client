@@ -16,6 +16,7 @@ abstract class AbstractSentCode extends TlObject
         return match ($constructorId) {
             SentCode::CONSTRUCTOR_ID => SentCode::deserialize($stream),
             SentCodeSuccess::CONSTRUCTOR_ID => SentCodeSuccess::deserialize($stream),
+            SentCodePaymentRequired::CONSTRUCTOR_ID => SentCodePaymentRequired::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type auth.SentCode. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

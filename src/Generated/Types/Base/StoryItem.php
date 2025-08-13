@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class StoryItem extends AbstractStoryItem
 {
-    public const CONSTRUCTOR_ID = 0x79b26a24;
+    public const CONSTRUCTOR_ID = 0xedf164f1;
     
     public string $predicate = 'storyItem';
     
@@ -36,6 +36,7 @@ final class StoryItem extends AbstractStoryItem
      * @param list<AbstractPrivacyRule>|null $privacy
      * @param StoryViews|null $views
      * @param AbstractReaction|null $sentReaction
+     * @param list<int>|null $albums
      */
     public function __construct(
         public readonly int $id,
@@ -58,7 +59,8 @@ final class StoryItem extends AbstractStoryItem
         public readonly ?array $mediaAreas = null,
         public readonly ?array $privacy = null,
         public readonly ?StoryViews $views = null,
-        public readonly ?AbstractReaction $sentReaction = null
+        public readonly ?AbstractReaction $sentReaction = null,
+        public readonly ?array $albums = null
     ) {}
     
     public function serialize(): string
@@ -82,6 +84,7 @@ final class StoryItem extends AbstractStoryItem
         if ($this->privacy !== null) $flags |= (1 << 2);
         if ($this->views !== null) $flags |= (1 << 3);
         if ($this->sentReaction !== null) $flags |= (1 << 15);
+        if ($this->albums !== null) $flags |= (1 << 19);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
         $buffer .= Serializer::int32($this->date);
@@ -110,6 +113,9 @@ final class StoryItem extends AbstractStoryItem
         }
         if ($flags & (1 << 15)) {
             $buffer .= $this->sentReaction->serialize();
+        }
+        if ($flags & (1 << 19)) {
+            $buffer .= Serializer::vectorOfInts($this->albums);
         }
 
         return $buffer;
@@ -140,6 +146,7 @@ final class StoryItem extends AbstractStoryItem
         $privacy = ($flags & (1 << 2)) ? Deserializer::vectorOfObjects($stream, [AbstractPrivacyRule::class, 'deserialize']) : null;
         $views = ($flags & (1 << 3)) ? StoryViews::deserialize($stream) : null;
         $sentReaction = ($flags & (1 << 15)) ? AbstractReaction::deserialize($stream) : null;
+        $albums = ($flags & (1 << 19)) ? Deserializer::vectorOfInts($stream) : null;
 
         return new self(
             $id,
@@ -162,7 +169,8 @@ final class StoryItem extends AbstractStoryItem
             $mediaAreas,
             $privacy,
             $views,
-            $sentReaction
+            $sentReaction,
+            $albums
         );
     }
 }

@@ -16,7 +16,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class SendStoryRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xe4e6694b;
+    public const CONSTRUCTOR_ID = 0x737fc2ec;
     
     public string $predicate = 'stories.sendStory';
     
@@ -43,6 +43,7 @@ final class SendStoryRequest extends TlObject
      * @param int|null $period
      * @param AbstractInputPeer|null $fwdFromId
      * @param int|null $fwdFromStory
+     * @param list<int>|null $albums
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
@@ -57,7 +58,8 @@ final class SendStoryRequest extends TlObject
         public readonly ?array $entities = null,
         public readonly ?int $period = null,
         public readonly ?AbstractInputPeer $fwdFromId = null,
-        public readonly ?int $fwdFromStory = null
+        public readonly ?int $fwdFromStory = null,
+        public readonly ?array $albums = null
     ) {}
     
     public function serialize(): string
@@ -73,6 +75,7 @@ final class SendStoryRequest extends TlObject
         if ($this->period !== null) $flags |= (1 << 3);
         if ($this->fwdFromId !== null) $flags |= (1 << 6);
         if ($this->fwdFromStory !== null) $flags |= (1 << 6);
+        if ($this->albums !== null) $flags |= (1 << 8);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= $this->media->serialize();
@@ -95,6 +98,9 @@ final class SendStoryRequest extends TlObject
         }
         if ($flags & (1 << 6)) {
             $buffer .= Serializer::int32($this->fwdFromStory);
+        }
+        if ($flags & (1 << 8)) {
+            $buffer .= Serializer::vectorOfInts($this->albums);
         }
 
         return $buffer;

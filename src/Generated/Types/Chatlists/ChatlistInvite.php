@@ -4,6 +4,7 @@ namespace DigitalStars\MtprotoClient\Generated\Types\Chatlists;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
+use DigitalStars\MtprotoClient\Generated\Types\Base\TextWithEntities;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -13,22 +14,24 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class ChatlistInvite extends AbstractChatlistInvite
 {
-    public const CONSTRUCTOR_ID = 0x1dcd839d;
+    public const CONSTRUCTOR_ID = 0xf10ece2f;
     
     public string $predicate = 'chatlists.chatlistInvite';
     
     /**
-     * @param string $title
+     * @param TextWithEntities $title
      * @param list<AbstractPeer> $peers
      * @param list<AbstractChat> $chats
      * @param list<AbstractUser> $users
+     * @param true|null $titleNoanimate
      * @param string|null $emoticon
      */
     public function __construct(
-        public readonly string $title,
+        public readonly TextWithEntities $title,
         public readonly array $peers,
         public readonly array $chats,
         public readonly array $users,
+        public readonly ?true $titleNoanimate = null,
         public readonly ?string $emoticon = null
     ) {}
     
@@ -36,9 +39,10 @@ final class ChatlistInvite extends AbstractChatlistInvite
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
+        if ($this->titleNoanimate) $flags |= (1 << 1);
         if ($this->emoticon !== null) $flags |= (1 << 0);
         $buffer .= Serializer::int32($flags);
-        $buffer .= Serializer::bytes($this->title);
+        $buffer .= $this->title->serialize();
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::bytes($this->emoticon);
         }
@@ -53,7 +57,8 @@ final class ChatlistInvite extends AbstractChatlistInvite
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $title = Deserializer::bytes($stream);
+        $titleNoanimate = ($flags & (1 << 1)) ? true : null;
+        $title = TextWithEntities::deserialize($stream);
         $emoticon = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
         $peers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
@@ -64,6 +69,7 @@ final class ChatlistInvite extends AbstractChatlistInvite
             $peers,
             $chats,
             $users,
+            $titleNoanimate,
             $emoticon
         );
     }

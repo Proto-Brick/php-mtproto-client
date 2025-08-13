@@ -27,7 +27,7 @@ final class ChatFull extends AbstractChatFull
      * @param list<BotInfo>|null $botInfo
      * @param int|null $pinnedMsgId
      * @param int|null $folderId
-     * @param InputGroupCall|null $call
+     * @param AbstractInputGroupCall|null $call
      * @param int|null $ttlPeriod
      * @param AbstractPeer|null $groupcallDefaultJoinAs
      * @param string|null $themeEmoticon
@@ -49,7 +49,7 @@ final class ChatFull extends AbstractChatFull
         public readonly ?array $botInfo = null,
         public readonly ?int $pinnedMsgId = null,
         public readonly ?int $folderId = null,
-        public readonly ?InputGroupCall $call = null,
+        public readonly ?AbstractInputGroupCall $call = null,
         public readonly ?int $ttlPeriod = null,
         public readonly ?AbstractPeer $groupcallDefaultJoinAs = null,
         public readonly ?string $themeEmoticon = null,
@@ -143,7 +143,7 @@ final class ChatFull extends AbstractChatFull
         $botInfo = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [BotInfo::class, 'deserialize']) : null;
         $pinnedMsgId = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
         $folderId = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
-        $call = ($flags & (1 << 12)) ? InputGroupCall::deserialize($stream) : null;
+        $call = ($flags & (1 << 12)) ? AbstractInputGroupCall::deserialize($stream) : null;
         $ttlPeriod = ($flags & (1 << 14)) ? Deserializer::int32($stream) : null;
         $groupcallDefaultJoinAs = ($flags & (1 << 15)) ? AbstractPeer::deserialize($stream) : null;
         $themeEmoticon = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;

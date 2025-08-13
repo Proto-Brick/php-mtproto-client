@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
 
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPhoneCallDiscardReason;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputPhoneCall;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PhoneCallDiscardReason;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -29,14 +29,14 @@ final class DiscardCallRequest extends TlObject
     /**
      * @param InputPhoneCall $peer
      * @param int $duration
-     * @param PhoneCallDiscardReason $reason
+     * @param AbstractPhoneCallDiscardReason $reason
      * @param int $connectionId
      * @param true|null $video
      */
     public function __construct(
         public readonly InputPhoneCall $peer,
         public readonly int $duration,
-        public readonly PhoneCallDiscardReason $reason,
+        public readonly AbstractPhoneCallDiscardReason $reason,
         public readonly int $connectionId,
         public readonly ?true $video = null
     ) {}

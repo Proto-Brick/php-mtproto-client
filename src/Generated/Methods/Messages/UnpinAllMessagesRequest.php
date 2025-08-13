@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class UnpinAllMessagesRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xee22b9a8;
+    public const CONSTRUCTOR_ID = 0x62dd747;
     
     public string $predicate = 'messages.unpinAllMessages';
     
@@ -28,10 +28,12 @@ final class UnpinAllMessagesRequest extends TlObject
     /**
      * @param AbstractInputPeer $peer
      * @param int|null $topMsgId
+     * @param AbstractInputPeer|null $savedPeerId
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
-        public readonly ?int $topMsgId = null
+        public readonly ?int $topMsgId = null,
+        public readonly ?AbstractInputPeer $savedPeerId = null
     ) {}
     
     public function serialize(): string
@@ -39,10 +41,14 @@ final class UnpinAllMessagesRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->topMsgId !== null) $flags |= (1 << 0);
+        if ($this->savedPeerId !== null) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->topMsgId);
+        }
+        if ($flags & (1 << 1)) {
+            $buffer .= $this->savedPeerId->serialize();
         }
 
         return $buffer;

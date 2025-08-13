@@ -2,9 +2,6 @@
 namespace DigitalStars\MtprotoClient\Generated\Api;
 
 use DigitalStars\MtprotoClient\Client;
-use DigitalStars\MtprotoClient\Generated\Methods\Stats\GetBroadcastRevenueStatsRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Stats\GetBroadcastRevenueTransactionsRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Stats\GetBroadcastRevenueWithdrawalUrlRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stats\GetBroadcastStatsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stats\GetMegagroupStatsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stats\GetMessagePublicForwardsRequest;
@@ -13,14 +10,11 @@ use DigitalStars\MtprotoClient\Generated\Methods\Stats\GetStoryPublicForwardsReq
 use DigitalStars\MtprotoClient\Generated\Methods\Stats\GetStoryStatsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stats\LoadAsyncGraphRequest;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputCheckPasswordSRP;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractStatsGraph;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputChannel;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputChannelEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputChannelFromMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputCheckPasswordEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputCheckPasswordSRP;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerChannel;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerChannelFromMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerChat;
@@ -31,9 +25,6 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerUserFromMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\StatsGraph;
 use DigitalStars\MtprotoClient\Generated\Types\Base\StatsGraphAsync;
 use DigitalStars\MtprotoClient\Generated\Types\Base\StatsGraphError;
-use DigitalStars\MtprotoClient\Generated\Types\Stats\BroadcastRevenueStats;
-use DigitalStars\MtprotoClient\Generated\Types\Stats\BroadcastRevenueTransactions;
-use DigitalStars\MtprotoClient\Generated\Types\Stats\BroadcastRevenueWithdrawalUrl;
 use DigitalStars\MtprotoClient\Generated\Types\Stats\BroadcastStats;
 use DigitalStars\MtprotoClient\Generated\Types\Stats\MegagroupStats;
 use DigitalStars\MtprotoClient\Generated\Types\Stats\MessageStats;
@@ -138,42 +129,5 @@ final readonly class StatsMethods
     public function getStoryPublicForwards(AbstractInputPeer $peer, int $id, string $offset, int $limit): ?PublicForwards
     {
         return $this->client->callSync(new GetStoryPublicForwardsRequest($peer, $id, $offset, $limit));
-    }
-
-    /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @param bool|null $dark
-     * @return BroadcastRevenueStats|null
-     * @see https://core.telegram.org/method/stats.getBroadcastRevenueStats
-     * @api
-     */
-    public function getBroadcastRevenueStats(AbstractInputPeer $peer, ?bool $dark = null): ?BroadcastRevenueStats
-    {
-        return $this->client->callSync(new GetBroadcastRevenueStatsRequest($peer, $dark));
-    }
-
-    /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP $password
-     * @return BroadcastRevenueWithdrawalUrl|null
-     * @see https://core.telegram.org/method/stats.getBroadcastRevenueWithdrawalUrl
-     * @api
-     */
-    public function getBroadcastRevenueWithdrawalUrl(AbstractInputPeer $peer, AbstractInputCheckPasswordSRP $password): ?BroadcastRevenueWithdrawalUrl
-    {
-        return $this->client->callSync(new GetBroadcastRevenueWithdrawalUrlRequest($peer, $password));
-    }
-
-    /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @param int $offset
-     * @param int $limit
-     * @return BroadcastRevenueTransactions|null
-     * @see https://core.telegram.org/method/stats.getBroadcastRevenueTransactions
-     * @api
-     */
-    public function getBroadcastRevenueTransactions(AbstractInputPeer $peer, int $offset, int $limit): ?BroadcastRevenueTransactions
-    {
-        return $this->client->callSync(new GetBroadcastRevenueTransactionsRequest($peer, $offset, $limit));
     }
 }

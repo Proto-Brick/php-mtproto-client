@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class GroupCall extends AbstractGroupCall
 {
-    public const CONSTRUCTOR_ID = 0xd597650c;
+    public const CONSTRUCTOR_ID = 0x553b0ba1;
     
     public string $predicate = 'groupCall';
     
@@ -28,11 +28,14 @@ final class GroupCall extends AbstractGroupCall
      * @param true|null $recordVideoActive
      * @param true|null $rtmpStream
      * @param true|null $listenersHidden
+     * @param true|null $conference
+     * @param true|null $creator
      * @param string|null $title
      * @param int|null $streamDcId
      * @param int|null $recordStartDate
      * @param int|null $scheduleDate
      * @param int|null $unmutedVideoCount
+     * @param string|null $inviteLink
      */
     public function __construct(
         public readonly int $id,
@@ -48,11 +51,14 @@ final class GroupCall extends AbstractGroupCall
         public readonly ?true $recordVideoActive = null,
         public readonly ?true $rtmpStream = null,
         public readonly ?true $listenersHidden = null,
+        public readonly ?true $conference = null,
+        public readonly ?true $creator = null,
         public readonly ?string $title = null,
         public readonly ?int $streamDcId = null,
         public readonly ?int $recordStartDate = null,
         public readonly ?int $scheduleDate = null,
-        public readonly ?int $unmutedVideoCount = null
+        public readonly ?int $unmutedVideoCount = null,
+        public readonly ?string $inviteLink = null
     ) {}
     
     public function serialize(): string
@@ -67,11 +73,14 @@ final class GroupCall extends AbstractGroupCall
         if ($this->recordVideoActive) $flags |= (1 << 11);
         if ($this->rtmpStream) $flags |= (1 << 12);
         if ($this->listenersHidden) $flags |= (1 << 13);
+        if ($this->conference) $flags |= (1 << 14);
+        if ($this->creator) $flags |= (1 << 15);
         if ($this->title !== null) $flags |= (1 << 3);
         if ($this->streamDcId !== null) $flags |= (1 << 4);
         if ($this->recordStartDate !== null) $flags |= (1 << 5);
         if ($this->scheduleDate !== null) $flags |= (1 << 7);
         if ($this->unmutedVideoCount !== null) $flags |= (1 << 10);
+        if ($this->inviteLink !== null) $flags |= (1 << 16);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::int64($this->accessHash);
@@ -93,6 +102,9 @@ final class GroupCall extends AbstractGroupCall
         }
         $buffer .= Serializer::int32($this->unmutedVideoLimit);
         $buffer .= Serializer::int32($this->version);
+        if ($flags & (1 << 16)) {
+            $buffer .= Serializer::bytes($this->inviteLink);
+        }
 
         return $buffer;
     }
@@ -109,6 +121,8 @@ final class GroupCall extends AbstractGroupCall
         $recordVideoActive = ($flags & (1 << 11)) ? true : null;
         $rtmpStream = ($flags & (1 << 12)) ? true : null;
         $listenersHidden = ($flags & (1 << 13)) ? true : null;
+        $conference = ($flags & (1 << 14)) ? true : null;
+        $creator = ($flags & (1 << 15)) ? true : null;
         $id = Deserializer::int64($stream);
         $accessHash = Deserializer::int64($stream);
         $participantsCount = Deserializer::int32($stream);
@@ -119,6 +133,7 @@ final class GroupCall extends AbstractGroupCall
         $unmutedVideoCount = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
         $unmutedVideoLimit = Deserializer::int32($stream);
         $version = Deserializer::int32($stream);
+        $inviteLink = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
 
         return new self(
             $id,
@@ -134,11 +149,14 @@ final class GroupCall extends AbstractGroupCall
             $recordVideoActive,
             $rtmpStream,
             $listenersHidden,
+            $conference,
+            $creator,
             $title,
             $streamDcId,
             $recordStartDate,
             $scheduleDate,
-            $unmutedVideoCount
+            $unmutedVideoCount,
+            $inviteLink
         );
     }
 }

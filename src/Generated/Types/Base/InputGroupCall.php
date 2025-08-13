@@ -8,7 +8,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
 /**
  * @see https://core.telegram.org/type/inputGroupCall
  */
-final class InputGroupCall extends TlObject
+final class InputGroupCall extends AbstractInputGroupCall
 {
     public const CONSTRUCTOR_ID = 0xd8aa840f;
     
@@ -34,10 +34,7 @@ final class InputGroupCall extends TlObject
 
     public static function deserialize(string &$stream): static
     {
-        $constructorId = Deserializer::int32($stream);
-        if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
-        }
+        Deserializer::int32($stream); // Constructor ID
         $id = Deserializer::int64($stream);
         $accessHash = Deserializer::int64($stream);
 

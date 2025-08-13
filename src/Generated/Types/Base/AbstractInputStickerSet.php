@@ -25,6 +25,7 @@ abstract class AbstractInputStickerSet extends TlObject
             InputStickerSetEmojiDefaultStatuses::CONSTRUCTOR_ID => InputStickerSetEmojiDefaultStatuses::deserialize($stream),
             InputStickerSetEmojiDefaultTopicIcons::CONSTRUCTOR_ID => InputStickerSetEmojiDefaultTopicIcons::deserialize($stream),
             InputStickerSetEmojiChannelDefaultStatuses::CONSTRUCTOR_ID => InputStickerSetEmojiChannelDefaultStatuses::deserialize($stream),
+            InputStickerSetTonGifts::CONSTRUCTOR_ID => InputStickerSetTonGifts::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputStickerSet. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

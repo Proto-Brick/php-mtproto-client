@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class SponsoredMessage extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x4d93a990;
+    public const CONSTRUCTOR_ID = 0x7dbf8673;
     
     public string $predicate = 'sponsoredMessage';
     
@@ -28,6 +28,8 @@ final class SponsoredMessage extends TlObject
      * @param PeerColor|null $color
      * @param string|null $sponsorInfo
      * @param string|null $additionalInfo
+     * @param int|null $minDisplayDuration
+     * @param int|null $maxDisplayDuration
      */
     public function __construct(
         public readonly string $randomId,
@@ -42,7 +44,9 @@ final class SponsoredMessage extends TlObject
         public readonly ?AbstractMessageMedia $media = null,
         public readonly ?PeerColor $color = null,
         public readonly ?string $sponsorInfo = null,
-        public readonly ?string $additionalInfo = null
+        public readonly ?string $additionalInfo = null,
+        public readonly ?int $minDisplayDuration = null,
+        public readonly ?int $maxDisplayDuration = null
     ) {}
     
     public function serialize(): string
@@ -57,6 +61,8 @@ final class SponsoredMessage extends TlObject
         if ($this->color !== null) $flags |= (1 << 13);
         if ($this->sponsorInfo !== null) $flags |= (1 << 7);
         if ($this->additionalInfo !== null) $flags |= (1 << 8);
+        if ($this->minDisplayDuration !== null) $flags |= (1 << 15);
+        if ($this->maxDisplayDuration !== null) $flags |= (1 << 15);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->randomId);
         $buffer .= Serializer::bytes($this->url);
@@ -80,6 +86,12 @@ final class SponsoredMessage extends TlObject
         }
         if ($flags & (1 << 8)) {
             $buffer .= Serializer::bytes($this->additionalInfo);
+        }
+        if ($flags & (1 << 15)) {
+            $buffer .= Serializer::int32($this->minDisplayDuration);
+        }
+        if ($flags & (1 << 15)) {
+            $buffer .= Serializer::int32($this->maxDisplayDuration);
         }
 
         return $buffer;
@@ -105,6 +117,8 @@ final class SponsoredMessage extends TlObject
         $buttonText = Deserializer::bytes($stream);
         $sponsorInfo = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
         $additionalInfo = ($flags & (1 << 8)) ? Deserializer::bytes($stream) : null;
+        $minDisplayDuration = ($flags & (1 << 15)) ? Deserializer::int32($stream) : null;
+        $maxDisplayDuration = ($flags & (1 << 15)) ? Deserializer::int32($stream) : null;
 
         return new self(
             $randomId,
@@ -119,7 +133,9 @@ final class SponsoredMessage extends TlObject
             $media,
             $color,
             $sponsorInfo,
-            $additionalInfo
+            $additionalInfo,
+            $minDisplayDuration,
+            $maxDisplayDuration
         );
     }
 }

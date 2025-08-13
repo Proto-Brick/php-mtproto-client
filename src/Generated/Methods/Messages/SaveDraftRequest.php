@@ -5,6 +5,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputMedia;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputReplyTo;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
+use DigitalStars\MtprotoClient\Generated\Types\Base\SuggestedPost;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -14,7 +15,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class SaveDraftRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xd372c5ce;
+    public const CONSTRUCTOR_ID = 0x54ae308e;
     
     public string $predicate = 'messages.saveDraft';
     
@@ -36,6 +37,7 @@ final class SaveDraftRequest extends TlObject
      * @param list<AbstractMessageEntity>|null $entities
      * @param AbstractInputMedia|null $media
      * @param int|null $effect
+     * @param SuggestedPost|null $suggestedPost
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
@@ -45,7 +47,8 @@ final class SaveDraftRequest extends TlObject
         public readonly ?AbstractInputReplyTo $replyTo = null,
         public readonly ?array $entities = null,
         public readonly ?AbstractInputMedia $media = null,
-        public readonly ?int $effect = null
+        public readonly ?int $effect = null,
+        public readonly ?SuggestedPost $suggestedPost = null
     ) {}
     
     public function serialize(): string
@@ -58,6 +61,7 @@ final class SaveDraftRequest extends TlObject
         if ($this->entities !== null) $flags |= (1 << 3);
         if ($this->media !== null) $flags |= (1 << 5);
         if ($this->effect !== null) $flags |= (1 << 7);
+        if ($this->suggestedPost !== null) $flags |= (1 << 8);
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 4)) {
             $buffer .= $this->replyTo->serialize();
@@ -72,6 +76,9 @@ final class SaveDraftRequest extends TlObject
         }
         if ($flags & (1 << 7)) {
             $buffer .= Serializer::int64($this->effect);
+        }
+        if ($flags & (1 << 8)) {
+            $buffer .= $this->suggestedPost->serialize();
         }
 
         return $buffer;

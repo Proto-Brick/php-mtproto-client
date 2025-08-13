@@ -17,6 +17,8 @@ abstract class AbstractWebPageAttribute extends TlObject
             WebPageAttributeTheme::CONSTRUCTOR_ID => WebPageAttributeTheme::deserialize($stream),
             WebPageAttributeStory::CONSTRUCTOR_ID => WebPageAttributeStory::deserialize($stream),
             WebPageAttributeStickerSet::CONSTRUCTOR_ID => WebPageAttributeStickerSet::deserialize($stream),
+            WebPageAttributeUniqueStarGift::CONSTRUCTOR_ID => WebPageAttributeUniqueStarGift::deserialize($stream),
+            WebPageAttributeStarGiftCollection::CONSTRUCTOR_ID => WebPageAttributeStarGiftCollection::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type WebPageAttribute. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class PeerSettings extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xacd66c5e;
+    public const CONSTRUCTOR_ID = 0xf47741f7;
     
     public string $predicate = 'peerSettings';
     
@@ -31,6 +31,11 @@ final class PeerSettings extends TlObject
      * @param int|null $requestChatDate
      * @param int|null $businessBotId
      * @param string|null $businessBotManageUrl
+     * @param int|null $chargePaidMessageStars
+     * @param string|null $registrationMonth
+     * @param string|null $phoneCountry
+     * @param int|null $nameChangeDate
+     * @param int|null $photoChangeDate
      */
     public function __construct(
         public readonly ?true $reportSpam = null,
@@ -48,7 +53,12 @@ final class PeerSettings extends TlObject
         public readonly ?string $requestChatTitle = null,
         public readonly ?int $requestChatDate = null,
         public readonly ?int $businessBotId = null,
-        public readonly ?string $businessBotManageUrl = null
+        public readonly ?string $businessBotManageUrl = null,
+        public readonly ?int $chargePaidMessageStars = null,
+        public readonly ?string $registrationMonth = null,
+        public readonly ?string $phoneCountry = null,
+        public readonly ?int $nameChangeDate = null,
+        public readonly ?int $photoChangeDate = null
     ) {}
     
     public function serialize(): string
@@ -71,6 +81,11 @@ final class PeerSettings extends TlObject
         if ($this->requestChatDate !== null) $flags |= (1 << 9);
         if ($this->businessBotId !== null) $flags |= (1 << 13);
         if ($this->businessBotManageUrl !== null) $flags |= (1 << 13);
+        if ($this->chargePaidMessageStars !== null) $flags |= (1 << 14);
+        if ($this->registrationMonth !== null) $flags |= (1 << 15);
+        if ($this->phoneCountry !== null) $flags |= (1 << 16);
+        if ($this->nameChangeDate !== null) $flags |= (1 << 17);
+        if ($this->photoChangeDate !== null) $flags |= (1 << 18);
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 6)) {
             $buffer .= Serializer::int32($this->geoDistance);
@@ -86,6 +101,21 @@ final class PeerSettings extends TlObject
         }
         if ($flags & (1 << 13)) {
             $buffer .= Serializer::bytes($this->businessBotManageUrl);
+        }
+        if ($flags & (1 << 14)) {
+            $buffer .= Serializer::int64($this->chargePaidMessageStars);
+        }
+        if ($flags & (1 << 15)) {
+            $buffer .= Serializer::bytes($this->registrationMonth);
+        }
+        if ($flags & (1 << 16)) {
+            $buffer .= Serializer::bytes($this->phoneCountry);
+        }
+        if ($flags & (1 << 17)) {
+            $buffer .= Serializer::int32($this->nameChangeDate);
+        }
+        if ($flags & (1 << 18)) {
+            $buffer .= Serializer::int32($this->photoChangeDate);
         }
 
         return $buffer;
@@ -114,6 +144,11 @@ final class PeerSettings extends TlObject
         $requestChatDate = ($flags & (1 << 9)) ? Deserializer::int32($stream) : null;
         $businessBotId = ($flags & (1 << 13)) ? Deserializer::int64($stream) : null;
         $businessBotManageUrl = ($flags & (1 << 13)) ? Deserializer::bytes($stream) : null;
+        $chargePaidMessageStars = ($flags & (1 << 14)) ? Deserializer::int64($stream) : null;
+        $registrationMonth = ($flags & (1 << 15)) ? Deserializer::bytes($stream) : null;
+        $phoneCountry = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
+        $nameChangeDate = ($flags & (1 << 17)) ? Deserializer::int32($stream) : null;
+        $photoChangeDate = ($flags & (1 << 18)) ? Deserializer::int32($stream) : null;
 
         return new self(
             $reportSpam,
@@ -131,7 +166,12 @@ final class PeerSettings extends TlObject
             $requestChatTitle,
             $requestChatDate,
             $businessBotId,
-            $businessBotManageUrl
+            $businessBotManageUrl,
+            $chargePaidMessageStars,
+            $registrationMonth,
+            $phoneCountry,
+            $nameChangeDate,
+            $photoChangeDate
         );
     }
 }

@@ -15,12 +15,12 @@ final class UpdateGroupCallParticipants extends AbstractUpdate
     public string $predicate = 'updateGroupCallParticipants';
     
     /**
-     * @param InputGroupCall $call
+     * @param AbstractInputGroupCall $call
      * @param list<GroupCallParticipant> $participants
      * @param int $version
      */
     public function __construct(
-        public readonly InputGroupCall $call,
+        public readonly AbstractInputGroupCall $call,
         public readonly array $participants,
         public readonly int $version
     ) {}
@@ -38,7 +38,7 @@ final class UpdateGroupCallParticipants extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $call = InputGroupCall::deserialize($stream);
+        $call = AbstractInputGroupCall::deserialize($stream);
         $participants = Deserializer::vectorOfObjects($stream, [GroupCallParticipant::class, 'deserialize']);
         $version = Deserializer::int32($stream);
 

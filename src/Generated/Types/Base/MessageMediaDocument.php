@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class MessageMediaDocument extends AbstractMessageMedia
 {
-    public const CONSTRUCTOR_ID = 0xdd570bd5;
+    public const CONSTRUCTOR_ID = 0x52d8ccd9;
     
     public string $predicate = 'messageMediaDocument';
     
@@ -22,6 +22,8 @@ final class MessageMediaDocument extends AbstractMessageMedia
      * @param true|null $voice
      * @param AbstractDocument|null $document
      * @param list<AbstractDocument>|null $altDocuments
+     * @param AbstractPhoto|null $videoCover
+     * @param int|null $videoTimestamp
      * @param int|null $ttlSeconds
      */
     public function __construct(
@@ -32,6 +34,8 @@ final class MessageMediaDocument extends AbstractMessageMedia
         public readonly ?true $voice = null,
         public readonly ?AbstractDocument $document = null,
         public readonly ?array $altDocuments = null,
+        public readonly ?AbstractPhoto $videoCover = null,
+        public readonly ?int $videoTimestamp = null,
         public readonly ?int $ttlSeconds = null
     ) {}
     
@@ -46,6 +50,8 @@ final class MessageMediaDocument extends AbstractMessageMedia
         if ($this->voice) $flags |= (1 << 8);
         if ($this->document !== null) $flags |= (1 << 0);
         if ($this->altDocuments !== null) $flags |= (1 << 5);
+        if ($this->videoCover !== null) $flags |= (1 << 9);
+        if ($this->videoTimestamp !== null) $flags |= (1 << 10);
         if ($this->ttlSeconds !== null) $flags |= (1 << 2);
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
@@ -53,6 +59,12 @@ final class MessageMediaDocument extends AbstractMessageMedia
         }
         if ($flags & (1 << 5)) {
             $buffer .= Serializer::vectorOfObjects($this->altDocuments);
+        }
+        if ($flags & (1 << 9)) {
+            $buffer .= $this->videoCover->serialize();
+        }
+        if ($flags & (1 << 10)) {
+            $buffer .= Serializer::int32($this->videoTimestamp);
         }
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::int32($this->ttlSeconds);
@@ -72,6 +84,8 @@ final class MessageMediaDocument extends AbstractMessageMedia
         $voice = ($flags & (1 << 8)) ? true : null;
         $document = ($flags & (1 << 0)) ? AbstractDocument::deserialize($stream) : null;
         $altDocuments = ($flags & (1 << 5)) ? Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']) : null;
+        $videoCover = ($flags & (1 << 9)) ? AbstractPhoto::deserialize($stream) : null;
+        $videoTimestamp = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
         $ttlSeconds = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
 
         return new self(
@@ -82,6 +96,8 @@ final class MessageMediaDocument extends AbstractMessageMedia
             $voice,
             $document,
             $altDocuments,
+            $videoCover,
+            $videoTimestamp,
             $ttlSeconds
         );
     }

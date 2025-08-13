@@ -3,8 +3,8 @@ namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
 
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessage;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractSavedDialog;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\SavedDialog;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -19,7 +19,7 @@ final class SavedDialogs extends AbstractSavedDialogs
     public string $predicate = 'messages.savedDialogs';
     
     /**
-     * @param list<SavedDialog> $dialogs
+     * @param list<AbstractSavedDialog> $dialogs
      * @param list<AbstractMessage> $messages
      * @param list<AbstractChat> $chats
      * @param list<AbstractUser> $users
@@ -45,7 +45,7 @@ final class SavedDialogs extends AbstractSavedDialogs
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $dialogs = Deserializer::vectorOfObjects($stream, [SavedDialog::class, 'deserialize']);
+        $dialogs = Deserializer::vectorOfObjects($stream, [AbstractSavedDialog::class, 'deserialize']);
         $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);

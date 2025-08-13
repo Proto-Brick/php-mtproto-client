@@ -15,11 +15,11 @@ final class MessageActionGroupCallScheduled extends AbstractMessageAction
     public string $predicate = 'messageActionGroupCallScheduled';
     
     /**
-     * @param InputGroupCall $call
+     * @param AbstractInputGroupCall $call
      * @param int $scheduleDate
      */
     public function __construct(
-        public readonly InputGroupCall $call,
+        public readonly AbstractInputGroupCall $call,
         public readonly int $scheduleDate
     ) {}
     
@@ -35,7 +35,7 @@ final class MessageActionGroupCallScheduled extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $call = InputGroupCall::deserialize($stream);
+        $call = AbstractInputGroupCall::deserialize($stream);
         $scheduleDate = Deserializer::int32($stream);
 
         return new self(

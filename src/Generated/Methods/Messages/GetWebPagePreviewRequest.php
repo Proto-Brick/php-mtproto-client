@@ -2,7 +2,7 @@
 namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
 
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageMedia;
+use DigitalStars\MtprotoClient\Generated\Types\Messages\WebPagePreview;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class GetWebPagePreviewRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x8b68b0cc;
+    public const CONSTRUCTOR_ID = 0x570d6f6f;
     
     public string $predicate = 'messages.getWebPagePreview';
     
@@ -23,7 +23,7 @@ final class GetWebPagePreviewRequest extends TlObject
     
     public function getResponseClass(): string
     {
-        return AbstractMessageMedia::class;
+        return WebPagePreview::class;
     }
     /**
      * @param string $message

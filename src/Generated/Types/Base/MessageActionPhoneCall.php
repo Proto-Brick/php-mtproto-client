@@ -17,13 +17,13 @@ final class MessageActionPhoneCall extends AbstractMessageAction
     /**
      * @param int $callId
      * @param true|null $video
-     * @param PhoneCallDiscardReason|null $reason
+     * @param AbstractPhoneCallDiscardReason|null $reason
      * @param int|null $duration
      */
     public function __construct(
         public readonly int $callId,
         public readonly ?true $video = null,
-        public readonly ?PhoneCallDiscardReason $reason = null,
+        public readonly ?AbstractPhoneCallDiscardReason $reason = null,
         public readonly ?int $duration = null
     ) {}
     
@@ -52,7 +52,7 @@ final class MessageActionPhoneCall extends AbstractMessageAction
         $flags = Deserializer::int32($stream);
         $video = ($flags & (1 << 2)) ? true : null;
         $callId = Deserializer::int64($stream);
-        $reason = ($flags & (1 << 0)) ? PhoneCallDiscardReason::deserialize($stream) : null;
+        $reason = ($flags & (1 << 0)) ? AbstractPhoneCallDiscardReason::deserialize($stream) : null;
         $duration = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
 
         return new self(

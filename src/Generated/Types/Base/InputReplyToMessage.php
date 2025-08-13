@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class InputReplyToMessage extends AbstractInputReplyTo
 {
-    public const CONSTRUCTOR_ID = 0x22c0f6d5;
+    public const CONSTRUCTOR_ID = 0x869fbe10;
     
     public string $predicate = 'inputReplyToMessage';
     
@@ -21,6 +21,8 @@ final class InputReplyToMessage extends AbstractInputReplyTo
      * @param string|null $quoteText
      * @param list<AbstractMessageEntity>|null $quoteEntities
      * @param int|null $quoteOffset
+     * @param AbstractInputPeer|null $monoforumPeerId
+     * @param int|null $todoItemId
      */
     public function __construct(
         public readonly int $replyToMsgId,
@@ -28,7 +30,9 @@ final class InputReplyToMessage extends AbstractInputReplyTo
         public readonly ?AbstractInputPeer $replyToPeerId = null,
         public readonly ?string $quoteText = null,
         public readonly ?array $quoteEntities = null,
-        public readonly ?int $quoteOffset = null
+        public readonly ?int $quoteOffset = null,
+        public readonly ?AbstractInputPeer $monoforumPeerId = null,
+        public readonly ?int $todoItemId = null
     ) {}
     
     public function serialize(): string
@@ -40,6 +44,8 @@ final class InputReplyToMessage extends AbstractInputReplyTo
         if ($this->quoteText !== null) $flags |= (1 << 2);
         if ($this->quoteEntities !== null) $flags |= (1 << 3);
         if ($this->quoteOffset !== null) $flags |= (1 << 4);
+        if ($this->monoforumPeerId !== null) $flags |= (1 << 5);
+        if ($this->todoItemId !== null) $flags |= (1 << 6);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->replyToMsgId);
         if ($flags & (1 << 0)) {
@@ -57,6 +63,12 @@ final class InputReplyToMessage extends AbstractInputReplyTo
         if ($flags & (1 << 4)) {
             $buffer .= Serializer::int32($this->quoteOffset);
         }
+        if ($flags & (1 << 5)) {
+            $buffer .= $this->monoforumPeerId->serialize();
+        }
+        if ($flags & (1 << 6)) {
+            $buffer .= Serializer::int32($this->todoItemId);
+        }
 
         return $buffer;
     }
@@ -71,6 +83,8 @@ final class InputReplyToMessage extends AbstractInputReplyTo
         $quoteText = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
         $quoteEntities = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
         $quoteOffset = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $monoforumPeerId = ($flags & (1 << 5)) ? AbstractInputPeer::deserialize($stream) : null;
+        $todoItemId = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
 
         return new self(
             $replyToMsgId,
@@ -78,7 +92,9 @@ final class InputReplyToMessage extends AbstractInputReplyTo
             $replyToPeerId,
             $quoteText,
             $quoteEntities,
-            $quoteOffset
+            $quoteOffset,
+            $monoforumPeerId,
+            $todoItemId
         );
     }
 }

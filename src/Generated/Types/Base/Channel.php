@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class Channel extends AbstractChat
 {
-    public const CONSTRUCTOR_ID = 0xfe4478bd;
+    public const CONSTRUCTOR_ID = 0xfe685355;
     
     public string $predicate = 'channel';
     
@@ -43,6 +43,10 @@ final class Channel extends AbstractChat
      * @param true|null $storiesHiddenMin
      * @param true|null $storiesUnavailable
      * @param true|null $signatureProfiles
+     * @param true|null $autotranslation
+     * @param true|null $broadcastMessagesAllowed
+     * @param true|null $monoforum
+     * @param true|null $forumTabs
      * @param int|null $accessHash
      * @param string|null $username
      * @param list<RestrictionReason>|null $restrictionReason
@@ -57,6 +61,9 @@ final class Channel extends AbstractChat
      * @param AbstractEmojiStatus|null $emojiStatus
      * @param int|null $level
      * @param int|null $subscriptionUntilDate
+     * @param int|null $botVerificationIcon
+     * @param int|null $sendPaidMessagesStars
+     * @param int|null $linkedMonoforumId
      */
     public function __construct(
         public readonly int $id,
@@ -87,6 +94,10 @@ final class Channel extends AbstractChat
         public readonly ?true $storiesHiddenMin = null,
         public readonly ?true $storiesUnavailable = null,
         public readonly ?true $signatureProfiles = null,
+        public readonly ?true $autotranslation = null,
+        public readonly ?true $broadcastMessagesAllowed = null,
+        public readonly ?true $monoforum = null,
+        public readonly ?true $forumTabs = null,
         public readonly ?int $accessHash = null,
         public readonly ?string $username = null,
         public readonly ?array $restrictionReason = null,
@@ -100,7 +111,10 @@ final class Channel extends AbstractChat
         public readonly ?PeerColor $profileColor = null,
         public readonly ?AbstractEmojiStatus $emojiStatus = null,
         public readonly ?int $level = null,
-        public readonly ?int $subscriptionUntilDate = null
+        public readonly ?int $subscriptionUntilDate = null,
+        public readonly ?int $botVerificationIcon = null,
+        public readonly ?int $sendPaidMessagesStars = null,
+        public readonly ?int $linkedMonoforumId = null
     ) {}
     
     public function serialize(): string
@@ -132,6 +146,10 @@ final class Channel extends AbstractChat
         if ($this->storiesHiddenMin) $flags2 |= (1 << 2);
         if ($this->storiesUnavailable) $flags2 |= (1 << 3);
         if ($this->signatureProfiles) $flags2 |= (1 << 12);
+        if ($this->autotranslation) $flags2 |= (1 << 15);
+        if ($this->broadcastMessagesAllowed) $flags2 |= (1 << 16);
+        if ($this->monoforum) $flags2 |= (1 << 17);
+        if ($this->forumTabs) $flags2 |= (1 << 19);
         if ($this->accessHash !== null) $flags |= (1 << 13);
         if ($this->username !== null) $flags |= (1 << 6);
         if ($this->restrictionReason !== null) $flags |= (1 << 9);
@@ -146,6 +164,9 @@ final class Channel extends AbstractChat
         if ($this->emojiStatus !== null) $flags2 |= (1 << 9);
         if ($this->level !== null) $flags2 |= (1 << 10);
         if ($this->subscriptionUntilDate !== null) $flags2 |= (1 << 11);
+        if ($this->botVerificationIcon !== null) $flags2 |= (1 << 13);
+        if ($this->sendPaidMessagesStars !== null) $flags2 |= (1 << 14);
+        if ($this->linkedMonoforumId !== null) $flags2 |= (1 << 18);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int64($this->id);
@@ -194,6 +215,15 @@ final class Channel extends AbstractChat
         if ($flags2 & (1 << 11)) {
             $buffer .= Serializer::int32($this->subscriptionUntilDate);
         }
+        if ($flags2 & (1 << 13)) {
+            $buffer .= Serializer::int64($this->botVerificationIcon);
+        }
+        if ($flags2 & (1 << 14)) {
+            $buffer .= Serializer::int64($this->sendPaidMessagesStars);
+        }
+        if ($flags2 & (1 << 18)) {
+            $buffer .= Serializer::int64($this->linkedMonoforumId);
+        }
 
         return $buffer;
     }
@@ -227,6 +257,10 @@ final class Channel extends AbstractChat
         $storiesHiddenMin = ($flags2 & (1 << 2)) ? true : null;
         $storiesUnavailable = ($flags2 & (1 << 3)) ? true : null;
         $signatureProfiles = ($flags2 & (1 << 12)) ? true : null;
+        $autotranslation = ($flags2 & (1 << 15)) ? true : null;
+        $broadcastMessagesAllowed = ($flags2 & (1 << 16)) ? true : null;
+        $monoforum = ($flags2 & (1 << 17)) ? true : null;
+        $forumTabs = ($flags2 & (1 << 19)) ? true : null;
         $id = Deserializer::int64($stream);
         $accessHash = ($flags & (1 << 13)) ? Deserializer::int64($stream) : null;
         $title = Deserializer::bytes($stream);
@@ -245,6 +279,9 @@ final class Channel extends AbstractChat
         $emojiStatus = ($flags2 & (1 << 9)) ? AbstractEmojiStatus::deserialize($stream) : null;
         $level = ($flags2 & (1 << 10)) ? Deserializer::int32($stream) : null;
         $subscriptionUntilDate = ($flags2 & (1 << 11)) ? Deserializer::int32($stream) : null;
+        $botVerificationIcon = ($flags2 & (1 << 13)) ? Deserializer::int64($stream) : null;
+        $sendPaidMessagesStars = ($flags2 & (1 << 14)) ? Deserializer::int64($stream) : null;
+        $linkedMonoforumId = ($flags2 & (1 << 18)) ? Deserializer::int64($stream) : null;
 
         return new self(
             $id,
@@ -275,6 +312,10 @@ final class Channel extends AbstractChat
             $storiesHiddenMin,
             $storiesUnavailable,
             $signatureProfiles,
+            $autotranslation,
+            $broadcastMessagesAllowed,
+            $monoforum,
+            $forumTabs,
             $accessHash,
             $username,
             $restrictionReason,
@@ -288,7 +329,10 @@ final class Channel extends AbstractChat
             $profileColor,
             $emojiStatus,
             $level,
-            $subscriptionUntilDate
+            $subscriptionUntilDate,
+            $botVerificationIcon,
+            $sendPaidMessagesStars,
+            $linkedMonoforumId
         );
     }
 }

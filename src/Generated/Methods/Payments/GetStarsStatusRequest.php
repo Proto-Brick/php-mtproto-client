@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class GetStarsStatusRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x104fcfa7;
+    public const CONSTRUCTOR_ID = 0x4ea9b3bf;
     
     public string $predicate = 'payments.getStarsStatus';
     
@@ -27,14 +27,19 @@ final class GetStarsStatusRequest extends TlObject
     }
     /**
      * @param AbstractInputPeer $peer
+     * @param true|null $ton
      */
     public function __construct(
-        public readonly AbstractInputPeer $peer
+        public readonly AbstractInputPeer $peer,
+        public readonly ?true $ton = null
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->ton) $flags |= (1 << 0);
+        $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
 
         return $buffer;

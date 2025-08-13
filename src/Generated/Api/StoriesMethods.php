@@ -4,9 +4,13 @@ namespace DigitalStars\MtprotoClient\Generated\Api;
 use DigitalStars\MtprotoClient\Client;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\ActivateStealthModeRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\CanSendStoryRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Stories\CreateAlbumRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Stories\DeleteAlbumRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\DeleteStoriesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\EditStoryRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\ExportStoryLinkRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Stories\GetAlbumStoriesRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Stories\GetAlbumsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\GetAllReadPeerStoriesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\GetAllStoriesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\GetChatsToSendRequest;
@@ -20,6 +24,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Stories\GetStoryReactionsListRe
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\GetStoryViewsListRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\IncrementStoryViewsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\ReadStoriesRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Stories\ReorderAlbumsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\ReportRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\SearchPostsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\SendReactionRequest;
@@ -28,6 +33,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Stories\ToggleAllStoriesHiddenR
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\TogglePeerStoriesHiddenRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\TogglePinnedRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Stories\TogglePinnedToTopRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Stories\UpdateAlbumRequest;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputMedia;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPrivacyRule;
@@ -53,6 +59,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaPhoto;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaPhotoExternal;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaPoll;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaStory;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaTodo;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaUploadedDocument;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaUploadedPhoto;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaVenue;
@@ -79,6 +86,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputPrivacyValueDisallowCon
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputPrivacyValueDisallowUsers;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MediaAreaChannelPost;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MediaAreaGeoPoint;
+use DigitalStars\MtprotoClient\Generated\Types\Base\MediaAreaStarGift;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MediaAreaSuggestedReaction;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MediaAreaUrl;
 use DigitalStars\MtprotoClient\Generated\Types\Base\MediaAreaVenue;
@@ -110,6 +118,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\ReactionPaid;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ReportResultAddComment;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ReportResultChooseOption;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ReportResultReported;
+use DigitalStars\MtprotoClient\Generated\Types\Base\StoryAlbum;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShort;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortChatMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortMessage;
@@ -120,9 +129,13 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\UpdatesTooLong;
 use DigitalStars\MtprotoClient\Generated\Types\Messages\AbstractChats;
 use DigitalStars\MtprotoClient\Generated\Types\Messages\Chats;
 use DigitalStars\MtprotoClient\Generated\Types\Messages\ChatsSlice;
+use DigitalStars\MtprotoClient\Generated\Types\Stories\AbstractAlbums;
 use DigitalStars\MtprotoClient\Generated\Types\Stories\AbstractAllStories;
+use DigitalStars\MtprotoClient\Generated\Types\Stories\Albums;
+use DigitalStars\MtprotoClient\Generated\Types\Stories\AlbumsNotModified;
 use DigitalStars\MtprotoClient\Generated\Types\Stories\AllStories;
 use DigitalStars\MtprotoClient\Generated\Types\Stories\AllStoriesNotModified;
+use DigitalStars\MtprotoClient\Generated\Types\Stories\CanSendStoryCount;
 use DigitalStars\MtprotoClient\Generated\Types\Stories\FoundStories;
 use DigitalStars\MtprotoClient\Generated\Types\Stories\PeerStories;
 use DigitalStars\MtprotoClient\Generated\Types\Stories\Stories;
@@ -142,43 +155,44 @@ final readonly class StoriesMethods
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @return bool
+     * @return CanSendStoryCount|null
      * @see https://core.telegram.org/method/stories.canSendStory
      * @api
      */
-    public function canSendStory(AbstractInputPeer $peer): bool
+    public function canSendStory(AbstractInputPeer $peer): ?CanSendStoryCount
     {
-        return (bool) $this->client->callSync(new CanSendStoryRequest($peer));
+        return $this->client->callSync(new CanSendStoryRequest($peer));
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia $media
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
      * @param list<InputPrivacyValueAllowContacts|InputPrivacyValueAllowAll|InputPrivacyValueAllowUsers|InputPrivacyValueDisallowContacts|InputPrivacyValueDisallowAll|InputPrivacyValueDisallowUsers|InputPrivacyValueAllowChatParticipants|InputPrivacyValueDisallowChatParticipants|InputPrivacyValueAllowCloseFriends|InputPrivacyValueAllowPremium|InputPrivacyValueAllowBots|InputPrivacyValueDisallowBots> $privacyRules
      * @param int $randomId
      * @param bool|null $pinned
      * @param bool|null $noforwards
      * @param bool|null $fwdModified
-     * @param list<MediaAreaVenue|InputMediaAreaVenue|MediaAreaGeoPoint|MediaAreaSuggestedReaction|MediaAreaChannelPost|InputMediaAreaChannelPost|MediaAreaUrl|MediaAreaWeather>|null $mediaAreas
+     * @param list<MediaAreaVenue|InputMediaAreaVenue|MediaAreaGeoPoint|MediaAreaSuggestedReaction|MediaAreaChannelPost|InputMediaAreaChannelPost|MediaAreaUrl|MediaAreaWeather|MediaAreaStarGift>|null $mediaAreas
      * @param string|null $caption
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
      * @param int|null $period
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $fwdFromId
      * @param int|null $fwdFromStory
+     * @param list<int>|null $albums
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/stories.sendStory
      * @api
      */
-    public function sendStory(AbstractInputPeer $peer, AbstractInputMedia $media, array $privacyRules, int $randomId, ?bool $pinned = null, ?bool $noforwards = null, ?bool $fwdModified = null, ?array $mediaAreas = null, ?string $caption = null, ?array $entities = null, ?int $period = null, ?AbstractInputPeer $fwdFromId = null, ?int $fwdFromStory = null): ?AbstractUpdates
+    public function sendStory(AbstractInputPeer $peer, AbstractInputMedia $media, array $privacyRules, int $randomId, ?bool $pinned = null, ?bool $noforwards = null, ?bool $fwdModified = null, ?array $mediaAreas = null, ?string $caption = null, ?array $entities = null, ?int $period = null, ?AbstractInputPeer $fwdFromId = null, ?int $fwdFromStory = null, ?array $albums = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new SendStoryRequest($peer, $media, $privacyRules, $randomId, $pinned, $noforwards, $fwdModified, $mediaAreas, $caption, $entities, $period, $fwdFromId, $fwdFromStory));
+        return $this->client->callSync(new SendStoryRequest($peer, $media, $privacyRules, $randomId, $pinned, $noforwards, $fwdModified, $mediaAreas, $caption, $entities, $period, $fwdFromId, $fwdFromStory, $albums));
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
      * @param int $id
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|null $media
-     * @param list<MediaAreaVenue|InputMediaAreaVenue|MediaAreaGeoPoint|MediaAreaSuggestedReaction|MediaAreaChannelPost|InputMediaAreaChannelPost|MediaAreaUrl|MediaAreaWeather>|null $mediaAreas
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo|null $media
+     * @param list<MediaAreaVenue|InputMediaAreaVenue|MediaAreaGeoPoint|MediaAreaSuggestedReaction|MediaAreaChannelPost|InputMediaAreaChannelPost|MediaAreaUrl|MediaAreaWeather|MediaAreaStarGift>|null $mediaAreas
      * @param string|null $caption
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
      * @param list<InputPrivacyValueAllowContacts|InputPrivacyValueAllowAll|InputPrivacyValueAllowUsers|InputPrivacyValueDisallowContacts|InputPrivacyValueDisallowAll|InputPrivacyValueDisallowUsers|InputPrivacyValueAllowChatParticipants|InputPrivacyValueDisallowChatParticipants|InputPrivacyValueAllowCloseFriends|InputPrivacyValueAllowPremium|InputPrivacyValueAllowBots|InputPrivacyValueDisallowBots>|null $privacyRules
@@ -470,7 +484,7 @@ final readonly class StoriesMethods
      * @param string $offset
      * @param int $limit
      * @param string|null $hashtag
-     * @param MediaAreaVenue|InputMediaAreaVenue|MediaAreaGeoPoint|MediaAreaSuggestedReaction|MediaAreaChannelPost|InputMediaAreaChannelPost|MediaAreaUrl|MediaAreaWeather|null $area
+     * @param MediaAreaVenue|InputMediaAreaVenue|MediaAreaGeoPoint|MediaAreaSuggestedReaction|MediaAreaChannelPost|InputMediaAreaChannelPost|MediaAreaUrl|MediaAreaWeather|MediaAreaStarGift|null $area
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $peer
      * @return FoundStories|null
      * @see https://core.telegram.org/method/stories.searchPosts
@@ -479,5 +493,84 @@ final readonly class StoriesMethods
     public function searchPosts(string $offset, int $limit, ?string $hashtag = null, ?AbstractMediaArea $area = null, ?AbstractInputPeer $peer = null): ?FoundStories
     {
         return $this->client->callSync(new SearchPostsRequest($offset, $limit, $hashtag, $area, $peer));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param string $title
+     * @param list<int> $stories
+     * @return StoryAlbum|null
+     * @see https://core.telegram.org/method/stories.createAlbum
+     * @api
+     */
+    public function createAlbum(AbstractInputPeer $peer, string $title, array $stories): ?StoryAlbum
+    {
+        return $this->client->callSync(new CreateAlbumRequest($peer, $title, $stories));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param int $albumId
+     * @param string|null $title
+     * @param list<int>|null $deleteStories
+     * @param list<int>|null $addStories
+     * @param list<int>|null $order
+     * @return StoryAlbum|null
+     * @see https://core.telegram.org/method/stories.updateAlbum
+     * @api
+     */
+    public function updateAlbum(AbstractInputPeer $peer, int $albumId, ?string $title = null, ?array $deleteStories = null, ?array $addStories = null, ?array $order = null): ?StoryAlbum
+    {
+        return $this->client->callSync(new UpdateAlbumRequest($peer, $albumId, $title, $deleteStories, $addStories, $order));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param list<int> $order
+     * @return bool
+     * @see https://core.telegram.org/method/stories.reorderAlbums
+     * @api
+     */
+    public function reorderAlbums(AbstractInputPeer $peer, array $order): bool
+    {
+        return (bool) $this->client->callSync(new ReorderAlbumsRequest($peer, $order));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param int $albumId
+     * @return bool
+     * @see https://core.telegram.org/method/stories.deleteAlbum
+     * @api
+     */
+    public function deleteAlbum(AbstractInputPeer $peer, int $albumId): bool
+    {
+        return (bool) $this->client->callSync(new DeleteAlbumRequest($peer, $albumId));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param int $hash
+     * @return AlbumsNotModified|Albums|null
+     * @see https://core.telegram.org/method/stories.getAlbums
+     * @api
+     */
+    public function getAlbums(AbstractInputPeer $peer, int $hash): ?AbstractAlbums
+    {
+        return $this->client->callSync(new GetAlbumsRequest($peer, $hash));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param int $albumId
+     * @param int $offset
+     * @param int $limit
+     * @return Stories|null
+     * @see https://core.telegram.org/method/stories.getAlbumStories
+     * @api
+     */
+    public function getAlbumStories(AbstractInputPeer $peer, int $albumId, int $offset, int $limit): ?Stories
+    {
+        return $this->client->callSync(new GetAlbumStoriesRequest($peer, $albumId, $offset, $limit));
     }
 }

@@ -16,6 +16,7 @@ abstract class AbstractInputReplyTo extends TlObject
         return match ($constructorId) {
             InputReplyToMessage::CONSTRUCTOR_ID => InputReplyToMessage::deserialize($stream),
             InputReplyToStory::CONSTRUCTOR_ID => InputReplyToStory::deserialize($stream),
+            InputReplyToMonoForum::CONSTRUCTOR_ID => InputReplyToMonoForum::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputReplyTo. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

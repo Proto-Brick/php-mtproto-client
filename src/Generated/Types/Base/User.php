@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class User extends AbstractUser
 {
-    public const CONSTRUCTOR_ID = 0x83314fca;
+    public const CONSTRUCTOR_ID = 0x20b1422;
     
     public string $predicate = 'user';
     
@@ -58,6 +58,8 @@ final class User extends AbstractUser
      * @param PeerColor|null $color
      * @param PeerColor|null $profileColor
      * @param int|null $botActiveUsers
+     * @param int|null $botVerificationIcon
+     * @param int|null $sendPaidMessagesStars
      */
     public function __construct(
         public readonly int $id,
@@ -102,7 +104,9 @@ final class User extends AbstractUser
         public readonly ?int $storiesMaxId = null,
         public readonly ?PeerColor $color = null,
         public readonly ?PeerColor $profileColor = null,
-        public readonly ?int $botActiveUsers = null
+        public readonly ?int $botActiveUsers = null,
+        public readonly ?int $botVerificationIcon = null,
+        public readonly ?int $sendPaidMessagesStars = null
     ) {}
     
     public function serialize(): string
@@ -152,6 +156,8 @@ final class User extends AbstractUser
         if ($this->color !== null) $flags2 |= (1 << 8);
         if ($this->profileColor !== null) $flags2 |= (1 << 9);
         if ($this->botActiveUsers !== null) $flags2 |= (1 << 12);
+        if ($this->botVerificationIcon !== null) $flags2 |= (1 << 14);
+        if ($this->sendPaidMessagesStars !== null) $flags2 |= (1 << 15);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int64($this->id);
@@ -206,6 +212,12 @@ final class User extends AbstractUser
         if ($flags2 & (1 << 12)) {
             $buffer .= Serializer::int32($this->botActiveUsers);
         }
+        if ($flags2 & (1 << 14)) {
+            $buffer .= Serializer::int64($this->botVerificationIcon);
+        }
+        if ($flags2 & (1 << 15)) {
+            $buffer .= Serializer::int64($this->sendPaidMessagesStars);
+        }
 
         return $buffer;
     }
@@ -258,6 +270,8 @@ final class User extends AbstractUser
         $color = ($flags2 & (1 << 8)) ? PeerColor::deserialize($stream) : null;
         $profileColor = ($flags2 & (1 << 9)) ? PeerColor::deserialize($stream) : null;
         $botActiveUsers = ($flags2 & (1 << 12)) ? Deserializer::int32($stream) : null;
+        $botVerificationIcon = ($flags2 & (1 << 14)) ? Deserializer::int64($stream) : null;
+        $sendPaidMessagesStars = ($flags2 & (1 << 15)) ? Deserializer::int64($stream) : null;
 
         return new self(
             $id,
@@ -302,7 +316,9 @@ final class User extends AbstractUser
             $storiesMaxId,
             $color,
             $profileColor,
-            $botActiveUsers
+            $botActiveUsers,
+            $botVerificationIcon,
+            $sendPaidMessagesStars
         );
     }
 }

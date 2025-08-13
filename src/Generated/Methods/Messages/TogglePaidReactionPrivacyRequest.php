@@ -2,6 +2,7 @@
 namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
 
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPaidReactionPrivacy;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -11,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class TogglePaidReactionPrivacyRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x849ad397;
+    public const CONSTRUCTOR_ID = 0x435885b5;
     
     public string $predicate = 'messages.togglePaidReactionPrivacy';
     
@@ -27,12 +28,12 @@ final class TogglePaidReactionPrivacyRequest extends TlObject
     /**
      * @param AbstractInputPeer $peer
      * @param int $msgId
-     * @param bool $private
+     * @param AbstractPaidReactionPrivacy $private
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
         public readonly int $msgId,
-        public readonly bool $private
+        public readonly AbstractPaidReactionPrivacy $private
     ) {}
     
     public function serialize(): string
@@ -40,7 +41,7 @@ final class TogglePaidReactionPrivacyRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->msgId);
-        $buffer .= ($this->private ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
+        $buffer .= $this->private->serialize();
 
         return $buffer;
     }

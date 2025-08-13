@@ -16,6 +16,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Contacts\GetContactIDsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Contacts\GetContactsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Contacts\GetLocatedRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Contacts\GetSavedRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Contacts\GetSponsoredPeersRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Contacts\GetStatusesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Contacts\GetTopPeersRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Contacts\ImportContactTokenRequest;
@@ -62,6 +63,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\User;
 use DigitalStars\MtprotoClient\Generated\Types\Base\UserEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\AbstractBlocked;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\AbstractContacts;
+use DigitalStars\MtprotoClient\Generated\Types\Contacts\AbstractSponsoredPeers;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\AbstractTopPeers;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\Blocked;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\BlockedSlice;
@@ -71,6 +73,8 @@ use DigitalStars\MtprotoClient\Generated\Types\Contacts\ContactsNotModified;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\Found;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\ImportedContacts;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\ResolvedPeer;
+use DigitalStars\MtprotoClient\Generated\Types\Contacts\SponsoredPeers;
+use DigitalStars\MtprotoClient\Generated\Types\Contacts\SponsoredPeersEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\TopPeers;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\TopPeersDisabled;
 use DigitalStars\MtprotoClient\Generated\Types\Contacts\TopPeersNotModified;
@@ -393,5 +397,16 @@ final readonly class ContactsMethods
     public function getBirthdays(): ?ContactBirthdays
     {
         return $this->client->callSync(new GetBirthdaysRequest());
+    }
+
+    /**
+     * @param string $q
+     * @return SponsoredPeersEmpty|SponsoredPeers|null
+     * @see https://core.telegram.org/method/contacts.getSponsoredPeers
+     * @api
+     */
+    public function getSponsoredPeers(string $q): ?AbstractSponsoredPeers
+    {
+        return $this->client->callSync(new GetSponsoredPeersRequest($q));
     }
 }

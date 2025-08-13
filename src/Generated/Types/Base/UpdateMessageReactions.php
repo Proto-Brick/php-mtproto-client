@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class UpdateMessageReactions extends AbstractUpdate
 {
-    public const CONSTRUCTOR_ID = 0x5e1b3cb8;
+    public const CONSTRUCTOR_ID = 0x1e297bfa;
     
     public string $predicate = 'updateMessageReactions';
     
@@ -19,12 +19,14 @@ final class UpdateMessageReactions extends AbstractUpdate
      * @param int $msgId
      * @param MessageReactions $reactions
      * @param int|null $topMsgId
+     * @param AbstractPeer|null $savedPeerId
      */
     public function __construct(
         public readonly AbstractPeer $peer,
         public readonly int $msgId,
         public readonly MessageReactions $reactions,
-        public readonly ?int $topMsgId = null
+        public readonly ?int $topMsgId = null,
+        public readonly ?AbstractPeer $savedPeerId = null
     ) {}
     
     public function serialize(): string
@@ -32,11 +34,15 @@ final class UpdateMessageReactions extends AbstractUpdate
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->topMsgId !== null) $flags |= (1 << 0);
+        if ($this->savedPeerId !== null) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->msgId);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->topMsgId);
+        }
+        if ($flags & (1 << 1)) {
+            $buffer .= $this->savedPeerId->serialize();
         }
         $buffer .= $this->reactions->serialize();
 
@@ -50,13 +56,15 @@ final class UpdateMessageReactions extends AbstractUpdate
         $peer = AbstractPeer::deserialize($stream);
         $msgId = Deserializer::int32($stream);
         $topMsgId = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $savedPeerId = ($flags & (1 << 1)) ? AbstractPeer::deserialize($stream) : null;
         $reactions = MessageReactions::deserialize($stream);
 
         return new self(
             $peer,
             $msgId,
             $reactions,
-            $topMsgId
+            $topMsgId,
+            $savedPeerId
         );
     }
 }

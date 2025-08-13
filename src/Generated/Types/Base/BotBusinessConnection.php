@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class BotBusinessConnection extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x896433b4;
+    public const CONSTRUCTOR_ID = 0x8f34b2f5;
     
     public string $predicate = 'botBusinessConnection';
     
@@ -19,29 +19,32 @@ final class BotBusinessConnection extends TlObject
      * @param int $userId
      * @param int $dcId
      * @param int $date
-     * @param true|null $canReply
      * @param true|null $disabled
+     * @param BusinessBotRights|null $rights
      */
     public function __construct(
         public readonly string $connectionId,
         public readonly int $userId,
         public readonly int $dcId,
         public readonly int $date,
-        public readonly ?true $canReply = null,
-        public readonly ?true $disabled = null
+        public readonly ?true $disabled = null,
+        public readonly ?BusinessBotRights $rights = null
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->canReply) $flags |= (1 << 0);
         if ($this->disabled) $flags |= (1 << 1);
+        if ($this->rights !== null) $flags |= (1 << 2);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->connectionId);
         $buffer .= Serializer::int64($this->userId);
         $buffer .= Serializer::int32($this->dcId);
         $buffer .= Serializer::int32($this->date);
+        if ($flags & (1 << 2)) {
+            $buffer .= $this->rights->serialize();
+        }
 
         return $buffer;
     }
@@ -53,20 +56,20 @@ final class BotBusinessConnection extends TlObject
             throw new \Exception('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $canReply = ($flags & (1 << 0)) ? true : null;
         $disabled = ($flags & (1 << 1)) ? true : null;
         $connectionId = Deserializer::bytes($stream);
         $userId = Deserializer::int64($stream);
         $dcId = Deserializer::int32($stream);
         $date = Deserializer::int32($stream);
+        $rights = ($flags & (1 << 2)) ? BusinessBotRights::deserialize($stream) : null;
 
         return new self(
             $connectionId,
             $userId,
             $dcId,
             $date,
-            $canReply,
-            $disabled
+            $disabled,
+            $rights
         );
     }
 }

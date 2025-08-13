@@ -38,6 +38,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Auth\LoginTokenMigrateTo;
 use DigitalStars\MtprotoClient\Generated\Types\Auth\LoginTokenSuccess;
 use DigitalStars\MtprotoClient\Generated\Types\Auth\PasswordRecovery;
 use DigitalStars\MtprotoClient\Generated\Types\Auth\SentCode;
+use DigitalStars\MtprotoClient\Generated\Types\Auth\SentCodePaymentRequired;
 use DigitalStars\MtprotoClient\Generated\Types\Auth\SentCodeSuccess;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractEmailVerification;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputCheckPasswordSRP;
@@ -64,7 +65,7 @@ final readonly class AuthMethods
      * @param int $apiId
      * @param string $apiHash
      * @param CodeSettings $settings
-     * @return SentCode|SentCodeSuccess|null
+     * @return SentCode|SentCodeSuccess|SentCodePaymentRequired|null
      * @see https://core.telegram.org/method/auth.sendCode
      * @api
      */
@@ -210,7 +211,7 @@ final readonly class AuthMethods
      * @param string $phoneNumber
      * @param string $phoneCodeHash
      * @param string|null $reason
-     * @return SentCode|SentCodeSuccess|null
+     * @return SentCode|SentCodeSuccess|SentCodePaymentRequired|null
      * @see https://core.telegram.org/method/auth.resendCode
      * @api
      */
@@ -319,7 +320,7 @@ final readonly class AuthMethods
     /**
      * @param string $phoneNumber
      * @param string $phoneCodeHash
-     * @return SentCode|SentCodeSuccess|null
+     * @return SentCode|SentCodeSuccess|SentCodePaymentRequired|null
      * @see https://core.telegram.org/method/auth.resetLoginEmail
      * @api
      */

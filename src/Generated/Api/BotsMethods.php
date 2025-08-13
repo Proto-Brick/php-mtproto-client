@@ -13,6 +13,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Bots\GetAdminedBotsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\GetBotCommandsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\GetBotInfoRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\GetBotMenuButtonRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Bots\GetBotRecommendationsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\GetPopularAppBotsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\GetPreviewInfoRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\GetPreviewMediasRequest;
@@ -26,6 +27,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Bots\SetBotCommandsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\SetBotGroupDefaultAdminRightsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\SetBotInfoRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\SetBotMenuButtonRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Bots\SetCustomVerificationRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\ToggleUserEmojiStatusPermissionRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\ToggleUsernameRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Bots\UpdateStarRefProgramRequest;
@@ -34,6 +36,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractBotCommandScope;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractBotMenuButton;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractEmojiStatus;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputMedia;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
@@ -51,8 +54,9 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\BotMenuButtonDefault;
 use DigitalStars\MtprotoClient\Generated\Types\Base\BotPreviewMedia;
 use DigitalStars\MtprotoClient\Generated\Types\Base\ChatAdminRights;
 use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatus;
+use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatusCollectible;
 use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatusEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatusUntil;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputEmojiStatusCollectible;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaContact;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaDice;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaDocument;
@@ -67,10 +71,18 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaPhoto;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaPhotoExternal;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaPoll;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaStory;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaTodo;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaUploadedDocument;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaUploadedPhoto;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaVenue;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputMediaWebPage;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerChannel;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerChannelFromMessage;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerChat;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerEmpty;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerSelf;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerUser;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerUserFromMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUser;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserFromMessage;
@@ -88,6 +100,9 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\UserEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Bots\BotInfo;
 use DigitalStars\MtprotoClient\Generated\Types\Bots\PopularAppBots;
 use DigitalStars\MtprotoClient\Generated\Types\Bots\PreviewInfo;
+use DigitalStars\MtprotoClient\Generated\Types\Users\AbstractUsers;
+use DigitalStars\MtprotoClient\Generated\Types\Users\Users;
+use DigitalStars\MtprotoClient\Generated\Types\Users\UsersSlice;
 
 
 /**
@@ -307,7 +322,7 @@ final readonly class BotsMethods
     /**
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
      * @param string $langCode
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia $media
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
      * @return BotPreviewMedia|null
      * @see https://core.telegram.org/method/bots.addPreviewMedia
      * @api
@@ -320,8 +335,8 @@ final readonly class BotsMethods
     /**
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
      * @param string $langCode
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia $media
-     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia $newMedia
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $newMedia
      * @return BotPreviewMedia|null
      * @see https://core.telegram.org/method/bots.editPreviewMedia
      * @api
@@ -334,7 +349,7 @@ final readonly class BotsMethods
     /**
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
      * @param string $langCode
-     * @param list<InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia> $media
+     * @param list<InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo> $media
      * @return bool
      * @see https://core.telegram.org/method/bots.deletePreviewMedia
      * @api
@@ -347,7 +362,7 @@ final readonly class BotsMethods
     /**
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
      * @param string $langCode
-     * @param list<InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia> $order
+     * @param list<InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo> $order
      * @return bool
      * @see https://core.telegram.org/method/bots.reorderPreviewMedias
      * @api
@@ -382,7 +397,7 @@ final readonly class BotsMethods
 
     /**
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
-     * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusUntil $emojiStatus
+     * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusCollectible|InputEmojiStatusCollectible $emojiStatus
      * @return bool
      * @see https://core.telegram.org/method/bots.updateUserEmojiStatus
      * @api
@@ -438,5 +453,30 @@ final readonly class BotsMethods
     public function updateStarRefProgram(AbstractInputUser $bot, int $commissionPermille, ?int $durationMonths = null): ?StarRefProgram
     {
         return $this->client->callSync(new UpdateStarRefProgramRequest($bot, $commissionPermille, $durationMonths));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param bool|null $enabled
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|null $bot
+     * @param string|null $customDescription
+     * @return bool
+     * @see https://core.telegram.org/method/bots.setCustomVerification
+     * @api
+     */
+    public function setCustomVerification(AbstractInputPeer $peer, ?bool $enabled = null, ?AbstractInputUser $bot = null, ?string $customDescription = null): bool
+    {
+        return (bool) $this->client->callSync(new SetCustomVerificationRequest($peer, $enabled, $bot, $customDescription));
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @return Users|UsersSlice|null
+     * @see https://core.telegram.org/method/bots.getBotRecommendations
+     * @api
+     */
+    public function getBotRecommendations(AbstractInputUser $bot): ?AbstractUsers
+    {
+        return $this->client->callSync(new GetBotRecommendationsRequest($bot));
     }
 }

@@ -19,14 +19,14 @@ final class StarRefProgram extends TlObject
      * @param int $commissionPermille
      * @param int|null $durationMonths
      * @param int|null $endDate
-     * @param StarsAmount|null $dailyRevenuePerUser
+     * @param AbstractStarsAmount|null $dailyRevenuePerUser
      */
     public function __construct(
         public readonly int $botId,
         public readonly int $commissionPermille,
         public readonly ?int $durationMonths = null,
         public readonly ?int $endDate = null,
-        public readonly ?StarsAmount $dailyRevenuePerUser = null
+        public readonly ?AbstractStarsAmount $dailyRevenuePerUser = null
     ) {}
     
     public function serialize(): string
@@ -63,7 +63,7 @@ final class StarRefProgram extends TlObject
         $commissionPermille = Deserializer::int32($stream);
         $durationMonths = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
         $endDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
-        $dailyRevenuePerUser = ($flags & (1 << 2)) ? StarsAmount::deserialize($stream) : null;
+        $dailyRevenuePerUser = ($flags & (1 << 2)) ? AbstractStarsAmount::deserialize($stream) : null;
 
         return new self(
             $botId,

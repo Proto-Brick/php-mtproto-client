@@ -2,6 +2,7 @@
 namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
 
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputDialogPeer;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -11,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class MarkDialogUnreadRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xc286d98f;
+    public const CONSTRUCTOR_ID = 0x8c5006f8;
     
     public string $predicate = 'messages.markDialogUnread';
     
@@ -27,10 +28,12 @@ final class MarkDialogUnreadRequest extends TlObject
     /**
      * @param AbstractInputDialogPeer $peer
      * @param true|null $unread
+     * @param AbstractInputPeer|null $parentPeer
      */
     public function __construct(
         public readonly AbstractInputDialogPeer $peer,
-        public readonly ?true $unread = null
+        public readonly ?true $unread = null,
+        public readonly ?AbstractInputPeer $parentPeer = null
     ) {}
     
     public function serialize(): string
@@ -38,7 +41,11 @@ final class MarkDialogUnreadRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->unread) $flags |= (1 << 0);
+        if ($this->parentPeer !== null) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 1)) {
+            $buffer .= $this->parentPeer->serialize();
+        }
         $buffer .= $this->peer->serialize();
 
         return $buffer;

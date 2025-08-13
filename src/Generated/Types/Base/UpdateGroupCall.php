@@ -10,23 +10,28 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class UpdateGroupCall extends AbstractUpdate
 {
-    public const CONSTRUCTOR_ID = 0x14b24500;
+    public const CONSTRUCTOR_ID = 0x97d64341;
     
     public string $predicate = 'updateGroupCall';
     
     /**
-     * @param int $chatId
      * @param AbstractGroupCall $call
+     * @param int|null $chatId
      */
     public function __construct(
-        public readonly int $chatId,
-        public readonly AbstractGroupCall $call
+        public readonly AbstractGroupCall $call,
+        public readonly ?int $chatId = null
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-        $buffer .= Serializer::int64($this->chatId);
+        $flags = 0;
+        if ($this->chatId !== null) $flags |= (1 << 0);
+        $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 0)) {
+            $buffer .= Serializer::int64($this->chatId);
+        }
         $buffer .= $this->call->serialize();
 
         return $buffer;
@@ -35,12 +40,13 @@ final class UpdateGroupCall extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $chatId = Deserializer::int64($stream);
+        $flags = Deserializer::int32($stream);
+        $chatId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
         $call = AbstractGroupCall::deserialize($stream);
 
         return new self(
-            $chatId,
-            $call
+            $call,
+            $chatId
         );
     }
 }

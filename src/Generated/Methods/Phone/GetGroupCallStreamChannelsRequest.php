@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputGroupCall;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputGroupCall;
 use DigitalStars\MtprotoClient\Generated\Types\Phone\GroupCallStreamChannels;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
@@ -26,10 +26,10 @@ final class GetGroupCallStreamChannelsRequest extends TlObject
         return GroupCallStreamChannels::class;
     }
     /**
-     * @param InputGroupCall $call
+     * @param AbstractInputGroupCall $call
      */
     public function __construct(
-        public readonly InputGroupCall $call
+        public readonly AbstractInputGroupCall $call
     ) {}
     
     public function serialize(): string

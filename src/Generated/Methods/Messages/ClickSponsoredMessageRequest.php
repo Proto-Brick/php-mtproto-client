@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -11,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class ClickSponsoredMessageRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xf093465;
+    public const CONSTRUCTOR_ID = 0x8235057e;
     
     public string $predicate = 'messages.clickSponsoredMessage';
     
@@ -25,13 +24,11 @@ final class ClickSponsoredMessageRequest extends TlObject
         return 'bool';
     }
     /**
-     * @param AbstractInputPeer $peer
      * @param string $randomId
      * @param true|null $media
      * @param true|null $fullscreen
      */
     public function __construct(
-        public readonly AbstractInputPeer $peer,
         public readonly string $randomId,
         public readonly ?true $media = null,
         public readonly ?true $fullscreen = null
@@ -44,7 +41,6 @@ final class ClickSponsoredMessageRequest extends TlObject
         if ($this->media) $flags |= (1 << 0);
         if ($this->fullscreen) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
-        $buffer .= $this->peer->serialize();
         $buffer .= Serializer::bytes($this->randomId);
 
         return $buffer;

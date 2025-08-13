@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class MessageService extends AbstractMessage
 {
-    public const CONSTRUCTOR_ID = 0x2b085862;
+    public const CONSTRUCTOR_ID = 0x7a800e0a;
     
     public string $predicate = 'messageService';
     
@@ -22,11 +22,14 @@ final class MessageService extends AbstractMessage
      * @param true|null $out
      * @param true|null $mentioned
      * @param true|null $mediaUnread
+     * @param true|null $reactionsArePossible
      * @param true|null $silent
      * @param true|null $post
      * @param true|null $legacy
      * @param AbstractPeer|null $fromId
+     * @param AbstractPeer|null $savedPeerId
      * @param AbstractMessageReplyHeader|null $replyTo
+     * @param MessageReactions|null $reactions
      * @param int|null $ttlPeriod
      */
     public function __construct(
@@ -37,11 +40,14 @@ final class MessageService extends AbstractMessage
         public readonly ?true $out = null,
         public readonly ?true $mentioned = null,
         public readonly ?true $mediaUnread = null,
+        public readonly ?true $reactionsArePossible = null,
         public readonly ?true $silent = null,
         public readonly ?true $post = null,
         public readonly ?true $legacy = null,
         public readonly ?AbstractPeer $fromId = null,
+        public readonly ?AbstractPeer $savedPeerId = null,
         public readonly ?AbstractMessageReplyHeader $replyTo = null,
+        public readonly ?MessageReactions $reactions = null,
         public readonly ?int $ttlPeriod = null
     ) {}
     
@@ -52,11 +58,14 @@ final class MessageService extends AbstractMessage
         if ($this->out) $flags |= (1 << 1);
         if ($this->mentioned) $flags |= (1 << 4);
         if ($this->mediaUnread) $flags |= (1 << 5);
+        if ($this->reactionsArePossible) $flags |= (1 << 9);
         if ($this->silent) $flags |= (1 << 13);
         if ($this->post) $flags |= (1 << 14);
         if ($this->legacy) $flags |= (1 << 19);
         if ($this->fromId !== null) $flags |= (1 << 8);
+        if ($this->savedPeerId !== null) $flags |= (1 << 28);
         if ($this->replyTo !== null) $flags |= (1 << 3);
+        if ($this->reactions !== null) $flags |= (1 << 20);
         if ($this->ttlPeriod !== null) $flags |= (1 << 25);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
@@ -64,11 +73,17 @@ final class MessageService extends AbstractMessage
             $buffer .= $this->fromId->serialize();
         }
         $buffer .= $this->peerId->serialize();
+        if ($flags & (1 << 28)) {
+            $buffer .= $this->savedPeerId->serialize();
+        }
         if ($flags & (1 << 3)) {
             $buffer .= $this->replyTo->serialize();
         }
         $buffer .= Serializer::int32($this->date);
         $buffer .= $this->action->serialize();
+        if ($flags & (1 << 20)) {
+            $buffer .= $this->reactions->serialize();
+        }
         if ($flags & (1 << 25)) {
             $buffer .= Serializer::int32($this->ttlPeriod);
         }
@@ -83,15 +98,18 @@ final class MessageService extends AbstractMessage
         $out = ($flags & (1 << 1)) ? true : null;
         $mentioned = ($flags & (1 << 4)) ? true : null;
         $mediaUnread = ($flags & (1 << 5)) ? true : null;
+        $reactionsArePossible = ($flags & (1 << 9)) ? true : null;
         $silent = ($flags & (1 << 13)) ? true : null;
         $post = ($flags & (1 << 14)) ? true : null;
         $legacy = ($flags & (1 << 19)) ? true : null;
         $id = Deserializer::int32($stream);
         $fromId = ($flags & (1 << 8)) ? AbstractPeer::deserialize($stream) : null;
         $peerId = AbstractPeer::deserialize($stream);
+        $savedPeerId = ($flags & (1 << 28)) ? AbstractPeer::deserialize($stream) : null;
         $replyTo = ($flags & (1 << 3)) ? AbstractMessageReplyHeader::deserialize($stream) : null;
         $date = Deserializer::int32($stream);
         $action = AbstractMessageAction::deserialize($stream);
+        $reactions = ($flags & (1 << 20)) ? MessageReactions::deserialize($stream) : null;
         $ttlPeriod = ($flags & (1 << 25)) ? Deserializer::int32($stream) : null;
 
         return new self(
@@ -102,11 +120,14 @@ final class MessageService extends AbstractMessage
             $out,
             $mentioned,
             $mediaUnread,
+            $reactionsArePossible,
             $silent,
             $post,
             $legacy,
             $fromId,
+            $savedPeerId,
             $replyTo,
+            $reactions,
             $ttlPeriod
         );
     }

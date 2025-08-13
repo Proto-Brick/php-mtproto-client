@@ -14,7 +14,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class SendInlineBotResultRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x3ebee86a;
+    public const CONSTRUCTOR_ID = 0xc0cf7646;
     
     public string $predicate = 'messages.sendInlineBotResult';
     
@@ -40,6 +40,7 @@ final class SendInlineBotResultRequest extends TlObject
      * @param int|null $scheduleDate
      * @param AbstractInputPeer|null $sendAs
      * @param AbstractInputQuickReplyShortcut|null $quickReplyShortcut
+     * @param int|null $allowPaidStars
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
@@ -53,7 +54,8 @@ final class SendInlineBotResultRequest extends TlObject
         public readonly ?AbstractInputReplyTo $replyTo = null,
         public readonly ?int $scheduleDate = null,
         public readonly ?AbstractInputPeer $sendAs = null,
-        public readonly ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null
+        public readonly ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null,
+        public readonly ?int $allowPaidStars = null
     ) {}
     
     public function serialize(): string
@@ -68,6 +70,7 @@ final class SendInlineBotResultRequest extends TlObject
         if ($this->scheduleDate !== null) $flags |= (1 << 10);
         if ($this->sendAs !== null) $flags |= (1 << 13);
         if ($this->quickReplyShortcut !== null) $flags |= (1 << 17);
+        if ($this->allowPaidStars !== null) $flags |= (1 << 21);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
@@ -84,6 +87,9 @@ final class SendInlineBotResultRequest extends TlObject
         }
         if ($flags & (1 << 17)) {
             $buffer .= $this->quickReplyShortcut->serialize();
+        }
+        if ($flags & (1 << 21)) {
+            $buffer .= Serializer::int64($this->allowPaidStars);
         }
 
         return $buffer;

@@ -15,11 +15,11 @@ final class MessageActionGroupCall extends AbstractMessageAction
     public string $predicate = 'messageActionGroupCall';
     
     /**
-     * @param InputGroupCall $call
+     * @param AbstractInputGroupCall $call
      * @param int|null $duration
      */
     public function __construct(
-        public readonly InputGroupCall $call,
+        public readonly AbstractInputGroupCall $call,
         public readonly ?int $duration = null
     ) {}
     
@@ -41,7 +41,7 @@ final class MessageActionGroupCall extends AbstractMessageAction
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $call = InputGroupCall::deserialize($stream);
+        $call = AbstractInputGroupCall::deserialize($stream);
         $duration = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
 
         return new self(

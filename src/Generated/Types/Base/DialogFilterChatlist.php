@@ -10,25 +10,27 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class DialogFilterChatlist extends AbstractDialogFilter
 {
-    public const CONSTRUCTOR_ID = 0x9fe28ea4;
+    public const CONSTRUCTOR_ID = 0x96537bd7;
     
     public string $predicate = 'dialogFilterChatlist';
     
     /**
      * @param int $id
-     * @param string $title
+     * @param TextWithEntities $title
      * @param list<AbstractInputPeer> $pinnedPeers
      * @param list<AbstractInputPeer> $includePeers
      * @param true|null $hasMyInvites
+     * @param true|null $titleNoanimate
      * @param string|null $emoticon
      * @param int|null $color
      */
     public function __construct(
         public readonly int $id,
-        public readonly string $title,
+        public readonly TextWithEntities $title,
         public readonly array $pinnedPeers,
         public readonly array $includePeers,
         public readonly ?true $hasMyInvites = null,
+        public readonly ?true $titleNoanimate = null,
         public readonly ?string $emoticon = null,
         public readonly ?int $color = null
     ) {}
@@ -38,11 +40,12 @@ final class DialogFilterChatlist extends AbstractDialogFilter
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->hasMyInvites) $flags |= (1 << 26);
+        if ($this->titleNoanimate) $flags |= (1 << 28);
         if ($this->emoticon !== null) $flags |= (1 << 25);
         if ($this->color !== null) $flags |= (1 << 27);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
-        $buffer .= Serializer::bytes($this->title);
+        $buffer .= $this->title->serialize();
         if ($flags & (1 << 25)) {
             $buffer .= Serializer::bytes($this->emoticon);
         }
@@ -60,8 +63,9 @@ final class DialogFilterChatlist extends AbstractDialogFilter
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
         $hasMyInvites = ($flags & (1 << 26)) ? true : null;
+        $titleNoanimate = ($flags & (1 << 28)) ? true : null;
         $id = Deserializer::int32($stream);
-        $title = Deserializer::bytes($stream);
+        $title = TextWithEntities::deserialize($stream);
         $emoticon = ($flags & (1 << 25)) ? Deserializer::bytes($stream) : null;
         $color = ($flags & (1 << 27)) ? Deserializer::int32($stream) : null;
         $pinnedPeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
@@ -73,6 +77,7 @@ final class DialogFilterChatlist extends AbstractDialogFilter
             $pinnedPeers,
             $includePeers,
             $hasMyInvites,
+            $titleNoanimate,
             $emoticon,
             $color
         );

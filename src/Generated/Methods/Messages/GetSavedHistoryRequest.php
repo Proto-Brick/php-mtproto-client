@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class GetSavedHistoryRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x3d9a414d;
+    public const CONSTRUCTOR_ID = 0x998ab009;
     
     public string $predicate = 'messages.getSavedHistory';
     
@@ -34,6 +34,7 @@ final class GetSavedHistoryRequest extends TlObject
      * @param int $maxId
      * @param int $minId
      * @param int $hash
+     * @param AbstractInputPeer|null $parentPeer
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
@@ -43,12 +44,19 @@ final class GetSavedHistoryRequest extends TlObject
         public readonly int $limit,
         public readonly int $maxId,
         public readonly int $minId,
-        public readonly int $hash
+        public readonly int $hash,
+        public readonly ?AbstractInputPeer $parentPeer = null
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->parentPeer !== null) $flags |= (1 << 0);
+        $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 0)) {
+            $buffer .= $this->parentPeer->serialize();
+        }
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->offsetId);
         $buffer .= Serializer::int32($this->offsetDate);

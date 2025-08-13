@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputSavedStarGift;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -11,7 +11,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class ConvertStarGiftRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x421e027;
+    public const CONSTRUCTOR_ID = 0x74bf076b;
     
     public string $predicate = 'payments.convertStarGift';
     
@@ -25,19 +25,16 @@ final class ConvertStarGiftRequest extends TlObject
         return 'bool';
     }
     /**
-     * @param AbstractInputUser $userId
-     * @param int $msgId
+     * @param AbstractInputSavedStarGift $stargift
      */
     public function __construct(
-        public readonly AbstractInputUser $userId,
-        public readonly int $msgId
+        public readonly AbstractInputSavedStarGift $stargift
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->userId->serialize();
-        $buffer .= Serializer::int32($this->msgId);
+        $buffer .= $this->stargift->serialize();
 
         return $buffer;
     }

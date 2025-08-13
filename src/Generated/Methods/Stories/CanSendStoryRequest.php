@@ -2,6 +2,7 @@
 namespace DigitalStars\MtprotoClient\Generated\Methods\Stories;
 
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
+use DigitalStars\MtprotoClient\Generated\Types\Stories\CanSendStoryCount;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -11,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class CanSendStoryRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xc7dfdfdd;
+    public const CONSTRUCTOR_ID = 0x30eb63f0;
     
     public string $predicate = 'stories.canSendStory';
     
@@ -22,7 +23,7 @@ final class CanSendStoryRequest extends TlObject
     
     public function getResponseClass(): string
     {
-        return 'bool';
+        return CanSendStoryCount::class;
     }
     /**
      * @param AbstractInputPeer $peer

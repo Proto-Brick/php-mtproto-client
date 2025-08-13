@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class Message extends AbstractMessage
 {
-    public const CONSTRUCTOR_ID = 0x94345242;
+    public const CONSTRUCTOR_ID = 0x9815cec8;
     
     public string $predicate = 'message';
     
@@ -32,6 +32,8 @@ final class Message extends AbstractMessage
      * @param true|null $invertMedia
      * @param true|null $offline
      * @param true|null $videoProcessingPending
+     * @param true|null $paidSuggestedPostStars
+     * @param true|null $paidSuggestedPostTon
      * @param AbstractPeer|null $fromId
      * @param int|null $fromBoostsApplied
      * @param AbstractPeer|null $savedPeerId
@@ -54,6 +56,9 @@ final class Message extends AbstractMessage
      * @param int|null $quickReplyShortcutId
      * @param int|null $effect
      * @param FactCheck|null $factcheck
+     * @param int|null $reportDeliveryUntilDate
+     * @param int|null $paidMessageStars
+     * @param SuggestedPost|null $suggestedPost
      */
     public function __construct(
         public readonly int $id,
@@ -73,6 +78,8 @@ final class Message extends AbstractMessage
         public readonly ?true $invertMedia = null,
         public readonly ?true $offline = null,
         public readonly ?true $videoProcessingPending = null,
+        public readonly ?true $paidSuggestedPostStars = null,
+        public readonly ?true $paidSuggestedPostTon = null,
         public readonly ?AbstractPeer $fromId = null,
         public readonly ?int $fromBoostsApplied = null,
         public readonly ?AbstractPeer $savedPeerId = null,
@@ -94,7 +101,10 @@ final class Message extends AbstractMessage
         public readonly ?int $ttlPeriod = null,
         public readonly ?int $quickReplyShortcutId = null,
         public readonly ?int $effect = null,
-        public readonly ?FactCheck $factcheck = null
+        public readonly ?FactCheck $factcheck = null,
+        public readonly ?int $reportDeliveryUntilDate = null,
+        public readonly ?int $paidMessageStars = null,
+        public readonly ?SuggestedPost $suggestedPost = null
     ) {}
     
     public function serialize(): string
@@ -115,6 +125,8 @@ final class Message extends AbstractMessage
         if ($this->invertMedia) $flags |= (1 << 27);
         if ($this->offline) $flags2 |= (1 << 1);
         if ($this->videoProcessingPending) $flags2 |= (1 << 4);
+        if ($this->paidSuggestedPostStars) $flags2 |= (1 << 8);
+        if ($this->paidSuggestedPostTon) $flags2 |= (1 << 9);
         if ($this->fromId !== null) $flags |= (1 << 8);
         if ($this->fromBoostsApplied !== null) $flags |= (1 << 29);
         if ($this->savedPeerId !== null) $flags |= (1 << 28);
@@ -137,6 +149,9 @@ final class Message extends AbstractMessage
         if ($this->quickReplyShortcutId !== null) $flags |= (1 << 30);
         if ($this->effect !== null) $flags2 |= (1 << 2);
         if ($this->factcheck !== null) $flags2 |= (1 << 3);
+        if ($this->reportDeliveryUntilDate !== null) $flags2 |= (1 << 5);
+        if ($this->paidMessageStars !== null) $flags2 |= (1 << 6);
+        if ($this->suggestedPost !== null) $flags2 |= (1 << 7);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int32($this->id);
@@ -209,6 +224,15 @@ final class Message extends AbstractMessage
         if ($flags2 & (1 << 3)) {
             $buffer .= $this->factcheck->serialize();
         }
+        if ($flags2 & (1 << 5)) {
+            $buffer .= Serializer::int32($this->reportDeliveryUntilDate);
+        }
+        if ($flags2 & (1 << 6)) {
+            $buffer .= Serializer::int64($this->paidMessageStars);
+        }
+        if ($flags2 & (1 << 7)) {
+            $buffer .= $this->suggestedPost->serialize();
+        }
 
         return $buffer;
     }
@@ -231,6 +255,8 @@ final class Message extends AbstractMessage
         $flags2 = Deserializer::int32($stream);
         $offline = ($flags2 & (1 << 1)) ? true : null;
         $videoProcessingPending = ($flags2 & (1 << 4)) ? true : null;
+        $paidSuggestedPostStars = ($flags2 & (1 << 8)) ? true : null;
+        $paidSuggestedPostTon = ($flags2 & (1 << 9)) ? true : null;
         $id = Deserializer::int32($stream);
         $fromId = ($flags & (1 << 8)) ? AbstractPeer::deserialize($stream) : null;
         $fromBoostsApplied = ($flags & (1 << 29)) ? Deserializer::int32($stream) : null;
@@ -257,6 +283,9 @@ final class Message extends AbstractMessage
         $quickReplyShortcutId = ($flags & (1 << 30)) ? Deserializer::int32($stream) : null;
         $effect = ($flags2 & (1 << 2)) ? Deserializer::int64($stream) : null;
         $factcheck = ($flags2 & (1 << 3)) ? FactCheck::deserialize($stream) : null;
+        $reportDeliveryUntilDate = ($flags2 & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $paidMessageStars = ($flags2 & (1 << 6)) ? Deserializer::int64($stream) : null;
+        $suggestedPost = ($flags2 & (1 << 7)) ? SuggestedPost::deserialize($stream) : null;
 
         return new self(
             $id,
@@ -276,6 +305,8 @@ final class Message extends AbstractMessage
             $invertMedia,
             $offline,
             $videoProcessingPending,
+            $paidSuggestedPostStars,
+            $paidSuggestedPostTon,
             $fromId,
             $fromBoostsApplied,
             $savedPeerId,
@@ -297,7 +328,10 @@ final class Message extends AbstractMessage
             $ttlPeriod,
             $quickReplyShortcutId,
             $effect,
-            $factcheck
+            $factcheck,
+            $reportDeliveryUntilDate,
+            $paidMessageStars,
+            $suggestedPost
         );
     }
 }

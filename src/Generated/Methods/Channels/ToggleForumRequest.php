@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class ToggleForumRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xa4298b29;
+    public const CONSTRUCTOR_ID = 0x3ff75734;
     
     public string $predicate = 'channels.toggleForum';
     
@@ -28,10 +28,12 @@ final class ToggleForumRequest extends TlObject
     /**
      * @param AbstractInputChannel $channel
      * @param bool $enabled
+     * @param bool $tabs
      */
     public function __construct(
         public readonly AbstractInputChannel $channel,
-        public readonly bool $enabled
+        public readonly bool $enabled,
+        public readonly bool $tabs
     ) {}
     
     public function serialize(): string
@@ -39,6 +41,7 @@ final class ToggleForumRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->channel->serialize();
         $buffer .= ($this->enabled ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
+        $buffer .= ($this->tabs ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
 
         return $buffer;
     }

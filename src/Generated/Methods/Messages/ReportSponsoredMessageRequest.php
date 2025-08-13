@@ -1,7 +1,6 @@
 <?php declare(strict_types=1);
 namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Channels\AbstractSponsoredMessageReportResult;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
@@ -12,7 +11,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class ReportSponsoredMessageRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x1af3dbb8;
+    public const CONSTRUCTOR_ID = 0x12cbf0c4;
     
     public string $predicate = 'messages.reportSponsoredMessage';
     
@@ -26,12 +25,10 @@ final class ReportSponsoredMessageRequest extends TlObject
         return AbstractSponsoredMessageReportResult::class;
     }
     /**
-     * @param AbstractInputPeer $peer
      * @param string $randomId
      * @param string $option
      */
     public function __construct(
-        public readonly AbstractInputPeer $peer,
         public readonly string $randomId,
         public readonly string $option
     ) {}
@@ -39,7 +36,6 @@ final class ReportSponsoredMessageRequest extends TlObject
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-        $buffer .= $this->peer->serialize();
         $buffer .= Serializer::bytes($this->randomId);
         $buffer .= Serializer::bytes($this->option);
 

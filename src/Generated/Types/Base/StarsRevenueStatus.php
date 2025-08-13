@@ -15,16 +15,16 @@ final class StarsRevenueStatus extends TlObject
     public string $predicate = 'starsRevenueStatus';
     
     /**
-     * @param StarsAmount $currentBalance
-     * @param StarsAmount $availableBalance
-     * @param StarsAmount $overallRevenue
+     * @param AbstractStarsAmount $currentBalance
+     * @param AbstractStarsAmount $availableBalance
+     * @param AbstractStarsAmount $overallRevenue
      * @param true|null $withdrawalEnabled
      * @param int|null $nextWithdrawalAt
      */
     public function __construct(
-        public readonly StarsAmount $currentBalance,
-        public readonly StarsAmount $availableBalance,
-        public readonly StarsAmount $overallRevenue,
+        public readonly AbstractStarsAmount $currentBalance,
+        public readonly AbstractStarsAmount $availableBalance,
+        public readonly AbstractStarsAmount $overallRevenue,
         public readonly ?true $withdrawalEnabled = null,
         public readonly ?int $nextWithdrawalAt = null
     ) {}
@@ -54,9 +54,9 @@ final class StarsRevenueStatus extends TlObject
         }
         $flags = Deserializer::int32($stream);
         $withdrawalEnabled = ($flags & (1 << 0)) ? true : null;
-        $currentBalance = StarsAmount::deserialize($stream);
-        $availableBalance = StarsAmount::deserialize($stream);
-        $overallRevenue = StarsAmount::deserialize($stream);
+        $currentBalance = AbstractStarsAmount::deserialize($stream);
+        $availableBalance = AbstractStarsAmount::deserialize($stream);
+        $overallRevenue = AbstractStarsAmount::deserialize($stream);
         $nextWithdrawalAt = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
 
         return new self(

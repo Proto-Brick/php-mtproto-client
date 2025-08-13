@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class DraftMessage extends AbstractDraftMessage
 {
-    public const CONSTRUCTOR_ID = 0x2d65321f;
+    public const CONSTRUCTOR_ID = 0x96eaa5eb;
     
     public string $predicate = 'draftMessage';
     
@@ -23,6 +23,7 @@ final class DraftMessage extends AbstractDraftMessage
      * @param list<AbstractMessageEntity>|null $entities
      * @param AbstractInputMedia|null $media
      * @param int|null $effect
+     * @param SuggestedPost|null $suggestedPost
      */
     public function __construct(
         public readonly string $message,
@@ -32,7 +33,8 @@ final class DraftMessage extends AbstractDraftMessage
         public readonly ?AbstractInputReplyTo $replyTo = null,
         public readonly ?array $entities = null,
         public readonly ?AbstractInputMedia $media = null,
-        public readonly ?int $effect = null
+        public readonly ?int $effect = null,
+        public readonly ?SuggestedPost $suggestedPost = null
     ) {}
     
     public function serialize(): string
@@ -45,6 +47,7 @@ final class DraftMessage extends AbstractDraftMessage
         if ($this->entities !== null) $flags |= (1 << 3);
         if ($this->media !== null) $flags |= (1 << 5);
         if ($this->effect !== null) $flags |= (1 << 7);
+        if ($this->suggestedPost !== null) $flags |= (1 << 8);
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 4)) {
             $buffer .= $this->replyTo->serialize();
@@ -59,6 +62,9 @@ final class DraftMessage extends AbstractDraftMessage
         $buffer .= Serializer::int32($this->date);
         if ($flags & (1 << 7)) {
             $buffer .= Serializer::int64($this->effect);
+        }
+        if ($flags & (1 << 8)) {
+            $buffer .= $this->suggestedPost->serialize();
         }
 
         return $buffer;
@@ -76,6 +82,7 @@ final class DraftMessage extends AbstractDraftMessage
         $media = ($flags & (1 << 5)) ? AbstractInputMedia::deserialize($stream) : null;
         $date = Deserializer::int32($stream);
         $effect = ($flags & (1 << 7)) ? Deserializer::int64($stream) : null;
+        $suggestedPost = ($flags & (1 << 8)) ? SuggestedPost::deserialize($stream) : null;
 
         return new self(
             $message,
@@ -85,7 +92,8 @@ final class DraftMessage extends AbstractDraftMessage
             $replyTo,
             $entities,
             $media,
-            $effect
+            $effect,
+            $suggestedPost
         );
     }
 }

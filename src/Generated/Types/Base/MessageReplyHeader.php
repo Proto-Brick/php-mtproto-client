@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class MessageReplyHeader extends AbstractMessageReplyHeader
 {
-    public const CONSTRUCTOR_ID = 0xafbc09db;
+    public const CONSTRUCTOR_ID = 0x6917560b;
     
     public string $predicate = 'messageReplyHeader';
     
@@ -26,6 +26,7 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
      * @param string|null $quoteText
      * @param list<AbstractMessageEntity>|null $quoteEntities
      * @param int|null $quoteOffset
+     * @param int|null $todoItemId
      */
     public function __construct(
         public readonly ?true $replyToScheduled = null,
@@ -38,7 +39,8 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
         public readonly ?int $replyToTopId = null,
         public readonly ?string $quoteText = null,
         public readonly ?array $quoteEntities = null,
-        public readonly ?int $quoteOffset = null
+        public readonly ?int $quoteOffset = null,
+        public readonly ?int $todoItemId = null
     ) {}
     
     public function serialize(): string
@@ -56,6 +58,7 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
         if ($this->quoteText !== null) $flags |= (1 << 6);
         if ($this->quoteEntities !== null) $flags |= (1 << 7);
         if ($this->quoteOffset !== null) $flags |= (1 << 10);
+        if ($this->todoItemId !== null) $flags |= (1 << 11);
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 4)) {
             $buffer .= Serializer::int32($this->replyToMsgId);
@@ -81,6 +84,9 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
         if ($flags & (1 << 10)) {
             $buffer .= Serializer::int32($this->quoteOffset);
         }
+        if ($flags & (1 << 11)) {
+            $buffer .= Serializer::int32($this->todoItemId);
+        }
 
         return $buffer;
     }
@@ -100,6 +106,7 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
         $quoteText = ($flags & (1 << 6)) ? Deserializer::bytes($stream) : null;
         $quoteEntities = ($flags & (1 << 7)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
         $quoteOffset = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
+        $todoItemId = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
 
         return new self(
             $replyToScheduled,
@@ -112,7 +119,8 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
             $replyToTopId,
             $quoteText,
             $quoteEntities,
-            $quoteOffset
+            $quoteOffset,
+            $todoItemId
         );
     }
 }

@@ -28,10 +28,12 @@ final class GetStarsRevenueStatsRequest extends TlObject
     /**
      * @param AbstractInputPeer $peer
      * @param true|null $dark
+     * @param true|null $ton
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
-        public readonly ?true $dark = null
+        public readonly ?true $dark = null,
+        public readonly ?true $ton = null
     ) {}
     
     public function serialize(): string
@@ -39,6 +41,7 @@ final class GetStarsRevenueStatsRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->dark) $flags |= (1 << 0);
+        if ($this->ton) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
 

@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class InputMediaUploadedDocument extends AbstractInputMedia
 {
-    public const CONSTRUCTOR_ID = 0x5b38c6c1;
+    public const CONSTRUCTOR_ID = 0x37c9330;
     
     public string $predicate = 'inputMediaUploadedDocument';
     
@@ -23,6 +23,8 @@ final class InputMediaUploadedDocument extends AbstractInputMedia
      * @param true|null $spoiler
      * @param AbstractInputFile|null $thumb
      * @param list<AbstractInputDocument>|null $stickers
+     * @param AbstractInputPhoto|null $videoCover
+     * @param int|null $videoTimestamp
      * @param int|null $ttlSeconds
      */
     public function __construct(
@@ -34,6 +36,8 @@ final class InputMediaUploadedDocument extends AbstractInputMedia
         public readonly ?true $spoiler = null,
         public readonly ?AbstractInputFile $thumb = null,
         public readonly ?array $stickers = null,
+        public readonly ?AbstractInputPhoto $videoCover = null,
+        public readonly ?int $videoTimestamp = null,
         public readonly ?int $ttlSeconds = null
     ) {}
     
@@ -46,6 +50,8 @@ final class InputMediaUploadedDocument extends AbstractInputMedia
         if ($this->spoiler) $flags |= (1 << 5);
         if ($this->thumb !== null) $flags |= (1 << 2);
         if ($this->stickers !== null) $flags |= (1 << 0);
+        if ($this->videoCover !== null) $flags |= (1 << 6);
+        if ($this->videoTimestamp !== null) $flags |= (1 << 7);
         if ($this->ttlSeconds !== null) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->file->serialize();
@@ -56,6 +62,12 @@ final class InputMediaUploadedDocument extends AbstractInputMedia
         $buffer .= Serializer::vectorOfObjects($this->attributes);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::vectorOfObjects($this->stickers);
+        }
+        if ($flags & (1 << 6)) {
+            $buffer .= $this->videoCover->serialize();
+        }
+        if ($flags & (1 << 7)) {
+            $buffer .= Serializer::int32($this->videoTimestamp);
         }
         if ($flags & (1 << 1)) {
             $buffer .= Serializer::int32($this->ttlSeconds);
@@ -76,6 +88,8 @@ final class InputMediaUploadedDocument extends AbstractInputMedia
         $mimeType = Deserializer::bytes($stream);
         $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
         $stickers = ($flags & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [AbstractInputDocument::class, 'deserialize']) : null;
+        $videoCover = ($flags & (1 << 6)) ? AbstractInputPhoto::deserialize($stream) : null;
+        $videoTimestamp = ($flags & (1 << 7)) ? Deserializer::int32($stream) : null;
         $ttlSeconds = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
 
         return new self(
@@ -87,6 +101,8 @@ final class InputMediaUploadedDocument extends AbstractInputMedia
             $spoiler,
             $thumb,
             $stickers,
+            $videoCover,
+            $videoTimestamp,
             $ttlSeconds
         );
     }

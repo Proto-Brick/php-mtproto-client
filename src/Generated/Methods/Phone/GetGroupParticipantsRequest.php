@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
 
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputGroupCall;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputGroupCall;
 use DigitalStars\MtprotoClient\Generated\Types\Phone\GroupParticipants;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
@@ -27,14 +27,14 @@ final class GetGroupParticipantsRequest extends TlObject
         return GroupParticipants::class;
     }
     /**
-     * @param InputGroupCall $call
+     * @param AbstractInputGroupCall $call
      * @param list<AbstractInputPeer> $ids
      * @param list<int> $sources
      * @param string $offset
      * @param int $limit
      */
     public function __construct(
-        public readonly InputGroupCall $call,
+        public readonly AbstractInputGroupCall $call,
         public readonly array $ids,
         public readonly array $sources,
         public readonly string $offset,

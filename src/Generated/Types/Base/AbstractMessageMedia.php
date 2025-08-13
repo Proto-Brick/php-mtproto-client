@@ -31,6 +31,7 @@ abstract class AbstractMessageMedia extends TlObject
             MessageMediaGiveaway::CONSTRUCTOR_ID => MessageMediaGiveaway::deserialize($stream),
             MessageMediaGiveawayResults::CONSTRUCTOR_ID => MessageMediaGiveawayResults::deserialize($stream),
             MessageMediaPaidMedia::CONSTRUCTOR_ID => MessageMediaPaidMedia::deserialize($stream),
+            MessageMediaToDo::CONSTRUCTOR_ID => MessageMediaToDo::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type MessageMedia. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

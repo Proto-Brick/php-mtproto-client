@@ -30,6 +30,7 @@ final class ChatAdminRights extends TlObject
      * @param true|null $postStories
      * @param true|null $editStories
      * @param true|null $deleteStories
+     * @param true|null $manageDirectMessages
      */
     public function __construct(
         public readonly ?true $changeInfo = null,
@@ -46,7 +47,8 @@ final class ChatAdminRights extends TlObject
         public readonly ?true $manageTopics = null,
         public readonly ?true $postStories = null,
         public readonly ?true $editStories = null,
-        public readonly ?true $deleteStories = null
+        public readonly ?true $deleteStories = null,
+        public readonly ?true $manageDirectMessages = null
     ) {}
     
     public function serialize(): string
@@ -68,6 +70,7 @@ final class ChatAdminRights extends TlObject
         if ($this->postStories) $flags |= (1 << 14);
         if ($this->editStories) $flags |= (1 << 15);
         if ($this->deleteStories) $flags |= (1 << 16);
+        if ($this->manageDirectMessages) $flags |= (1 << 17);
         $buffer .= Serializer::int32($flags);
 
         return $buffer;
@@ -95,6 +98,7 @@ final class ChatAdminRights extends TlObject
         $postStories = ($flags & (1 << 14)) ? true : null;
         $editStories = ($flags & (1 << 15)) ? true : null;
         $deleteStories = ($flags & (1 << 16)) ? true : null;
+        $manageDirectMessages = ($flags & (1 << 17)) ? true : null;
 
         return new self(
             $changeInfo,
@@ -111,7 +115,8 @@ final class ChatAdminRights extends TlObject
             $manageTopics,
             $postStories,
             $editStories,
-            $deleteStories
+            $deleteStories,
+            $manageDirectMessages
         );
     }
 }

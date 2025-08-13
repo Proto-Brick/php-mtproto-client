@@ -4,6 +4,7 @@ namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
+use DigitalStars\MtprotoClient\Generated\Types\Base\SearchPostsFlood;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -13,7 +14,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class MessagesSlice extends AbstractMessages
 {
-    public const CONSTRUCTOR_ID = 0x3a54685e;
+    public const CONSTRUCTOR_ID = 0x762b263d;
     
     public string $predicate = 'messages.messagesSlice';
     
@@ -25,6 +26,7 @@ final class MessagesSlice extends AbstractMessages
      * @param true|null $inexact
      * @param int|null $nextRate
      * @param int|null $offsetIdOffset
+     * @param SearchPostsFlood|null $searchFlood
      */
     public function __construct(
         public readonly int $count,
@@ -33,7 +35,8 @@ final class MessagesSlice extends AbstractMessages
         public readonly array $users,
         public readonly ?true $inexact = null,
         public readonly ?int $nextRate = null,
-        public readonly ?int $offsetIdOffset = null
+        public readonly ?int $offsetIdOffset = null,
+        public readonly ?SearchPostsFlood $searchFlood = null
     ) {}
     
     public function serialize(): string
@@ -43,6 +46,7 @@ final class MessagesSlice extends AbstractMessages
         if ($this->inexact) $flags |= (1 << 1);
         if ($this->nextRate !== null) $flags |= (1 << 0);
         if ($this->offsetIdOffset !== null) $flags |= (1 << 2);
+        if ($this->searchFlood !== null) $flags |= (1 << 3);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->count);
         if ($flags & (1 << 0)) {
@@ -50,6 +54,9 @@ final class MessagesSlice extends AbstractMessages
         }
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::int32($this->offsetIdOffset);
+        }
+        if ($flags & (1 << 3)) {
+            $buffer .= $this->searchFlood->serialize();
         }
         $buffer .= Serializer::vectorOfObjects($this->messages);
         $buffer .= Serializer::vectorOfObjects($this->chats);
@@ -66,6 +73,7 @@ final class MessagesSlice extends AbstractMessages
         $count = Deserializer::int32($stream);
         $nextRate = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
         $offsetIdOffset = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $searchFlood = ($flags & (1 << 3)) ? SearchPostsFlood::deserialize($stream) : null;
         $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
@@ -77,7 +85,8 @@ final class MessagesSlice extends AbstractMessages
             $users,
             $inexact,
             $nextRate,
-            $offsetIdOffset
+            $offsetIdOffset,
+            $searchFlood
         );
     }
 }

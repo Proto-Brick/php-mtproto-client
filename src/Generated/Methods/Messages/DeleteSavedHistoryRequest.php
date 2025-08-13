@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class DeleteSavedHistoryRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x6e98102b;
+    public const CONSTRUCTOR_ID = 0x4dc5085f;
     
     public string $predicate = 'messages.deleteSavedHistory';
     
@@ -28,12 +28,14 @@ final class DeleteSavedHistoryRequest extends TlObject
     /**
      * @param AbstractInputPeer $peer
      * @param int $maxId
+     * @param AbstractInputPeer|null $parentPeer
      * @param int|null $minDate
      * @param int|null $maxDate
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
         public readonly int $maxId,
+        public readonly ?AbstractInputPeer $parentPeer = null,
         public readonly ?int $minDate = null,
         public readonly ?int $maxDate = null
     ) {}
@@ -42,9 +44,13 @@ final class DeleteSavedHistoryRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
+        if ($this->parentPeer !== null) $flags |= (1 << 0);
         if ($this->minDate !== null) $flags |= (1 << 2);
         if ($this->maxDate !== null) $flags |= (1 << 3);
         $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 0)) {
+            $buffer .= $this->parentPeer->serialize();
+        }
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->maxId);
         if ($flags & (1 << 2)) {

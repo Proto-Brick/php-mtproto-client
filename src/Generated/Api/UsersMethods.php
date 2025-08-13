@@ -3,16 +3,20 @@ namespace DigitalStars\MtprotoClient\Generated\Api;
 
 use DigitalStars\MtprotoClient\Client;
 use DigitalStars\MtprotoClient\Generated\Methods\Users\GetFullUserRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Users\GetIsPremiumRequiredToContactRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Users\GetRequirementsToContactRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Users\GetUsersRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Users\SetSecureValueErrorsRequest;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractRequirementToContact;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractSecureValueError;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUser;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserFromMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserSelf;
+use DigitalStars\MtprotoClient\Generated\Types\Base\RequirementToContactEmpty;
+use DigitalStars\MtprotoClient\Generated\Types\Base\RequirementToContactPaidMessages;
+use DigitalStars\MtprotoClient\Generated\Types\Base\RequirementToContactPremium;
 use DigitalStars\MtprotoClient\Generated\Types\Base\SecureValueError;
 use DigitalStars\MtprotoClient\Generated\Types\Base\SecureValueErrorData;
 use DigitalStars\MtprotoClient\Generated\Types\Base\SecureValueErrorFile;
@@ -72,12 +76,12 @@ final readonly class UsersMethods
 
     /**
      * @param list<InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage> $id
-     * @return list<bool>
-     * @see https://core.telegram.org/method/users.getIsPremiumRequiredToContact
+     * @return list<RequirementToContactEmpty|RequirementToContactPremium|RequirementToContactPaidMessages>
+     * @see https://core.telegram.org/method/users.getRequirementsToContact
      * @api
      */
-    public function getIsPremiumRequiredToContact(array $id): array
+    public function getRequirementsToContact(array $id): array
     {
-        return $this->client->callSync(new GetIsPremiumRequiredToContactRequest($id));
+        return $this->client->callSync(new GetRequirementsToContactRequest($id));
     }
 }

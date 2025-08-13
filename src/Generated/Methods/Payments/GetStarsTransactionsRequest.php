@@ -32,6 +32,7 @@ final class GetStarsTransactionsRequest extends TlObject
      * @param true|null $inbound
      * @param true|null $outbound
      * @param true|null $ascending
+     * @param true|null $ton
      * @param string|null $subscriptionId
      */
     public function __construct(
@@ -41,6 +42,7 @@ final class GetStarsTransactionsRequest extends TlObject
         public readonly ?true $inbound = null,
         public readonly ?true $outbound = null,
         public readonly ?true $ascending = null,
+        public readonly ?true $ton = null,
         public readonly ?string $subscriptionId = null
     ) {}
     
@@ -51,6 +53,7 @@ final class GetStarsTransactionsRequest extends TlObject
         if ($this->inbound) $flags |= (1 << 0);
         if ($this->outbound) $flags |= (1 << 1);
         if ($this->ascending) $flags |= (1 << 2);
+        if ($this->ton) $flags |= (1 << 4);
         if ($this->subscriptionId !== null) $flags |= (1 << 3);
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 3)) {

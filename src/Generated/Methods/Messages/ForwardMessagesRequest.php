@@ -3,7 +3,9 @@ namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
 
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputQuickReplyShortcut;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputReplyTo;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
+use DigitalStars\MtprotoClient\Generated\Types\Base\SuggestedPost;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -13,7 +15,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class ForwardMessagesRequest extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xd5039208;
+    public const CONSTRUCTOR_ID = 0x978928ca;
     
     public string $predicate = 'messages.forwardMessages';
     
@@ -39,9 +41,13 @@ final class ForwardMessagesRequest extends TlObject
      * @param true|null $noforwards
      * @param true|null $allowPaidFloodskip
      * @param int|null $topMsgId
+     * @param AbstractInputReplyTo|null $replyTo
      * @param int|null $scheduleDate
      * @param AbstractInputPeer|null $sendAs
      * @param AbstractInputQuickReplyShortcut|null $quickReplyShortcut
+     * @param int|null $videoTimestamp
+     * @param int|null $allowPaidStars
+     * @param SuggestedPost|null $suggestedPost
      */
     public function __construct(
         public readonly AbstractInputPeer $fromPeer,
@@ -56,9 +62,13 @@ final class ForwardMessagesRequest extends TlObject
         public readonly ?true $noforwards = null,
         public readonly ?true $allowPaidFloodskip = null,
         public readonly ?int $topMsgId = null,
+        public readonly ?AbstractInputReplyTo $replyTo = null,
         public readonly ?int $scheduleDate = null,
         public readonly ?AbstractInputPeer $sendAs = null,
-        public readonly ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null
+        public readonly ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null,
+        public readonly ?int $videoTimestamp = null,
+        public readonly ?int $allowPaidStars = null,
+        public readonly ?SuggestedPost $suggestedPost = null
     ) {}
     
     public function serialize(): string
@@ -73,9 +83,13 @@ final class ForwardMessagesRequest extends TlObject
         if ($this->noforwards) $flags |= (1 << 14);
         if ($this->allowPaidFloodskip) $flags |= (1 << 19);
         if ($this->topMsgId !== null) $flags |= (1 << 9);
+        if ($this->replyTo !== null) $flags |= (1 << 22);
         if ($this->scheduleDate !== null) $flags |= (1 << 10);
         if ($this->sendAs !== null) $flags |= (1 << 13);
         if ($this->quickReplyShortcut !== null) $flags |= (1 << 17);
+        if ($this->videoTimestamp !== null) $flags |= (1 << 20);
+        if ($this->allowPaidStars !== null) $flags |= (1 << 21);
+        if ($this->suggestedPost !== null) $flags |= (1 << 23);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->fromPeer->serialize();
         $buffer .= Serializer::vectorOfInts($this->id);
@@ -83,6 +97,9 @@ final class ForwardMessagesRequest extends TlObject
         $buffer .= $this->toPeer->serialize();
         if ($flags & (1 << 9)) {
             $buffer .= Serializer::int32($this->topMsgId);
+        }
+        if ($flags & (1 << 22)) {
+            $buffer .= $this->replyTo->serialize();
         }
         if ($flags & (1 << 10)) {
             $buffer .= Serializer::int32($this->scheduleDate);
@@ -92,6 +109,15 @@ final class ForwardMessagesRequest extends TlObject
         }
         if ($flags & (1 << 17)) {
             $buffer .= $this->quickReplyShortcut->serialize();
+        }
+        if ($flags & (1 << 20)) {
+            $buffer .= Serializer::int32($this->videoTimestamp);
+        }
+        if ($flags & (1 << 21)) {
+            $buffer .= Serializer::int64($this->allowPaidStars);
+        }
+        if ($flags & (1 << 23)) {
+            $buffer .= $this->suggestedPost->serialize();
         }
 
         return $buffer;

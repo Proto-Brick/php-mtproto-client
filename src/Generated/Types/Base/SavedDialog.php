@@ -8,7 +8,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
 /**
  * @see https://core.telegram.org/type/savedDialog
  */
-final class SavedDialog extends TlObject
+final class SavedDialog extends AbstractSavedDialog
 {
     public const CONSTRUCTOR_ID = 0xbd87cb6c;
     
@@ -39,10 +39,7 @@ final class SavedDialog extends TlObject
 
     public static function deserialize(string &$stream): static
     {
-        $constructorId = Deserializer::int32($stream);
-        if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
-        }
+        Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
         $pinned = ($flags & (1 << 2)) ? true : null;
         $peer = AbstractPeer::deserialize($stream);

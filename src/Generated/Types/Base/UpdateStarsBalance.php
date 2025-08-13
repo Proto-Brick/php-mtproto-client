@@ -15,10 +15,10 @@ final class UpdateStarsBalance extends AbstractUpdate
     public string $predicate = 'updateStarsBalance';
     
     /**
-     * @param StarsAmount $balance
+     * @param AbstractStarsAmount $balance
      */
     public function __construct(
-        public readonly StarsAmount $balance
+        public readonly AbstractStarsAmount $balance
     ) {}
     
     public function serialize(): string
@@ -32,7 +32,7 @@ final class UpdateStarsBalance extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $balance = StarsAmount::deserialize($stream);
+        $balance = AbstractStarsAmount::deserialize($stream);
 
         return new self(
             $balance

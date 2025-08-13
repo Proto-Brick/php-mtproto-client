@@ -10,7 +10,7 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class UserFull extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x979d2376;
+    public const CONSTRUCTOR_ID = 0x7e63ce1f;
     
     public string $predicate = 'userFull';
     
@@ -35,6 +35,7 @@ final class UserFull extends TlObject
      * @param true|null $sponsoredEnabled
      * @param true|null $canViewRevenue
      * @param true|null $botCanManageEmojiStatus
+     * @param true|null $displayGiftsButton
      * @param string|null $about
      * @param AbstractPhoto|null $personalPhoto
      * @param AbstractPhoto|null $profilePhoto
@@ -47,7 +48,6 @@ final class UserFull extends TlObject
      * @param string|null $privateForwardName
      * @param ChatAdminRights|null $botGroupAdminRights
      * @param ChatAdminRights|null $botBroadcastAdminRights
-     * @param list<PremiumGiftOption>|null $premiumGifts
      * @param AbstractWallPaper|null $wallpaper
      * @param PeerStories|null $stories
      * @param BusinessWorkHours|null $businessWorkHours
@@ -60,6 +60,12 @@ final class UserFull extends TlObject
      * @param int|null $personalChannelMessage
      * @param int|null $stargiftsCount
      * @param StarRefProgram|null $starrefProgram
+     * @param BotVerification|null $botVerification
+     * @param int|null $sendPaidMessagesStars
+     * @param DisallowedGiftsSettings|null $disallowedGifts
+     * @param StarsRating|null $starsRating
+     * @param StarsRating|null $starsMyPendingRating
+     * @param int|null $starsMyPendingRatingDate
      */
     public function __construct(
         public readonly int $id,
@@ -82,6 +88,7 @@ final class UserFull extends TlObject
         public readonly ?true $sponsoredEnabled = null,
         public readonly ?true $canViewRevenue = null,
         public readonly ?true $botCanManageEmojiStatus = null,
+        public readonly ?true $displayGiftsButton = null,
         public readonly ?string $about = null,
         public readonly ?AbstractPhoto $personalPhoto = null,
         public readonly ?AbstractPhoto $profilePhoto = null,
@@ -94,7 +101,6 @@ final class UserFull extends TlObject
         public readonly ?string $privateForwardName = null,
         public readonly ?ChatAdminRights $botGroupAdminRights = null,
         public readonly ?ChatAdminRights $botBroadcastAdminRights = null,
-        public readonly ?array $premiumGifts = null,
         public readonly ?AbstractWallPaper $wallpaper = null,
         public readonly ?PeerStories $stories = null,
         public readonly ?BusinessWorkHours $businessWorkHours = null,
@@ -106,7 +112,13 @@ final class UserFull extends TlObject
         public readonly ?int $personalChannelId = null,
         public readonly ?int $personalChannelMessage = null,
         public readonly ?int $stargiftsCount = null,
-        public readonly ?StarRefProgram $starrefProgram = null
+        public readonly ?StarRefProgram $starrefProgram = null,
+        public readonly ?BotVerification $botVerification = null,
+        public readonly ?int $sendPaidMessagesStars = null,
+        public readonly ?DisallowedGiftsSettings $disallowedGifts = null,
+        public readonly ?StarsRating $starsRating = null,
+        public readonly ?StarsRating $starsMyPendingRating = null,
+        public readonly ?int $starsMyPendingRatingDate = null
     ) {}
     
     public function serialize(): string
@@ -130,6 +142,7 @@ final class UserFull extends TlObject
         if ($this->sponsoredEnabled) $flags2 |= (1 << 7);
         if ($this->canViewRevenue) $flags2 |= (1 << 9);
         if ($this->botCanManageEmojiStatus) $flags2 |= (1 << 10);
+        if ($this->displayGiftsButton) $flags2 |= (1 << 16);
         if ($this->about !== null) $flags |= (1 << 1);
         if ($this->personalPhoto !== null) $flags |= (1 << 21);
         if ($this->profilePhoto !== null) $flags |= (1 << 2);
@@ -142,7 +155,6 @@ final class UserFull extends TlObject
         if ($this->privateForwardName !== null) $flags |= (1 << 16);
         if ($this->botGroupAdminRights !== null) $flags |= (1 << 17);
         if ($this->botBroadcastAdminRights !== null) $flags |= (1 << 18);
-        if ($this->premiumGifts !== null) $flags |= (1 << 19);
         if ($this->wallpaper !== null) $flags |= (1 << 24);
         if ($this->stories !== null) $flags |= (1 << 25);
         if ($this->businessWorkHours !== null) $flags2 |= (1 << 0);
@@ -155,6 +167,12 @@ final class UserFull extends TlObject
         if ($this->personalChannelMessage !== null) $flags2 |= (1 << 6);
         if ($this->stargiftsCount !== null) $flags2 |= (1 << 8);
         if ($this->starrefProgram !== null) $flags2 |= (1 << 11);
+        if ($this->botVerification !== null) $flags2 |= (1 << 12);
+        if ($this->sendPaidMessagesStars !== null) $flags2 |= (1 << 14);
+        if ($this->disallowedGifts !== null) $flags2 |= (1 << 15);
+        if ($this->starsRating !== null) $flags2 |= (1 << 17);
+        if ($this->starsMyPendingRating !== null) $flags2 |= (1 << 18);
+        if ($this->starsMyPendingRatingDate !== null) $flags2 |= (1 << 18);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int64($this->id);
@@ -197,9 +215,6 @@ final class UserFull extends TlObject
         if ($flags & (1 << 18)) {
             $buffer .= $this->botBroadcastAdminRights->serialize();
         }
-        if ($flags & (1 << 19)) {
-            $buffer .= Serializer::vectorOfObjects($this->premiumGifts);
-        }
         if ($flags & (1 << 24)) {
             $buffer .= $this->wallpaper->serialize();
         }
@@ -236,6 +251,24 @@ final class UserFull extends TlObject
         if ($flags2 & (1 << 11)) {
             $buffer .= $this->starrefProgram->serialize();
         }
+        if ($flags2 & (1 << 12)) {
+            $buffer .= $this->botVerification->serialize();
+        }
+        if ($flags2 & (1 << 14)) {
+            $buffer .= Serializer::int64($this->sendPaidMessagesStars);
+        }
+        if ($flags2 & (1 << 15)) {
+            $buffer .= $this->disallowedGifts->serialize();
+        }
+        if ($flags2 & (1 << 17)) {
+            $buffer .= $this->starsRating->serialize();
+        }
+        if ($flags2 & (1 << 18)) {
+            $buffer .= $this->starsMyPendingRating->serialize();
+        }
+        if ($flags2 & (1 << 18)) {
+            $buffer .= Serializer::int32($this->starsMyPendingRatingDate);
+        }
 
         return $buffer;
     }
@@ -264,6 +297,7 @@ final class UserFull extends TlObject
         $sponsoredEnabled = ($flags2 & (1 << 7)) ? true : null;
         $canViewRevenue = ($flags2 & (1 << 9)) ? true : null;
         $botCanManageEmojiStatus = ($flags2 & (1 << 10)) ? true : null;
+        $displayGiftsButton = ($flags2 & (1 << 16)) ? true : null;
         $id = Deserializer::int64($stream);
         $about = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
         $settings = PeerSettings::deserialize($stream);
@@ -280,7 +314,6 @@ final class UserFull extends TlObject
         $privateForwardName = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
         $botGroupAdminRights = ($flags & (1 << 17)) ? ChatAdminRights::deserialize($stream) : null;
         $botBroadcastAdminRights = ($flags & (1 << 18)) ? ChatAdminRights::deserialize($stream) : null;
-        $premiumGifts = ($flags & (1 << 19)) ? Deserializer::vectorOfObjects($stream, [PremiumGiftOption::class, 'deserialize']) : null;
         $wallpaper = ($flags & (1 << 24)) ? AbstractWallPaper::deserialize($stream) : null;
         $stories = ($flags & (1 << 25)) ? PeerStories::deserialize($stream) : null;
         $businessWorkHours = ($flags2 & (1 << 0)) ? BusinessWorkHours::deserialize($stream) : null;
@@ -293,6 +326,12 @@ final class UserFull extends TlObject
         $personalChannelMessage = ($flags2 & (1 << 6)) ? Deserializer::int32($stream) : null;
         $stargiftsCount = ($flags2 & (1 << 8)) ? Deserializer::int32($stream) : null;
         $starrefProgram = ($flags2 & (1 << 11)) ? StarRefProgram::deserialize($stream) : null;
+        $botVerification = ($flags2 & (1 << 12)) ? BotVerification::deserialize($stream) : null;
+        $sendPaidMessagesStars = ($flags2 & (1 << 14)) ? Deserializer::int64($stream) : null;
+        $disallowedGifts = ($flags2 & (1 << 15)) ? DisallowedGiftsSettings::deserialize($stream) : null;
+        $starsRating = ($flags2 & (1 << 17)) ? StarsRating::deserialize($stream) : null;
+        $starsMyPendingRating = ($flags2 & (1 << 18)) ? StarsRating::deserialize($stream) : null;
+        $starsMyPendingRatingDate = ($flags2 & (1 << 18)) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,
@@ -315,6 +354,7 @@ final class UserFull extends TlObject
             $sponsoredEnabled,
             $canViewRevenue,
             $botCanManageEmojiStatus,
+            $displayGiftsButton,
             $about,
             $personalPhoto,
             $profilePhoto,
@@ -327,7 +367,6 @@ final class UserFull extends TlObject
             $privateForwardName,
             $botGroupAdminRights,
             $botBroadcastAdminRights,
-            $premiumGifts,
             $wallpaper,
             $stories,
             $businessWorkHours,
@@ -339,7 +378,13 @@ final class UserFull extends TlObject
             $personalChannelId,
             $personalChannelMessage,
             $stargiftsCount,
-            $starrefProgram
+            $starrefProgram,
+            $botVerification,
+            $sendPaidMessagesStars,
+            $disallowedGifts,
+            $starsRating,
+            $starsMyPendingRating,
+            $starsMyPendingRatingDate
         );
     }
 }

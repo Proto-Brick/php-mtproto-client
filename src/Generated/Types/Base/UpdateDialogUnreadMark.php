@@ -10,17 +10,19 @@ use DigitalStars\MtprotoClient\TL\TlObject;
  */
 final class UpdateDialogUnreadMark extends AbstractUpdate
 {
-    public const CONSTRUCTOR_ID = 0xe16459c3;
+    public const CONSTRUCTOR_ID = 0xb658f23e;
     
     public string $predicate = 'updateDialogUnreadMark';
     
     /**
      * @param AbstractDialogPeer $peer
      * @param true|null $unread
+     * @param AbstractPeer|null $savedPeerId
      */
     public function __construct(
         public readonly AbstractDialogPeer $peer,
-        public readonly ?true $unread = null
+        public readonly ?true $unread = null,
+        public readonly ?AbstractPeer $savedPeerId = null
     ) {}
     
     public function serialize(): string
@@ -28,8 +30,12 @@ final class UpdateDialogUnreadMark extends AbstractUpdate
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         if ($this->unread) $flags |= (1 << 0);
+        if ($this->savedPeerId !== null) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
+        if ($flags & (1 << 1)) {
+            $buffer .= $this->savedPeerId->serialize();
+        }
 
         return $buffer;
     }
@@ -40,10 +46,12 @@ final class UpdateDialogUnreadMark extends AbstractUpdate
         $flags = Deserializer::int32($stream);
         $unread = ($flags & (1 << 0)) ? true : null;
         $peer = AbstractDialogPeer::deserialize($stream);
+        $savedPeerId = ($flags & (1 << 1)) ? AbstractPeer::deserialize($stream) : null;
 
         return new self(
             $peer,
-            $unread
+            $unread,
+            $savedPeerId
         );
     }
 }

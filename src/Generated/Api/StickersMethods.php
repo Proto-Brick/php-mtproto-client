@@ -30,6 +30,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetID;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetItem;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetPremiumGifts;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetShortName;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetTonGifts;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUser;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserFromMessage;
@@ -93,7 +94,7 @@ final readonly class StickersMethods
     }
 
     /**
-     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses $stickerset
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
      * @param InputStickerSetItem $sticker
      * @return StickerSet|StickerSetNotModified|null
      * @see https://core.telegram.org/method/stickers.addStickerToSet
@@ -105,7 +106,7 @@ final readonly class StickersMethods
     }
 
     /**
-     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses $stickerset
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
      * @param InputDocumentEmpty|InputDocument|null $thumb
      * @param int|null $thumbDocumentId
      * @return StickerSet|StickerSetNotModified|null
@@ -154,7 +155,7 @@ final readonly class StickersMethods
     }
 
     /**
-     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses $stickerset
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
      * @param string $title
      * @return StickerSet|StickerSetNotModified|null
      * @see https://core.telegram.org/method/stickers.renameStickerSet
@@ -166,7 +167,7 @@ final readonly class StickersMethods
     }
 
     /**
-     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses $stickerset
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
      * @return bool
      * @see https://core.telegram.org/method/stickers.deleteStickerSet
      * @api

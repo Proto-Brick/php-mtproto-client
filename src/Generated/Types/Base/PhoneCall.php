@@ -27,6 +27,7 @@ final class PhoneCall extends AbstractPhoneCall
      * @param int $startDate
      * @param true|null $p2pAllowed
      * @param true|null $video
+     * @param true|null $conferenceSupported
      * @param array|null $customParameters
      */
     public function __construct(
@@ -42,6 +43,7 @@ final class PhoneCall extends AbstractPhoneCall
         public readonly int $startDate,
         public readonly ?true $p2pAllowed = null,
         public readonly ?true $video = null,
+        public readonly ?true $conferenceSupported = null,
         public readonly ?array $customParameters = null
     ) {}
     
@@ -51,6 +53,7 @@ final class PhoneCall extends AbstractPhoneCall
         $flags = 0;
         if ($this->p2pAllowed) $flags |= (1 << 5);
         if ($this->video) $flags |= (1 << 6);
+        if ($this->conferenceSupported) $flags |= (1 << 8);
         if ($this->customParameters !== null) $flags |= (1 << 7);
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
@@ -76,6 +79,7 @@ final class PhoneCall extends AbstractPhoneCall
         $flags = Deserializer::int32($stream);
         $p2pAllowed = ($flags & (1 << 5)) ? true : null;
         $video = ($flags & (1 << 6)) ? true : null;
+        $conferenceSupported = ($flags & (1 << 8)) ? true : null;
         $id = Deserializer::int64($stream);
         $accessHash = Deserializer::int64($stream);
         $date = Deserializer::int32($stream);
@@ -101,6 +105,7 @@ final class PhoneCall extends AbstractPhoneCall
             $startDate,
             $p2pAllowed,
             $video,
+            $conferenceSupported,
             $customParameters
         );
     }

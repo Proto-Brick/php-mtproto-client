@@ -31,6 +31,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Account\GetBusinessChatLinksReq
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetChannelDefaultEmojiStatusesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetChannelRestrictedStatusEmojisRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetChatThemesRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Account\GetCollectibleEmojiStatusesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetConnectedBotsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetContactSignUpNotificationRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetContentSettingsRequest;
@@ -42,6 +43,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Account\GetGlobalPrivacySetting
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetMultiWallPapersRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetNotifyExceptionsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetNotifySettingsRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Account\GetPaidMessagesRevenueRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetPasswordRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetPasswordSettingsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\GetPrivacyRequest;
@@ -89,6 +91,7 @@ use DigitalStars\MtprotoClient\Generated\Methods\Account\SetGlobalPrivacySetting
 use DigitalStars\MtprotoClient\Generated\Methods\Account\SetPrivacyRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\SetReactionsNotifySettingsRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\ToggleConnectedBotPausedRequest;
+use DigitalStars\MtprotoClient\Generated\Methods\Account\ToggleNoPaidMessagesExceptionRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\ToggleSponsoredMessagesRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\ToggleUsernameRequest;
 use DigitalStars\MtprotoClient\Generated\Methods\Account\UnregisterDeviceRequest;
@@ -132,6 +135,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Account\EmailVerified;
 use DigitalStars\MtprotoClient\Generated\Types\Account\EmailVerifiedLogin;
 use DigitalStars\MtprotoClient\Generated\Types\Account\EmojiStatuses;
 use DigitalStars\MtprotoClient\Generated\Types\Account\EmojiStatusesNotModified;
+use DigitalStars\MtprotoClient\Generated\Types\Account\PaidMessagesRevenue;
 use DigitalStars\MtprotoClient\Generated\Types\Account\Password;
 use DigitalStars\MtprotoClient\Generated\Types\Account\PasswordInputSettings;
 use DigitalStars\MtprotoClient\Generated\Types\Account\PasswordSettings;
@@ -154,6 +158,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Account\WallPapersNotModified;
 use DigitalStars\MtprotoClient\Generated\Types\Account\WebAuthorizations;
 use DigitalStars\MtprotoClient\Generated\Types\Auth\AbstractSentCode;
 use DigitalStars\MtprotoClient\Generated\Types\Auth\SentCode;
+use DigitalStars\MtprotoClient\Generated\Types\Auth\SentCodePaymentRequired;
 use DigitalStars\MtprotoClient\Generated\Types\Auth\SentCodeSuccess;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractDocument;
 use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractEmailVerification;
@@ -180,6 +185,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\AutoDownloadSettings as Base
 use DigitalStars\MtprotoClient\Generated\Types\Base\AutoSaveSettings as BaseAutoSaveSettings;
 use DigitalStars\MtprotoClient\Generated\Types\Base\BaseTheme;
 use DigitalStars\MtprotoClient\Generated\Types\Base\Birthday;
+use DigitalStars\MtprotoClient\Generated\Types\Base\BusinessBotRights;
 use DigitalStars\MtprotoClient\Generated\Types\Base\BusinessChatLink;
 use DigitalStars\MtprotoClient\Generated\Types\Base\BusinessWorkHours;
 use DigitalStars\MtprotoClient\Generated\Types\Base\CodeSettings;
@@ -194,8 +200,8 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\EmailVerifyPurposePassport;
 use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiList;
 use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiListNotModified;
 use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatus;
+use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatusCollectible;
 use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatusEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiStatusUntil;
 use DigitalStars\MtprotoClient\Generated\Types\Base\GlobalPrivacySettings;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputBusinessAwayMessage;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputBusinessBotRecipients;
@@ -209,6 +215,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\InputCheckPasswordEmpty;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputCheckPasswordSRP;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputDocument;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputDocumentEmpty;
+use DigitalStars\MtprotoClient\Generated\Types\Base\InputEmojiStatusCollectible;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputFile;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputFileBig;
 use DigitalStars\MtprotoClient\Generated\Types\Base\InputFileStoryDocument;
@@ -475,7 +482,7 @@ final readonly class AccountMethods
     /**
      * @param string $phoneNumber
      * @param CodeSettings $settings
-     * @return SentCode|SentCodeSuccess|null
+     * @return SentCode|SentCodeSuccess|SentCodePaymentRequired|null
      * @see https://core.telegram.org/method/account.sendChangePhoneCode
      * @api
      */
@@ -565,7 +572,7 @@ final readonly class AccountMethods
     /**
      * @param string $hash
      * @param CodeSettings $settings
-     * @return SentCode|SentCodeSuccess|null
+     * @return SentCode|SentCodeSuccess|SentCodePaymentRequired|null
      * @see https://core.telegram.org/method/account.sendConfirmPhoneCode
      * @api
      */
@@ -704,7 +711,7 @@ final readonly class AccountMethods
     /**
      * @param string $phoneNumber
      * @param CodeSettings $settings
-     * @return SentCode|SentCodeSuccess|null
+     * @return SentCode|SentCodeSuccess|SentCodePaymentRequired|null
      * @see https://core.telegram.org/method/account.sendVerifyPhoneCode
      * @api
      */
@@ -1180,7 +1187,7 @@ final readonly class AccountMethods
     }
 
     /**
-     * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusUntil $emojiStatus
+     * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusCollectible|InputEmojiStatusCollectible $emojiStatus
      * @return bool
      * @see https://core.telegram.org/method/account.updateEmojiStatus
      * @api
@@ -1407,15 +1414,15 @@ final readonly class AccountMethods
     /**
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
      * @param InputBusinessBotRecipients $recipients
-     * @param bool|null $canReply
      * @param bool|null $deleted
+     * @param BusinessBotRights|null $rights
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/account.updateConnectedBot
      * @api
      */
-    public function updateConnectedBot(AbstractInputUser $bot, InputBusinessBotRecipients $recipients, ?bool $canReply = null, ?bool $deleted = null): ?AbstractUpdates
+    public function updateConnectedBot(AbstractInputUser $bot, InputBusinessBotRecipients $recipients, ?bool $deleted = null, ?BusinessBotRights $rights = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new UpdateConnectedBotRequest($bot, $recipients, $canReply, $deleted));
+        return $this->client->callSync(new UpdateConnectedBotRequest($bot, $recipients, $deleted, $rights));
     }
 
     /**
@@ -1580,5 +1587,42 @@ final readonly class AccountMethods
     public function setReactionsNotifySettings(ReactionsNotifySettings $settings): ?ReactionsNotifySettings
     {
         return $this->client->callSync(new SetReactionsNotifySettingsRequest($settings));
+    }
+
+    /**
+     * @param int $hash
+     * @return EmojiStatusesNotModified|EmojiStatuses|null
+     * @see https://core.telegram.org/method/account.getCollectibleEmojiStatuses
+     * @api
+     */
+    public function getCollectibleEmojiStatuses(int $hash): ?AbstractEmojiStatuses
+    {
+        return $this->client->callSync(new GetCollectibleEmojiStatusesRequest($hash));
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
+     * @return PaidMessagesRevenue|null
+     * @see https://core.telegram.org/method/account.getPaidMessagesRevenue
+     * @api
+     */
+    public function getPaidMessagesRevenue(AbstractInputUser $userId, ?AbstractInputPeer $parentPeer = null): ?PaidMessagesRevenue
+    {
+        return $this->client->callSync(new GetPaidMessagesRevenueRequest($userId, $parentPeer));
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param bool|null $refundCharged
+     * @param bool|null $requirePayment
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
+     * @return bool
+     * @see https://core.telegram.org/method/account.toggleNoPaidMessagesException
+     * @api
+     */
+    public function toggleNoPaidMessagesException(AbstractInputUser $userId, ?bool $refundCharged = null, ?bool $requirePayment = null, ?AbstractInputPeer $parentPeer = null): bool
+    {
+        return (bool) $this->client->callSync(new ToggleNoPaidMessagesExceptionRequest($userId, $refundCharged, $requirePayment, $parentPeer));
     }
 }

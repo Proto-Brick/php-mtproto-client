@@ -64,6 +64,7 @@ abstract class AbstractChannelAdminLogEventAction extends TlObject
             ChannelAdminLogEventActionChangeEmojiStickerSet::CONSTRUCTOR_ID => ChannelAdminLogEventActionChangeEmojiStickerSet::deserialize($stream),
             ChannelAdminLogEventActionToggleSignatureProfiles::CONSTRUCTOR_ID => ChannelAdminLogEventActionToggleSignatureProfiles::deserialize($stream),
             ChannelAdminLogEventActionParticipantSubExtend::CONSTRUCTOR_ID => ChannelAdminLogEventActionParticipantSubExtend::deserialize($stream),
+            ChannelAdminLogEventActionToggleAutotranslation::CONSTRUCTOR_ID => ChannelAdminLogEventActionToggleAutotranslation::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ChannelAdminLogEventAction. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

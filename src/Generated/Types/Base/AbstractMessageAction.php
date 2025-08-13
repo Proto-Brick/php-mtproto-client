@@ -61,6 +61,16 @@ abstract class AbstractMessageAction extends TlObject
             MessageActionGiftStars::CONSTRUCTOR_ID => MessageActionGiftStars::deserialize($stream),
             MessageActionPrizeStars::CONSTRUCTOR_ID => MessageActionPrizeStars::deserialize($stream),
             MessageActionStarGift::CONSTRUCTOR_ID => MessageActionStarGift::deserialize($stream),
+            MessageActionStarGiftUnique::CONSTRUCTOR_ID => MessageActionStarGiftUnique::deserialize($stream),
+            MessageActionPaidMessagesRefunded::CONSTRUCTOR_ID => MessageActionPaidMessagesRefunded::deserialize($stream),
+            MessageActionPaidMessagesPrice::CONSTRUCTOR_ID => MessageActionPaidMessagesPrice::deserialize($stream),
+            MessageActionConferenceCall::CONSTRUCTOR_ID => MessageActionConferenceCall::deserialize($stream),
+            MessageActionTodoCompletions::CONSTRUCTOR_ID => MessageActionTodoCompletions::deserialize($stream),
+            MessageActionTodoAppendTasks::CONSTRUCTOR_ID => MessageActionTodoAppendTasks::deserialize($stream),
+            MessageActionSuggestedPostApproval::CONSTRUCTOR_ID => MessageActionSuggestedPostApproval::deserialize($stream),
+            MessageActionSuggestedPostSuccess::CONSTRUCTOR_ID => MessageActionSuggestedPostSuccess::deserialize($stream),
+            MessageActionSuggestedPostRefund::CONSTRUCTOR_ID => MessageActionSuggestedPostRefund::deserialize($stream),
+            MessageActionGiftTon::CONSTRUCTOR_ID => MessageActionGiftTon::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type MessageAction. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

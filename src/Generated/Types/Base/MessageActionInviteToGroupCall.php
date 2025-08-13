@@ -15,11 +15,11 @@ final class MessageActionInviteToGroupCall extends AbstractMessageAction
     public string $predicate = 'messageActionInviteToGroupCall';
     
     /**
-     * @param InputGroupCall $call
+     * @param AbstractInputGroupCall $call
      * @param list<int> $users
      */
     public function __construct(
-        public readonly InputGroupCall $call,
+        public readonly AbstractInputGroupCall $call,
         public readonly array $users
     ) {}
     
@@ -35,7 +35,7 @@ final class MessageActionInviteToGroupCall extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $call = InputGroupCall::deserialize($stream);
+        $call = AbstractInputGroupCall::deserialize($stream);
         $users = Deserializer::vectorOfLongs($stream);
 
         return new self(
