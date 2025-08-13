@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\TL;
+namespace ProtoBrick\MTProtoClient\TL;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractJSONValue;
-use DigitalStars\MtprotoClient\Generated\Types\Base\DataJSON;
-use DigitalStars\MtprotoClient\Generated\Types\Base\JsonArray;
-use DigitalStars\MtprotoClient\Generated\Types\Base\JsonBool;
-use DigitalStars\MtprotoClient\Generated\Types\Base\JsonNull;
-use DigitalStars\MtprotoClient\Generated\Types\Base\JsonNumber;
-use DigitalStars\MtprotoClient\Generated\Types\Base\JsonObject;
-use DigitalStars\MtprotoClient\Generated\Types\Base\JSONObjectValue;
-use DigitalStars\MtprotoClient\Generated\Types\Base\JsonString;
-use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractJSONValue;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\DataJSON;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\JsonArray;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\JsonBool;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\JsonNull;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\JsonNumber;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\JsonObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\JSONObjectValue;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\JsonString;
+use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
 
 class Serializer
 {
@@ -204,7 +204,7 @@ class Serializer
         $initConnectionConstructor = 0xc1cd5ea9;
 
         // --- Параметры для initConnection ---
-        $deviceModel = 'DigitalStars MTProto Client';
+        $deviceModel = 'ProtoBrick MTProto Client';
         $systemVersion = 'Unknown OS';
         $appVersion = '1.0.0';
         $systemLangCode = 'en';

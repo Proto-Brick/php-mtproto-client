@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace ProtoBrick\MTProtoClient\TL;
 
-use ProtoBrick\MTProtoClient\TL\Contracts\Deserializable;
+use ProtoBrick\MTProtoClient\TL\Contracts\RequestInterface;
 use ProtoBrick\MTProtoClient\TL\Contracts\Serializable;
 use ProtoBrick\MTProtoClient\TL\Contracts\TlObjectInterface;
 
 /**
- * Abstract base class for all generated DTO (Type) classes.
- * These objects are both serializable and deserializable.
+ * Abstract base class for all generated RPC Request classes.
+ * These objects are serializable but not deserializable.
  */
-abstract class TlObject implements TlObjectInterface, Serializable, Deserializable
+abstract class RpcRequest implements TlObjectInterface, Serializable, RequestInterface
 {
     /**
      * Must be defined in generated classes.
@@ -38,10 +38,6 @@ abstract class TlObject implements TlObjectInterface, Serializable, Deserializab
 
     // These methods must be implemented by the generated classes.
     abstract public function serialize(): string;
-
-    /**
-     * @param string $stream
-     * @return static
-     */
-    abstract public static function deserialize(string &$stream): static;
+    abstract public function getMethodName(): string;
+    abstract public function getResponseClass(): string;
 }

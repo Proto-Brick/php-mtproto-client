@@ -1,5 +1,5 @@
 <?php
 
-namespace DigitalStars\MtprotoClient\Exception;
+namespace ProtoBrick\MTProtoClient\Exception;
 
 class AuthKeyNotFoundOnServerErrorException extends TransportException {}

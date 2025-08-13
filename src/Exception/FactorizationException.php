@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Exception;
+namespace ProtoBrick\MTProtoClient\Exception;
 
 /**
  * Выбрасывается, когда не удалось разложить число на простые множители.

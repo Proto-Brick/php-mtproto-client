@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Transport;
+namespace ProtoBrick\MTProtoClient\Transport;
 
 enum TransportProtocol: string
 {

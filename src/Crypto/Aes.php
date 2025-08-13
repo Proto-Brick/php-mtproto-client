@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Crypto;
+namespace ProtoBrick\MTProtoClient\Crypto;
 
-use DigitalStars\MtprotoClient\Auth\AuthKey;
+use ProtoBrick\MTProtoClient\Auth\AuthKey;
 
 class Aes
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Auth\Storage;
+namespace ProtoBrick\MTProtoClient\Auth\Storage;
 
-use DigitalStars\MtprotoClient\Auth\AuthKey;
+use ProtoBrick\MTProtoClient\Auth\AuthKey;
 
 /**
  * Интерфейс для хранения и получения ключа авторизации.

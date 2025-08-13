@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use DigitalStars\MtprotoClient\ClientFactory;
-use DigitalStars\MtprotoClient\Settings;
-use DigitalStars\MtprotoClient\Transport\TransportProtocol;
+use ProtoBrick\MTProtoClient\ClientFactory;
+use ProtoBrick\MTProtoClient\Settings;
+use ProtoBrick\MTProtoClient\Transport\TransportProtocol;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 

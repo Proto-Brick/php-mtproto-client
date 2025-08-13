@@ -2,19 +2,19 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Auth;
+namespace ProtoBrick\MTProtoClient\Auth;
 
-use DigitalStars\MtprotoClient\Crypto\Ige;
-use DigitalStars\MtprotoClient\Crypto\Rsa;
-use DigitalStars\MtprotoClient\Domain\Factorizer;
-use DigitalStars\MtprotoClient\Exception\FactorizationException;
-use DigitalStars\MtprotoClient\Exception\TransportException;
-use DigitalStars\MtprotoClient\MessagePacker;
-use DigitalStars\MtprotoClient\Session\Session;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\Transport\Transport;
+use ProtoBrick\MTProtoClient\Crypto\Ige;
+use ProtoBrick\MTProtoClient\Crypto\Rsa;
+use ProtoBrick\MTProtoClient\Domain\Factorizer;
+use ProtoBrick\MTProtoClient\Exception\FactorizationException;
+use ProtoBrick\MTProtoClient\Exception\TransportException;
+use ProtoBrick\MTProtoClient\MessagePacker;
+use ProtoBrick\MTProtoClient\Session\Session;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\Transport\Transport;
 use phpseclib3\Math\BigInteger;
 
 class AuthKeyCreator

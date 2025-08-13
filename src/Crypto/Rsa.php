@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Crypto;
+namespace ProtoBrick\MTProtoClient\Crypto;
 
 use phpseclib3\Math\BigInteger;
 

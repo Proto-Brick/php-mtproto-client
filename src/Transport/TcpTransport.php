@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Transport;
+namespace ProtoBrick\MTProtoClient\Transport;
 
 use Amp\Future;
 use Amp\Socket as AmpSocketNamespace;
@@ -10,12 +10,12 @@ use Amp\Socket\ConnectContext;
 use Amp\Socket\Socket as AmpSocket;
 use function Amp\async;
 use Amp\TimeoutCancellation;
-use DigitalStars\MtprotoClient\Exception\TransportException;
-use DigitalStars\MtprotoClient\Settings;
-use DigitalStars\MtprotoClient\Transport\Framing\AbridgedFramer;
-use DigitalStars\MtprotoClient\Transport\Framing\FramerInterface;
-use DigitalStars\MtprotoClient\Transport\Framing\IntermediateFramer;
-use DigitalStars\MtprotoClient\Transport\Framing\IntermediatePaddedFramer;
+use ProtoBrick\MTProtoClient\Exception\TransportException;
+use ProtoBrick\MTProtoClient\Settings;
+use ProtoBrick\MTProtoClient\Transport\Framing\AbridgedFramer;
+use ProtoBrick\MTProtoClient\Transport\Framing\FramerInterface;
+use ProtoBrick\MTProtoClient\Transport\Framing\IntermediateFramer;
+use ProtoBrick\MTProtoClient\Transport\Framing\IntermediatePaddedFramer;
 
 class TcpTransport implements Transport
 {

@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient;
+namespace ProtoBrick\MTProtoClient;
 
-use DigitalStars\MtprotoClient\Auth\AuthKey;
-use DigitalStars\MtprotoClient\Crypto\Aes;
-use DigitalStars\MtprotoClient\Exception\TransportException;
-use DigitalStars\MtprotoClient\Session\Session;
-use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Auth\AuthKey;
+use ProtoBrick\MTProtoClient\Crypto\Aes;
+use ProtoBrick\MTProtoClient\Exception\TransportException;
+use ProtoBrick\MTProtoClient\Session\Session;
+use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
 use Random\RandomException;
 
 class MessagePacker

@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Session;
+namespace ProtoBrick\MTProtoClient\Session;
 
-use DigitalStars\MtprotoClient\Auth\AuthKey;
-use DigitalStars\MtprotoClient\Session\Storage\SessionStorage;
+use ProtoBrick\MTProtoClient\Auth\AuthKey;
+use ProtoBrick\MTProtoClient\Session\Storage\SessionStorage;
 
 class Session
 {

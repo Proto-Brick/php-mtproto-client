@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Crypto;
+namespace ProtoBrick\MTProtoClient\Crypto;
 
 /**
  * Реализация AES-IGE с использованием нативного расширения OpenSSL.

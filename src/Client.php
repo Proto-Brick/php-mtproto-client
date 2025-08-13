@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient;
+namespace ProtoBrick\MTProtoClient;
 
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
 use function Amp\async;
 
 use Amp\DeferredFuture;
@@ -12,44 +13,43 @@ use function Amp\delay;
 
 use Amp\Future;
 use Amp\TimeoutCancellation;
-use DigitalStars\MtprotoClient\Auth\AuthKey;
-use DigitalStars\MtprotoClient\Auth\AuthKeyCreator;
-use DigitalStars\MtprotoClient\Auth\Storage\AuthKeyStorage;
-use DigitalStars\MtprotoClient\Exception\AuthKeyNotFoundOnServerErrorException;
-use DigitalStars\MtprotoClient\Exception\ResendRequiredException;
-use DigitalStars\MtprotoClient\Exception\RpcErrorException;
-use DigitalStars\MtprotoClient\Exception\TransportException;
-use DigitalStars\MtprotoClient\Session\Session;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
-use DigitalStars\MtprotoClient\Transport\Transport;
+use ProtoBrick\MTProtoClient\Auth\AuthKey;
+use ProtoBrick\MTProtoClient\Auth\AuthKeyCreator;
+use ProtoBrick\MTProtoClient\Auth\Storage\AuthKeyStorage;
+use ProtoBrick\MTProtoClient\Exception\AuthKeyNotFoundOnServerErrorException;
+use ProtoBrick\MTProtoClient\Exception\ResendRequiredException;
+use ProtoBrick\MTProtoClient\Exception\RpcErrorException;
+use ProtoBrick\MTProtoClient\Exception\TransportException;
+use ProtoBrick\MTProtoClient\Session\Session;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\Transport\Transport;
 use Revolt\EventLoop;
 
 // #-- API_HANDLERS_USE_START --#
-use DigitalStars\MtprotoClient\Generated\Api\AccountMethods;
-use DigitalStars\MtprotoClient\Generated\Api\AuthMethods;
-use DigitalStars\MtprotoClient\Generated\Api\BotsMethods;
-use DigitalStars\MtprotoClient\Generated\Api\ChannelsMethods;
-use DigitalStars\MtprotoClient\Generated\Api\ChatlistsMethods;
-use DigitalStars\MtprotoClient\Generated\Api\ContactsMethods;
-use DigitalStars\MtprotoClient\Generated\Api\FoldersMethods;
-use DigitalStars\MtprotoClient\Generated\Api\FragmentMethods;
-use DigitalStars\MtprotoClient\Generated\Api\HelpMethods;
-use DigitalStars\MtprotoClient\Generated\Api\LangpackMethods;
-use DigitalStars\MtprotoClient\Generated\Api\MessagesMethods;
-use DigitalStars\MtprotoClient\Generated\Api\PaymentsMethods;
-use DigitalStars\MtprotoClient\Generated\Api\PhoneMethods;
-use DigitalStars\MtprotoClient\Generated\Api\PhotosMethods;
-use DigitalStars\MtprotoClient\Generated\Api\PremiumMethods;
-use DigitalStars\MtprotoClient\Generated\Api\SmsjobsMethods;
-use DigitalStars\MtprotoClient\Generated\Api\StatsMethods;
-use DigitalStars\MtprotoClient\Generated\Api\StickersMethods;
-use DigitalStars\MtprotoClient\Generated\Api\StoriesMethods;
-use DigitalStars\MtprotoClient\Generated\Api\UpdatesMethods;
-use DigitalStars\MtprotoClient\Generated\Api\UploadMethods;
-use DigitalStars\MtprotoClient\Generated\Api\UsersMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\AccountMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\AuthMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\BotsMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\ChannelsMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\ChatlistsMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\ContactsMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\FoldersMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\FragmentMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\HelpMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\LangpackMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\MessagesMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\PaymentsMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\PhoneMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\PhotosMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\PremiumMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\SmsjobsMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\StatsMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\StickersMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\StoriesMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\UpdatesMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\UploadMethods;
+use ProtoBrick\MTProtoClient\Generated\Api\UsersMethods;
 // #-- API_HANDLERS_USE_END --#
 
 
@@ -112,7 +112,7 @@ class Client
     private ?AuthKey $authKey = null;
 
     /**
-     * @var array<int, array{deferred: DeferredFuture, request: TlObject}>
+     * @var array<int, array{deferred: DeferredFuture, request: RpcRequest}>
      */
     private array $pendingRequests = [];
 
@@ -186,7 +186,7 @@ class Client
         });
     }
 
-    public function callSync(TlObject $request, int $timeout = 30): mixed
+    public function callSync(RpcRequest $request, int $timeout = 30): mixed
     {
         if ($this->authKey === null) {
             throw new \LogicException("Not connected. Please call connect() first.");
@@ -194,7 +194,7 @@ class Client
         return $this->call($request)->await(new TimeoutCancellation($timeout));
     }
 
-    private function call(TlObject $request): Future
+    private function call(RpcRequest $request): Future
     {
         return async(function () use ($request) {
             $attempt = 1;
@@ -222,7 +222,7 @@ class Client
         });
     }
 
-    private function sendPacketAndRegister(TlObject $request, DeferredFuture $deferred): Future
+    private function sendPacketAndRegister(RpcRequest $request, DeferredFuture $deferred): Future
     {
         return async(function () use ($request, $deferred): void {
             $ackIds = $this->session->getAndClearAckQueue();
@@ -595,7 +595,7 @@ class Client
 
     // ... (внутри класса Client)
 
-    private function deserializeResponsePayload(TlObject $request, string &$payload): mixed
+    private function deserializeResponsePayload(RpcRequest $request, string &$payload): mixed
     {
         $responseClassOrType = $request->getResponseClass();
 

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient;
+namespace ProtoBrick\MTProtoClient;
 
-use DigitalStars\MtprotoClient\Transport\TransportProtocol;
+use ProtoBrick\MTProtoClient\Transport\TransportProtocol;
 
 /**
  * Неизменяемый DTO для хранения настроек клиента.

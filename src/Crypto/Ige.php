@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Crypto;
+namespace ProtoBrick\MTProtoClient\Crypto;
 
 /**
  * Ручная реализация режима шифрования AES-IGE.

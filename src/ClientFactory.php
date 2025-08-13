@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient;
+namespace ProtoBrick\MTProtoClient;
 
-use DigitalStars\MtprotoClient\Auth\AuthKeyCreator;
-use DigitalStars\MtprotoClient\Auth\Storage\FileAuthKeyStorage;
-use DigitalStars\MtprotoClient\Crypto\Aes;
-use DigitalStars\MtprotoClient\Crypto\Rsa;
-use DigitalStars\MtprotoClient\Session\Session;
-use DigitalStars\MtprotoClient\Session\Storage\FileSessionStorage;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\Transport\TcpTransport;
+use ProtoBrick\MTProtoClient\Auth\AuthKeyCreator;
+use ProtoBrick\MTProtoClient\Auth\Storage\FileAuthKeyStorage;
+use ProtoBrick\MTProtoClient\Crypto\Aes;
+use ProtoBrick\MTProtoClient\Crypto\Rsa;
+use ProtoBrick\MTProtoClient\Session\Session;
+use ProtoBrick\MTProtoClient\Session\Storage\FileSessionStorage;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\Transport\TcpTransport;
 
 class ClientFactory
 {

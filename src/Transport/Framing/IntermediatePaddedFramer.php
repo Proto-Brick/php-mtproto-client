@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Transport\Framing;
+namespace ProtoBrick\MTProtoClient\Transport\Framing;
 
 final class IntermediatePaddedFramer implements FramerInterface
 {

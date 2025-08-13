@@ -1,8 +1,8 @@
 <?php
 
-namespace DigitalStars\MtprotoClient\Domain;
+namespace ProtoBrick\MTProtoClient\Domain;
 
-use DigitalStars\MtprotoClient\Exception\FactorizationException;
+use ProtoBrick\MTProtoClient\Exception\FactorizationException;
 use Exception;
 use FFI;
 use phpseclib3\Math\BigInteger;

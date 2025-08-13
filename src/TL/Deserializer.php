@@ -2,16 +2,16 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\TL;
+namespace ProtoBrick\MTProtoClient\TL;
 
-use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
+use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
 
 class Deserializer
 {
     public static function peekInt32(string $stream): int
     {
         if (\strlen($stream) < 4) {
-            throw new \Exception("Not enough data to peek int32");
+            throw new \RuntimeException("Not enough data to peek int32");
         }
         return unpack('V', substr($stream, 0, 4))[1];
     }
@@ -25,7 +25,7 @@ class Deserializer
         if ($constructorId === 0xbc799737) { // boolFalse
             return false;
         }
-        throw new \Exception("Expected bool, but got constructor " . dechex($constructorId));
+        throw new \RuntimeException("Expected bool, but got constructor " . dechex($constructorId));
     }
 
     public static function int32(string &$stream): int
@@ -81,7 +81,7 @@ class Deserializer
                 $stream = substr($stream, 3);
                 $padding = (4 - $len % 4) % 4;
             } else {
-                throw new \Exception("Invalid length prefix for TL-string: " . dechex($firstByte));
+                throw new \RuntimeException("Invalid length prefix for TL-string: " . dechex($firstByte));
             }
         }
 
@@ -117,12 +117,11 @@ class Deserializer
      * @param callable $itemDeserializer - Функция для десериализации одного элемента,
      *                                     например, [AbstractMessage::class, 'deserialize']
      * @return array
-     * @throws \Exception
      */
     public static function vectorOfObjects(string &$payload, callable $itemDeserializer): array
     {
         if (self::int32($payload) !== 0x1cb5c415) {
-            throw new \Exception('Invalid vector constructor ID');
+            throw new \RuntimeException('Invalid vector constructor ID');
         }
 
         $count = self::int32($payload);
@@ -139,7 +138,7 @@ class Deserializer
     public static function vectorOfInts(string &$payload): array
     {
         if (self::int32($payload) !== 0x1cb5c415) {
-            throw new \Exception('Invalid vector constructor for Vector<int>');
+            throw new \RuntimeException('Invalid vector constructor for Vector<int>');
         }
         $count = self::int32($payload);
         $result = [];
@@ -152,7 +151,7 @@ class Deserializer
     public static function vectorOfLongs(string &$payload): array
     {
         if (self::int32($payload) !== 0x1cb5c415) {
-            throw new \Exception('Invalid vector constructor for Vector<long>');
+            throw new \RuntimeException('Invalid vector constructor for Vector<long>');
         }
         $count = self::int32($payload);
         $result = [];
@@ -165,7 +164,7 @@ class Deserializer
     public static function vectorOfStrings(string &$payload): array
     {
         if (self::int32($payload) !== 0x1cb5c415) {
-            throw new \Exception('Invalid vector constructor for Vector<string>');
+            throw new \RuntimeException('Invalid vector constructor for Vector<string>');
         }
         $count = self::int32($payload);
         $result = [];
@@ -199,7 +198,7 @@ class Deserializer
                 if ($boolConstructor === 0xbc799737) {
                     return false;
                 } // boolFalse
-                throw new \Exception("Invalid constructor for Bool inside jsonBool");
+                throw new \RuntimeException("Invalid constructor for Bool inside jsonBool");
 
             case 0x2be0dfa4: // jsonNumber#2be0dfa4 value:double = JSONValue;
                 self::int32($stream); // "Съедаем" ID
@@ -215,7 +214,7 @@ class Deserializer
 
                 // Это вектор<JSONValue>
                 if (self::int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
-                    throw new \Exception('Invalid vector constructor in jsonArray');
+                    throw new \RuntimeException('Invalid vector constructor in jsonArray');
                 }
                 $count = self::int32($stream);
                 $result = [];
@@ -230,7 +229,7 @@ class Deserializer
 
                 // Это вектор<JSONObjectValue>
                 if (self::int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
-                    throw new \Exception('Invalid vector constructor in jsonObject');
+                    throw new \RuntimeException('Invalid vector constructor in jsonObject');
                 }
                 $count = self::int32($stream);
                 $result = [];
@@ -238,7 +237,7 @@ class Deserializer
                     // Десериализуем пару ключ-значение (JSONObjectValue)
                     // jsonObjectValue#c0de1bd9 key:string value:JSONValue = JSONObjectValue;
                     if (self::int32($stream) !== 0xc0de1bd9) {
-                        throw new \Exception('Invalid constructor for JSONObjectValue');
+                        throw new \RuntimeException('Invalid constructor for JSONObjectValue');
                     }
                     $key = self::bytes($stream);
                     // Рекурсивно вызываем себя для значения
@@ -253,7 +252,7 @@ class Deserializer
                 return json_decode($data, true) ?: []; // Парсим строку как JSON
 
             default:
-                throw new \Exception('Unknown JSONValue constructor: ' . dechex($constructorId));
+                throw new \RuntimeException('Unknown JSONValue constructor: ' . dechex($constructorId));
         }
     }
 
@@ -266,7 +265,7 @@ class Deserializer
     {
         $constructor = self::int32($stream);
         if ($constructor !== 0x05162463) {
-            throw new \Exception("Expected resPQ constructor, but got " . dechex($constructor));
+            throw new \RuntimeException("Expected resPQ constructor, but got " . dechex($constructor));
         }
 
         $nonce = self::raw128($stream);
@@ -275,7 +274,7 @@ class Deserializer
 
         $vector_constructor = self::int32($stream);
         if ($vector_constructor !== 0x1cb5c415) {
-            throw new \Exception(
+            throw new \RuntimeException(
                 "Expected vector constructor, but got " . dechex($vector_constructor) . ". Stream state: " . bin2hex(
                     $stream,
                 ),
@@ -300,14 +299,13 @@ class Deserializer
      * Десериализует ответ server_DH_params_ok.
      * @param string $stream
      * @return array
-     * @throws \Exception
      */
     public static function deserializeServerDhParamsOk(string &$stream): array
     {
         $constructor = self::int32($stream);
         // Конструктор для server_DH_params_ok = 0xd0e8075c
         if ($constructor !== 0xd0e8075c) {
-            throw new \Exception("Expected server_DH_params_ok constructor, but got " . dechex($constructor));
+            throw new \RuntimeException("Expected server_DH_params_ok constructor, but got " . dechex($constructor));
         }
 
         // Читаем поля в том порядке, в котором они идут в схеме
@@ -326,7 +324,7 @@ class Deserializer
     {
         $constructor = self::int32($stream);
         if ($constructor !== 0xb5890dba) {
-            throw new \Exception("Invalid constructor in DH answer: " . dechex($constructor));
+            throw new \RuntimeException("Invalid constructor in DH answer: " . dechex($constructor));
         }
         $nonce = self::raw128($stream);
         $server_nonce = self::raw128($stream);
@@ -349,14 +347,14 @@ class Deserializer
     {
         $constructor = self::int32($stream);
         if ($constructor !== 0x3072cfa1) { // gzip_packed
-            throw new \Exception("Expected gzip_packed constructor, but got " . dechex($constructor));
+            throw new \RuntimeException("Expected gzip_packed constructor, but got " . dechex($constructor));
         }
 
         $packed_data = self::bytes($stream);
         $unpacked_data = gzdecode($packed_data);
 
         if ($unpacked_data === false) {
-            throw new \Exception("Failed to gzdecode the response payload.");
+            throw new \RuntimeException("Failed to gzdecode the response payload.");
         }
 
         return $unpacked_data;
@@ -371,14 +369,13 @@ class Deserializer
      *
      * @param string $stream
      * @return array
-     * @throws \Exception
      */
     public static function deserializeDcOption(string &$stream): array
     {
         // В новой JSON-схеме ID конструктора 414687501, что равно 0x18b7a10d
         $constructor = self::int32($stream);
         if ($constructor !== 0x18b7a10d) {
-            throw new \Exception("Expected dcOption constructor (0x18b7a10d), but got " . dechex($constructor));
+            throw new \RuntimeException("Expected dcOption constructor (0x18b7a10d), but got " . dechex($constructor));
         }
 
         $flags = self::int32($stream);
@@ -409,7 +406,7 @@ class Deserializer
     {
         $constructor = self::int32($stream);
         if ($constructor !== 0xedab447b) {
-            throw new \Exception("Expected bad_server_salt constructor, but got " . dechex($constructor));
+            throw new \RuntimeException("Expected bad_server_salt constructor, but got " . dechex($constructor));
         }
 
         $bad_msg_id = self::int64($stream);
@@ -433,14 +430,13 @@ class Deserializer
      *
      * @param string $stream
      * @return array
-     * @throws \Exception
      */
     public static function deserializeConfig(string &$stream): array
     {
         // ID конструктора -870702050 (signed int32) соответствует 0xcc1a241e (unsigned)
         $constructor = self::int32($stream);
         if ($constructor !== 0xcc1a241e) {
-            throw new \Exception("Expected config constructor (0xcc1a241e), but got " . dechex($constructor));
+            throw new \RuntimeException("Expected config constructor (0xcc1a241e), but got " . dechex($constructor));
         }
 
         $config = ['_' => 'config']; // Начинаем собирать результат
@@ -460,7 +456,7 @@ class Deserializer
         // --- Вектор DcOption ---
         $vector_constructor = self::int32($stream);
         if ($vector_constructor !== 0x1cb5c415) {
-            throw new \Exception("Expected vector constructor for dc_options, but got " . dechex($vector_constructor));
+            throw new \RuntimeException("Expected vector constructor for dc_options, but got " . dechex($vector_constructor));
         }
         $dc_options_count = self::int32($stream);
         $dc_options = [];
@@ -555,7 +551,7 @@ class Deserializer
     {
         $constructor = self::int32($stream);
         if ($constructor !== Constructors::MSG_CONTAINER) {
-            throw new \Exception("Expected msg_container constructor, but got " . dechex($constructor));
+            throw new \RuntimeException("Expected msg_container constructor, but got " . dechex($constructor));
         }
 
         $count = self::int32($stream); // Количество сообщений в контейнере
@@ -568,7 +564,7 @@ class Deserializer
             $length = self::int32($stream);
 
             if (\strlen($stream) < $length) {
-                throw new \Exception("Not enough data in stream to read message of length {$length}.");
+                throw new \RuntimeException("Not enough data in stream to read message of length {$length}.");
             }
 
             $body = substr($stream, 0, $length);
@@ -592,7 +588,7 @@ class Deserializer
     {
         $constructor = self::int32($stream);
         if ($constructor !== 0x9ec20908) {
-            throw new \Exception("Expected new_session_created constructor, but got " . dechex($constructor));
+            throw new \RuntimeException("Expected new_session_created constructor, but got " . dechex($constructor));
         }
 
         $first_msg_id = self::int64($stream);

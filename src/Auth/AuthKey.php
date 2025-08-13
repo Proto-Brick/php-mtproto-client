@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Auth;
+namespace ProtoBrick\MTProtoClient\Auth;
 
 final readonly class AuthKey
 {

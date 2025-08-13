@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\Session\Storage;
+namespace ProtoBrick\MTProtoClient\Session\Storage;
 
 class FileSessionStorage implements SessionStorage
 {

@@ -2,9 +2,9 @@
 
 declare(strict_types=1);
 
-use DigitalStars\MtprotoClient\Transport\Framing\AbridgedFramer;
-use DigitalStars\MtprotoClient\Transport\Framing\IntermediateFramer;
-use DigitalStars\MtprotoClient\Transport\Framing\IntermediatePaddedFramer;
+use ProtoBrick\MTProtoClient\Transport\Framing\AbridgedFramer;
+use ProtoBrick\MTProtoClient\Transport\Framing\IntermediateFramer;
+use ProtoBrick\MTProtoClient\Transport\Framing\IntermediatePaddedFramer;
 use PHPUnit\Framework\TestCase;
 
 final class FramersTest extends TestCase
