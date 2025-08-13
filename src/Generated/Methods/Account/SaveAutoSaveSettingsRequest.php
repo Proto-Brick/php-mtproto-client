@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AutoSaveSettings;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AutoSaveSettings;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.saveAutoSaveSettings
  */
-final class SaveAutoSaveSettingsRequest extends TlObject
+final class SaveAutoSaveSettingsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xd69b8361;
     
@@ -44,21 +43,23 @@ final class SaveAutoSaveSettingsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->users) $flags |= (1 << 0);
-        if ($this->chats) $flags |= (1 << 1);
-        if ($this->broadcasts) $flags |= (1 << 2);
-        if ($this->peer !== null) $flags |= (1 << 3);
+        if ($this->users) {
+            $flags |= (1 << 0);
+        }
+        if ($this->chats) {
+            $flags |= (1 << 1);
+        }
+        if ($this->broadcasts) {
+            $flags |= (1 << 2);
+        }
+        if ($this->peer !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 3)) {
             $buffer .= $this->peer->serialize();
         }
         $buffer .= $this->settings->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

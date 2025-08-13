@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/emojiGroup
@@ -31,10 +30,8 @@ final class EmojiGroup extends AbstractEmojiGroup
         $buffer .= Serializer::bytes($this->title);
         $buffer .= Serializer::int64($this->iconEmojiId);
         $buffer .= Serializer::vectorOfStrings($this->emoticons);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/inputGroupCallStream
@@ -33,8 +32,12 @@ final class InputGroupCallStream extends AbstractInputFileLocation
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->videoChannel !== null) $flags |= (1 << 0);
-        if ($this->videoQuality !== null) $flags |= (1 << 0);
+        if ($this->videoChannel !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->videoQuality !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->call->serialize();
         $buffer .= Serializer::int64($this->timeMs);
@@ -45,10 +48,8 @@ final class InputGroupCallStream extends AbstractInputFileLocation
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->videoQuality);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -56,8 +57,8 @@ final class InputGroupCallStream extends AbstractInputFileLocation
         $call = AbstractInputGroupCall::deserialize($stream);
         $timeMs = Deserializer::int64($stream);
         $scale = Deserializer::int32($stream);
-        $videoChannel = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $videoQuality = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $videoChannel = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $videoQuality = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $call,

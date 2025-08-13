@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/starGift
@@ -63,22 +62,54 @@ final class StarGift extends AbstractStarGift
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->limited) $flags |= (1 << 0);
-        if ($this->soldOut) $flags |= (1 << 1);
-        if ($this->birthday) $flags |= (1 << 2);
-        if ($this->requirePremium) $flags |= (1 << 7);
-        if ($this->limitedPerUser) $flags |= (1 << 8);
-        if ($this->availabilityRemains !== null) $flags |= (1 << 0);
-        if ($this->availabilityTotal !== null) $flags |= (1 << 0);
-        if ($this->availabilityResale !== null) $flags |= (1 << 4);
-        if ($this->firstSaleDate !== null) $flags |= (1 << 1);
-        if ($this->lastSaleDate !== null) $flags |= (1 << 1);
-        if ($this->upgradeStars !== null) $flags |= (1 << 3);
-        if ($this->resellMinStars !== null) $flags |= (1 << 4);
-        if ($this->title !== null) $flags |= (1 << 5);
-        if ($this->releasedBy !== null) $flags |= (1 << 6);
-        if ($this->perUserTotal !== null) $flags |= (1 << 8);
-        if ($this->perUserRemains !== null) $flags |= (1 << 8);
+        if ($this->limited) {
+            $flags |= (1 << 0);
+        }
+        if ($this->soldOut) {
+            $flags |= (1 << 1);
+        }
+        if ($this->birthday) {
+            $flags |= (1 << 2);
+        }
+        if ($this->requirePremium) {
+            $flags |= (1 << 7);
+        }
+        if ($this->limitedPerUser) {
+            $flags |= (1 << 8);
+        }
+        if ($this->availabilityRemains !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->availabilityTotal !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->availabilityResale !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->firstSaleDate !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->lastSaleDate !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->upgradeStars !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->resellMinStars !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->title !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->releasedBy !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->perUserTotal !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->perUserRemains !== null) {
+            $flags |= (1 << 8);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= $this->sticker->serialize();
@@ -117,34 +148,32 @@ final class StarGift extends AbstractStarGift
         if ($flags & (1 << 8)) {
             $buffer .= Serializer::int32($this->perUserRemains);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $limited = ($flags & (1 << 0)) ? true : null;
-        $soldOut = ($flags & (1 << 1)) ? true : null;
-        $birthday = ($flags & (1 << 2)) ? true : null;
-        $requirePremium = ($flags & (1 << 7)) ? true : null;
-        $limitedPerUser = ($flags & (1 << 8)) ? true : null;
+        $limited = (($flags & (1 << 0)) !== 0) ? true : null;
+        $soldOut = (($flags & (1 << 1)) !== 0) ? true : null;
+        $birthday = (($flags & (1 << 2)) !== 0) ? true : null;
+        $requirePremium = (($flags & (1 << 7)) !== 0) ? true : null;
+        $limitedPerUser = (($flags & (1 << 8)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $sticker = AbstractDocument::deserialize($stream);
         $stars = Deserializer::int64($stream);
-        $availabilityRemains = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $availabilityTotal = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $availabilityResale = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;
+        $availabilityRemains = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $availabilityTotal = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $availabilityResale = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
         $convertStars = Deserializer::int64($stream);
-        $firstSaleDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
-        $lastSaleDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
-        $upgradeStars = ($flags & (1 << 3)) ? Deserializer::int64($stream) : null;
-        $resellMinStars = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;
-        $title = ($flags & (1 << 5)) ? Deserializer::bytes($stream) : null;
-        $releasedBy = ($flags & (1 << 6)) ? AbstractPeer::deserialize($stream) : null;
-        $perUserTotal = ($flags & (1 << 8)) ? Deserializer::int32($stream) : null;
-        $perUserRemains = ($flags & (1 << 8)) ? Deserializer::int32($stream) : null;
+        $firstSaleDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $lastSaleDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $upgradeStars = (($flags & (1 << 3)) !== 0) ? Deserializer::int64($stream) : null;
+        $resellMinStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
+        $title = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
+        $releasedBy = (($flags & (1 << 6)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $perUserTotal = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
+        $perUserRemains = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,

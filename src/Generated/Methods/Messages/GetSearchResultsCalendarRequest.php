@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessagesFilter;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\SearchResultsCalendar;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessagesFilter;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\SearchResultsCalendar;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.getSearchResultsCalendar
  */
-final class GetSearchResultsCalendarRequest extends TlObject
+final class GetSearchResultsCalendarRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x6aa3f6bd;
     
@@ -45,7 +44,9 @@ final class GetSearchResultsCalendarRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->savedPeerId !== null) $flags |= (1 << 2);
+        if ($this->savedPeerId !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 2)) {
@@ -54,12 +55,6 @@ final class GetSearchResultsCalendarRequest extends TlObject
         $buffer .= $this->filter->serialize();
         $buffer .= Serializer::int32($this->offsetId);
         $buffer .= Serializer::int32($this->offsetDate);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

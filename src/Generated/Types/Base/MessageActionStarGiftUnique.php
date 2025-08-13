@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messageActionStarGiftUnique
@@ -49,18 +48,42 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->upgrade) $flags |= (1 << 0);
-        if ($this->transferred) $flags |= (1 << 1);
-        if ($this->saved) $flags |= (1 << 2);
-        if ($this->refunded) $flags |= (1 << 5);
-        if ($this->canExportAt !== null) $flags |= (1 << 3);
-        if ($this->transferStars !== null) $flags |= (1 << 4);
-        if ($this->fromId !== null) $flags |= (1 << 6);
-        if ($this->peer !== null) $flags |= (1 << 7);
-        if ($this->savedId !== null) $flags |= (1 << 7);
-        if ($this->resaleAmount !== null) $flags |= (1 << 8);
-        if ($this->canTransferAt !== null) $flags |= (1 << 9);
-        if ($this->canResellAt !== null) $flags |= (1 << 10);
+        if ($this->upgrade) {
+            $flags |= (1 << 0);
+        }
+        if ($this->transferred) {
+            $flags |= (1 << 1);
+        }
+        if ($this->saved) {
+            $flags |= (1 << 2);
+        }
+        if ($this->refunded) {
+            $flags |= (1 << 5);
+        }
+        if ($this->canExportAt !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->transferStars !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->fromId !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->peer !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->savedId !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->resaleAmount !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->canTransferAt !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->canResellAt !== null) {
+            $flags |= (1 << 10);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->gift->serialize();
         if ($flags & (1 << 3)) {
@@ -87,27 +110,25 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
         if ($flags & (1 << 10)) {
             $buffer .= Serializer::int32($this->canResellAt);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $upgrade = ($flags & (1 << 0)) ? true : null;
-        $transferred = ($flags & (1 << 1)) ? true : null;
-        $saved = ($flags & (1 << 2)) ? true : null;
-        $refunded = ($flags & (1 << 5)) ? true : null;
+        $upgrade = (($flags & (1 << 0)) !== 0) ? true : null;
+        $transferred = (($flags & (1 << 1)) !== 0) ? true : null;
+        $saved = (($flags & (1 << 2)) !== 0) ? true : null;
+        $refunded = (($flags & (1 << 5)) !== 0) ? true : null;
         $gift = AbstractStarGift::deserialize($stream);
-        $canExportAt = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
-        $transferStars = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;
-        $fromId = ($flags & (1 << 6)) ? AbstractPeer::deserialize($stream) : null;
-        $peer = ($flags & (1 << 7)) ? AbstractPeer::deserialize($stream) : null;
-        $savedId = ($flags & (1 << 7)) ? Deserializer::int64($stream) : null;
-        $resaleAmount = ($flags & (1 << 8)) ? AbstractStarsAmount::deserialize($stream) : null;
-        $canTransferAt = ($flags & (1 << 9)) ? Deserializer::int32($stream) : null;
-        $canResellAt = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
+        $canExportAt = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $transferStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
+        $fromId = (($flags & (1 << 6)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $peer = (($flags & (1 << 7)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $savedId = (($flags & (1 << 7)) !== 0) ? Deserializer::int64($stream) : null;
+        $resaleAmount = (($flags & (1 << 8)) !== 0) ? AbstractStarsAmount::deserialize($stream) : null;
+        $canTransferAt = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($stream) : null;
+        $canResellAt = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $gift,

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/pageBlockTable
@@ -31,21 +30,23 @@ final class PageBlockTable extends AbstractPageBlock
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->bordered) $flags |= (1 << 0);
-        if ($this->striped) $flags |= (1 << 1);
+        if ($this->bordered) {
+            $flags |= (1 << 0);
+        }
+        if ($this->striped) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->title->serialize();
         $buffer .= Serializer::vectorOfObjects($this->rows);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $bordered = ($flags & (1 << 0)) ? true : null;
-        $striped = ($flags & (1 << 1)) ? true : null;
+        $bordered = (($flags & (1 << 0)) !== 0) ? true : null;
+        $striped = (($flags & (1 << 1)) !== 0) ? true : null;
         $title = AbstractRichText::deserialize($stream);
         $rows = Deserializer::vectorOfObjects($stream, [PageTableRow::class, 'deserialize']);
 

@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Stories;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Stories;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\StoriesStealthMode;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StoriesStealthMode;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/stories.allStoriesNotModified
@@ -31,10 +30,8 @@ final class AllStoriesNotModified extends AbstractAllStories
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->state);
         $buffer .= $this->stealthMode->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

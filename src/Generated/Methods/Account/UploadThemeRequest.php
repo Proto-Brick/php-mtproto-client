@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputFile;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputFile;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.uploadTheme
  */
-final class UploadThemeRequest extends TlObject
+final class UploadThemeRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x1c3db333;
     
@@ -42,7 +41,9 @@ final class UploadThemeRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->thumb !== null) $flags |= (1 << 0);
+        if ($this->thumb !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->file->serialize();
         if ($flags & (1 << 0)) {
@@ -50,12 +51,6 @@ final class UploadThemeRequest extends TlObject
         }
         $buffer .= Serializer::bytes($this->fileName);
         $buffer .= Serializer::bytes($this->mimeType);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

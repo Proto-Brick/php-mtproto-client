@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/inputBotInlineResultDocument
@@ -35,8 +34,12 @@ final class InputBotInlineResultDocument extends AbstractInputBotInlineResult
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->title !== null) $flags |= (1 << 1);
-        if ($this->description !== null) $flags |= (1 << 2);
+        if ($this->title !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->description !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->id);
         $buffer .= Serializer::bytes($this->type);
@@ -48,18 +51,16 @@ final class InputBotInlineResultDocument extends AbstractInputBotInlineResult
         }
         $buffer .= $this->document->serialize();
         $buffer .= $this->sendMessage->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
         $id = Deserializer::bytes($stream);
         $type = Deserializer::bytes($stream);
-        $title = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $description = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $title = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $description = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
         $document = AbstractInputDocument::deserialize($stream);
         $sendMessage = AbstractInputBotInlineMessage::deserialize($stream);
 

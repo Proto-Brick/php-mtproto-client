@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPaidReactionPrivacy;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractPaidReactionPrivacy;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.togglePaidReactionPrivacy
  */
-final class TogglePaidReactionPrivacyRequest extends TlObject
+final class TogglePaidReactionPrivacyRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x435885b5;
     
@@ -42,12 +41,6 @@ final class TogglePaidReactionPrivacyRequest extends TlObject
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->msgId);
         $buffer .= $this->private->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

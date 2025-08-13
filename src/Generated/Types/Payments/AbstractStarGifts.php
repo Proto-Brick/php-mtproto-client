@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/payments.StarGifts
  */
@@ -16,7 +19,7 @@ abstract class AbstractStarGifts extends TlObject
         return match ($constructorId) {
             0xa388a368 => StarGiftsNotModified::deserialize($stream),
             0x2ed82995 => StarGifts::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type payments.StarGifts. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type payments.StarGifts. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

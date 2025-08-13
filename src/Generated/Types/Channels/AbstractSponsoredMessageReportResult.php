@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Channels;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/channels.SponsoredMessageReportResult
  */
@@ -17,7 +20,7 @@ abstract class AbstractSponsoredMessageReportResult extends TlObject
             0x846f9e42 => SponsoredMessageReportResultChooseOption::deserialize($stream),
             0x3e3bcf2f => SponsoredMessageReportResultAdsHidden::deserialize($stream),
             0xad798849 => SponsoredMessageReportResultReported::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type channels.SponsoredMessageReportResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type channels.SponsoredMessageReportResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

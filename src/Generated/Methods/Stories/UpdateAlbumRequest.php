@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Stories;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Stories;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StoryAlbum;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StoryAlbum;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/stories.updateAlbum
  */
-final class UpdateAlbumRequest extends TlObject
+final class UpdateAlbumRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x5e5259b6;
     
@@ -46,10 +45,18 @@ final class UpdateAlbumRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->title !== null) $flags |= (1 << 0);
-        if ($this->deleteStories !== null) $flags |= (1 << 1);
-        if ($this->addStories !== null) $flags |= (1 << 2);
-        if ($this->order !== null) $flags |= (1 << 3);
+        if ($this->title !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->deleteStories !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->addStories !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->order !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->albumId);
@@ -65,12 +72,6 @@ final class UpdateAlbumRequest extends TlObject
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::vectorOfInts($this->order);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

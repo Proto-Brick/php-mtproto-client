@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Bots;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Bots;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/bots.allowSendMessage
  */
-final class AllowSendMessageRequest extends TlObject
+final class AllowSendMessageRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xf132e3ef;
     
@@ -36,12 +35,6 @@ final class AllowSendMessageRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->bot->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

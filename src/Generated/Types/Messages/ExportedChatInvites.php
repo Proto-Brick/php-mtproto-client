@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractExportedChatInvite;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractExportedChatInvite;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/messages.exportedChatInvites
@@ -33,15 +34,13 @@ final class ExportedChatInvites extends TlObject
         $buffer .= Serializer::int32($this->count);
         $buffer .= Serializer::vectorOfObjects($this->invites);
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $count = Deserializer::int32($stream);
         $invites = Deserializer::vectorOfObjects($stream, [AbstractExportedChatInvite::class, 'deserialize']);

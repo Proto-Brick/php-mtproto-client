@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputBotInlineResult;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InlineBotSwitchPM;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InlineBotWebView;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputBotInlineResult;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InlineBotSwitchPM;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InlineBotWebView;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.setInlineBotResults
  */
-final class SetInlineBotResultsRequest extends TlObject
+final class SetInlineBotResultsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xbb12a419;
     
@@ -51,11 +50,21 @@ final class SetInlineBotResultsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->gallery) $flags |= (1 << 0);
-        if ($this->private) $flags |= (1 << 1);
-        if ($this->nextOffset !== null) $flags |= (1 << 2);
-        if ($this->switchPm !== null) $flags |= (1 << 3);
-        if ($this->switchWebview !== null) $flags |= (1 << 4);
+        if ($this->gallery) {
+            $flags |= (1 << 0);
+        }
+        if ($this->private) {
+            $flags |= (1 << 1);
+        }
+        if ($this->nextOffset !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->switchPm !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->switchWebview !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->queryId);
         $buffer .= Serializer::vectorOfObjects($this->results);
@@ -69,12 +78,6 @@ final class SetInlineBotResultsRequest extends TlObject
         if ($flags & (1 << 4)) {
             $buffer .= $this->switchWebview->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

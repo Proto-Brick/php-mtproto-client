@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Stories;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Stories;
 
-use DigitalStars\MtprotoClient\Generated\Types\Messages\AbstractChats;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AbstractChats;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/stories.getChatsToSend
  */
-final class GetChatsToSendRequest extends TlObject
+final class GetChatsToSendRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xa56a8b60;
     
@@ -28,13 +27,6 @@ final class GetChatsToSendRequest extends TlObject
     
     public function serialize(): string
     {
-        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-
-        return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
+        return Serializer::int32(self::CONSTRUCTOR_ID);
     }
 }

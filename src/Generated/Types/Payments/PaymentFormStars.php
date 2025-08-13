@@ -1,12 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractWebDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\Invoice;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractWebDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Invoice;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/payments.paymentFormStars
@@ -40,7 +39,9 @@ final class PaymentFormStars extends AbstractPaymentForm
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->photo !== null) $flags |= (1 << 5);
+        if ($this->photo !== null) {
+            $flags |= (1 << 5);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->formId);
         $buffer .= Serializer::int64($this->botId);
@@ -51,10 +52,8 @@ final class PaymentFormStars extends AbstractPaymentForm
         }
         $buffer .= $this->invoice->serialize();
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -63,7 +62,7 @@ final class PaymentFormStars extends AbstractPaymentForm
         $botId = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
-        $photo = ($flags & (1 << 5)) ? AbstractWebDocument::deserialize($stream) : null;
+        $photo = (($flags & (1 << 5)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
         $invoice = Invoice::deserialize($stream);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 

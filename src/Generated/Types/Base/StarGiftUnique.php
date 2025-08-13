@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/starGiftUnique
@@ -53,14 +52,30 @@ final class StarGiftUnique extends AbstractStarGift
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->requirePremium) $flags |= (1 << 6);
-        if ($this->resaleTonOnly) $flags |= (1 << 7);
-        if ($this->ownerId !== null) $flags |= (1 << 0);
-        if ($this->ownerName !== null) $flags |= (1 << 1);
-        if ($this->ownerAddress !== null) $flags |= (1 << 2);
-        if ($this->giftAddress !== null) $flags |= (1 << 3);
-        if ($this->resellAmount !== null) $flags |= (1 << 4);
-        if ($this->releasedBy !== null) $flags |= (1 << 5);
+        if ($this->requirePremium) {
+            $flags |= (1 << 6);
+        }
+        if ($this->resaleTonOnly) {
+            $flags |= (1 << 7);
+        }
+        if ($this->ownerId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->ownerName !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->ownerAddress !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->giftAddress !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->resellAmount !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->releasedBy !== null) {
+            $flags |= (1 << 5);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::bytes($this->title);
@@ -87,29 +102,27 @@ final class StarGiftUnique extends AbstractStarGift
         if ($flags & (1 << 5)) {
             $buffer .= $this->releasedBy->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $requirePremium = ($flags & (1 << 6)) ? true : null;
-        $resaleTonOnly = ($flags & (1 << 7)) ? true : null;
+        $requirePremium = (($flags & (1 << 6)) !== 0) ? true : null;
+        $resaleTonOnly = (($flags & (1 << 7)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $slug = Deserializer::bytes($stream);
         $num = Deserializer::int32($stream);
-        $ownerId = ($flags & (1 << 0)) ? AbstractPeer::deserialize($stream) : null;
-        $ownerName = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $ownerAddress = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $ownerId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $ownerName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $ownerAddress = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
         $attributes = Deserializer::vectorOfObjects($stream, [AbstractStarGiftAttribute::class, 'deserialize']);
         $availabilityIssued = Deserializer::int32($stream);
         $availabilityTotal = Deserializer::int32($stream);
-        $giftAddress = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
-        $resellAmount = ($flags & (1 << 4)) ? Deserializer::vectorOfObjects($stream, [AbstractStarsAmount::class, 'deserialize']) : null;
-        $releasedBy = ($flags & (1 << 5)) ? AbstractPeer::deserialize($stream) : null;
+        $giftAddress = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
+        $resellAmount = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractStarsAmount::class, 'deserialize']) : null;
+        $releasedBy = (($flags & (1 << 5)) !== 0) ? AbstractPeer::deserialize($stream) : null;
 
         return new self(
             $id,

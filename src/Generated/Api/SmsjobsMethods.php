@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Api;
+namespace ProtoBrick\MTProtoClient\Generated\Api;
 
-use DigitalStars\MtprotoClient\Client;
-use DigitalStars\MtprotoClient\Generated\Methods\Smsjobs\FinishJobRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Smsjobs\GetSmsJobRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Smsjobs\GetStatusRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Smsjobs\IsEligibleToJoinRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Smsjobs\JoinRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Smsjobs\LeaveRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Smsjobs\UpdateSettingsRequest;
-use DigitalStars\MtprotoClient\Generated\Types\Base\SmsJob;
-use DigitalStars\MtprotoClient\Generated\Types\Smsjobs\EligibilityToJoin;
-use DigitalStars\MtprotoClient\Generated\Types\Smsjobs\Status;
+use ProtoBrick\MTProtoClient\Client;
+use ProtoBrick\MTProtoClient\Generated\Methods\Smsjobs\FinishJobRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Smsjobs\GetSmsJobRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Smsjobs\GetStatusRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Smsjobs\IsEligibleToJoinRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Smsjobs\JoinRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Smsjobs\LeaveRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Smsjobs\UpdateSettingsRequest;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SmsJob;
+use ProtoBrick\MTProtoClient\Generated\Types\Smsjobs\EligibilityToJoin;
+use ProtoBrick\MTProtoClient\Generated\Types\Smsjobs\Status;
 
 
 /**

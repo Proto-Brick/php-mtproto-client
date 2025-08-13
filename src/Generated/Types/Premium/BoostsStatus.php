@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Premium;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Premium;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPrepaidGiveaway;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StatsPercentValue;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractPrepaidGiveaway;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StatsPercentValue;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/premium.boostsStatus
@@ -45,12 +46,24 @@ final class BoostsStatus extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->myBoost) $flags |= (1 << 2);
-        if ($this->giftBoosts !== null) $flags |= (1 << 4);
-        if ($this->nextLevelBoosts !== null) $flags |= (1 << 0);
-        if ($this->premiumAudience !== null) $flags |= (1 << 1);
-        if ($this->prepaidGiveaways !== null) $flags |= (1 << 3);
-        if ($this->myBoostSlots !== null) $flags |= (1 << 2);
+        if ($this->myBoost) {
+            $flags |= (1 << 2);
+        }
+        if ($this->giftBoosts !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->nextLevelBoosts !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->premiumAudience !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->prepaidGiveaways !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->myBoostSlots !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->level);
         $buffer .= Serializer::int32($this->currentLevelBoosts);
@@ -71,27 +84,25 @@ final class BoostsStatus extends TlObject
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::vectorOfInts($this->myBoostSlots);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $myBoost = ($flags & (1 << 2)) ? true : null;
+        $myBoost = (($flags & (1 << 2)) !== 0) ? true : null;
         $level = Deserializer::int32($stream);
         $currentLevelBoosts = Deserializer::int32($stream);
         $boosts = Deserializer::int32($stream);
-        $giftBoosts = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $nextLevelBoosts = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $premiumAudience = ($flags & (1 << 1)) ? StatsPercentValue::deserialize($stream) : null;
+        $giftBoosts = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $nextLevelBoosts = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $premiumAudience = (($flags & (1 << 1)) !== 0) ? StatsPercentValue::deserialize($stream) : null;
         $boostUrl = Deserializer::bytes($stream);
-        $prepaidGiveaways = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [AbstractPrepaidGiveaway::class, 'deserialize']) : null;
-        $myBoostSlots = ($flags & (1 << 2)) ? Deserializer::vectorOfInts($stream) : null;
+        $prepaidGiveaways = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractPrepaidGiveaway::class, 'deserialize']) : null;
+        $myBoostSlots = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfInts($stream) : null;
 
         return new self(
             $level,

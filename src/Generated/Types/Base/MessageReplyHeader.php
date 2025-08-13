@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messageReplyHeader
@@ -47,18 +46,42 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->replyToScheduled) $flags |= (1 << 2);
-        if ($this->forumTopic) $flags |= (1 << 3);
-        if ($this->quote) $flags |= (1 << 9);
-        if ($this->replyToMsgId !== null) $flags |= (1 << 4);
-        if ($this->replyToPeerId !== null) $flags |= (1 << 0);
-        if ($this->replyFrom !== null) $flags |= (1 << 5);
-        if ($this->replyMedia !== null) $flags |= (1 << 8);
-        if ($this->replyToTopId !== null) $flags |= (1 << 1);
-        if ($this->quoteText !== null) $flags |= (1 << 6);
-        if ($this->quoteEntities !== null) $flags |= (1 << 7);
-        if ($this->quoteOffset !== null) $flags |= (1 << 10);
-        if ($this->todoItemId !== null) $flags |= (1 << 11);
+        if ($this->replyToScheduled) {
+            $flags |= (1 << 2);
+        }
+        if ($this->forumTopic) {
+            $flags |= (1 << 3);
+        }
+        if ($this->quote) {
+            $flags |= (1 << 9);
+        }
+        if ($this->replyToMsgId !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->replyToPeerId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->replyFrom !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->replyMedia !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->replyToTopId !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->quoteText !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->quoteEntities !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->quoteOffset !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->todoItemId !== null) {
+            $flags |= (1 << 11);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 4)) {
             $buffer .= Serializer::int32($this->replyToMsgId);
@@ -87,26 +110,24 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
         if ($flags & (1 << 11)) {
             $buffer .= Serializer::int32($this->todoItemId);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $replyToScheduled = ($flags & (1 << 2)) ? true : null;
-        $forumTopic = ($flags & (1 << 3)) ? true : null;
-        $quote = ($flags & (1 << 9)) ? true : null;
-        $replyToMsgId = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $replyToPeerId = ($flags & (1 << 0)) ? AbstractPeer::deserialize($stream) : null;
-        $replyFrom = ($flags & (1 << 5)) ? MessageFwdHeader::deserialize($stream) : null;
-        $replyMedia = ($flags & (1 << 8)) ? AbstractMessageMedia::deserialize($stream) : null;
-        $replyToTopId = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
-        $quoteText = ($flags & (1 << 6)) ? Deserializer::bytes($stream) : null;
-        $quoteEntities = ($flags & (1 << 7)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $quoteOffset = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
-        $todoItemId = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
+        $replyToScheduled = (($flags & (1 << 2)) !== 0) ? true : null;
+        $forumTopic = (($flags & (1 << 3)) !== 0) ? true : null;
+        $quote = (($flags & (1 << 9)) !== 0) ? true : null;
+        $replyToMsgId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $replyToPeerId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $replyFrom = (($flags & (1 << 5)) !== 0) ? MessageFwdHeader::deserialize($stream) : null;
+        $replyMedia = (($flags & (1 << 8)) !== 0) ? AbstractMessageMedia::deserialize($stream) : null;
+        $replyToTopId = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $quoteText = (($flags & (1 << 6)) !== 0) ? Deserializer::bytes($stream) : null;
+        $quoteEntities = (($flags & (1 << 7)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $quoteOffset = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
+        $todoItemId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $replyToScheduled,

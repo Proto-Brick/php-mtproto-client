@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/Photo
  */
@@ -16,7 +19,7 @@ abstract class AbstractPhoto extends TlObject
         return match ($constructorId) {
             0x2331b22d => PhotoEmpty::deserialize($stream),
             0xfb197a65 => Photo::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type Photo. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type Photo. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

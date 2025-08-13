@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Phone;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputGroupCall;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputGroupCall;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/phone.checkGroupCall
  */
-final class CheckGroupCallRequest extends TlObject
+final class CheckGroupCallRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xb59cf977;
     
@@ -38,12 +37,6 @@ final class CheckGroupCallRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->call->serialize();
         $buffer .= Serializer::vectorOfInts($this->sources);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

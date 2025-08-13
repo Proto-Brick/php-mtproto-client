@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/messages.Messages
  */
@@ -18,7 +21,7 @@ abstract class AbstractMessages extends TlObject
             0x762b263d => MessagesSlice::deserialize($stream),
             0xc776ba4e => ChannelMessages::deserialize($stream),
             0x74535f21 => MessagesNotModified::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type messages.Messages. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type messages.Messages. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

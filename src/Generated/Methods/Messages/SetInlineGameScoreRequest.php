@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputBotInlineMessageID;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputBotInlineMessageID;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.setInlineGameScore
  */
-final class SetInlineGameScoreRequest extends TlObject
+final class SetInlineGameScoreRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x15ad9f64;
     
@@ -44,18 +43,16 @@ final class SetInlineGameScoreRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->editMessage) $flags |= (1 << 0);
-        if ($this->force) $flags |= (1 << 1);
+        if ($this->editMessage) {
+            $flags |= (1 << 0);
+        }
+        if ($this->force) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->id->serialize();
         $buffer .= $this->userId->serialize();
         $buffer .= Serializer::int32($this->score);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

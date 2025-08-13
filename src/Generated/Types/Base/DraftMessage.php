@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/draftMessage
@@ -41,13 +40,27 @@ final class DraftMessage extends AbstractDraftMessage
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->noWebpage) $flags |= (1 << 1);
-        if ($this->invertMedia) $flags |= (1 << 6);
-        if ($this->replyTo !== null) $flags |= (1 << 4);
-        if ($this->entities !== null) $flags |= (1 << 3);
-        if ($this->media !== null) $flags |= (1 << 5);
-        if ($this->effect !== null) $flags |= (1 << 7);
-        if ($this->suggestedPost !== null) $flags |= (1 << 8);
+        if ($this->noWebpage) {
+            $flags |= (1 << 1);
+        }
+        if ($this->invertMedia) {
+            $flags |= (1 << 6);
+        }
+        if ($this->replyTo !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->media !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->effect !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->suggestedPost !== null) {
+            $flags |= (1 << 8);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 4)) {
             $buffer .= $this->replyTo->serialize();
@@ -66,23 +79,21 @@ final class DraftMessage extends AbstractDraftMessage
         if ($flags & (1 << 8)) {
             $buffer .= $this->suggestedPost->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $noWebpage = ($flags & (1 << 1)) ? true : null;
-        $invertMedia = ($flags & (1 << 6)) ? true : null;
-        $replyTo = ($flags & (1 << 4)) ? AbstractInputReplyTo::deserialize($stream) : null;
+        $noWebpage = (($flags & (1 << 1)) !== 0) ? true : null;
+        $invertMedia = (($flags & (1 << 6)) !== 0) ? true : null;
+        $replyTo = (($flags & (1 << 4)) !== 0) ? AbstractInputReplyTo::deserialize($stream) : null;
         $message = Deserializer::bytes($stream);
-        $entities = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $media = ($flags & (1 << 5)) ? AbstractInputMedia::deserialize($stream) : null;
+        $entities = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $media = (($flags & (1 << 5)) !== 0) ? AbstractInputMedia::deserialize($stream) : null;
         $date = Deserializer::int32($stream);
-        $effect = ($flags & (1 << 7)) ? Deserializer::int64($stream) : null;
-        $suggestedPost = ($flags & (1 << 8)) ? SuggestedPost::deserialize($stream) : null;
+        $effect = (($flags & (1 << 7)) !== 0) ? Deserializer::int64($stream) : null;
+        $suggestedPost = (($flags & (1 << 8)) !== 0) ? SuggestedPost::deserialize($stream) : null;
 
         return new self(
             $message,

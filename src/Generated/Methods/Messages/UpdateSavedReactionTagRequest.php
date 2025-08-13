@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractReaction;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractReaction;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.updateSavedReactionTag
  */
-final class UpdateSavedReactionTagRequest extends TlObject
+final class UpdateSavedReactionTagRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x60297dec;
     
@@ -37,18 +36,14 @@ final class UpdateSavedReactionTagRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->title !== null) $flags |= (1 << 0);
+        if ($this->title !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->reaction->serialize();
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::bytes($this->title);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

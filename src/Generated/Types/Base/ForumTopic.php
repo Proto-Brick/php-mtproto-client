@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/forumTopic
@@ -61,13 +60,27 @@ final class ForumTopic extends AbstractForumTopic
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->my) $flags |= (1 << 1);
-        if ($this->closed) $flags |= (1 << 2);
-        if ($this->pinned) $flags |= (1 << 3);
-        if ($this->short) $flags |= (1 << 5);
-        if ($this->hidden) $flags |= (1 << 6);
-        if ($this->iconEmojiId !== null) $flags |= (1 << 0);
-        if ($this->draft !== null) $flags |= (1 << 4);
+        if ($this->my) {
+            $flags |= (1 << 1);
+        }
+        if ($this->closed) {
+            $flags |= (1 << 2);
+        }
+        if ($this->pinned) {
+            $flags |= (1 << 3);
+        }
+        if ($this->short) {
+            $flags |= (1 << 5);
+        }
+        if ($this->hidden) {
+            $flags |= (1 << 6);
+        }
+        if ($this->iconEmojiId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->draft !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
         $buffer .= Serializer::int32($this->date);
@@ -87,24 +100,22 @@ final class ForumTopic extends AbstractForumTopic
         if ($flags & (1 << 4)) {
             $buffer .= $this->draft->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $my = ($flags & (1 << 1)) ? true : null;
-        $closed = ($flags & (1 << 2)) ? true : null;
-        $pinned = ($flags & (1 << 3)) ? true : null;
-        $short = ($flags & (1 << 5)) ? true : null;
-        $hidden = ($flags & (1 << 6)) ? true : null;
+        $my = (($flags & (1 << 1)) !== 0) ? true : null;
+        $closed = (($flags & (1 << 2)) !== 0) ? true : null;
+        $pinned = (($flags & (1 << 3)) !== 0) ? true : null;
+        $short = (($flags & (1 << 5)) !== 0) ? true : null;
+        $hidden = (($flags & (1 << 6)) !== 0) ? true : null;
         $id = Deserializer::int32($stream);
         $date = Deserializer::int32($stream);
         $title = Deserializer::bytes($stream);
         $iconColor = Deserializer::int32($stream);
-        $iconEmojiId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $iconEmojiId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
         $topMessage = Deserializer::int32($stream);
         $readInboxMaxId = Deserializer::int32($stream);
         $readOutboxMaxId = Deserializer::int32($stream);
@@ -113,7 +124,7 @@ final class ForumTopic extends AbstractForumTopic
         $unreadReactionsCount = Deserializer::int32($stream);
         $fromId = AbstractPeer::deserialize($stream);
         $notifySettings = PeerNotifySettings::deserialize($stream);
-        $draft = ($flags & (1 << 4)) ? AbstractDraftMessage::deserialize($stream) : null;
+        $draft = (($flags & (1 << 4)) !== 0) ? AbstractDraftMessage::deserialize($stream) : null;
 
         return new self(
             $id,

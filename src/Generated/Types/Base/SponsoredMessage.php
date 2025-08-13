@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/sponsoredMessage
@@ -53,16 +54,36 @@ final class SponsoredMessage extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->recommended) $flags |= (1 << 5);
-        if ($this->canReport) $flags |= (1 << 12);
-        if ($this->entities !== null) $flags |= (1 << 1);
-        if ($this->photo !== null) $flags |= (1 << 6);
-        if ($this->media !== null) $flags |= (1 << 14);
-        if ($this->color !== null) $flags |= (1 << 13);
-        if ($this->sponsorInfo !== null) $flags |= (1 << 7);
-        if ($this->additionalInfo !== null) $flags |= (1 << 8);
-        if ($this->minDisplayDuration !== null) $flags |= (1 << 15);
-        if ($this->maxDisplayDuration !== null) $flags |= (1 << 15);
+        if ($this->recommended) {
+            $flags |= (1 << 5);
+        }
+        if ($this->canReport) {
+            $flags |= (1 << 12);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->photo !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->media !== null) {
+            $flags |= (1 << 14);
+        }
+        if ($this->color !== null) {
+            $flags |= (1 << 13);
+        }
+        if ($this->sponsorInfo !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->additionalInfo !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->minDisplayDuration !== null) {
+            $flags |= (1 << 15);
+        }
+        if ($this->maxDisplayDuration !== null) {
+            $flags |= (1 << 15);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->randomId);
         $buffer .= Serializer::bytes($this->url);
@@ -93,32 +114,30 @@ final class SponsoredMessage extends TlObject
         if ($flags & (1 << 15)) {
             $buffer .= Serializer::int32($this->maxDisplayDuration);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $recommended = ($flags & (1 << 5)) ? true : null;
-        $canReport = ($flags & (1 << 12)) ? true : null;
+        $recommended = (($flags & (1 << 5)) !== 0) ? true : null;
+        $canReport = (($flags & (1 << 12)) !== 0) ? true : null;
         $randomId = Deserializer::bytes($stream);
         $url = Deserializer::bytes($stream);
         $title = Deserializer::bytes($stream);
         $message = Deserializer::bytes($stream);
-        $entities = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $photo = ($flags & (1 << 6)) ? AbstractPhoto::deserialize($stream) : null;
-        $media = ($flags & (1 << 14)) ? AbstractMessageMedia::deserialize($stream) : null;
-        $color = ($flags & (1 << 13)) ? PeerColor::deserialize($stream) : null;
+        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $photo = (($flags & (1 << 6)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
+        $media = (($flags & (1 << 14)) !== 0) ? AbstractMessageMedia::deserialize($stream) : null;
+        $color = (($flags & (1 << 13)) !== 0) ? PeerColor::deserialize($stream) : null;
         $buttonText = Deserializer::bytes($stream);
-        $sponsorInfo = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
-        $additionalInfo = ($flags & (1 << 8)) ? Deserializer::bytes($stream) : null;
-        $minDisplayDuration = ($flags & (1 << 15)) ? Deserializer::int32($stream) : null;
-        $maxDisplayDuration = ($flags & (1 << 15)) ? Deserializer::int32($stream) : null;
+        $sponsorInfo = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
+        $additionalInfo = (($flags & (1 << 8)) !== 0) ? Deserializer::bytes($stream) : null;
+        $minDisplayDuration = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($stream) : null;
+        $maxDisplayDuration = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $randomId,

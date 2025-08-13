@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.changePhone
  */
-final class ChangePhoneRequest extends TlObject
+final class ChangePhoneRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x70c32edb;
     
@@ -41,12 +40,6 @@ final class ChangePhoneRequest extends TlObject
         $buffer .= Serializer::bytes($this->phoneNumber);
         $buffer .= Serializer::bytes($this->phoneCodeHash);
         $buffer .= Serializer::bytes($this->phoneCode);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

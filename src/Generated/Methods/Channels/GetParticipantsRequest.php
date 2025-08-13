@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChannelParticipantsFilter;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Channels\AbstractChannelParticipants;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChannelParticipantsFilter;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Channels\AbstractChannelParticipants;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/channels.getParticipants
  */
-final class GetParticipantsRequest extends TlObject
+final class GetParticipantsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x77ced9d0;
     
@@ -49,12 +48,6 @@ final class GetParticipantsRequest extends TlObject
         $buffer .= Serializer::int32($this->offset);
         $buffer .= Serializer::int32($this->limit);
         $buffer .= Serializer::int64($this->hash);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

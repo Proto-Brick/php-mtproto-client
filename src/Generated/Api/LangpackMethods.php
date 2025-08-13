@@ -1,18 +1,18 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Api;
+namespace ProtoBrick\MTProtoClient\Generated\Api;
 
-use DigitalStars\MtprotoClient\Client;
-use DigitalStars\MtprotoClient\Generated\Methods\Langpack\GetDifferenceRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Langpack\GetLangPackRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Langpack\GetLanguageRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Langpack\GetLanguagesRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Langpack\GetStringsRequest;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractLangPackString;
-use DigitalStars\MtprotoClient\Generated\Types\Base\LangPackDifference;
-use DigitalStars\MtprotoClient\Generated\Types\Base\LangPackLanguage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\LangPackString;
-use DigitalStars\MtprotoClient\Generated\Types\Base\LangPackStringDeleted;
-use DigitalStars\MtprotoClient\Generated\Types\Base\LangPackStringPluralized;
+use ProtoBrick\MTProtoClient\Client;
+use ProtoBrick\MTProtoClient\Generated\Methods\Langpack\GetDifferenceRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Langpack\GetLangPackRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Langpack\GetLanguageRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Langpack\GetLanguagesRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Langpack\GetStringsRequest;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractLangPackString;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\LangPackDifference;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\LangPackLanguage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\LangPackString;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\LangPackStringDeleted;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\LangPackStringPluralized;
 
 
 /**

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/channel
@@ -122,51 +121,141 @@ final class Channel extends AbstractChat
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         $flags2 = 0;
-        if ($this->creator) $flags |= (1 << 0);
-        if ($this->left) $flags |= (1 << 2);
-        if ($this->broadcast) $flags |= (1 << 5);
-        if ($this->verified) $flags |= (1 << 7);
-        if ($this->megagroup) $flags |= (1 << 8);
-        if ($this->restricted) $flags |= (1 << 9);
-        if ($this->signatures) $flags |= (1 << 11);
-        if ($this->min) $flags |= (1 << 12);
-        if ($this->scam) $flags |= (1 << 19);
-        if ($this->hasLink) $flags |= (1 << 20);
-        if ($this->hasGeo) $flags |= (1 << 21);
-        if ($this->slowmodeEnabled) $flags |= (1 << 22);
-        if ($this->callActive) $flags |= (1 << 23);
-        if ($this->callNotEmpty) $flags |= (1 << 24);
-        if ($this->fake) $flags |= (1 << 25);
-        if ($this->gigagroup) $flags |= (1 << 26);
-        if ($this->noforwards) $flags |= (1 << 27);
-        if ($this->joinToSend) $flags |= (1 << 28);
-        if ($this->joinRequest) $flags |= (1 << 29);
-        if ($this->forum) $flags |= (1 << 30);
-        if ($this->storiesHidden) $flags2 |= (1 << 1);
-        if ($this->storiesHiddenMin) $flags2 |= (1 << 2);
-        if ($this->storiesUnavailable) $flags2 |= (1 << 3);
-        if ($this->signatureProfiles) $flags2 |= (1 << 12);
-        if ($this->autotranslation) $flags2 |= (1 << 15);
-        if ($this->broadcastMessagesAllowed) $flags2 |= (1 << 16);
-        if ($this->monoforum) $flags2 |= (1 << 17);
-        if ($this->forumTabs) $flags2 |= (1 << 19);
-        if ($this->accessHash !== null) $flags |= (1 << 13);
-        if ($this->username !== null) $flags |= (1 << 6);
-        if ($this->restrictionReason !== null) $flags |= (1 << 9);
-        if ($this->adminRights !== null) $flags |= (1 << 14);
-        if ($this->bannedRights !== null) $flags |= (1 << 15);
-        if ($this->defaultBannedRights !== null) $flags |= (1 << 18);
-        if ($this->participantsCount !== null) $flags |= (1 << 17);
-        if ($this->usernames !== null) $flags2 |= (1 << 0);
-        if ($this->storiesMaxId !== null) $flags2 |= (1 << 4);
-        if ($this->color !== null) $flags2 |= (1 << 7);
-        if ($this->profileColor !== null) $flags2 |= (1 << 8);
-        if ($this->emojiStatus !== null) $flags2 |= (1 << 9);
-        if ($this->level !== null) $flags2 |= (1 << 10);
-        if ($this->subscriptionUntilDate !== null) $flags2 |= (1 << 11);
-        if ($this->botVerificationIcon !== null) $flags2 |= (1 << 13);
-        if ($this->sendPaidMessagesStars !== null) $flags2 |= (1 << 14);
-        if ($this->linkedMonoforumId !== null) $flags2 |= (1 << 18);
+        if ($this->creator) {
+            $flags |= (1 << 0);
+        }
+        if ($this->left) {
+            $flags |= (1 << 2);
+        }
+        if ($this->broadcast) {
+            $flags |= (1 << 5);
+        }
+        if ($this->verified) {
+            $flags |= (1 << 7);
+        }
+        if ($this->megagroup) {
+            $flags |= (1 << 8);
+        }
+        if ($this->restricted) {
+            $flags |= (1 << 9);
+        }
+        if ($this->signatures) {
+            $flags |= (1 << 11);
+        }
+        if ($this->min) {
+            $flags |= (1 << 12);
+        }
+        if ($this->scam) {
+            $flags |= (1 << 19);
+        }
+        if ($this->hasLink) {
+            $flags |= (1 << 20);
+        }
+        if ($this->hasGeo) {
+            $flags |= (1 << 21);
+        }
+        if ($this->slowmodeEnabled) {
+            $flags |= (1 << 22);
+        }
+        if ($this->callActive) {
+            $flags |= (1 << 23);
+        }
+        if ($this->callNotEmpty) {
+            $flags |= (1 << 24);
+        }
+        if ($this->fake) {
+            $flags |= (1 << 25);
+        }
+        if ($this->gigagroup) {
+            $flags |= (1 << 26);
+        }
+        if ($this->noforwards) {
+            $flags |= (1 << 27);
+        }
+        if ($this->joinToSend) {
+            $flags |= (1 << 28);
+        }
+        if ($this->joinRequest) {
+            $flags |= (1 << 29);
+        }
+        if ($this->forum) {
+            $flags |= (1 << 30);
+        }
+        if ($this->storiesHidden) {
+            $flags2 |= (1 << 1);
+        }
+        if ($this->storiesHiddenMin) {
+            $flags2 |= (1 << 2);
+        }
+        if ($this->storiesUnavailable) {
+            $flags2 |= (1 << 3);
+        }
+        if ($this->signatureProfiles) {
+            $flags2 |= (1 << 12);
+        }
+        if ($this->autotranslation) {
+            $flags2 |= (1 << 15);
+        }
+        if ($this->broadcastMessagesAllowed) {
+            $flags2 |= (1 << 16);
+        }
+        if ($this->monoforum) {
+            $flags2 |= (1 << 17);
+        }
+        if ($this->forumTabs) {
+            $flags2 |= (1 << 19);
+        }
+        if ($this->accessHash !== null) {
+            $flags |= (1 << 13);
+        }
+        if ($this->username !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->restrictionReason !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->adminRights !== null) {
+            $flags |= (1 << 14);
+        }
+        if ($this->bannedRights !== null) {
+            $flags |= (1 << 15);
+        }
+        if ($this->defaultBannedRights !== null) {
+            $flags |= (1 << 18);
+        }
+        if ($this->participantsCount !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->usernames !== null) {
+            $flags2 |= (1 << 0);
+        }
+        if ($this->storiesMaxId !== null) {
+            $flags2 |= (1 << 4);
+        }
+        if ($this->color !== null) {
+            $flags2 |= (1 << 7);
+        }
+        if ($this->profileColor !== null) {
+            $flags2 |= (1 << 8);
+        }
+        if ($this->emojiStatus !== null) {
+            $flags2 |= (1 << 9);
+        }
+        if ($this->level !== null) {
+            $flags2 |= (1 << 10);
+        }
+        if ($this->subscriptionUntilDate !== null) {
+            $flags2 |= (1 << 11);
+        }
+        if ($this->botVerificationIcon !== null) {
+            $flags2 |= (1 << 13);
+        }
+        if ($this->sendPaidMessagesStars !== null) {
+            $flags2 |= (1 << 14);
+        }
+        if ($this->linkedMonoforumId !== null) {
+            $flags2 |= (1 << 18);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int64($this->id);
@@ -224,64 +313,62 @@ final class Channel extends AbstractChat
         if ($flags2 & (1 << 18)) {
             $buffer .= Serializer::int64($this->linkedMonoforumId);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $creator = ($flags & (1 << 0)) ? true : null;
-        $left = ($flags & (1 << 2)) ? true : null;
-        $broadcast = ($flags & (1 << 5)) ? true : null;
-        $verified = ($flags & (1 << 7)) ? true : null;
-        $megagroup = ($flags & (1 << 8)) ? true : null;
-        $restricted = ($flags & (1 << 9)) ? true : null;
-        $signatures = ($flags & (1 << 11)) ? true : null;
-        $min = ($flags & (1 << 12)) ? true : null;
-        $scam = ($flags & (1 << 19)) ? true : null;
-        $hasLink = ($flags & (1 << 20)) ? true : null;
-        $hasGeo = ($flags & (1 << 21)) ? true : null;
-        $slowmodeEnabled = ($flags & (1 << 22)) ? true : null;
-        $callActive = ($flags & (1 << 23)) ? true : null;
-        $callNotEmpty = ($flags & (1 << 24)) ? true : null;
-        $fake = ($flags & (1 << 25)) ? true : null;
-        $gigagroup = ($flags & (1 << 26)) ? true : null;
-        $noforwards = ($flags & (1 << 27)) ? true : null;
-        $joinToSend = ($flags & (1 << 28)) ? true : null;
-        $joinRequest = ($flags & (1 << 29)) ? true : null;
-        $forum = ($flags & (1 << 30)) ? true : null;
+        $creator = (($flags & (1 << 0)) !== 0) ? true : null;
+        $left = (($flags & (1 << 2)) !== 0) ? true : null;
+        $broadcast = (($flags & (1 << 5)) !== 0) ? true : null;
+        $verified = (($flags & (1 << 7)) !== 0) ? true : null;
+        $megagroup = (($flags & (1 << 8)) !== 0) ? true : null;
+        $restricted = (($flags & (1 << 9)) !== 0) ? true : null;
+        $signatures = (($flags & (1 << 11)) !== 0) ? true : null;
+        $min = (($flags & (1 << 12)) !== 0) ? true : null;
+        $scam = (($flags & (1 << 19)) !== 0) ? true : null;
+        $hasLink = (($flags & (1 << 20)) !== 0) ? true : null;
+        $hasGeo = (($flags & (1 << 21)) !== 0) ? true : null;
+        $slowmodeEnabled = (($flags & (1 << 22)) !== 0) ? true : null;
+        $callActive = (($flags & (1 << 23)) !== 0) ? true : null;
+        $callNotEmpty = (($flags & (1 << 24)) !== 0) ? true : null;
+        $fake = (($flags & (1 << 25)) !== 0) ? true : null;
+        $gigagroup = (($flags & (1 << 26)) !== 0) ? true : null;
+        $noforwards = (($flags & (1 << 27)) !== 0) ? true : null;
+        $joinToSend = (($flags & (1 << 28)) !== 0) ? true : null;
+        $joinRequest = (($flags & (1 << 29)) !== 0) ? true : null;
+        $forum = (($flags & (1 << 30)) !== 0) ? true : null;
         $flags2 = Deserializer::int32($stream);
-        $storiesHidden = ($flags2 & (1 << 1)) ? true : null;
-        $storiesHiddenMin = ($flags2 & (1 << 2)) ? true : null;
-        $storiesUnavailable = ($flags2 & (1 << 3)) ? true : null;
-        $signatureProfiles = ($flags2 & (1 << 12)) ? true : null;
-        $autotranslation = ($flags2 & (1 << 15)) ? true : null;
-        $broadcastMessagesAllowed = ($flags2 & (1 << 16)) ? true : null;
-        $monoforum = ($flags2 & (1 << 17)) ? true : null;
-        $forumTabs = ($flags2 & (1 << 19)) ? true : null;
+        $storiesHidden = (($flags2 & (1 << 1)) !== 0) ? true : null;
+        $storiesHiddenMin = (($flags2 & (1 << 2)) !== 0) ? true : null;
+        $storiesUnavailable = (($flags2 & (1 << 3)) !== 0) ? true : null;
+        $signatureProfiles = (($flags2 & (1 << 12)) !== 0) ? true : null;
+        $autotranslation = (($flags2 & (1 << 15)) !== 0) ? true : null;
+        $broadcastMessagesAllowed = (($flags2 & (1 << 16)) !== 0) ? true : null;
+        $monoforum = (($flags2 & (1 << 17)) !== 0) ? true : null;
+        $forumTabs = (($flags2 & (1 << 19)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
-        $accessHash = ($flags & (1 << 13)) ? Deserializer::int64($stream) : null;
+        $accessHash = (($flags & (1 << 13)) !== 0) ? Deserializer::int64($stream) : null;
         $title = Deserializer::bytes($stream);
-        $username = ($flags & (1 << 6)) ? Deserializer::bytes($stream) : null;
+        $username = (($flags & (1 << 6)) !== 0) ? Deserializer::bytes($stream) : null;
         $photo = AbstractChatPhoto::deserialize($stream);
         $date = Deserializer::int32($stream);
-        $restrictionReason = ($flags & (1 << 9)) ? Deserializer::vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
-        $adminRights = ($flags & (1 << 14)) ? ChatAdminRights::deserialize($stream) : null;
-        $bannedRights = ($flags & (1 << 15)) ? ChatBannedRights::deserialize($stream) : null;
-        $defaultBannedRights = ($flags & (1 << 18)) ? ChatBannedRights::deserialize($stream) : null;
-        $participantsCount = ($flags & (1 << 17)) ? Deserializer::int32($stream) : null;
-        $usernames = ($flags2 & (1 << 0)) ? Deserializer::vectorOfObjects($stream, [Username::class, 'deserialize']) : null;
-        $storiesMaxId = ($flags2 & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $color = ($flags2 & (1 << 7)) ? PeerColor::deserialize($stream) : null;
-        $profileColor = ($flags2 & (1 << 8)) ? PeerColor::deserialize($stream) : null;
-        $emojiStatus = ($flags2 & (1 << 9)) ? AbstractEmojiStatus::deserialize($stream) : null;
-        $level = ($flags2 & (1 << 10)) ? Deserializer::int32($stream) : null;
-        $subscriptionUntilDate = ($flags2 & (1 << 11)) ? Deserializer::int32($stream) : null;
-        $botVerificationIcon = ($flags2 & (1 << 13)) ? Deserializer::int64($stream) : null;
-        $sendPaidMessagesStars = ($flags2 & (1 << 14)) ? Deserializer::int64($stream) : null;
-        $linkedMonoforumId = ($flags2 & (1 << 18)) ? Deserializer::int64($stream) : null;
+        $restrictionReason = (($flags & (1 << 9)) !== 0) ? Deserializer::vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
+        $adminRights = (($flags & (1 << 14)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
+        $bannedRights = (($flags & (1 << 15)) !== 0) ? ChatBannedRights::deserialize($stream) : null;
+        $defaultBannedRights = (($flags & (1 << 18)) !== 0) ? ChatBannedRights::deserialize($stream) : null;
+        $participantsCount = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($stream) : null;
+        $usernames = (($flags2 & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [Username::class, 'deserialize']) : null;
+        $storiesMaxId = (($flags2 & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $color = (($flags2 & (1 << 7)) !== 0) ? PeerColor::deserialize($stream) : null;
+        $profileColor = (($flags2 & (1 << 8)) !== 0) ? PeerColor::deserialize($stream) : null;
+        $emojiStatus = (($flags2 & (1 << 9)) !== 0) ? AbstractEmojiStatus::deserialize($stream) : null;
+        $level = (($flags2 & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
+        $subscriptionUntilDate = (($flags2 & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
+        $botVerificationIcon = (($flags2 & (1 << 13)) !== 0) ? Deserializer::int64($stream) : null;
+        $sendPaidMessagesStars = (($flags2 & (1 << 14)) !== 0) ? Deserializer::int64($stream) : null;
+        $linkedMonoforumId = (($flags2 & (1 << 18)) !== 0) ? Deserializer::int64($stream) : null;
 
         return new self(
             $id,

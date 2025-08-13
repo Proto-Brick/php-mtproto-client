@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Contacts;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Contacts;
 
-use DigitalStars\MtprotoClient\Generated\Types\Contacts\AbstractBlocked;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Contacts\AbstractBlocked;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/contacts.getBlocked
  */
-final class GetBlockedRequest extends TlObject
+final class GetBlockedRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x9a868f80;
     
@@ -39,16 +38,12 @@ final class GetBlockedRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->myStoriesFrom) $flags |= (1 << 0);
+        if ($this->myStoriesFrom) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

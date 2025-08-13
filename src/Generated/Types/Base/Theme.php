@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/theme
@@ -45,13 +46,27 @@ final class Theme extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->creator) $flags |= (1 << 0);
-        if ($this->default_) $flags |= (1 << 1);
-        if ($this->forChat) $flags |= (1 << 5);
-        if ($this->document !== null) $flags |= (1 << 2);
-        if ($this->settings !== null) $flags |= (1 << 3);
-        if ($this->emoticon !== null) $flags |= (1 << 6);
-        if ($this->installsCount !== null) $flags |= (1 << 4);
+        if ($this->creator) {
+            $flags |= (1 << 0);
+        }
+        if ($this->default_) {
+            $flags |= (1 << 1);
+        }
+        if ($this->forChat) {
+            $flags |= (1 << 5);
+        }
+        if ($this->document !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->settings !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->emoticon !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->installsCount !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::int64($this->accessHash);
@@ -69,28 +84,26 @@ final class Theme extends TlObject
         if ($flags & (1 << 4)) {
             $buffer .= Serializer::int32($this->installsCount);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $creator = ($flags & (1 << 0)) ? true : null;
-        $default_ = ($flags & (1 << 1)) ? true : null;
-        $forChat = ($flags & (1 << 5)) ? true : null;
+        $creator = (($flags & (1 << 0)) !== 0) ? true : null;
+        $default_ = (($flags & (1 << 1)) !== 0) ? true : null;
+        $forChat = (($flags & (1 << 5)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $accessHash = Deserializer::int64($stream);
         $slug = Deserializer::bytes($stream);
         $title = Deserializer::bytes($stream);
-        $document = ($flags & (1 << 2)) ? AbstractDocument::deserialize($stream) : null;
-        $settings = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [ThemeSettings::class, 'deserialize']) : null;
-        $emoticon = ($flags & (1 << 6)) ? Deserializer::bytes($stream) : null;
-        $installsCount = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $document = (($flags & (1 << 2)) !== 0) ? AbstractDocument::deserialize($stream) : null;
+        $settings = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [ThemeSettings::class, 'deserialize']) : null;
+        $emoticon = (($flags & (1 << 6)) !== 0) ? Deserializer::bytes($stream) : null;
+        $installsCount = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,

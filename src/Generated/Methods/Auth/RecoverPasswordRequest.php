@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Auth;
 
-use DigitalStars\MtprotoClient\Generated\Types\Account\PasswordInputSettings;
-use DigitalStars\MtprotoClient\Generated\Types\Auth\AbstractAuthorization;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\PasswordInputSettings;
+use ProtoBrick\MTProtoClient\Generated\Types\Auth\AbstractAuthorization;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/auth.recoverPassword
  */
-final class RecoverPasswordRequest extends TlObject
+final class RecoverPasswordRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x37096c70;
     
@@ -38,18 +37,14 @@ final class RecoverPasswordRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->newSettings !== null) $flags |= (1 << 0);
+        if ($this->newSettings !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->code);
         if ($flags & (1 << 0)) {
             $buffer .= $this->newSettings->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

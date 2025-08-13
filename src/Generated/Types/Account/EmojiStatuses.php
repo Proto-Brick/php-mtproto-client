@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractEmojiStatus;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractEmojiStatus;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/account.emojiStatuses
@@ -29,10 +28,8 @@ final class EmojiStatuses extends AbstractEmojiStatuses
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::int64($this->hash);
         $buffer .= Serializer::vectorOfObjects($this->statuses);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

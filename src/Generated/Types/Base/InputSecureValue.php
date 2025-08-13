@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/inputSecureValue
@@ -39,13 +40,27 @@ final class InputSecureValue extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->data !== null) $flags |= (1 << 0);
-        if ($this->frontSide !== null) $flags |= (1 << 1);
-        if ($this->reverseSide !== null) $flags |= (1 << 2);
-        if ($this->selfie !== null) $flags |= (1 << 3);
-        if ($this->translation !== null) $flags |= (1 << 6);
-        if ($this->files !== null) $flags |= (1 << 4);
-        if ($this->plainData !== null) $flags |= (1 << 5);
+        if ($this->data !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->frontSide !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->reverseSide !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->selfie !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->translation !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->files !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->plainData !== null) {
+            $flags |= (1 << 5);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->type->serialize();
         if ($flags & (1 << 0)) {
@@ -69,25 +84,23 @@ final class InputSecureValue extends TlObject
         if ($flags & (1 << 5)) {
             $buffer .= $this->plainData->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
         $type = SecureValueType::deserialize($stream);
-        $data = ($flags & (1 << 0)) ? SecureData::deserialize($stream) : null;
-        $frontSide = ($flags & (1 << 1)) ? AbstractInputSecureFile::deserialize($stream) : null;
-        $reverseSide = ($flags & (1 << 2)) ? AbstractInputSecureFile::deserialize($stream) : null;
-        $selfie = ($flags & (1 << 3)) ? AbstractInputSecureFile::deserialize($stream) : null;
-        $translation = ($flags & (1 << 6)) ? Deserializer::vectorOfObjects($stream, [AbstractInputSecureFile::class, 'deserialize']) : null;
-        $files = ($flags & (1 << 4)) ? Deserializer::vectorOfObjects($stream, [AbstractInputSecureFile::class, 'deserialize']) : null;
-        $plainData = ($flags & (1 << 5)) ? AbstractSecurePlainData::deserialize($stream) : null;
+        $data = (($flags & (1 << 0)) !== 0) ? SecureData::deserialize($stream) : null;
+        $frontSide = (($flags & (1 << 1)) !== 0) ? AbstractInputSecureFile::deserialize($stream) : null;
+        $reverseSide = (($flags & (1 << 2)) !== 0) ? AbstractInputSecureFile::deserialize($stream) : null;
+        $selfie = (($flags & (1 << 3)) !== 0) ? AbstractInputSecureFile::deserialize($stream) : null;
+        $translation = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputSecureFile::class, 'deserialize']) : null;
+        $files = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputSecureFile::class, 'deserialize']) : null;
+        $plainData = (($flags & (1 << 5)) !== 0) ? AbstractSecurePlainData::deserialize($stream) : null;
 
         return new self(
             $type,

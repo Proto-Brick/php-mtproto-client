@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.editQuickReplyShortcut
  */
-final class EditQuickReplyShortcutRequest extends TlObject
+final class EditQuickReplyShortcutRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x5c003cef;
     
@@ -37,12 +36,6 @@ final class EditQuickReplyShortcutRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::int32($this->shortcutId);
         $buffer .= Serializer::bytes($this->shortcut);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Premium;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Premium;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Premium\BoostsList;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Premium\BoostsList;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/premium.getBoostsList
  */
-final class GetBoostsListRequest extends TlObject
+final class GetBoostsListRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x60f67660;
     
@@ -42,17 +41,13 @@ final class GetBoostsListRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->gifts) $flags |= (1 << 0);
+        if ($this->gifts) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::bytes($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

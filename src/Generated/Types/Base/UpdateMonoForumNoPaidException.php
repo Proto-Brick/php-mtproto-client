@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/updateMonoForumNoPaidException
@@ -29,19 +28,19 @@ final class UpdateMonoForumNoPaidException extends AbstractUpdate
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->exception) $flags |= (1 << 0);
+        if ($this->exception) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->channelId);
         $buffer .= $this->savedPeerId->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $exception = ($flags & (1 << 0)) ? true : null;
+        $exception = (($flags & (1 << 0)) !== 0) ? true : null;
         $channelId = Deserializer::int64($stream);
         $savedPeerId = AbstractPeer::deserialize($stream);
 

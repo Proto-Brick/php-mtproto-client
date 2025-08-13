@@ -1,19 +1,18 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputMedia;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractReplyMarkup;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputMedia;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessageEntity;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractReplyMarkup;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.editMessage
  */
-final class EditMessageRequest extends TlObject
+final class EditMessageRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xdfd14005;
     
@@ -57,14 +56,30 @@ final class EditMessageRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->noWebpage) $flags |= (1 << 1);
-        if ($this->invertMedia) $flags |= (1 << 16);
-        if ($this->message !== null) $flags |= (1 << 11);
-        if ($this->media !== null) $flags |= (1 << 14);
-        if ($this->replyMarkup !== null) $flags |= (1 << 2);
-        if ($this->entities !== null) $flags |= (1 << 3);
-        if ($this->scheduleDate !== null) $flags |= (1 << 15);
-        if ($this->quickReplyShortcutId !== null) $flags |= (1 << 17);
+        if ($this->noWebpage) {
+            $flags |= (1 << 1);
+        }
+        if ($this->invertMedia) {
+            $flags |= (1 << 16);
+        }
+        if ($this->message !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->media !== null) {
+            $flags |= (1 << 14);
+        }
+        if ($this->replyMarkup !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->scheduleDate !== null) {
+            $flags |= (1 << 15);
+        }
+        if ($this->quickReplyShortcutId !== null) {
+            $flags |= (1 << 17);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->id);
@@ -86,12 +101,6 @@ final class EditMessageRequest extends TlObject
         if ($flags & (1 << 17)) {
             $buffer .= Serializer::int32($this->quickReplyShortcutId);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

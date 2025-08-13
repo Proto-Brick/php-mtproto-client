@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/updateReadMessagesContents
@@ -31,7 +30,9 @@ final class UpdateReadMessagesContents extends AbstractUpdate
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->date !== null) $flags |= (1 << 0);
+        if ($this->date !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::vectorOfInts($this->messages);
         $buffer .= Serializer::int32($this->pts);
@@ -39,10 +40,8 @@ final class UpdateReadMessagesContents extends AbstractUpdate
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->date);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -50,7 +49,7 @@ final class UpdateReadMessagesContents extends AbstractUpdate
         $messages = Deserializer::vectorOfInts($stream);
         $pts = Deserializer::int32($stream);
         $ptsCount = Deserializer::int32($stream);
-        $date = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $date = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $messages,

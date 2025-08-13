@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\AffectedHistory;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AffectedHistory;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.deleteHistory
  */
-final class DeleteHistoryRequest extends TlObject
+final class DeleteHistoryRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xb08f922a;
     
@@ -46,10 +45,18 @@ final class DeleteHistoryRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->justClear) $flags |= (1 << 0);
-        if ($this->revoke) $flags |= (1 << 1);
-        if ($this->minDate !== null) $flags |= (1 << 2);
-        if ($this->maxDate !== null) $flags |= (1 << 3);
+        if ($this->justClear) {
+            $flags |= (1 << 0);
+        }
+        if ($this->revoke) {
+            $flags |= (1 << 1);
+        }
+        if ($this->minDate !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->maxDate !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->maxId);
@@ -59,12 +66,6 @@ final class DeleteHistoryRequest extends TlObject
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::int32($this->maxDate);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

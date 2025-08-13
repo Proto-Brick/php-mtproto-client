@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.toggleUsername
  */
-final class ToggleUsernameRequest extends TlObject
+final class ToggleUsernameRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x58d6b376;
     
@@ -37,12 +36,6 @@ final class ToggleUsernameRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::bytes($this->username);
         $buffer .= ($this->active ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

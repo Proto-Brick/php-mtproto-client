@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Stats;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Stats;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractStatsGraph;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractStatsGraph;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/stats.messageStats
@@ -29,15 +30,13 @@ final class MessageStats extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->viewsGraph->serialize();
         $buffer .= $this->reactionsByEmotionGraph->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $viewsGraph = AbstractStatsGraph::deserialize($stream);
         $reactionsByEmotionGraph = AbstractStatsGraph::deserialize($stream);

@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/EmojiGroup
  */
@@ -17,7 +20,7 @@ abstract class AbstractEmojiGroup extends TlObject
             0x7a9abda9 => EmojiGroup::deserialize($stream),
             0x80d26cc7 => EmojiGroupGreeting::deserialize($stream),
             0x93bcf34 => EmojiGroupPremium::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type EmojiGroup. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type EmojiGroup. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Upload;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Upload;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputWebFileLocation;
-use DigitalStars\MtprotoClient\Generated\Types\Upload\WebFile;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputWebFileLocation;
+use ProtoBrick\MTProtoClient\Generated\Types\Upload\WebFile;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/upload.getWebFile
  */
-final class GetWebFileRequest extends TlObject
+final class GetWebFileRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x24e6818d;
     
@@ -42,12 +41,6 @@ final class GetWebFileRequest extends TlObject
         $buffer .= $this->location->serialize();
         $buffer .= Serializer::int32($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

@@ -1,11 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Help;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Help;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
-use DigitalStars\MtprotoClient\Generated\Types\Base\DataJSON;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessageEntity;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/help.termsOfService
@@ -35,8 +35,12 @@ final class TermsOfService extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->popup) $flags |= (1 << 0);
-        if ($this->minAgeConfirm !== null) $flags |= (1 << 1);
+        if ($this->popup) {
+            $flags |= (1 << 0);
+        }
+        if ($this->minAgeConfirm !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::serializeDataJSON($this->id);
         $buffer .= Serializer::bytes($this->text);
@@ -44,22 +48,20 @@ final class TermsOfService extends TlObject
         if ($flags & (1 << 1)) {
             $buffer .= Serializer::int32($this->minAgeConfirm);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $popup = ($flags & (1 << 0)) ? true : null;
+        $popup = (($flags & (1 << 0)) !== 0) ? true : null;
         $id = Deserializer::deserializeDataJSON($stream);
         $text = Deserializer::bytes($stream);
         $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
-        $minAgeConfirm = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $minAgeConfirm = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,

@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputSavedStarGift;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StarGiftCollection;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputSavedStarGift;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StarGiftCollection;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.updateStarGiftCollection
  */
-final class UpdateStarGiftCollectionRequest extends TlObject
+final class UpdateStarGiftCollectionRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x4fddbee7;
     
@@ -47,10 +46,18 @@ final class UpdateStarGiftCollectionRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->title !== null) $flags |= (1 << 0);
-        if ($this->deleteStargift !== null) $flags |= (1 << 1);
-        if ($this->addStargift !== null) $flags |= (1 << 2);
-        if ($this->order !== null) $flags |= (1 << 3);
+        if ($this->title !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->deleteStargift !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->addStargift !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->order !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->collectionId);
@@ -66,12 +73,6 @@ final class UpdateStarGiftCollectionRequest extends TlObject
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::vectorOfObjects($this->order);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

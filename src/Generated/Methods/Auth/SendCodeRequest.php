@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Auth;
 
-use DigitalStars\MtprotoClient\Generated\Types\Auth\AbstractSentCode;
-use DigitalStars\MtprotoClient\Generated\Types\Base\CodeSettings;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Auth\AbstractSentCode;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\CodeSettings;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/auth.sendCode
  */
-final class SendCodeRequest extends TlObject
+final class SendCodeRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xa677244f;
     
@@ -45,12 +44,6 @@ final class SendCodeRequest extends TlObject
         $buffer .= Serializer::int32($this->apiId);
         $buffer .= Serializer::bytes($this->apiHash);
         $buffer .= $this->settings->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

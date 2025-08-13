@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputCheckPasswordSRP;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputSavedStarGift;
-use DigitalStars\MtprotoClient\Generated\Types\Payments\StarGiftWithdrawalUrl;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputCheckPasswordSRP;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputSavedStarGift;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftWithdrawalUrl;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.getStarGiftWithdrawalUrl
  */
-final class GetStarGiftWithdrawalUrlRequest extends TlObject
+final class GetStarGiftWithdrawalUrlRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xd06e93a8;
     
@@ -40,12 +39,6 @@ final class GetStarGiftWithdrawalUrlRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->stargift->serialize();
         $buffer .= $this->password->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Bots;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Bots;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/bots.setBotInfo
  */
-final class SetBotInfoRequest extends TlObject
+final class SetBotInfoRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x10cf3123;
     
@@ -43,10 +42,18 @@ final class SetBotInfoRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->bot !== null) $flags |= (1 << 2);
-        if ($this->name !== null) $flags |= (1 << 3);
-        if ($this->about !== null) $flags |= (1 << 0);
-        if ($this->description !== null) $flags |= (1 << 1);
+        if ($this->bot !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->name !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->about !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->description !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 2)) {
             $buffer .= $this->bot->serialize();
@@ -61,12 +68,6 @@ final class SetBotInfoRequest extends TlObject
         if ($flags & (1 << 1)) {
             $buffer .= Serializer::bytes($this->description);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

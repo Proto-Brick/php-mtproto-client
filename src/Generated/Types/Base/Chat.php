@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/chat
@@ -53,15 +52,33 @@ final class Chat extends AbstractChat
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->creator) $flags |= (1 << 0);
-        if ($this->left) $flags |= (1 << 2);
-        if ($this->deactivated) $flags |= (1 << 5);
-        if ($this->callActive) $flags |= (1 << 23);
-        if ($this->callNotEmpty) $flags |= (1 << 24);
-        if ($this->noforwards) $flags |= (1 << 25);
-        if ($this->migratedTo !== null) $flags |= (1 << 6);
-        if ($this->adminRights !== null) $flags |= (1 << 14);
-        if ($this->defaultBannedRights !== null) $flags |= (1 << 18);
+        if ($this->creator) {
+            $flags |= (1 << 0);
+        }
+        if ($this->left) {
+            $flags |= (1 << 2);
+        }
+        if ($this->deactivated) {
+            $flags |= (1 << 5);
+        }
+        if ($this->callActive) {
+            $flags |= (1 << 23);
+        }
+        if ($this->callNotEmpty) {
+            $flags |= (1 << 24);
+        }
+        if ($this->noforwards) {
+            $flags |= (1 << 25);
+        }
+        if ($this->migratedTo !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->adminRights !== null) {
+            $flags |= (1 << 14);
+        }
+        if ($this->defaultBannedRights !== null) {
+            $flags |= (1 << 18);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::bytes($this->title);
@@ -78,29 +95,27 @@ final class Chat extends AbstractChat
         if ($flags & (1 << 18)) {
             $buffer .= $this->defaultBannedRights->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $creator = ($flags & (1 << 0)) ? true : null;
-        $left = ($flags & (1 << 2)) ? true : null;
-        $deactivated = ($flags & (1 << 5)) ? true : null;
-        $callActive = ($flags & (1 << 23)) ? true : null;
-        $callNotEmpty = ($flags & (1 << 24)) ? true : null;
-        $noforwards = ($flags & (1 << 25)) ? true : null;
+        $creator = (($flags & (1 << 0)) !== 0) ? true : null;
+        $left = (($flags & (1 << 2)) !== 0) ? true : null;
+        $deactivated = (($flags & (1 << 5)) !== 0) ? true : null;
+        $callActive = (($flags & (1 << 23)) !== 0) ? true : null;
+        $callNotEmpty = (($flags & (1 << 24)) !== 0) ? true : null;
+        $noforwards = (($flags & (1 << 25)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $photo = AbstractChatPhoto::deserialize($stream);
         $participantsCount = Deserializer::int32($stream);
         $date = Deserializer::int32($stream);
         $version = Deserializer::int32($stream);
-        $migratedTo = ($flags & (1 << 6)) ? AbstractInputChannel::deserialize($stream) : null;
-        $adminRights = ($flags & (1 << 14)) ? ChatAdminRights::deserialize($stream) : null;
-        $defaultBannedRights = ($flags & (1 << 18)) ? ChatBannedRights::deserialize($stream) : null;
+        $migratedTo = (($flags & (1 << 6)) !== 0) ? AbstractInputChannel::deserialize($stream) : null;
+        $adminRights = (($flags & (1 << 14)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
+        $defaultBannedRights = (($flags & (1 << 18)) !== 0) ? ChatBannedRights::deserialize($stream) : null;
 
         return new self(
             $id,

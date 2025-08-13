@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/channels.updateColor
  */
-final class UpdateColorRequest extends TlObject
+final class UpdateColorRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xd8aa3671;
     
@@ -42,9 +41,15 @@ final class UpdateColorRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->forProfile) $flags |= (1 << 1);
-        if ($this->color !== null) $flags |= (1 << 2);
-        if ($this->backgroundEmojiId !== null) $flags |= (1 << 0);
+        if ($this->forProfile) {
+            $flags |= (1 << 1);
+        }
+        if ($this->color !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->backgroundEmojiId !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->channel->serialize();
         if ($flags & (1 << 2)) {
@@ -53,12 +58,6 @@ final class UpdateColorRequest extends TlObject
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int64($this->backgroundEmojiId);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

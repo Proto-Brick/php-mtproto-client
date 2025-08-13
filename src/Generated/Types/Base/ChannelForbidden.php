@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/channelForbidden
@@ -35,9 +34,15 @@ final class ChannelForbidden extends AbstractChat
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->broadcast) $flags |= (1 << 5);
-        if ($this->megagroup) $flags |= (1 << 8);
-        if ($this->untilDate !== null) $flags |= (1 << 16);
+        if ($this->broadcast) {
+            $flags |= (1 << 5);
+        }
+        if ($this->megagroup) {
+            $flags |= (1 << 8);
+        }
+        if ($this->untilDate !== null) {
+            $flags |= (1 << 16);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::int64($this->accessHash);
@@ -45,20 +50,18 @@ final class ChannelForbidden extends AbstractChat
         if ($flags & (1 << 16)) {
             $buffer .= Serializer::int32($this->untilDate);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $broadcast = ($flags & (1 << 5)) ? true : null;
-        $megagroup = ($flags & (1 << 8)) ? true : null;
+        $broadcast = (($flags & (1 << 5)) !== 0) ? true : null;
+        $megagroup = (($flags & (1 << 8)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $accessHash = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
-        $untilDate = ($flags & (1 << 16)) ? Deserializer::int32($stream) : null;
+        $untilDate = (($flags & (1 << 16)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/phoneConnection
@@ -35,22 +34,22 @@ final class PhoneConnection extends AbstractPhoneConnection
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->tcp) $flags |= (1 << 0);
+        if ($this->tcp) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::bytes($this->ip);
         $buffer .= Serializer::bytes($this->ipv6);
         $buffer .= Serializer::int32($this->port);
         $buffer .= Serializer::bytes($this->peerTag);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $tcp = ($flags & (1 << 0)) ? true : null;
+        $tcp = (($flags & (1 << 0)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $ip = Deserializer::bytes($stream);
         $ipv6 = Deserializer::bytes($stream);

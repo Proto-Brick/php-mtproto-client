@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/videoSize
@@ -33,7 +32,9 @@ final class VideoSize extends AbstractVideoSize
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->videoStartTs !== null) $flags |= (1 << 0);
+        if ($this->videoStartTs !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->type);
         $buffer .= Serializer::int32($this->w);
@@ -42,10 +43,8 @@ final class VideoSize extends AbstractVideoSize
         if ($flags & (1 << 0)) {
             $buffer .= pack('d', $this->videoStartTs);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -54,7 +53,7 @@ final class VideoSize extends AbstractVideoSize
         $w = Deserializer::int32($stream);
         $h = Deserializer::int32($stream);
         $size = Deserializer::int32($stream);
-        $videoStartTs = ($flags & (1 << 0)) ? Deserializer::double($stream) : null;
+        $videoStartTs = (($flags & (1 << 0)) !== 0) ? Deserializer::double($stream) : null;
 
         return new self(
             $type,

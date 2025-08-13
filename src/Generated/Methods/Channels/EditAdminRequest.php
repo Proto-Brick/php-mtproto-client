@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\Generated\Types\Base\ChatAdminRights;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ChatAdminRights;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/channels.editAdmin
  */
-final class EditAdminRequest extends TlObject
+final class EditAdminRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xd33c8902;
     
@@ -47,12 +46,6 @@ final class EditAdminRequest extends TlObject
         $buffer .= $this->userId->serialize();
         $buffer .= $this->adminRights->serialize();
         $buffer .= Serializer::bytes($this->rank);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

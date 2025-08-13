@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Contacts;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Contacts;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/contacts.resetSaved
  */
-final class ResetSavedRequest extends TlObject
+final class ResetSavedRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x879537f1;
     
@@ -27,13 +26,6 @@ final class ResetSavedRequest extends TlObject
     
     public function serialize(): string
     {
-        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-
-        return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
+        return Serializer::int32(self::CONSTRUCTOR_ID);
     }
 }

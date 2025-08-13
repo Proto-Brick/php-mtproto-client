@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/updateChatParticipant
@@ -39,9 +38,15 @@ final class UpdateChatParticipant extends AbstractUpdate
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->prevParticipant !== null) $flags |= (1 << 0);
-        if ($this->newParticipant !== null) $flags |= (1 << 1);
-        if ($this->invite !== null) $flags |= (1 << 2);
+        if ($this->prevParticipant !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->newParticipant !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->invite !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->chatId);
         $buffer .= Serializer::int32($this->date);
@@ -57,10 +62,8 @@ final class UpdateChatParticipant extends AbstractUpdate
             $buffer .= $this->invite->serialize();
         }
         $buffer .= Serializer::int32($this->qts);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -69,9 +72,9 @@ final class UpdateChatParticipant extends AbstractUpdate
         $date = Deserializer::int32($stream);
         $actorId = Deserializer::int64($stream);
         $userId = Deserializer::int64($stream);
-        $prevParticipant = ($flags & (1 << 0)) ? AbstractChatParticipant::deserialize($stream) : null;
-        $newParticipant = ($flags & (1 << 1)) ? AbstractChatParticipant::deserialize($stream) : null;
-        $invite = ($flags & (1 << 2)) ? AbstractExportedChatInvite::deserialize($stream) : null;
+        $prevParticipant = (($flags & (1 << 0)) !== 0) ? AbstractChatParticipant::deserialize($stream) : null;
+        $newParticipant = (($flags & (1 << 1)) !== 0) ? AbstractChatParticipant::deserialize($stream) : null;
+        $invite = (($flags & (1 << 2)) !== 0) ? AbstractExportedChatInvite::deserialize($stream) : null;
         $qts = Deserializer::int32($stream);
 
         return new self(

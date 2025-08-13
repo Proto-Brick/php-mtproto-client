@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/chatInvite
@@ -59,20 +58,48 @@ final class ChatInvite extends AbstractChatInvite
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->channel) $flags |= (1 << 0);
-        if ($this->broadcast) $flags |= (1 << 1);
-        if ($this->public) $flags |= (1 << 2);
-        if ($this->megagroup) $flags |= (1 << 3);
-        if ($this->requestNeeded) $flags |= (1 << 6);
-        if ($this->verified) $flags |= (1 << 7);
-        if ($this->scam) $flags |= (1 << 8);
-        if ($this->fake) $flags |= (1 << 9);
-        if ($this->canRefulfillSubscription) $flags |= (1 << 11);
-        if ($this->about !== null) $flags |= (1 << 5);
-        if ($this->participants !== null) $flags |= (1 << 4);
-        if ($this->subscriptionPricing !== null) $flags |= (1 << 10);
-        if ($this->subscriptionFormId !== null) $flags |= (1 << 12);
-        if ($this->botVerification !== null) $flags |= (1 << 13);
+        if ($this->channel) {
+            $flags |= (1 << 0);
+        }
+        if ($this->broadcast) {
+            $flags |= (1 << 1);
+        }
+        if ($this->public) {
+            $flags |= (1 << 2);
+        }
+        if ($this->megagroup) {
+            $flags |= (1 << 3);
+        }
+        if ($this->requestNeeded) {
+            $flags |= (1 << 6);
+        }
+        if ($this->verified) {
+            $flags |= (1 << 7);
+        }
+        if ($this->scam) {
+            $flags |= (1 << 8);
+        }
+        if ($this->fake) {
+            $flags |= (1 << 9);
+        }
+        if ($this->canRefulfillSubscription) {
+            $flags |= (1 << 11);
+        }
+        if ($this->about !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->participants !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->subscriptionPricing !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->subscriptionFormId !== null) {
+            $flags |= (1 << 12);
+        }
+        if ($this->botVerification !== null) {
+            $flags |= (1 << 13);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->title);
         if ($flags & (1 << 5)) {
@@ -93,32 +120,30 @@ final class ChatInvite extends AbstractChatInvite
         if ($flags & (1 << 13)) {
             $buffer .= $this->botVerification->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $channel = ($flags & (1 << 0)) ? true : null;
-        $broadcast = ($flags & (1 << 1)) ? true : null;
-        $public = ($flags & (1 << 2)) ? true : null;
-        $megagroup = ($flags & (1 << 3)) ? true : null;
-        $requestNeeded = ($flags & (1 << 6)) ? true : null;
-        $verified = ($flags & (1 << 7)) ? true : null;
-        $scam = ($flags & (1 << 8)) ? true : null;
-        $fake = ($flags & (1 << 9)) ? true : null;
-        $canRefulfillSubscription = ($flags & (1 << 11)) ? true : null;
+        $channel = (($flags & (1 << 0)) !== 0) ? true : null;
+        $broadcast = (($flags & (1 << 1)) !== 0) ? true : null;
+        $public = (($flags & (1 << 2)) !== 0) ? true : null;
+        $megagroup = (($flags & (1 << 3)) !== 0) ? true : null;
+        $requestNeeded = (($flags & (1 << 6)) !== 0) ? true : null;
+        $verified = (($flags & (1 << 7)) !== 0) ? true : null;
+        $scam = (($flags & (1 << 8)) !== 0) ? true : null;
+        $fake = (($flags & (1 << 9)) !== 0) ? true : null;
+        $canRefulfillSubscription = (($flags & (1 << 11)) !== 0) ? true : null;
         $title = Deserializer::bytes($stream);
-        $about = ($flags & (1 << 5)) ? Deserializer::bytes($stream) : null;
+        $about = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
         $photo = AbstractPhoto::deserialize($stream);
         $participantsCount = Deserializer::int32($stream);
-        $participants = ($flags & (1 << 4)) ? Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']) : null;
+        $participants = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']) : null;
         $color = Deserializer::int32($stream);
-        $subscriptionPricing = ($flags & (1 << 10)) ? StarsSubscriptionPricing::deserialize($stream) : null;
-        $subscriptionFormId = ($flags & (1 << 12)) ? Deserializer::int64($stream) : null;
-        $botVerification = ($flags & (1 << 13)) ? BotVerification::deserialize($stream) : null;
+        $subscriptionPricing = (($flags & (1 << 10)) !== 0) ? StarsSubscriptionPricing::deserialize($stream) : null;
+        $subscriptionFormId = (($flags & (1 << 12)) !== 0) ? Deserializer::int64($stream) : null;
+        $botVerification = (($flags & (1 << 13)) !== 0) ? BotVerification::deserialize($stream) : null;
 
         return new self(
             $title,

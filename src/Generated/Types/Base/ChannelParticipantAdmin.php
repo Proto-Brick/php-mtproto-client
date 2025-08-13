@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/channelParticipantAdmin
@@ -39,10 +38,18 @@ final class ChannelParticipantAdmin extends AbstractChannelParticipant
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->canEdit) $flags |= (1 << 0);
-        if ($this->self) $flags |= (1 << 1);
-        if ($this->inviterId !== null) $flags |= (1 << 1);
-        if ($this->rank !== null) $flags |= (1 << 2);
+        if ($this->canEdit) {
+            $flags |= (1 << 0);
+        }
+        if ($this->self) {
+            $flags |= (1 << 1);
+        }
+        if ($this->inviterId !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->rank !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->userId);
         if ($flags & (1 << 1)) {
@@ -54,22 +61,20 @@ final class ChannelParticipantAdmin extends AbstractChannelParticipant
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::bytes($this->rank);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $canEdit = ($flags & (1 << 0)) ? true : null;
-        $self = ($flags & (1 << 1)) ? true : null;
+        $canEdit = (($flags & (1 << 0)) !== 0) ? true : null;
+        $self = (($flags & (1 << 1)) !== 0) ? true : null;
         $userId = Deserializer::int64($stream);
-        $inviterId = ($flags & (1 << 1)) ? Deserializer::int64($stream) : null;
+        $inviterId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($stream) : null;
         $promotedBy = Deserializer::int64($stream);
         $date = Deserializer::int32($stream);
         $adminRights = ChatAdminRights::deserialize($stream);
-        $rank = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $rank = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(
             $userId,

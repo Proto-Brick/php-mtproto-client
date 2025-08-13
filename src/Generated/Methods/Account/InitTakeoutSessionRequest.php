@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Account\Takeout;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\Takeout;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.initTakeoutSession
  */
-final class InitTakeoutSessionRequest extends TlObject
+final class InitTakeoutSessionRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x8ef3eab0;
     
@@ -47,23 +46,31 @@ final class InitTakeoutSessionRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->contacts) $flags |= (1 << 0);
-        if ($this->messageUsers) $flags |= (1 << 1);
-        if ($this->messageChats) $flags |= (1 << 2);
-        if ($this->messageMegagroups) $flags |= (1 << 3);
-        if ($this->messageChannels) $flags |= (1 << 4);
-        if ($this->files) $flags |= (1 << 5);
-        if ($this->fileMaxSize !== null) $flags |= (1 << 5);
+        if ($this->contacts) {
+            $flags |= (1 << 0);
+        }
+        if ($this->messageUsers) {
+            $flags |= (1 << 1);
+        }
+        if ($this->messageChats) {
+            $flags |= (1 << 2);
+        }
+        if ($this->messageMegagroups) {
+            $flags |= (1 << 3);
+        }
+        if ($this->messageChannels) {
+            $flags |= (1 << 4);
+        }
+        if ($this->files) {
+            $flags |= (1 << 5);
+        }
+        if ($this->fileMaxSize !== null) {
+            $flags |= (1 << 5);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 5)) {
             $buffer .= Serializer::int64($this->fileMaxSize);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Help;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Help;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/help.country
@@ -33,8 +34,12 @@ final class Country extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->hidden) $flags |= (1 << 0);
-        if ($this->name !== null) $flags |= (1 << 1);
+        if ($this->hidden) {
+            $flags |= (1 << 0);
+        }
+        if ($this->name !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->iso2);
         $buffer .= Serializer::bytes($this->defaultName);
@@ -42,21 +47,19 @@ final class Country extends TlObject
             $buffer .= Serializer::bytes($this->name);
         }
         $buffer .= Serializer::vectorOfObjects($this->countryCodes);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $hidden = ($flags & (1 << 0)) ? true : null;
+        $hidden = (($flags & (1 << 0)) !== 0) ? true : null;
         $iso2 = Deserializer::bytes($stream);
         $defaultName = Deserializer::bytes($stream);
-        $name = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $name = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $countryCodes = Deserializer::vectorOfObjects($stream, [CountryCode::class, 'deserialize']);
 
         return new self(

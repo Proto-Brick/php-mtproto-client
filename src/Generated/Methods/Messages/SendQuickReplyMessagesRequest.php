@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.sendQuickReplyMessages
  */
-final class SendQuickReplyMessagesRequest extends TlObject
+final class SendQuickReplyMessagesRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x6c750de1;
     
@@ -45,12 +44,6 @@ final class SendQuickReplyMessagesRequest extends TlObject
         $buffer .= Serializer::int32($this->shortcutId);
         $buffer .= Serializer::vectorOfInts($this->id);
         $buffer .= Serializer::vectorOfLongs($this->randomId);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

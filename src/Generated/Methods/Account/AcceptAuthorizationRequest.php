@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\SecureCredentialsEncrypted;
-use DigitalStars\MtprotoClient\Generated\Types\Base\SecureValueHash;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SecureCredentialsEncrypted;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SecureValueHash;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.acceptAuthorization
  */
-final class AcceptAuthorizationRequest extends TlObject
+final class AcceptAuthorizationRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xf3ed4c73;
     
@@ -48,12 +47,6 @@ final class AcceptAuthorizationRequest extends TlObject
         $buffer .= Serializer::bytes($this->publicKey);
         $buffer .= Serializer::vectorOfObjects($this->valueHashes);
         $buffer .= $this->credentials->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

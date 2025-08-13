@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.deleteStarGiftCollection
  */
-final class DeleteStarGiftCollectionRequest extends TlObject
+final class DeleteStarGiftCollectionRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xad5648e8;
     
@@ -38,12 +37,6 @@ final class DeleteStarGiftCollectionRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->collectionId);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

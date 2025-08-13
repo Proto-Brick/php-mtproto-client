@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\ShippingOption;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ShippingOption;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.setBotShippingResults
  */
-final class SetBotShippingResultsRequest extends TlObject
+final class SetBotShippingResultsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xe5f672fa;
     
@@ -39,8 +38,12 @@ final class SetBotShippingResultsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->error !== null) $flags |= (1 << 0);
-        if ($this->shippingOptions !== null) $flags |= (1 << 1);
+        if ($this->error !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->shippingOptions !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->queryId);
         if ($flags & (1 << 0)) {
@@ -49,12 +52,6 @@ final class SetBotShippingResultsRequest extends TlObject
         if ($flags & (1 << 1)) {
             $buffer .= Serializer::vectorOfObjects($this->shippingOptions);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

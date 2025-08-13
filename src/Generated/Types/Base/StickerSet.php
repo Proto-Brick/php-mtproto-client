@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/stickerSet
@@ -59,18 +60,42 @@ final class StickerSet extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->archived) $flags |= (1 << 1);
-        if ($this->official) $flags |= (1 << 2);
-        if ($this->masks) $flags |= (1 << 3);
-        if ($this->emojis) $flags |= (1 << 7);
-        if ($this->textColor) $flags |= (1 << 9);
-        if ($this->channelEmojiStatus) $flags |= (1 << 10);
-        if ($this->creator) $flags |= (1 << 11);
-        if ($this->installedDate !== null) $flags |= (1 << 0);
-        if ($this->thumbs !== null) $flags |= (1 << 4);
-        if ($this->thumbDcId !== null) $flags |= (1 << 4);
-        if ($this->thumbVersion !== null) $flags |= (1 << 4);
-        if ($this->thumbDocumentId !== null) $flags |= (1 << 8);
+        if ($this->archived) {
+            $flags |= (1 << 1);
+        }
+        if ($this->official) {
+            $flags |= (1 << 2);
+        }
+        if ($this->masks) {
+            $flags |= (1 << 3);
+        }
+        if ($this->emojis) {
+            $flags |= (1 << 7);
+        }
+        if ($this->textColor) {
+            $flags |= (1 << 9);
+        }
+        if ($this->channelEmojiStatus) {
+            $flags |= (1 << 10);
+        }
+        if ($this->creator) {
+            $flags |= (1 << 11);
+        }
+        if ($this->installedDate !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->thumbs !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->thumbDcId !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->thumbVersion !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->thumbDocumentId !== null) {
+            $flags |= (1 << 8);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->installedDate);
@@ -93,33 +118,31 @@ final class StickerSet extends TlObject
         }
         $buffer .= Serializer::int32($this->count);
         $buffer .= Serializer::int32($this->hash);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $archived = ($flags & (1 << 1)) ? true : null;
-        $official = ($flags & (1 << 2)) ? true : null;
-        $masks = ($flags & (1 << 3)) ? true : null;
-        $emojis = ($flags & (1 << 7)) ? true : null;
-        $textColor = ($flags & (1 << 9)) ? true : null;
-        $channelEmojiStatus = ($flags & (1 << 10)) ? true : null;
-        $creator = ($flags & (1 << 11)) ? true : null;
-        $installedDate = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $archived = (($flags & (1 << 1)) !== 0) ? true : null;
+        $official = (($flags & (1 << 2)) !== 0) ? true : null;
+        $masks = (($flags & (1 << 3)) !== 0) ? true : null;
+        $emojis = (($flags & (1 << 7)) !== 0) ? true : null;
+        $textColor = (($flags & (1 << 9)) !== 0) ? true : null;
+        $channelEmojiStatus = (($flags & (1 << 10)) !== 0) ? true : null;
+        $creator = (($flags & (1 << 11)) !== 0) ? true : null;
+        $installedDate = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $id = Deserializer::int64($stream);
         $accessHash = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $shortName = Deserializer::bytes($stream);
-        $thumbs = ($flags & (1 << 4)) ? Deserializer::vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']) : null;
-        $thumbDcId = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $thumbVersion = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $thumbDocumentId = ($flags & (1 << 8)) ? Deserializer::int64($stream) : null;
+        $thumbs = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']) : null;
+        $thumbDcId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $thumbVersion = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $thumbDocumentId = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($stream) : null;
         $count = Deserializer::int32($stream);
         $hash = Deserializer::int32($stream);
 

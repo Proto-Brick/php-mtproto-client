@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Help;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Help;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
-use DigitalStars\MtprotoClient\Generated\Types\Help\AbstractUserInfo;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessageEntity;
+use ProtoBrick\MTProtoClient\Generated\Types\Help\AbstractUserInfo;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/help.editUserInfo
  */
-final class EditUserInfoRequest extends TlObject
+final class EditUserInfoRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x66b91b70;
     
@@ -43,12 +42,6 @@ final class EditUserInfoRequest extends TlObject
         $buffer .= $this->userId->serialize();
         $buffer .= Serializer::bytes($this->message);
         $buffer .= Serializer::vectorOfObjects($this->entities);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

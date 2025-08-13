@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/payments.giveawayInfo
@@ -35,11 +34,21 @@ final class GiveawayInfo extends AbstractGiveawayInfo
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->participating) $flags |= (1 << 0);
-        if ($this->preparingResults) $flags |= (1 << 3);
-        if ($this->joinedTooEarlyDate !== null) $flags |= (1 << 1);
-        if ($this->adminDisallowedChatId !== null) $flags |= (1 << 2);
-        if ($this->disallowedCountry !== null) $flags |= (1 << 4);
+        if ($this->participating) {
+            $flags |= (1 << 0);
+        }
+        if ($this->preparingResults) {
+            $flags |= (1 << 3);
+        }
+        if ($this->joinedTooEarlyDate !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->adminDisallowedChatId !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->disallowedCountry !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->startDate);
         if ($flags & (1 << 1)) {
@@ -51,20 +60,18 @@ final class GiveawayInfo extends AbstractGiveawayInfo
         if ($flags & (1 << 4)) {
             $buffer .= Serializer::bytes($this->disallowedCountry);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $participating = ($flags & (1 << 0)) ? true : null;
-        $preparingResults = ($flags & (1 << 3)) ? true : null;
+        $participating = (($flags & (1 << 0)) !== 0) ? true : null;
+        $preparingResults = (($flags & (1 << 3)) !== 0) ? true : null;
         $startDate = Deserializer::int32($stream);
-        $joinedTooEarlyDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
-        $adminDisallowedChatId = ($flags & (1 << 2)) ? Deserializer::int64($stream) : null;
-        $disallowedCountry = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
+        $joinedTooEarlyDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $adminDisallowedChatId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;
+        $disallowedCountry = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(
             $startDate,

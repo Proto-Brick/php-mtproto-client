@@ -1,12 +1,12 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Api;
+namespace ProtoBrick\MTProtoClient\Generated\Api;
 
-use DigitalStars\MtprotoClient\Client;
-use DigitalStars\MtprotoClient\Generated\Methods\Fragment\GetCollectibleInfoRequest;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputCollectible;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputCollectiblePhone;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputCollectibleUsername;
-use DigitalStars\MtprotoClient\Generated\Types\Fragment\CollectibleInfo;
+use ProtoBrick\MTProtoClient\Client;
+use ProtoBrick\MTProtoClient\Generated\Methods\Fragment\GetCollectibleInfoRequest;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputCollectible;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputCollectiblePhone;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputCollectibleUsername;
+use ProtoBrick\MTProtoClient\Generated\Types\Fragment\CollectibleInfo;
 
 
 /**

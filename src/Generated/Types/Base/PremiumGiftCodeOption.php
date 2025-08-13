@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/premiumGiftCodeOption
@@ -35,8 +36,12 @@ final class PremiumGiftCodeOption extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->storeProduct !== null) $flags |= (1 << 0);
-        if ($this->storeQuantity !== null) $flags |= (1 << 1);
+        if ($this->storeProduct !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->storeQuantity !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->users);
         $buffer .= Serializer::int32($this->months);
@@ -48,21 +53,19 @@ final class PremiumGiftCodeOption extends TlObject
         }
         $buffer .= Serializer::bytes($this->currency);
         $buffer .= Serializer::int64($this->amount);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
         $users = Deserializer::int32($stream);
         $months = Deserializer::int32($stream);
-        $storeProduct = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
-        $storeQuantity = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $storeProduct = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $storeQuantity = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $currency = Deserializer::bytes($stream);
         $amount = Deserializer::int64($stream);
 

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/dialogFilterChatlist
@@ -39,10 +38,18 @@ final class DialogFilterChatlist extends AbstractDialogFilter
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->hasMyInvites) $flags |= (1 << 26);
-        if ($this->titleNoanimate) $flags |= (1 << 28);
-        if ($this->emoticon !== null) $flags |= (1 << 25);
-        if ($this->color !== null) $flags |= (1 << 27);
+        if ($this->hasMyInvites) {
+            $flags |= (1 << 26);
+        }
+        if ($this->titleNoanimate) {
+            $flags |= (1 << 28);
+        }
+        if ($this->emoticon !== null) {
+            $flags |= (1 << 25);
+        }
+        if ($this->color !== null) {
+            $flags |= (1 << 27);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
         $buffer .= $this->title->serialize();
@@ -54,20 +61,18 @@ final class DialogFilterChatlist extends AbstractDialogFilter
         }
         $buffer .= Serializer::vectorOfObjects($this->pinnedPeers);
         $buffer .= Serializer::vectorOfObjects($this->includePeers);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $hasMyInvites = ($flags & (1 << 26)) ? true : null;
-        $titleNoanimate = ($flags & (1 << 28)) ? true : null;
+        $hasMyInvites = (($flags & (1 << 26)) !== 0) ? true : null;
+        $titleNoanimate = (($flags & (1 << 28)) !== 0) ? true : null;
         $id = Deserializer::int32($stream);
         $title = TextWithEntities::deserialize($stream);
-        $emoticon = ($flags & (1 << 25)) ? Deserializer::bytes($stream) : null;
-        $color = ($flags & (1 << 27)) ? Deserializer::int32($stream) : null;
+        $emoticon = (($flags & (1 << 25)) !== 0) ? Deserializer::bytes($stream) : null;
+        $color = (($flags & (1 << 27)) !== 0) ? Deserializer::int32($stream) : null;
         $pinnedPeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
         $includePeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
 

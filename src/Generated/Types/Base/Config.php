@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/config
@@ -117,22 +118,54 @@ final class Config extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->defaultP2pContacts) $flags |= (1 << 3);
-        if ($this->preloadFeaturedStickers) $flags |= (1 << 4);
-        if ($this->revokePmInbox) $flags |= (1 << 6);
-        if ($this->blockedMode) $flags |= (1 << 8);
-        if ($this->forceTryIpv6) $flags |= (1 << 14);
-        if ($this->tmpSessions !== null) $flags |= (1 << 0);
-        if ($this->autoupdateUrlPrefix !== null) $flags |= (1 << 7);
-        if ($this->gifSearchUsername !== null) $flags |= (1 << 9);
-        if ($this->venueSearchUsername !== null) $flags |= (1 << 10);
-        if ($this->imgSearchUsername !== null) $flags |= (1 << 11);
-        if ($this->staticMapsProvider !== null) $flags |= (1 << 12);
-        if ($this->suggestedLangCode !== null) $flags |= (1 << 2);
-        if ($this->langPackVersion !== null) $flags |= (1 << 2);
-        if ($this->baseLangPackVersion !== null) $flags |= (1 << 2);
-        if ($this->reactionsDefault !== null) $flags |= (1 << 15);
-        if ($this->autologinToken !== null) $flags |= (1 << 16);
+        if ($this->defaultP2pContacts) {
+            $flags |= (1 << 3);
+        }
+        if ($this->preloadFeaturedStickers) {
+            $flags |= (1 << 4);
+        }
+        if ($this->revokePmInbox) {
+            $flags |= (1 << 6);
+        }
+        if ($this->blockedMode) {
+            $flags |= (1 << 8);
+        }
+        if ($this->forceTryIpv6) {
+            $flags |= (1 << 14);
+        }
+        if ($this->tmpSessions !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->autoupdateUrlPrefix !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->gifSearchUsername !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->venueSearchUsername !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->imgSearchUsername !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->staticMapsProvider !== null) {
+            $flags |= (1 << 12);
+        }
+        if ($this->suggestedLangCode !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->langPackVersion !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->baseLangPackVersion !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->reactionsDefault !== null) {
+            $flags |= (1 << 15);
+        }
+        if ($this->autologinToken !== null) {
+            $flags |= (1 << 16);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->date);
         $buffer .= Serializer::int32($this->expires);
@@ -198,22 +231,20 @@ final class Config extends TlObject
         if ($flags & (1 << 16)) {
             $buffer .= Serializer::bytes($this->autologinToken);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $defaultP2pContacts = ($flags & (1 << 3)) ? true : null;
-        $preloadFeaturedStickers = ($flags & (1 << 4)) ? true : null;
-        $revokePmInbox = ($flags & (1 << 6)) ? true : null;
-        $blockedMode = ($flags & (1 << 8)) ? true : null;
-        $forceTryIpv6 = ($flags & (1 << 14)) ? true : null;
+        $defaultP2pContacts = (($flags & (1 << 3)) !== 0) ? true : null;
+        $preloadFeaturedStickers = (($flags & (1 << 4)) !== 0) ? true : null;
+        $revokePmInbox = (($flags & (1 << 6)) !== 0) ? true : null;
+        $blockedMode = (($flags & (1 << 8)) !== 0) ? true : null;
+        $forceTryIpv6 = (($flags & (1 << 14)) !== 0) ? true : null;
         $date = Deserializer::int32($stream);
         $expires = Deserializer::int32($stream);
         $testMode = (Deserializer::int32($stream) === 0x997275b5);
@@ -237,25 +268,25 @@ final class Config extends TlObject
         $ratingEDecay = Deserializer::int32($stream);
         $stickersRecentLimit = Deserializer::int32($stream);
         $channelsReadMediaPeriod = Deserializer::int32($stream);
-        $tmpSessions = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $tmpSessions = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $callReceiveTimeoutMs = Deserializer::int32($stream);
         $callRingTimeoutMs = Deserializer::int32($stream);
         $callConnectTimeoutMs = Deserializer::int32($stream);
         $callPacketTimeoutMs = Deserializer::int32($stream);
         $meUrlPrefix = Deserializer::bytes($stream);
-        $autoupdateUrlPrefix = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
-        $gifSearchUsername = ($flags & (1 << 9)) ? Deserializer::bytes($stream) : null;
-        $venueSearchUsername = ($flags & (1 << 10)) ? Deserializer::bytes($stream) : null;
-        $imgSearchUsername = ($flags & (1 << 11)) ? Deserializer::bytes($stream) : null;
-        $staticMapsProvider = ($flags & (1 << 12)) ? Deserializer::bytes($stream) : null;
+        $autoupdateUrlPrefix = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
+        $gifSearchUsername = (($flags & (1 << 9)) !== 0) ? Deserializer::bytes($stream) : null;
+        $venueSearchUsername = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($stream) : null;
+        $imgSearchUsername = (($flags & (1 << 11)) !== 0) ? Deserializer::bytes($stream) : null;
+        $staticMapsProvider = (($flags & (1 << 12)) !== 0) ? Deserializer::bytes($stream) : null;
         $captionLengthMax = Deserializer::int32($stream);
         $messageLengthMax = Deserializer::int32($stream);
         $webfileDcId = Deserializer::int32($stream);
-        $suggestedLangCode = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
-        $langPackVersion = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
-        $baseLangPackVersion = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
-        $reactionsDefault = ($flags & (1 << 15)) ? AbstractReaction::deserialize($stream) : null;
-        $autologinToken = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
+        $suggestedLangCode = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
+        $langPackVersion = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $baseLangPackVersion = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $reactionsDefault = (($flags & (1 << 15)) !== 0) ? AbstractReaction::deserialize($stream) : null;
+        $autologinToken = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(
             $date,

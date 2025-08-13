@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Langpack;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Langpack;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractLangPackString;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractLangPackString;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/langpack.getStrings
  */
-final class GetStringsRequest extends TlObject
+final class GetStringsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xefea3803;
     
@@ -41,12 +40,6 @@ final class GetStringsRequest extends TlObject
         $buffer .= Serializer::bytes($this->langPack);
         $buffer .= Serializer::bytes($this->langCode);
         $buffer .= Serializer::vectorOfStrings($this->keys);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

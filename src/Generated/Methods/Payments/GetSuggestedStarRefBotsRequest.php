@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Payments\SuggestedStarRefBots;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\SuggestedStarRefBots;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.getSuggestedStarRefBots
  */
-final class GetSuggestedStarRefBotsRequest extends TlObject
+final class GetSuggestedStarRefBotsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xd6b48f7;
     
@@ -44,18 +43,16 @@ final class GetSuggestedStarRefBotsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->orderByRevenue) $flags |= (1 << 0);
-        if ($this->orderByDate) $flags |= (1 << 1);
+        if ($this->orderByRevenue) {
+            $flags |= (1 << 0);
+        }
+        if ($this->orderByDate) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::bytes($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

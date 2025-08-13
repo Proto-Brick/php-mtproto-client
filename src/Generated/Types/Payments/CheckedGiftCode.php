@@ -1,12 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/payments.checkedGiftCode
@@ -44,11 +45,21 @@ final class CheckedGiftCode extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->viaGiveaway) $flags |= (1 << 2);
-        if ($this->fromId !== null) $flags |= (1 << 4);
-        if ($this->giveawayMsgId !== null) $flags |= (1 << 3);
-        if ($this->toId !== null) $flags |= (1 << 0);
-        if ($this->usedDate !== null) $flags |= (1 << 1);
+        if ($this->viaGiveaway) {
+            $flags |= (1 << 2);
+        }
+        if ($this->fromId !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->giveawayMsgId !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->toId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->usedDate !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 4)) {
             $buffer .= $this->fromId->serialize();
@@ -66,24 +77,22 @@ final class CheckedGiftCode extends TlObject
         }
         $buffer .= Serializer::vectorOfObjects($this->chats);
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $viaGiveaway = ($flags & (1 << 2)) ? true : null;
-        $fromId = ($flags & (1 << 4)) ? AbstractPeer::deserialize($stream) : null;
-        $giveawayMsgId = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
-        $toId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
+        $viaGiveaway = (($flags & (1 << 2)) !== 0) ? true : null;
+        $fromId = (($flags & (1 << 4)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $giveawayMsgId = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $toId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
         $date = Deserializer::int32($stream);
         $months = Deserializer::int32($stream);
-        $usedDate = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $usedDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 

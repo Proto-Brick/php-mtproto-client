@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/documentAttributeAudio
@@ -33,10 +32,18 @@ final class DocumentAttributeAudio extends AbstractDocumentAttribute
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->voice) $flags |= (1 << 10);
-        if ($this->title !== null) $flags |= (1 << 0);
-        if ($this->performer !== null) $flags |= (1 << 1);
-        if ($this->waveform !== null) $flags |= (1 << 2);
+        if ($this->voice) {
+            $flags |= (1 << 10);
+        }
+        if ($this->title !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->performer !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->waveform !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->duration);
         if ($flags & (1 << 0)) {
@@ -48,19 +55,17 @@ final class DocumentAttributeAudio extends AbstractDocumentAttribute
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::bytes($this->waveform);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $voice = ($flags & (1 << 10)) ? true : null;
+        $voice = (($flags & (1 << 10)) !== 0) ? true : null;
         $duration = Deserializer::int32($stream);
-        $title = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
-        $performer = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $waveform = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $performer = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $waveform = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(
             $duration,

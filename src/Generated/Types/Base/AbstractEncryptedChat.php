@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/EncryptedChat
  */
@@ -19,7 +22,7 @@ abstract class AbstractEncryptedChat extends TlObject
             0x48f1d94c => EncryptedChatRequested::deserialize($stream),
             0x61f0d4c7 => EncryptedChat::deserialize($stream),
             0x1e1c7c45 => EncryptedChatDiscarded::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type EncryptedChat. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type EncryptedChat. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

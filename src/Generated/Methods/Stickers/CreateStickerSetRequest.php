@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Stickers;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Stickers;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputStickerSetItem;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\AbstractStickerSet;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputStickerSetItem;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AbstractStickerSet;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/stickers.createStickerSet
  */
-final class CreateStickerSetRequest extends TlObject
+final class CreateStickerSetRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x9021ab67;
     
@@ -54,11 +53,21 @@ final class CreateStickerSetRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->masks) $flags |= (1 << 0);
-        if ($this->emojis) $flags |= (1 << 5);
-        if ($this->textColor) $flags |= (1 << 6);
-        if ($this->thumb !== null) $flags |= (1 << 2);
-        if ($this->software !== null) $flags |= (1 << 3);
+        if ($this->masks) {
+            $flags |= (1 << 0);
+        }
+        if ($this->emojis) {
+            $flags |= (1 << 5);
+        }
+        if ($this->textColor) {
+            $flags |= (1 << 6);
+        }
+        if ($this->thumb !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->software !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->userId->serialize();
         $buffer .= Serializer::bytes($this->title);
@@ -70,12 +79,6 @@ final class CreateStickerSetRequest extends TlObject
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::bytes($this->software);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

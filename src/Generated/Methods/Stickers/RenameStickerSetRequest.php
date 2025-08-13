@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Stickers;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Stickers;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputStickerSet;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\AbstractStickerSet;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputStickerSet;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AbstractStickerSet;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/stickers.renameStickerSet
  */
-final class RenameStickerSetRequest extends TlObject
+final class RenameStickerSetRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x124b1c00;
     
@@ -39,12 +38,6 @@ final class RenameStickerSetRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->stickerset->serialize();
         $buffer .= Serializer::bytes($this->title);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

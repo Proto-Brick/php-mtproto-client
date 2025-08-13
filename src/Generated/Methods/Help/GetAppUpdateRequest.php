@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Help;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Help;
 
-use DigitalStars\MtprotoClient\Generated\Types\Help\AbstractAppUpdate;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Help\AbstractAppUpdate;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/help.getAppUpdate
  */
-final class GetAppUpdateRequest extends TlObject
+final class GetAppUpdateRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x522d5a7d;
     
@@ -35,12 +34,6 @@ final class GetAppUpdateRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::bytes($this->source);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

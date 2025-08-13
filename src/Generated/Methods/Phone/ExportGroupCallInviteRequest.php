@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Phone;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputGroupCall;
-use DigitalStars\MtprotoClient\Generated\Types\Phone\ExportedGroupCallInvite;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputGroupCall;
+use ProtoBrick\MTProtoClient\Generated\Types\Phone\ExportedGroupCallInvite;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/phone.exportGroupCallInvite
  */
-final class ExportGroupCallInviteRequest extends TlObject
+final class ExportGroupCallInviteRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xe6aa647f;
     
@@ -38,15 +37,11 @@ final class ExportGroupCallInviteRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->canSelfUnmute) $flags |= (1 << 0);
+        if ($this->canSelfUnmute) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->call->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

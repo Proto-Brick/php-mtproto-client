@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Premium;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Premium;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\Boost;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Boost;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/premium.boostsList
@@ -33,7 +34,9 @@ final class BoostsList extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->nextOffset !== null) $flags |= (1 << 0);
+        if ($this->nextOffset !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->count);
         $buffer .= Serializer::vectorOfObjects($this->boosts);
@@ -41,20 +44,18 @@ final class BoostsList extends TlObject
             $buffer .= Serializer::bytes($this->nextOffset);
         }
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
         $count = Deserializer::int32($stream);
         $boosts = Deserializer::vectorOfObjects($stream, [Boost::class, 'deserialize']);
-        $nextOffset = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
+        $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 
         return new self(

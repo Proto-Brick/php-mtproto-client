@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Auth;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/auth.dropTempAuthKeys
  */
-final class DropTempAuthKeysRequest extends TlObject
+final class DropTempAuthKeysRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x8e48a188;
     
@@ -34,12 +33,6 @@ final class DropTempAuthKeysRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::vectorOfLongs($this->exceptAuthKeys);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputReplyTo;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\WebViewResult;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputReplyTo;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\WebViewResult;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.requestWebView
  */
-final class RequestWebViewRequest extends TlObject
+final class RequestWebViewRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x269dc2c1;
     
@@ -60,15 +59,33 @@ final class RequestWebViewRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->fromBotMenu) $flags |= (1 << 4);
-        if ($this->silent) $flags |= (1 << 5);
-        if ($this->compact) $flags |= (1 << 7);
-        if ($this->fullscreen) $flags |= (1 << 8);
-        if ($this->url !== null) $flags |= (1 << 1);
-        if ($this->startParam !== null) $flags |= (1 << 3);
-        if ($this->themeParams !== null) $flags |= (1 << 2);
-        if ($this->replyTo !== null) $flags |= (1 << 0);
-        if ($this->sendAs !== null) $flags |= (1 << 13);
+        if ($this->fromBotMenu) {
+            $flags |= (1 << 4);
+        }
+        if ($this->silent) {
+            $flags |= (1 << 5);
+        }
+        if ($this->compact) {
+            $flags |= (1 << 7);
+        }
+        if ($this->fullscreen) {
+            $flags |= (1 << 8);
+        }
+        if ($this->url !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->startParam !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->themeParams !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->replyTo !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->sendAs !== null) {
+            $flags |= (1 << 13);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= $this->bot->serialize();
@@ -88,12 +105,6 @@ final class RequestWebViewRequest extends TlObject
         if ($flags & (1 << 13)) {
             $buffer .= $this->sendAs->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

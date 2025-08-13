@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Stories;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Stories;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/stories.toggleAllStoriesHidden
  */
-final class ToggleAllStoriesHiddenRequest extends TlObject
+final class ToggleAllStoriesHiddenRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x7c2557c4;
     
@@ -34,12 +33,6 @@ final class ToggleAllStoriesHiddenRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= ($this->hidden ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

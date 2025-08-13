@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Phone;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputGroupCall;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputGroupCall;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/phone.toggleGroupCallRecord
  */
-final class ToggleGroupCallRecordRequest extends TlObject
+final class ToggleGroupCallRecordRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xf128c708;
     
@@ -44,10 +43,18 @@ final class ToggleGroupCallRecordRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->start) $flags |= (1 << 0);
-        if ($this->video) $flags |= (1 << 2);
-        if ($this->title !== null) $flags |= (1 << 1);
-        if ($this->videoPortrait !== null) $flags |= (1 << 2);
+        if ($this->start) {
+            $flags |= (1 << 0);
+        }
+        if ($this->video) {
+            $flags |= (1 << 2);
+        }
+        if ($this->title !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->videoPortrait !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->call->serialize();
         if ($flags & (1 << 1)) {
@@ -56,12 +63,6 @@ final class ToggleGroupCallRecordRequest extends TlObject
         if ($flags & (1 << 2)) {
             $buffer .= ($this->videoPortrait ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

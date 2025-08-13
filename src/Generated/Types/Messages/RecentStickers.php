@@ -1,11 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StickerPack;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StickerPack;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messages.recentStickers
@@ -36,10 +35,8 @@ final class RecentStickers extends AbstractRecentStickers
         $buffer .= Serializer::vectorOfObjects($this->packs);
         $buffer .= Serializer::vectorOfObjects($this->stickers);
         $buffer .= Serializer::vectorOfInts($this->dates);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

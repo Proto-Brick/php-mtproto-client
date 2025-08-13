@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputStickeredMedia;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractStickerSetCovered;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputStickeredMedia;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractStickerSetCovered;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.getAttachedStickers
  */
-final class GetAttachedStickersRequest extends TlObject
+final class GetAttachedStickersRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xcc5b67cc;
     
@@ -36,12 +35,6 @@ final class GetAttachedStickersRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->media->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

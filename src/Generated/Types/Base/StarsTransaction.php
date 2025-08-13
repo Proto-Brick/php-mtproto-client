@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/starsTransaction
@@ -85,33 +86,87 @@ final class StarsTransaction extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->refund) $flags |= (1 << 3);
-        if ($this->pending) $flags |= (1 << 4);
-        if ($this->failed) $flags |= (1 << 6);
-        if ($this->gift) $flags |= (1 << 10);
-        if ($this->reaction) $flags |= (1 << 11);
-        if ($this->stargiftUpgrade) $flags |= (1 << 18);
-        if ($this->businessTransfer) $flags |= (1 << 21);
-        if ($this->stargiftResale) $flags |= (1 << 22);
-        if ($this->title !== null) $flags |= (1 << 0);
-        if ($this->description !== null) $flags |= (1 << 1);
-        if ($this->photo !== null) $flags |= (1 << 2);
-        if ($this->transactionDate !== null) $flags |= (1 << 5);
-        if ($this->transactionUrl !== null) $flags |= (1 << 5);
-        if ($this->botPayload !== null) $flags |= (1 << 7);
-        if ($this->msgId !== null) $flags |= (1 << 8);
-        if ($this->extendedMedia !== null) $flags |= (1 << 9);
-        if ($this->subscriptionPeriod !== null) $flags |= (1 << 12);
-        if ($this->giveawayPostId !== null) $flags |= (1 << 13);
-        if ($this->stargift !== null) $flags |= (1 << 14);
-        if ($this->floodskipNumber !== null) $flags |= (1 << 15);
-        if ($this->starrefCommissionPermille !== null) $flags |= (1 << 16);
-        if ($this->starrefPeer !== null) $flags |= (1 << 17);
-        if ($this->starrefAmount !== null) $flags |= (1 << 17);
-        if ($this->paidMessages !== null) $flags |= (1 << 19);
-        if ($this->premiumGiftMonths !== null) $flags |= (1 << 20);
-        if ($this->adsProceedsFromDate !== null) $flags |= (1 << 23);
-        if ($this->adsProceedsToDate !== null) $flags |= (1 << 23);
+        if ($this->refund) {
+            $flags |= (1 << 3);
+        }
+        if ($this->pending) {
+            $flags |= (1 << 4);
+        }
+        if ($this->failed) {
+            $flags |= (1 << 6);
+        }
+        if ($this->gift) {
+            $flags |= (1 << 10);
+        }
+        if ($this->reaction) {
+            $flags |= (1 << 11);
+        }
+        if ($this->stargiftUpgrade) {
+            $flags |= (1 << 18);
+        }
+        if ($this->businessTransfer) {
+            $flags |= (1 << 21);
+        }
+        if ($this->stargiftResale) {
+            $flags |= (1 << 22);
+        }
+        if ($this->title !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->description !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->photo !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->transactionDate !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->transactionUrl !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->botPayload !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->msgId !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->extendedMedia !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->subscriptionPeriod !== null) {
+            $flags |= (1 << 12);
+        }
+        if ($this->giveawayPostId !== null) {
+            $flags |= (1 << 13);
+        }
+        if ($this->stargift !== null) {
+            $flags |= (1 << 14);
+        }
+        if ($this->floodskipNumber !== null) {
+            $flags |= (1 << 15);
+        }
+        if ($this->starrefCommissionPermille !== null) {
+            $flags |= (1 << 16);
+        }
+        if ($this->starrefPeer !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->starrefAmount !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->paidMessages !== null) {
+            $flags |= (1 << 19);
+        }
+        if ($this->premiumGiftMonths !== null) {
+            $flags |= (1 << 20);
+        }
+        if ($this->adsProceedsFromDate !== null) {
+            $flags |= (1 << 23);
+        }
+        if ($this->adsProceedsToDate !== null) {
+            $flags |= (1 << 23);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->id);
         $buffer .= $this->amount->serialize();
@@ -174,48 +229,46 @@ final class StarsTransaction extends TlObject
         if ($flags & (1 << 23)) {
             $buffer .= Serializer::int32($this->adsProceedsToDate);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $refund = ($flags & (1 << 3)) ? true : null;
-        $pending = ($flags & (1 << 4)) ? true : null;
-        $failed = ($flags & (1 << 6)) ? true : null;
-        $gift = ($flags & (1 << 10)) ? true : null;
-        $reaction = ($flags & (1 << 11)) ? true : null;
-        $stargiftUpgrade = ($flags & (1 << 18)) ? true : null;
-        $businessTransfer = ($flags & (1 << 21)) ? true : null;
-        $stargiftResale = ($flags & (1 << 22)) ? true : null;
+        $refund = (($flags & (1 << 3)) !== 0) ? true : null;
+        $pending = (($flags & (1 << 4)) !== 0) ? true : null;
+        $failed = (($flags & (1 << 6)) !== 0) ? true : null;
+        $gift = (($flags & (1 << 10)) !== 0) ? true : null;
+        $reaction = (($flags & (1 << 11)) !== 0) ? true : null;
+        $stargiftUpgrade = (($flags & (1 << 18)) !== 0) ? true : null;
+        $businessTransfer = (($flags & (1 << 21)) !== 0) ? true : null;
+        $stargiftResale = (($flags & (1 << 22)) !== 0) ? true : null;
         $id = Deserializer::bytes($stream);
         $amount = AbstractStarsAmount::deserialize($stream);
         $date = Deserializer::int32($stream);
         $peer = AbstractStarsTransactionPeer::deserialize($stream);
-        $title = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
-        $description = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $photo = ($flags & (1 << 2)) ? AbstractWebDocument::deserialize($stream) : null;
-        $transactionDate = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
-        $transactionUrl = ($flags & (1 << 5)) ? Deserializer::bytes($stream) : null;
-        $botPayload = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
-        $msgId = ($flags & (1 << 8)) ? Deserializer::int32($stream) : null;
-        $extendedMedia = ($flags & (1 << 9)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageMedia::class, 'deserialize']) : null;
-        $subscriptionPeriod = ($flags & (1 << 12)) ? Deserializer::int32($stream) : null;
-        $giveawayPostId = ($flags & (1 << 13)) ? Deserializer::int32($stream) : null;
-        $stargift = ($flags & (1 << 14)) ? AbstractStarGift::deserialize($stream) : null;
-        $floodskipNumber = ($flags & (1 << 15)) ? Deserializer::int32($stream) : null;
-        $starrefCommissionPermille = ($flags & (1 << 16)) ? Deserializer::int32($stream) : null;
-        $starrefPeer = ($flags & (1 << 17)) ? AbstractPeer::deserialize($stream) : null;
-        $starrefAmount = ($flags & (1 << 17)) ? AbstractStarsAmount::deserialize($stream) : null;
-        $paidMessages = ($flags & (1 << 19)) ? Deserializer::int32($stream) : null;
-        $premiumGiftMonths = ($flags & (1 << 20)) ? Deserializer::int32($stream) : null;
-        $adsProceedsFromDate = ($flags & (1 << 23)) ? Deserializer::int32($stream) : null;
-        $adsProceedsToDate = ($flags & (1 << 23)) ? Deserializer::int32($stream) : null;
+        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $photo = (($flags & (1 << 2)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
+        $transactionDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
+        $transactionUrl = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
+        $botPayload = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
+        $msgId = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
+        $extendedMedia = (($flags & (1 << 9)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageMedia::class, 'deserialize']) : null;
+        $subscriptionPeriod = (($flags & (1 << 12)) !== 0) ? Deserializer::int32($stream) : null;
+        $giveawayPostId = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($stream) : null;
+        $stargift = (($flags & (1 << 14)) !== 0) ? AbstractStarGift::deserialize($stream) : null;
+        $floodskipNumber = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($stream) : null;
+        $starrefCommissionPermille = (($flags & (1 << 16)) !== 0) ? Deserializer::int32($stream) : null;
+        $starrefPeer = (($flags & (1 << 17)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $starrefAmount = (($flags & (1 << 17)) !== 0) ? AbstractStarsAmount::deserialize($stream) : null;
+        $paidMessages = (($flags & (1 << 19)) !== 0) ? Deserializer::int32($stream) : null;
+        $premiumGiftMonths = (($flags & (1 << 20)) !== 0) ? Deserializer::int32($stream) : null;
+        $adsProceedsFromDate = (($flags & (1 << 23)) !== 0) ? Deserializer::int32($stream) : null;
+        $adsProceedsToDate = (($flags & (1 << 23)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,

@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Upload;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Upload;
 
-use DigitalStars\MtprotoClient\Generated\Types\Upload\AbstractCdnFile;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Upload\AbstractCdnFile;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/upload.getCdnFile
  */
-final class GetCdnFileRequest extends TlObject
+final class GetCdnFileRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x395f69da;
     
@@ -41,12 +40,6 @@ final class GetCdnFileRequest extends TlObject
         $buffer .= Serializer::bytes($this->fileToken);
         $buffer .= Serializer::int64($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

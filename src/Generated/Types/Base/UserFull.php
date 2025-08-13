@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/userFull
@@ -126,53 +127,147 @@ final class UserFull extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         $flags2 = 0;
-        if ($this->blocked) $flags |= (1 << 0);
-        if ($this->phoneCallsAvailable) $flags |= (1 << 4);
-        if ($this->phoneCallsPrivate) $flags |= (1 << 5);
-        if ($this->canPinMessage) $flags |= (1 << 7);
-        if ($this->hasScheduled) $flags |= (1 << 12);
-        if ($this->videoCallsAvailable) $flags |= (1 << 13);
-        if ($this->voiceMessagesForbidden) $flags |= (1 << 20);
-        if ($this->translationsDisabled) $flags |= (1 << 23);
-        if ($this->storiesPinnedAvailable) $flags |= (1 << 26);
-        if ($this->blockedMyStoriesFrom) $flags |= (1 << 27);
-        if ($this->wallpaperOverridden) $flags |= (1 << 28);
-        if ($this->contactRequirePremium) $flags |= (1 << 29);
-        if ($this->readDatesPrivate) $flags |= (1 << 30);
-        if ($this->sponsoredEnabled) $flags2 |= (1 << 7);
-        if ($this->canViewRevenue) $flags2 |= (1 << 9);
-        if ($this->botCanManageEmojiStatus) $flags2 |= (1 << 10);
-        if ($this->displayGiftsButton) $flags2 |= (1 << 16);
-        if ($this->about !== null) $flags |= (1 << 1);
-        if ($this->personalPhoto !== null) $flags |= (1 << 21);
-        if ($this->profilePhoto !== null) $flags |= (1 << 2);
-        if ($this->fallbackPhoto !== null) $flags |= (1 << 22);
-        if ($this->botInfo !== null) $flags |= (1 << 3);
-        if ($this->pinnedMsgId !== null) $flags |= (1 << 6);
-        if ($this->folderId !== null) $flags |= (1 << 11);
-        if ($this->ttlPeriod !== null) $flags |= (1 << 14);
-        if ($this->themeEmoticon !== null) $flags |= (1 << 15);
-        if ($this->privateForwardName !== null) $flags |= (1 << 16);
-        if ($this->botGroupAdminRights !== null) $flags |= (1 << 17);
-        if ($this->botBroadcastAdminRights !== null) $flags |= (1 << 18);
-        if ($this->wallpaper !== null) $flags |= (1 << 24);
-        if ($this->stories !== null) $flags |= (1 << 25);
-        if ($this->businessWorkHours !== null) $flags2 |= (1 << 0);
-        if ($this->businessLocation !== null) $flags2 |= (1 << 1);
-        if ($this->businessGreetingMessage !== null) $flags2 |= (1 << 2);
-        if ($this->businessAwayMessage !== null) $flags2 |= (1 << 3);
-        if ($this->businessIntro !== null) $flags2 |= (1 << 4);
-        if ($this->birthday !== null) $flags2 |= (1 << 5);
-        if ($this->personalChannelId !== null) $flags2 |= (1 << 6);
-        if ($this->personalChannelMessage !== null) $flags2 |= (1 << 6);
-        if ($this->stargiftsCount !== null) $flags2 |= (1 << 8);
-        if ($this->starrefProgram !== null) $flags2 |= (1 << 11);
-        if ($this->botVerification !== null) $flags2 |= (1 << 12);
-        if ($this->sendPaidMessagesStars !== null) $flags2 |= (1 << 14);
-        if ($this->disallowedGifts !== null) $flags2 |= (1 << 15);
-        if ($this->starsRating !== null) $flags2 |= (1 << 17);
-        if ($this->starsMyPendingRating !== null) $flags2 |= (1 << 18);
-        if ($this->starsMyPendingRatingDate !== null) $flags2 |= (1 << 18);
+        if ($this->blocked) {
+            $flags |= (1 << 0);
+        }
+        if ($this->phoneCallsAvailable) {
+            $flags |= (1 << 4);
+        }
+        if ($this->phoneCallsPrivate) {
+            $flags |= (1 << 5);
+        }
+        if ($this->canPinMessage) {
+            $flags |= (1 << 7);
+        }
+        if ($this->hasScheduled) {
+            $flags |= (1 << 12);
+        }
+        if ($this->videoCallsAvailable) {
+            $flags |= (1 << 13);
+        }
+        if ($this->voiceMessagesForbidden) {
+            $flags |= (1 << 20);
+        }
+        if ($this->translationsDisabled) {
+            $flags |= (1 << 23);
+        }
+        if ($this->storiesPinnedAvailable) {
+            $flags |= (1 << 26);
+        }
+        if ($this->blockedMyStoriesFrom) {
+            $flags |= (1 << 27);
+        }
+        if ($this->wallpaperOverridden) {
+            $flags |= (1 << 28);
+        }
+        if ($this->contactRequirePremium) {
+            $flags |= (1 << 29);
+        }
+        if ($this->readDatesPrivate) {
+            $flags |= (1 << 30);
+        }
+        if ($this->sponsoredEnabled) {
+            $flags2 |= (1 << 7);
+        }
+        if ($this->canViewRevenue) {
+            $flags2 |= (1 << 9);
+        }
+        if ($this->botCanManageEmojiStatus) {
+            $flags2 |= (1 << 10);
+        }
+        if ($this->displayGiftsButton) {
+            $flags2 |= (1 << 16);
+        }
+        if ($this->about !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->personalPhoto !== null) {
+            $flags |= (1 << 21);
+        }
+        if ($this->profilePhoto !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->fallbackPhoto !== null) {
+            $flags |= (1 << 22);
+        }
+        if ($this->botInfo !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->pinnedMsgId !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->folderId !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->ttlPeriod !== null) {
+            $flags |= (1 << 14);
+        }
+        if ($this->themeEmoticon !== null) {
+            $flags |= (1 << 15);
+        }
+        if ($this->privateForwardName !== null) {
+            $flags |= (1 << 16);
+        }
+        if ($this->botGroupAdminRights !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->botBroadcastAdminRights !== null) {
+            $flags |= (1 << 18);
+        }
+        if ($this->wallpaper !== null) {
+            $flags |= (1 << 24);
+        }
+        if ($this->stories !== null) {
+            $flags |= (1 << 25);
+        }
+        if ($this->businessWorkHours !== null) {
+            $flags2 |= (1 << 0);
+        }
+        if ($this->businessLocation !== null) {
+            $flags2 |= (1 << 1);
+        }
+        if ($this->businessGreetingMessage !== null) {
+            $flags2 |= (1 << 2);
+        }
+        if ($this->businessAwayMessage !== null) {
+            $flags2 |= (1 << 3);
+        }
+        if ($this->businessIntro !== null) {
+            $flags2 |= (1 << 4);
+        }
+        if ($this->birthday !== null) {
+            $flags2 |= (1 << 5);
+        }
+        if ($this->personalChannelId !== null) {
+            $flags2 |= (1 << 6);
+        }
+        if ($this->personalChannelMessage !== null) {
+            $flags2 |= (1 << 6);
+        }
+        if ($this->stargiftsCount !== null) {
+            $flags2 |= (1 << 8);
+        }
+        if ($this->starrefProgram !== null) {
+            $flags2 |= (1 << 11);
+        }
+        if ($this->botVerification !== null) {
+            $flags2 |= (1 << 12);
+        }
+        if ($this->sendPaidMessagesStars !== null) {
+            $flags2 |= (1 << 14);
+        }
+        if ($this->disallowedGifts !== null) {
+            $flags2 |= (1 << 15);
+        }
+        if ($this->starsRating !== null) {
+            $flags2 |= (1 << 17);
+        }
+        if ($this->starsMyPendingRating !== null) {
+            $flags2 |= (1 << 18);
+        }
+        if ($this->starsMyPendingRatingDate !== null) {
+            $flags2 |= (1 << 18);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int64($this->id);
@@ -269,69 +364,67 @@ final class UserFull extends TlObject
         if ($flags2 & (1 << 18)) {
             $buffer .= Serializer::int32($this->starsMyPendingRatingDate);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $blocked = ($flags & (1 << 0)) ? true : null;
-        $phoneCallsAvailable = ($flags & (1 << 4)) ? true : null;
-        $phoneCallsPrivate = ($flags & (1 << 5)) ? true : null;
-        $canPinMessage = ($flags & (1 << 7)) ? true : null;
-        $hasScheduled = ($flags & (1 << 12)) ? true : null;
-        $videoCallsAvailable = ($flags & (1 << 13)) ? true : null;
-        $voiceMessagesForbidden = ($flags & (1 << 20)) ? true : null;
-        $translationsDisabled = ($flags & (1 << 23)) ? true : null;
-        $storiesPinnedAvailable = ($flags & (1 << 26)) ? true : null;
-        $blockedMyStoriesFrom = ($flags & (1 << 27)) ? true : null;
-        $wallpaperOverridden = ($flags & (1 << 28)) ? true : null;
-        $contactRequirePremium = ($flags & (1 << 29)) ? true : null;
-        $readDatesPrivate = ($flags & (1 << 30)) ? true : null;
+        $blocked = (($flags & (1 << 0)) !== 0) ? true : null;
+        $phoneCallsAvailable = (($flags & (1 << 4)) !== 0) ? true : null;
+        $phoneCallsPrivate = (($flags & (1 << 5)) !== 0) ? true : null;
+        $canPinMessage = (($flags & (1 << 7)) !== 0) ? true : null;
+        $hasScheduled = (($flags & (1 << 12)) !== 0) ? true : null;
+        $videoCallsAvailable = (($flags & (1 << 13)) !== 0) ? true : null;
+        $voiceMessagesForbidden = (($flags & (1 << 20)) !== 0) ? true : null;
+        $translationsDisabled = (($flags & (1 << 23)) !== 0) ? true : null;
+        $storiesPinnedAvailable = (($flags & (1 << 26)) !== 0) ? true : null;
+        $blockedMyStoriesFrom = (($flags & (1 << 27)) !== 0) ? true : null;
+        $wallpaperOverridden = (($flags & (1 << 28)) !== 0) ? true : null;
+        $contactRequirePremium = (($flags & (1 << 29)) !== 0) ? true : null;
+        $readDatesPrivate = (($flags & (1 << 30)) !== 0) ? true : null;
         $flags2 = Deserializer::int32($stream);
-        $sponsoredEnabled = ($flags2 & (1 << 7)) ? true : null;
-        $canViewRevenue = ($flags2 & (1 << 9)) ? true : null;
-        $botCanManageEmojiStatus = ($flags2 & (1 << 10)) ? true : null;
-        $displayGiftsButton = ($flags2 & (1 << 16)) ? true : null;
+        $sponsoredEnabled = (($flags2 & (1 << 7)) !== 0) ? true : null;
+        $canViewRevenue = (($flags2 & (1 << 9)) !== 0) ? true : null;
+        $botCanManageEmojiStatus = (($flags2 & (1 << 10)) !== 0) ? true : null;
+        $displayGiftsButton = (($flags2 & (1 << 16)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
-        $about = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $about = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $settings = PeerSettings::deserialize($stream);
-        $personalPhoto = ($flags & (1 << 21)) ? AbstractPhoto::deserialize($stream) : null;
-        $profilePhoto = ($flags & (1 << 2)) ? AbstractPhoto::deserialize($stream) : null;
-        $fallbackPhoto = ($flags & (1 << 22)) ? AbstractPhoto::deserialize($stream) : null;
+        $personalPhoto = (($flags & (1 << 21)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
+        $profilePhoto = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
+        $fallbackPhoto = (($flags & (1 << 22)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
         $notifySettings = PeerNotifySettings::deserialize($stream);
-        $botInfo = ($flags & (1 << 3)) ? BotInfo::deserialize($stream) : null;
-        $pinnedMsgId = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
+        $botInfo = (($flags & (1 << 3)) !== 0) ? BotInfo::deserialize($stream) : null;
+        $pinnedMsgId = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
         $commonChatsCount = Deserializer::int32($stream);
-        $folderId = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
-        $ttlPeriod = ($flags & (1 << 14)) ? Deserializer::int32($stream) : null;
-        $themeEmoticon = ($flags & (1 << 15)) ? Deserializer::bytes($stream) : null;
-        $privateForwardName = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
-        $botGroupAdminRights = ($flags & (1 << 17)) ? ChatAdminRights::deserialize($stream) : null;
-        $botBroadcastAdminRights = ($flags & (1 << 18)) ? ChatAdminRights::deserialize($stream) : null;
-        $wallpaper = ($flags & (1 << 24)) ? AbstractWallPaper::deserialize($stream) : null;
-        $stories = ($flags & (1 << 25)) ? PeerStories::deserialize($stream) : null;
-        $businessWorkHours = ($flags2 & (1 << 0)) ? BusinessWorkHours::deserialize($stream) : null;
-        $businessLocation = ($flags2 & (1 << 1)) ? BusinessLocation::deserialize($stream) : null;
-        $businessGreetingMessage = ($flags2 & (1 << 2)) ? BusinessGreetingMessage::deserialize($stream) : null;
-        $businessAwayMessage = ($flags2 & (1 << 3)) ? BusinessAwayMessage::deserialize($stream) : null;
-        $businessIntro = ($flags2 & (1 << 4)) ? BusinessIntro::deserialize($stream) : null;
-        $birthday = ($flags2 & (1 << 5)) ? Birthday::deserialize($stream) : null;
-        $personalChannelId = ($flags2 & (1 << 6)) ? Deserializer::int64($stream) : null;
-        $personalChannelMessage = ($flags2 & (1 << 6)) ? Deserializer::int32($stream) : null;
-        $stargiftsCount = ($flags2 & (1 << 8)) ? Deserializer::int32($stream) : null;
-        $starrefProgram = ($flags2 & (1 << 11)) ? StarRefProgram::deserialize($stream) : null;
-        $botVerification = ($flags2 & (1 << 12)) ? BotVerification::deserialize($stream) : null;
-        $sendPaidMessagesStars = ($flags2 & (1 << 14)) ? Deserializer::int64($stream) : null;
-        $disallowedGifts = ($flags2 & (1 << 15)) ? DisallowedGiftsSettings::deserialize($stream) : null;
-        $starsRating = ($flags2 & (1 << 17)) ? StarsRating::deserialize($stream) : null;
-        $starsMyPendingRating = ($flags2 & (1 << 18)) ? StarsRating::deserialize($stream) : null;
-        $starsMyPendingRatingDate = ($flags2 & (1 << 18)) ? Deserializer::int32($stream) : null;
+        $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
+        $ttlPeriod = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($stream) : null;
+        $themeEmoticon = (($flags & (1 << 15)) !== 0) ? Deserializer::bytes($stream) : null;
+        $privateForwardName = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
+        $botGroupAdminRights = (($flags & (1 << 17)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
+        $botBroadcastAdminRights = (($flags & (1 << 18)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
+        $wallpaper = (($flags & (1 << 24)) !== 0) ? AbstractWallPaper::deserialize($stream) : null;
+        $stories = (($flags & (1 << 25)) !== 0) ? PeerStories::deserialize($stream) : null;
+        $businessWorkHours = (($flags2 & (1 << 0)) !== 0) ? BusinessWorkHours::deserialize($stream) : null;
+        $businessLocation = (($flags2 & (1 << 1)) !== 0) ? BusinessLocation::deserialize($stream) : null;
+        $businessGreetingMessage = (($flags2 & (1 << 2)) !== 0) ? BusinessGreetingMessage::deserialize($stream) : null;
+        $businessAwayMessage = (($flags2 & (1 << 3)) !== 0) ? BusinessAwayMessage::deserialize($stream) : null;
+        $businessIntro = (($flags2 & (1 << 4)) !== 0) ? BusinessIntro::deserialize($stream) : null;
+        $birthday = (($flags2 & (1 << 5)) !== 0) ? Birthday::deserialize($stream) : null;
+        $personalChannelId = (($flags2 & (1 << 6)) !== 0) ? Deserializer::int64($stream) : null;
+        $personalChannelMessage = (($flags2 & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
+        $stargiftsCount = (($flags2 & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
+        $starrefProgram = (($flags2 & (1 << 11)) !== 0) ? StarRefProgram::deserialize($stream) : null;
+        $botVerification = (($flags2 & (1 << 12)) !== 0) ? BotVerification::deserialize($stream) : null;
+        $sendPaidMessagesStars = (($flags2 & (1 << 14)) !== 0) ? Deserializer::int64($stream) : null;
+        $disallowedGifts = (($flags2 & (1 << 15)) !== 0) ? DisallowedGiftsSettings::deserialize($stream) : null;
+        $starsRating = (($flags2 & (1 << 17)) !== 0) ? StarsRating::deserialize($stream) : null;
+        $starsMyPendingRating = (($flags2 & (1 << 18)) !== 0) ? StarsRating::deserialize($stream) : null;
+        $starsMyPendingRatingDate = (($flags2 & (1 << 18)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,

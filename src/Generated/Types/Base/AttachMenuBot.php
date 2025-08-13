@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/attachMenuBot
@@ -43,13 +44,27 @@ final class AttachMenuBot extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->inactive) $flags |= (1 << 0);
-        if ($this->hasSettings) $flags |= (1 << 1);
-        if ($this->requestWriteAccess) $flags |= (1 << 2);
-        if ($this->showInAttachMenu) $flags |= (1 << 3);
-        if ($this->showInSideMenu) $flags |= (1 << 4);
-        if ($this->sideMenuDisclaimerNeeded) $flags |= (1 << 5);
-        if ($this->peerTypes !== null) $flags |= (1 << 3);
+        if ($this->inactive) {
+            $flags |= (1 << 0);
+        }
+        if ($this->hasSettings) {
+            $flags |= (1 << 1);
+        }
+        if ($this->requestWriteAccess) {
+            $flags |= (1 << 2);
+        }
+        if ($this->showInAttachMenu) {
+            $flags |= (1 << 3);
+        }
+        if ($this->showInSideMenu) {
+            $flags |= (1 << 4);
+        }
+        if ($this->sideMenuDisclaimerNeeded) {
+            $flags |= (1 << 5);
+        }
+        if ($this->peerTypes !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->botId);
         $buffer .= Serializer::bytes($this->shortName);
@@ -57,26 +72,24 @@ final class AttachMenuBot extends TlObject
             $buffer .= Serializer::vectorOfObjects($this->peerTypes);
         }
         $buffer .= Serializer::vectorOfObjects($this->icons);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $inactive = ($flags & (1 << 0)) ? true : null;
-        $hasSettings = ($flags & (1 << 1)) ? true : null;
-        $requestWriteAccess = ($flags & (1 << 2)) ? true : null;
-        $showInAttachMenu = ($flags & (1 << 3)) ? true : null;
-        $showInSideMenu = ($flags & (1 << 4)) ? true : null;
-        $sideMenuDisclaimerNeeded = ($flags & (1 << 5)) ? true : null;
+        $inactive = (($flags & (1 << 0)) !== 0) ? true : null;
+        $hasSettings = (($flags & (1 << 1)) !== 0) ? true : null;
+        $requestWriteAccess = (($flags & (1 << 2)) !== 0) ? true : null;
+        $showInAttachMenu = (($flags & (1 << 3)) !== 0) ? true : null;
+        $showInSideMenu = (($flags & (1 << 4)) !== 0) ? true : null;
+        $sideMenuDisclaimerNeeded = (($flags & (1 << 5)) !== 0) ? true : null;
         $botId = Deserializer::int64($stream);
         $shortName = Deserializer::bytes($stream);
-        $peerTypes = ($flags & (1 << 3)) ? Deserializer::vectorOfObjects($stream, [AttachMenuPeerType::class, 'deserialize']) : null;
+        $peerTypes = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [AttachMenuPeerType::class, 'deserialize']) : null;
         $icons = Deserializer::vectorOfObjects($stream, [AttachMenuBotIcon::class, 'deserialize']);
 
         return new self(

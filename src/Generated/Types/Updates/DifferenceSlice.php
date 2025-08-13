@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Updates;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Updates;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractEncryptedMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdate;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractEncryptedMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdate;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/updates.differenceSlice
@@ -45,10 +44,8 @@ final class DifferenceSlice extends AbstractDifference
         $buffer .= Serializer::vectorOfObjects($this->chats);
         $buffer .= Serializer::vectorOfObjects($this->users);
         $buffer .= $this->intermediateState->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

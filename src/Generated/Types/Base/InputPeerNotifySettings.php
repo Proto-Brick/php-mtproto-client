@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/inputPeerNotifySettings
@@ -37,13 +38,27 @@ final class InputPeerNotifySettings extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->showPreviews !== null) $flags |= (1 << 0);
-        if ($this->silent !== null) $flags |= (1 << 1);
-        if ($this->muteUntil !== null) $flags |= (1 << 2);
-        if ($this->sound !== null) $flags |= (1 << 3);
-        if ($this->storiesMuted !== null) $flags |= (1 << 6);
-        if ($this->storiesHideSender !== null) $flags |= (1 << 7);
-        if ($this->storiesSound !== null) $flags |= (1 << 8);
+        if ($this->showPreviews !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->silent !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->muteUntil !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->sound !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->storiesMuted !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->storiesHideSender !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->storiesSound !== null) {
+            $flags |= (1 << 8);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= ($this->showPreviews ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
@@ -66,24 +81,22 @@ final class InputPeerNotifySettings extends TlObject
         if ($flags & (1 << 8)) {
             $buffer .= $this->storiesSound->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $showPreviews = ($flags & (1 << 0)) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $silent = ($flags & (1 << 1)) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $muteUntil = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
-        $sound = ($flags & (1 << 3)) ? AbstractNotificationSound::deserialize($stream) : null;
-        $storiesMuted = ($flags & (1 << 6)) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $storiesHideSender = ($flags & (1 << 7)) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $storiesSound = ($flags & (1 << 8)) ? AbstractNotificationSound::deserialize($stream) : null;
+        $showPreviews = (($flags & (1 << 0)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
+        $silent = (($flags & (1 << 1)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
+        $muteUntil = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $sound = (($flags & (1 << 3)) !== 0) ? AbstractNotificationSound::deserialize($stream) : null;
+        $storiesMuted = (($flags & (1 << 6)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
+        $storiesHideSender = (($flags & (1 << 7)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
+        $storiesSound = (($flags & (1 << 8)) !== 0) ? AbstractNotificationSound::deserialize($stream) : null;
 
         return new self(
             $showPreviews,

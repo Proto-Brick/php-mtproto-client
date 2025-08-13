@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.changeStarsSubscription
  */
-final class ChangeStarsSubscriptionRequest extends TlObject
+final class ChangeStarsSubscriptionRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xc7770878;
     
@@ -39,19 +38,15 @@ final class ChangeStarsSubscriptionRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->canceled !== null) $flags |= (1 << 0);
+        if ($this->canceled !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::bytes($this->subscriptionId);
         if ($flags & (1 << 0)) {
             $buffer .= ($this->canceled ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

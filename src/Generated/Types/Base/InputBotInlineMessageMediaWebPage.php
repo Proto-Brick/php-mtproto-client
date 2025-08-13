@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/inputBotInlineMessageMediaWebPage
@@ -39,12 +38,24 @@ final class InputBotInlineMessageMediaWebPage extends AbstractInputBotInlineMess
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->invertMedia) $flags |= (1 << 3);
-        if ($this->forceLargeMedia) $flags |= (1 << 4);
-        if ($this->forceSmallMedia) $flags |= (1 << 5);
-        if ($this->optional) $flags |= (1 << 6);
-        if ($this->entities !== null) $flags |= (1 << 1);
-        if ($this->replyMarkup !== null) $flags |= (1 << 2);
+        if ($this->invertMedia) {
+            $flags |= (1 << 3);
+        }
+        if ($this->forceLargeMedia) {
+            $flags |= (1 << 4);
+        }
+        if ($this->forceSmallMedia) {
+            $flags |= (1 << 5);
+        }
+        if ($this->optional) {
+            $flags |= (1 << 6);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->replyMarkup !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->message);
         if ($flags & (1 << 1)) {
@@ -54,22 +65,20 @@ final class InputBotInlineMessageMediaWebPage extends AbstractInputBotInlineMess
         if ($flags & (1 << 2)) {
             $buffer .= $this->replyMarkup->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $invertMedia = ($flags & (1 << 3)) ? true : null;
-        $forceLargeMedia = ($flags & (1 << 4)) ? true : null;
-        $forceSmallMedia = ($flags & (1 << 5)) ? true : null;
-        $optional = ($flags & (1 << 6)) ? true : null;
+        $invertMedia = (($flags & (1 << 3)) !== 0) ? true : null;
+        $forceLargeMedia = (($flags & (1 << 4)) !== 0) ? true : null;
+        $forceSmallMedia = (($flags & (1 << 5)) !== 0) ? true : null;
+        $optional = (($flags & (1 << 6)) !== 0) ? true : null;
         $message = Deserializer::bytes($stream);
-        $entities = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
         $url = Deserializer::bytes($stream);
-        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($stream) : null;
+        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($stream) : null;
 
         return new self(
             $message,

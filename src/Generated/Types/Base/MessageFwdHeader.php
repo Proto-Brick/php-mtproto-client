@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/messageFwdHeader
@@ -49,18 +50,42 @@ final class MessageFwdHeader extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->imported) $flags |= (1 << 7);
-        if ($this->savedOut) $flags |= (1 << 11);
-        if ($this->fromId !== null) $flags |= (1 << 0);
-        if ($this->fromName !== null) $flags |= (1 << 5);
-        if ($this->channelPost !== null) $flags |= (1 << 2);
-        if ($this->postAuthor !== null) $flags |= (1 << 3);
-        if ($this->savedFromPeer !== null) $flags |= (1 << 4);
-        if ($this->savedFromMsgId !== null) $flags |= (1 << 4);
-        if ($this->savedFromId !== null) $flags |= (1 << 8);
-        if ($this->savedFromName !== null) $flags |= (1 << 9);
-        if ($this->savedDate !== null) $flags |= (1 << 10);
-        if ($this->psaType !== null) $flags |= (1 << 6);
+        if ($this->imported) {
+            $flags |= (1 << 7);
+        }
+        if ($this->savedOut) {
+            $flags |= (1 << 11);
+        }
+        if ($this->fromId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->fromName !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->channelPost !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->postAuthor !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->savedFromPeer !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->savedFromMsgId !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->savedFromId !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->savedFromName !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->savedDate !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->psaType !== null) {
+            $flags |= (1 << 6);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= $this->fromId->serialize();
@@ -93,30 +118,28 @@ final class MessageFwdHeader extends TlObject
         if ($flags & (1 << 6)) {
             $buffer .= Serializer::bytes($this->psaType);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $imported = ($flags & (1 << 7)) ? true : null;
-        $savedOut = ($flags & (1 << 11)) ? true : null;
-        $fromId = ($flags & (1 << 0)) ? AbstractPeer::deserialize($stream) : null;
-        $fromName = ($flags & (1 << 5)) ? Deserializer::bytes($stream) : null;
+        $imported = (($flags & (1 << 7)) !== 0) ? true : null;
+        $savedOut = (($flags & (1 << 11)) !== 0) ? true : null;
+        $fromId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $fromName = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
         $date = Deserializer::int32($stream);
-        $channelPost = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
-        $postAuthor = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
-        $savedFromPeer = ($flags & (1 << 4)) ? AbstractPeer::deserialize($stream) : null;
-        $savedFromMsgId = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $savedFromId = ($flags & (1 << 8)) ? AbstractPeer::deserialize($stream) : null;
-        $savedFromName = ($flags & (1 << 9)) ? Deserializer::bytes($stream) : null;
-        $savedDate = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
-        $psaType = ($flags & (1 << 6)) ? Deserializer::bytes($stream) : null;
+        $channelPost = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $postAuthor = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
+        $savedFromPeer = (($flags & (1 << 4)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $savedFromMsgId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $savedFromId = (($flags & (1 << 8)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $savedFromName = (($flags & (1 << 9)) !== 0) ? Deserializer::bytes($stream) : null;
+        $savedDate = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
+        $psaType = (($flags & (1 << 6)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(
             $date,

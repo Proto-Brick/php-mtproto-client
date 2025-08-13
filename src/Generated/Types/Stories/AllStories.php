@@ -1,13 +1,12 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Stories;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Stories;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PeerStories;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StoriesStealthMode;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PeerStories;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StoriesStealthMode;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/stories.allStories
@@ -41,7 +40,9 @@ final class AllStories extends AbstractAllStories
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->hasMore) $flags |= (1 << 0);
+        if ($this->hasMore) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->count);
         $buffer .= Serializer::bytes($this->state);
@@ -49,15 +50,13 @@ final class AllStories extends AbstractAllStories
         $buffer .= Serializer::vectorOfObjects($this->chats);
         $buffer .= Serializer::vectorOfObjects($this->users);
         $buffer .= $this->stealthMode->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $hasMore = ($flags & (1 << 0)) ? true : null;
+        $hasMore = (($flags & (1 << 0)) !== 0) ? true : null;
         $count = Deserializer::int32($stream);
         $state = Deserializer::bytes($stream);
         $peerStories = Deserializer::vectorOfObjects($stream, [PeerStories::class, 'deserialize']);

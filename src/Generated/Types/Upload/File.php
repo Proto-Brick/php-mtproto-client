@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Upload;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Upload;
 
-use DigitalStars\MtprotoClient\Generated\Types\Storage\FileType;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Storage\FileType;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/upload.file
@@ -32,10 +31,8 @@ final class File extends AbstractFile
         $buffer .= $this->type->serialize();
         $buffer .= Serializer::int32($this->mtime);
         $buffer .= Serializer::bytes($this->bytes);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

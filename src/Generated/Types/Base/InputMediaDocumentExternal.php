@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/inputMediaDocumentExternal
@@ -33,10 +32,18 @@ final class InputMediaDocumentExternal extends AbstractInputMedia
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->spoiler) $flags |= (1 << 1);
-        if ($this->ttlSeconds !== null) $flags |= (1 << 0);
-        if ($this->videoCover !== null) $flags |= (1 << 2);
-        if ($this->videoTimestamp !== null) $flags |= (1 << 3);
+        if ($this->spoiler) {
+            $flags |= (1 << 1);
+        }
+        if ($this->ttlSeconds !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->videoCover !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->videoTimestamp !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->url);
         if ($flags & (1 << 0)) {
@@ -48,19 +55,17 @@ final class InputMediaDocumentExternal extends AbstractInputMedia
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::int32($this->videoTimestamp);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $spoiler = ($flags & (1 << 1)) ? true : null;
+        $spoiler = (($flags & (1 << 1)) !== 0) ? true : null;
         $url = Deserializer::bytes($stream);
-        $ttlSeconds = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $videoCover = ($flags & (1 << 2)) ? AbstractInputPhoto::deserialize($stream) : null;
-        $videoTimestamp = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $ttlSeconds = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $videoCover = (($flags & (1 << 2)) !== 0) ? AbstractInputPhoto::deserialize($stream) : null;
+        $videoTimestamp = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $url,

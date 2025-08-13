@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputBotInlineMessageID;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputMedia;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractReplyMarkup;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputBotInlineMessageID;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputMedia;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessageEntity;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractReplyMarkup;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.editInlineBotMessage
  */
-final class EditInlineBotMessageRequest extends TlObject
+final class EditInlineBotMessageRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x83557dba;
     
@@ -50,12 +49,24 @@ final class EditInlineBotMessageRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->noWebpage) $flags |= (1 << 1);
-        if ($this->invertMedia) $flags |= (1 << 16);
-        if ($this->message !== null) $flags |= (1 << 11);
-        if ($this->media !== null) $flags |= (1 << 14);
-        if ($this->replyMarkup !== null) $flags |= (1 << 2);
-        if ($this->entities !== null) $flags |= (1 << 3);
+        if ($this->noWebpage) {
+            $flags |= (1 << 1);
+        }
+        if ($this->invertMedia) {
+            $flags |= (1 << 16);
+        }
+        if ($this->message !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->media !== null) {
+            $flags |= (1 << 14);
+        }
+        if ($this->replyMarkup !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->id->serialize();
         if ($flags & (1 << 11)) {
@@ -70,12 +81,6 @@ final class EditInlineBotMessageRequest extends TlObject
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::vectorOfObjects($this->entities);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

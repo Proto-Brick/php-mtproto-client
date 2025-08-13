@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputFile;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractWallPaper;
-use DigitalStars\MtprotoClient\Generated\Types\Base\WallPaperSettings;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputFile;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractWallPaper;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\WallPaperSettings;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.uploadWallPaper
  */
-final class UploadWallPaperRequest extends TlObject
+final class UploadWallPaperRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xe39a8f03;
     
@@ -43,17 +42,13 @@ final class UploadWallPaperRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->forChat) $flags |= (1 << 0);
+        if ($this->forChat) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->file->serialize();
         $buffer .= Serializer::bytes($this->mimeType);
         $buffer .= $this->settings->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

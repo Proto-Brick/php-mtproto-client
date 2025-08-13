@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Auth;
 
-use DigitalStars\MtprotoClient\Generated\Types\Auth\AbstractAuthorization;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Auth\AbstractAuthorization;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/auth.importAuthorization
  */
-final class ImportAuthorizationRequest extends TlObject
+final class ImportAuthorizationRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xa57a7dad;
     
@@ -38,12 +37,6 @@ final class ImportAuthorizationRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::bytes($this->bytes);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

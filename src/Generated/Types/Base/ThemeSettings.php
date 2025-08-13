@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/themeSettings
@@ -35,10 +36,18 @@ final class ThemeSettings extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->messageColorsAnimated) $flags |= (1 << 2);
-        if ($this->outboxAccentColor !== null) $flags |= (1 << 3);
-        if ($this->messageColors !== null) $flags |= (1 << 0);
-        if ($this->wallpaper !== null) $flags |= (1 << 1);
+        if ($this->messageColorsAnimated) {
+            $flags |= (1 << 2);
+        }
+        if ($this->outboxAccentColor !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->messageColors !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->wallpaper !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->baseTheme->serialize();
         $buffer .= Serializer::int32($this->accentColor);
@@ -51,23 +60,21 @@ final class ThemeSettings extends TlObject
         if ($flags & (1 << 1)) {
             $buffer .= $this->wallpaper->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $messageColorsAnimated = ($flags & (1 << 2)) ? true : null;
+        $messageColorsAnimated = (($flags & (1 << 2)) !== 0) ? true : null;
         $baseTheme = BaseTheme::deserialize($stream);
         $accentColor = Deserializer::int32($stream);
-        $outboxAccentColor = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
-        $messageColors = ($flags & (1 << 0)) ? Deserializer::vectorOfInts($stream) : null;
-        $wallpaper = ($flags & (1 << 1)) ? AbstractWallPaper::deserialize($stream) : null;
+        $outboxAccentColor = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $messageColors = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfInts($stream) : null;
+        $wallpaper = (($flags & (1 << 1)) !== 0) ? AbstractWallPaper::deserialize($stream) : null;
 
         return new self(
             $baseTheme,

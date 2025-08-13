@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messageMediaDocument
@@ -43,16 +42,36 @@ final class MessageMediaDocument extends AbstractMessageMedia
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->nopremium) $flags |= (1 << 3);
-        if ($this->spoiler) $flags |= (1 << 4);
-        if ($this->video) $flags |= (1 << 6);
-        if ($this->round) $flags |= (1 << 7);
-        if ($this->voice) $flags |= (1 << 8);
-        if ($this->document !== null) $flags |= (1 << 0);
-        if ($this->altDocuments !== null) $flags |= (1 << 5);
-        if ($this->videoCover !== null) $flags |= (1 << 9);
-        if ($this->videoTimestamp !== null) $flags |= (1 << 10);
-        if ($this->ttlSeconds !== null) $flags |= (1 << 2);
+        if ($this->nopremium) {
+            $flags |= (1 << 3);
+        }
+        if ($this->spoiler) {
+            $flags |= (1 << 4);
+        }
+        if ($this->video) {
+            $flags |= (1 << 6);
+        }
+        if ($this->round) {
+            $flags |= (1 << 7);
+        }
+        if ($this->voice) {
+            $flags |= (1 << 8);
+        }
+        if ($this->document !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->altDocuments !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->videoCover !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->videoTimestamp !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->ttlSeconds !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= $this->document->serialize();
@@ -69,24 +88,22 @@ final class MessageMediaDocument extends AbstractMessageMedia
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::int32($this->ttlSeconds);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $nopremium = ($flags & (1 << 3)) ? true : null;
-        $spoiler = ($flags & (1 << 4)) ? true : null;
-        $video = ($flags & (1 << 6)) ? true : null;
-        $round = ($flags & (1 << 7)) ? true : null;
-        $voice = ($flags & (1 << 8)) ? true : null;
-        $document = ($flags & (1 << 0)) ? AbstractDocument::deserialize($stream) : null;
-        $altDocuments = ($flags & (1 << 5)) ? Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']) : null;
-        $videoCover = ($flags & (1 << 9)) ? AbstractPhoto::deserialize($stream) : null;
-        $videoTimestamp = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
-        $ttlSeconds = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $nopremium = (($flags & (1 << 3)) !== 0) ? true : null;
+        $spoiler = (($flags & (1 << 4)) !== 0) ? true : null;
+        $video = (($flags & (1 << 6)) !== 0) ? true : null;
+        $round = (($flags & (1 << 7)) !== 0) ? true : null;
+        $voice = (($flags & (1 << 8)) !== 0) ? true : null;
+        $document = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($stream) : null;
+        $altDocuments = (($flags & (1 << 5)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']) : null;
+        $videoCover = (($flags & (1 << 9)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
+        $videoTimestamp = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
+        $ttlSeconds = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $nopremium,

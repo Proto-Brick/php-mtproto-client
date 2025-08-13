@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Upload;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Upload;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputFileLocation;
-use DigitalStars\MtprotoClient\Generated\Types\Upload\AbstractFile;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputFileLocation;
+use ProtoBrick\MTProtoClient\Generated\Types\Upload\AbstractFile;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/upload.getFile
  */
-final class GetFileRequest extends TlObject
+final class GetFileRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xbe5335be;
     
@@ -44,18 +43,16 @@ final class GetFileRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->precise) $flags |= (1 << 0);
-        if ($this->cdnSupported) $flags |= (1 << 1);
+        if ($this->precise) {
+            $flags |= (1 << 0);
+        }
+        if ($this->cdnSupported) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->location->serialize();
         $buffer .= Serializer::int64($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

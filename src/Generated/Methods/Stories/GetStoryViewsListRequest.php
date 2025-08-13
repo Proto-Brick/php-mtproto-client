@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Stories;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Stories;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Stories\StoryViewsList;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Stories\StoryViewsList;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/stories.getStoryViewsList
  */
-final class GetStoryViewsListRequest extends TlObject
+final class GetStoryViewsListRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x7ed23c57;
     
@@ -50,10 +49,18 @@ final class GetStoryViewsListRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->justContacts) $flags |= (1 << 0);
-        if ($this->reactionsFirst) $flags |= (1 << 2);
-        if ($this->forwardsFirst) $flags |= (1 << 3);
-        if ($this->q !== null) $flags |= (1 << 1);
+        if ($this->justContacts) {
+            $flags |= (1 << 0);
+        }
+        if ($this->reactionsFirst) {
+            $flags |= (1 << 2);
+        }
+        if ($this->forwardsFirst) {
+            $flags |= (1 << 3);
+        }
+        if ($this->q !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 1)) {
@@ -62,12 +69,6 @@ final class GetStoryViewsListRequest extends TlObject
         $buffer .= Serializer::int32($this->id);
         $buffer .= Serializer::bytes($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

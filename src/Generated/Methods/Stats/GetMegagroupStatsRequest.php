@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Stats;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Stats;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Stats\MegagroupStats;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Stats\MegagroupStats;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/stats.getMegagroupStats
  */
-final class GetMegagroupStatsRequest extends TlObject
+final class GetMegagroupStatsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xdcdf8607;
     
@@ -38,15 +37,11 @@ final class GetMegagroupStatsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->dark) $flags |= (1 << 0);
+        if ($this->dark) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->channel->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

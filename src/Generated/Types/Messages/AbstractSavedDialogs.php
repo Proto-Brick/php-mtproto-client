@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/messages.SavedDialogs
  */
@@ -17,7 +20,7 @@ abstract class AbstractSavedDialogs extends TlObject
             0xf83ae221 => SavedDialogs::deserialize($stream),
             0x44ba9dd9 => SavedDialogsSlice::deserialize($stream),
             0xc01f6fe8 => SavedDialogsNotModified::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type messages.SavedDialogs. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type messages.SavedDialogs. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

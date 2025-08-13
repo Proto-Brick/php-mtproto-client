@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Account;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/account.SavedRingtones
  */
@@ -16,7 +19,7 @@ abstract class AbstractSavedRingtones extends TlObject
         return match ($constructorId) {
             0xfbf6e8b1 => SavedRingtonesNotModified::deserialize($stream),
             0xc1e92cc5 => SavedRingtones::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type account.SavedRingtones. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type account.SavedRingtones. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

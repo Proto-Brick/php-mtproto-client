@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/poll
@@ -41,12 +42,24 @@ final class Poll extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->closed) $flags |= (1 << 0);
-        if ($this->publicVoters) $flags |= (1 << 1);
-        if ($this->multipleChoice) $flags |= (1 << 2);
-        if ($this->quiz) $flags |= (1 << 3);
-        if ($this->closePeriod !== null) $flags |= (1 << 4);
-        if ($this->closeDate !== null) $flags |= (1 << 5);
+        if ($this->closed) {
+            $flags |= (1 << 0);
+        }
+        if ($this->publicVoters) {
+            $flags |= (1 << 1);
+        }
+        if ($this->multipleChoice) {
+            $flags |= (1 << 2);
+        }
+        if ($this->quiz) {
+            $flags |= (1 << 3);
+        }
+        if ($this->closePeriod !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->closeDate !== null) {
+            $flags |= (1 << 5);
+        }
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->question->serialize();
@@ -57,26 +70,24 @@ final class Poll extends TlObject
         if ($flags & (1 << 5)) {
             $buffer .= Serializer::int32($this->closeDate);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $id = Deserializer::int64($stream);
         $flags = Deserializer::int32($stream);
-        $closed = ($flags & (1 << 0)) ? true : null;
-        $publicVoters = ($flags & (1 << 1)) ? true : null;
-        $multipleChoice = ($flags & (1 << 2)) ? true : null;
-        $quiz = ($flags & (1 << 3)) ? true : null;
+        $closed = (($flags & (1 << 0)) !== 0) ? true : null;
+        $publicVoters = (($flags & (1 << 1)) !== 0) ? true : null;
+        $multipleChoice = (($flags & (1 << 2)) !== 0) ? true : null;
+        $quiz = (($flags & (1 << 3)) !== 0) ? true : null;
         $question = TextWithEntities::deserialize($stream);
         $answers = Deserializer::vectorOfObjects($stream, [PollAnswer::class, 'deserialize']);
-        $closePeriod = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $closeDate = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $closePeriod = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $closeDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,

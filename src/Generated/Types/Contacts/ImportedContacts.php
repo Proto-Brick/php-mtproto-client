@@ -1,12 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Contacts;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Contacts;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\ImportedContact;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PopularContact;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ImportedContact;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PopularContact;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/contacts.importedContacts
@@ -37,15 +38,13 @@ final class ImportedContacts extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->popularInvites);
         $buffer .= Serializer::vectorOfLongs($this->retryContacts);
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $imported = Deserializer::vectorOfObjects($stream, [ImportedContact::class, 'deserialize']);
         $popularInvites = Deserializer::vectorOfObjects($stream, [PopularContact::class, 'deserialize']);

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messageActionSuggestedPostApproval
@@ -33,11 +32,21 @@ final class MessageActionSuggestedPostApproval extends AbstractMessageAction
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->rejected) $flags |= (1 << 0);
-        if ($this->balanceTooLow) $flags |= (1 << 1);
-        if ($this->rejectComment !== null) $flags |= (1 << 2);
-        if ($this->scheduleDate !== null) $flags |= (1 << 3);
-        if ($this->price !== null) $flags |= (1 << 4);
+        if ($this->rejected) {
+            $flags |= (1 << 0);
+        }
+        if ($this->balanceTooLow) {
+            $flags |= (1 << 1);
+        }
+        if ($this->rejectComment !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->scheduleDate !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->price !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::bytes($this->rejectComment);
@@ -48,19 +57,17 @@ final class MessageActionSuggestedPostApproval extends AbstractMessageAction
         if ($flags & (1 << 4)) {
             $buffer .= $this->price->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $rejected = ($flags & (1 << 0)) ? true : null;
-        $balanceTooLow = ($flags & (1 << 1)) ? true : null;
-        $rejectComment = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
-        $scheduleDate = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
-        $price = ($flags & (1 << 4)) ? AbstractStarsAmount::deserialize($stream) : null;
+        $rejected = (($flags & (1 << 0)) !== 0) ? true : null;
+        $balanceTooLow = (($flags & (1 << 1)) !== 0) ? true : null;
+        $rejectComment = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
+        $scheduleDate = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $price = (($flags & (1 << 4)) !== 0) ? AbstractStarsAmount::deserialize($stream) : null;
 
         return new self(
             $rejected,

@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Fragment;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Fragment;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/fragment.collectibleInfo
@@ -40,15 +41,13 @@ final class CollectibleInfo extends TlObject
         $buffer .= Serializer::bytes($this->cryptoCurrency);
         $buffer .= Serializer::int64($this->cryptoAmount);
         $buffer .= Serializer::bytes($this->url);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $purchaseDate = Deserializer::int32($stream);
         $currency = Deserializer::bytes($stream);

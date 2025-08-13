@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/starsGiveawayOption
@@ -39,9 +40,15 @@ final class StarsGiveawayOption extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->extended) $flags |= (1 << 0);
-        if ($this->default_) $flags |= (1 << 1);
-        if ($this->storeProduct !== null) $flags |= (1 << 2);
+        if ($this->extended) {
+            $flags |= (1 << 0);
+        }
+        if ($this->default_) {
+            $flags |= (1 << 1);
+        }
+        if ($this->storeProduct !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->stars);
         $buffer .= Serializer::int32($this->yearlyBoosts);
@@ -51,22 +58,20 @@ final class StarsGiveawayOption extends TlObject
         $buffer .= Serializer::bytes($this->currency);
         $buffer .= Serializer::int64($this->amount);
         $buffer .= Serializer::vectorOfObjects($this->winners);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $extended = ($flags & (1 << 0)) ? true : null;
-        $default_ = ($flags & (1 << 1)) ? true : null;
+        $extended = (($flags & (1 << 0)) !== 0) ? true : null;
+        $default_ = (($flags & (1 << 1)) !== 0) ? true : null;
         $stars = Deserializer::int64($stream);
         $yearlyBoosts = Deserializer::int32($stream);
-        $storeProduct = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
+        $storeProduct = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
         $currency = Deserializer::bytes($stream);
         $amount = Deserializer::int64($stream);
         $winners = Deserializer::vectorOfObjects($stream, [StarsGiveawayWinnersOption::class, 'deserialize']);

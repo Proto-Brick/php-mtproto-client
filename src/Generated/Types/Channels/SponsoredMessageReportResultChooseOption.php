@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\SponsoredMessageReportOption;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SponsoredMessageReportOption;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/channels.sponsoredMessageReportResultChooseOption
@@ -29,10 +28,8 @@ final class SponsoredMessageReportResultChooseOption extends AbstractSponsoredMe
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::bytes($this->title);
         $buffer .= Serializer::vectorOfObjects($this->options);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

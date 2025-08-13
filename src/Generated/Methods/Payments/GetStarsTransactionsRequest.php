@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Payments\StarsStatus;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarsStatus;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.getStarsTransactions
  */
-final class GetStarsTransactionsRequest extends TlObject
+final class GetStarsTransactionsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x69da4557;
     
@@ -50,11 +49,21 @@ final class GetStarsTransactionsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->inbound) $flags |= (1 << 0);
-        if ($this->outbound) $flags |= (1 << 1);
-        if ($this->ascending) $flags |= (1 << 2);
-        if ($this->ton) $flags |= (1 << 4);
-        if ($this->subscriptionId !== null) $flags |= (1 << 3);
+        if ($this->inbound) {
+            $flags |= (1 << 0);
+        }
+        if ($this->outbound) {
+            $flags |= (1 << 1);
+        }
+        if ($this->ascending) {
+            $flags |= (1 << 2);
+        }
+        if ($this->ton) {
+            $flags |= (1 << 4);
+        }
+        if ($this->subscriptionId !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::bytes($this->subscriptionId);
@@ -62,12 +71,6 @@ final class GetStarsTransactionsRequest extends TlObject
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::bytes($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

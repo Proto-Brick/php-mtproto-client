@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Photos;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Photos;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputFile;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractVideoSize;
-use DigitalStars\MtprotoClient\Generated\Types\Photos\Photo;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputFile;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractVideoSize;
+use ProtoBrick\MTProtoClient\Generated\Types\Photos\Photo;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/photos.uploadProfilePhoto
  */
-final class UploadProfilePhotoRequest extends TlObject
+final class UploadProfilePhotoRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x388a3b5;
     
@@ -48,12 +47,24 @@ final class UploadProfilePhotoRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->fallback) $flags |= (1 << 3);
-        if ($this->bot !== null) $flags |= (1 << 5);
-        if ($this->file !== null) $flags |= (1 << 0);
-        if ($this->video !== null) $flags |= (1 << 1);
-        if ($this->videoStartTs !== null) $flags |= (1 << 2);
-        if ($this->videoEmojiMarkup !== null) $flags |= (1 << 4);
+        if ($this->fallback) {
+            $flags |= (1 << 3);
+        }
+        if ($this->bot !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->file !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->video !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->videoStartTs !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->videoEmojiMarkup !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 5)) {
             $buffer .= $this->bot->serialize();
@@ -70,12 +81,6 @@ final class UploadProfilePhotoRequest extends TlObject
         if ($flags & (1 << 4)) {
             $buffer .= $this->videoEmojiMarkup->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

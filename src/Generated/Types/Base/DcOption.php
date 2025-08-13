@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/dcOption
@@ -43,13 +44,27 @@ final class DcOption extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->ipv6) $flags |= (1 << 0);
-        if ($this->mediaOnly) $flags |= (1 << 1);
-        if ($this->tcpoOnly) $flags |= (1 << 2);
-        if ($this->cdn) $flags |= (1 << 3);
-        if ($this->static) $flags |= (1 << 4);
-        if ($this->thisPortOnly) $flags |= (1 << 5);
-        if ($this->secret !== null) $flags |= (1 << 10);
+        if ($this->ipv6) {
+            $flags |= (1 << 0);
+        }
+        if ($this->mediaOnly) {
+            $flags |= (1 << 1);
+        }
+        if ($this->tcpoOnly) {
+            $flags |= (1 << 2);
+        }
+        if ($this->cdn) {
+            $flags |= (1 << 3);
+        }
+        if ($this->static) {
+            $flags |= (1 << 4);
+        }
+        if ($this->thisPortOnly) {
+            $flags |= (1 << 5);
+        }
+        if ($this->secret !== null) {
+            $flags |= (1 << 10);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
         $buffer .= Serializer::bytes($this->ipAddress);
@@ -57,27 +72,25 @@ final class DcOption extends TlObject
         if ($flags & (1 << 10)) {
             $buffer .= Serializer::bytes($this->secret);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $ipv6 = ($flags & (1 << 0)) ? true : null;
-        $mediaOnly = ($flags & (1 << 1)) ? true : null;
-        $tcpoOnly = ($flags & (1 << 2)) ? true : null;
-        $cdn = ($flags & (1 << 3)) ? true : null;
-        $static = ($flags & (1 << 4)) ? true : null;
-        $thisPortOnly = ($flags & (1 << 5)) ? true : null;
+        $ipv6 = (($flags & (1 << 0)) !== 0) ? true : null;
+        $mediaOnly = (($flags & (1 << 1)) !== 0) ? true : null;
+        $tcpoOnly = (($flags & (1 << 2)) !== 0) ? true : null;
+        $cdn = (($flags & (1 << 3)) !== 0) ? true : null;
+        $static = (($flags & (1 << 4)) !== 0) ? true : null;
+        $thisPortOnly = (($flags & (1 << 5)) !== 0) ? true : null;
         $id = Deserializer::int32($stream);
         $ipAddress = Deserializer::bytes($stream);
         $port = Deserializer::int32($stream);
-        $secret = ($flags & (1 << 10)) ? Deserializer::bytes($stream) : null;
+        $secret = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(
             $id,

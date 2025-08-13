@@ -1,16 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractWebDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\DataJSON;
-use DigitalStars\MtprotoClient\Generated\Types\Base\Invoice;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PaymentFormMethod;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PaymentRequestedInfo;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PaymentSavedCredentials;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractWebDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Invoice;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PaymentFormMethod;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PaymentRequestedInfo;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PaymentSavedCredentials;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/payments.paymentForm
@@ -62,14 +60,30 @@ final class PaymentForm extends AbstractPaymentForm
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->canSaveCredentials) $flags |= (1 << 2);
-        if ($this->passwordMissing) $flags |= (1 << 3);
-        if ($this->photo !== null) $flags |= (1 << 5);
-        if ($this->nativeProvider !== null) $flags |= (1 << 4);
-        if ($this->nativeParams !== null) $flags |= (1 << 4);
-        if ($this->additionalMethods !== null) $flags |= (1 << 6);
-        if ($this->savedInfo !== null) $flags |= (1 << 0);
-        if ($this->savedCredentials !== null) $flags |= (1 << 1);
+        if ($this->canSaveCredentials) {
+            $flags |= (1 << 2);
+        }
+        if ($this->passwordMissing) {
+            $flags |= (1 << 3);
+        }
+        if ($this->photo !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->nativeProvider !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->nativeParams !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->additionalMethods !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->savedInfo !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->savedCredentials !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->formId);
         $buffer .= Serializer::int64($this->botId);
@@ -97,29 +111,27 @@ final class PaymentForm extends AbstractPaymentForm
             $buffer .= Serializer::vectorOfObjects($this->savedCredentials);
         }
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $canSaveCredentials = ($flags & (1 << 2)) ? true : null;
-        $passwordMissing = ($flags & (1 << 3)) ? true : null;
+        $canSaveCredentials = (($flags & (1 << 2)) !== 0) ? true : null;
+        $passwordMissing = (($flags & (1 << 3)) !== 0) ? true : null;
         $formId = Deserializer::int64($stream);
         $botId = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
-        $photo = ($flags & (1 << 5)) ? AbstractWebDocument::deserialize($stream) : null;
+        $photo = (($flags & (1 << 5)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
         $invoice = Invoice::deserialize($stream);
         $providerId = Deserializer::int64($stream);
         $url = Deserializer::bytes($stream);
-        $nativeProvider = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
-        $nativeParams = ($flags & (1 << 4)) ? Deserializer::deserializeDataJSON($stream) : null;
-        $additionalMethods = ($flags & (1 << 6)) ? Deserializer::vectorOfObjects($stream, [PaymentFormMethod::class, 'deserialize']) : null;
-        $savedInfo = ($flags & (1 << 0)) ? PaymentRequestedInfo::deserialize($stream) : null;
-        $savedCredentials = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [PaymentSavedCredentials::class, 'deserialize']) : null;
+        $nativeProvider = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
+        $nativeParams = (($flags & (1 << 4)) !== 0) ? Deserializer::deserializeDataJSON($stream) : null;
+        $additionalMethods = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfObjects($stream, [PaymentFormMethod::class, 'deserialize']) : null;
+        $savedInfo = (($flags & (1 << 0)) !== 0) ? PaymentRequestedInfo::deserialize($stream) : null;
+        $savedCredentials = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [PaymentSavedCredentials::class, 'deserialize']) : null;
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 
         return new self(

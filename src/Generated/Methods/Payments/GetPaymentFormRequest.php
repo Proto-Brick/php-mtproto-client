@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputInvoice;
-use DigitalStars\MtprotoClient\Generated\Types\Payments\AbstractPaymentForm;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputInvoice;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractPaymentForm;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.getPaymentForm
  */
-final class GetPaymentFormRequest extends TlObject
+final class GetPaymentFormRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x37148dbb;
     
@@ -38,18 +37,14 @@ final class GetPaymentFormRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->themeParams !== null) $flags |= (1 << 0);
+        if ($this->themeParams !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->invoice->serialize();
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::serializeDataJSON($this->themeParams);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

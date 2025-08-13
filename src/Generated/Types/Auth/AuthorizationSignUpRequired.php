@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Auth;
 
-use DigitalStars\MtprotoClient\Generated\Types\Help\TermsOfService;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Help\TermsOfService;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/auth.authorizationSignUpRequired
@@ -26,20 +25,20 @@ final class AuthorizationSignUpRequired extends AbstractAuthorization
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->termsOfService !== null) $flags |= (1 << 0);
+        if ($this->termsOfService !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= $this->termsOfService->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $termsOfService = ($flags & (1 << 0)) ? TermsOfService::deserialize($stream) : null;
+        $termsOfService = (($flags & (1 << 0)) !== 0) ? TermsOfService::deserialize($stream) : null;
 
         return new self(
             $termsOfService

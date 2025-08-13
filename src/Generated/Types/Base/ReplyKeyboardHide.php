@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/replyKeyboardHide
@@ -25,17 +24,17 @@ final class ReplyKeyboardHide extends AbstractReplyMarkup
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->selective) $flags |= (1 << 2);
+        if ($this->selective) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $selective = ($flags & (1 << 2)) ? true : null;
+        $selective = (($flags & (1 << 2)) !== 0) ? true : null;
 
         return new self(
             $selective

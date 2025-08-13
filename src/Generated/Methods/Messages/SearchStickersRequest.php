@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Messages\AbstractFoundStickers;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AbstractFoundStickers;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.searchStickers
  */
-final class SearchStickersRequest extends TlObject
+final class SearchStickersRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x29b1c66a;
     
@@ -47,7 +46,9 @@ final class SearchStickersRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->emojis) $flags |= (1 << 0);
+        if ($this->emojis) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->q);
         $buffer .= Serializer::bytes($this->emoticon);
@@ -55,12 +56,6 @@ final class SearchStickersRequest extends TlObject
         $buffer .= Serializer::int32($this->offset);
         $buffer .= Serializer::int32($this->limit);
         $buffer .= Serializer::int64($this->hash);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

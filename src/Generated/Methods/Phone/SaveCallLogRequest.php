@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Phone;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputFile;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputPhoneCall;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputFile;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPhoneCall;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/phone.saveCallLog
  */
-final class SaveCallLogRequest extends TlObject
+final class SaveCallLogRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x41248786;
     
@@ -39,12 +38,6 @@ final class SaveCallLogRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->peer->serialize();
         $buffer .= $this->file->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

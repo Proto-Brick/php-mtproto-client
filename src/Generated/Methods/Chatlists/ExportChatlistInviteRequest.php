@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Chatlists;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Chatlists;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputChatlist;
-use DigitalStars\MtprotoClient\Generated\Types\Chatlists\ExportedChatlistInvite;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputChatlist;
+use ProtoBrick\MTProtoClient\Generated\Types\Chatlists\ExportedChatlistInvite;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/chatlists.exportChatlistInvite
  */
-final class ExportChatlistInviteRequest extends TlObject
+final class ExportChatlistInviteRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x8472478e;
     
@@ -43,12 +42,6 @@ final class ExportChatlistInviteRequest extends TlObject
         $buffer .= $this->chatlist->serialize();
         $buffer .= Serializer::bytes($this->title);
         $buffer .= Serializer::vectorOfObjects($this->peers);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

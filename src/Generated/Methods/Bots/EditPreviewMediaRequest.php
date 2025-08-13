@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Bots;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Bots;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputMedia;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\BotPreviewMedia;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputMedia;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\BotPreviewMedia;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/bots.editPreviewMedia
  */
-final class EditPreviewMediaRequest extends TlObject
+final class EditPreviewMediaRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x8525606f;
     
@@ -46,12 +45,6 @@ final class EditPreviewMediaRequest extends TlObject
         $buffer .= Serializer::bytes($this->langCode);
         $buffer .= $this->media->serialize();
         $buffer .= $this->newMedia->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

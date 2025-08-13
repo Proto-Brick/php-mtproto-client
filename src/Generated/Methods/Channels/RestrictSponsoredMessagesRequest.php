@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/channels.restrictSponsoredMessages
  */
-final class RestrictSponsoredMessagesRequest extends TlObject
+final class RestrictSponsoredMessagesRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x9ae91519;
     
@@ -39,12 +38,6 @@ final class RestrictSponsoredMessagesRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->channel->serialize();
         $buffer .= ($this->restricted ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

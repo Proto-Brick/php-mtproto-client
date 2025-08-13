@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/dialog
@@ -53,13 +52,27 @@ final class Dialog extends AbstractDialog
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->pinned) $flags |= (1 << 2);
-        if ($this->unreadMark) $flags |= (1 << 3);
-        if ($this->viewForumAsMessages) $flags |= (1 << 6);
-        if ($this->pts !== null) $flags |= (1 << 0);
-        if ($this->draft !== null) $flags |= (1 << 1);
-        if ($this->folderId !== null) $flags |= (1 << 4);
-        if ($this->ttlPeriod !== null) $flags |= (1 << 5);
+        if ($this->pinned) {
+            $flags |= (1 << 2);
+        }
+        if ($this->unreadMark) {
+            $flags |= (1 << 3);
+        }
+        if ($this->viewForumAsMessages) {
+            $flags |= (1 << 6);
+        }
+        if ($this->pts !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->draft !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->folderId !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->ttlPeriod !== null) {
+            $flags |= (1 << 5);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->topMessage);
@@ -81,17 +94,15 @@ final class Dialog extends AbstractDialog
         if ($flags & (1 << 5)) {
             $buffer .= Serializer::int32($this->ttlPeriod);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $pinned = ($flags & (1 << 2)) ? true : null;
-        $unreadMark = ($flags & (1 << 3)) ? true : null;
-        $viewForumAsMessages = ($flags & (1 << 6)) ? true : null;
+        $pinned = (($flags & (1 << 2)) !== 0) ? true : null;
+        $unreadMark = (($flags & (1 << 3)) !== 0) ? true : null;
+        $viewForumAsMessages = (($flags & (1 << 6)) !== 0) ? true : null;
         $peer = AbstractPeer::deserialize($stream);
         $topMessage = Deserializer::int32($stream);
         $readInboxMaxId = Deserializer::int32($stream);
@@ -100,10 +111,10 @@ final class Dialog extends AbstractDialog
         $unreadMentionsCount = Deserializer::int32($stream);
         $unreadReactionsCount = Deserializer::int32($stream);
         $notifySettings = PeerNotifySettings::deserialize($stream);
-        $pts = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $draft = ($flags & (1 << 1)) ? AbstractDraftMessage::deserialize($stream) : null;
-        $folderId = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $ttlPeriod = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
+        $pts = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $draft = (($flags & (1 << 1)) !== 0) ? AbstractDraftMessage::deserialize($stream) : null;
+        $folderId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $ttlPeriod = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $peer,

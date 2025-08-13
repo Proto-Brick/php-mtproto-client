@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/emojiStatusCollectible
@@ -43,7 +42,9 @@ final class EmojiStatusCollectible extends AbstractEmojiStatus
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->until !== null) $flags |= (1 << 0);
+        if ($this->until !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->collectibleId);
         $buffer .= Serializer::int64($this->documentId);
@@ -57,10 +58,8 @@ final class EmojiStatusCollectible extends AbstractEmojiStatus
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->until);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -74,7 +73,7 @@ final class EmojiStatusCollectible extends AbstractEmojiStatus
         $edgeColor = Deserializer::int32($stream);
         $patternColor = Deserializer::int32($stream);
         $textColor = Deserializer::int32($stream);
-        $until = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $until = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $collectibleId,

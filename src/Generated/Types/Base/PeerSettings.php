@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/peerSettings
@@ -65,27 +66,69 @@ final class PeerSettings extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->reportSpam) $flags |= (1 << 0);
-        if ($this->addContact) $flags |= (1 << 1);
-        if ($this->blockContact) $flags |= (1 << 2);
-        if ($this->shareContact) $flags |= (1 << 3);
-        if ($this->needContactsException) $flags |= (1 << 4);
-        if ($this->reportGeo) $flags |= (1 << 5);
-        if ($this->autoarchived) $flags |= (1 << 7);
-        if ($this->inviteMembers) $flags |= (1 << 8);
-        if ($this->requestChatBroadcast) $flags |= (1 << 10);
-        if ($this->businessBotPaused) $flags |= (1 << 11);
-        if ($this->businessBotCanReply) $flags |= (1 << 12);
-        if ($this->geoDistance !== null) $flags |= (1 << 6);
-        if ($this->requestChatTitle !== null) $flags |= (1 << 9);
-        if ($this->requestChatDate !== null) $flags |= (1 << 9);
-        if ($this->businessBotId !== null) $flags |= (1 << 13);
-        if ($this->businessBotManageUrl !== null) $flags |= (1 << 13);
-        if ($this->chargePaidMessageStars !== null) $flags |= (1 << 14);
-        if ($this->registrationMonth !== null) $flags |= (1 << 15);
-        if ($this->phoneCountry !== null) $flags |= (1 << 16);
-        if ($this->nameChangeDate !== null) $flags |= (1 << 17);
-        if ($this->photoChangeDate !== null) $flags |= (1 << 18);
+        if ($this->reportSpam) {
+            $flags |= (1 << 0);
+        }
+        if ($this->addContact) {
+            $flags |= (1 << 1);
+        }
+        if ($this->blockContact) {
+            $flags |= (1 << 2);
+        }
+        if ($this->shareContact) {
+            $flags |= (1 << 3);
+        }
+        if ($this->needContactsException) {
+            $flags |= (1 << 4);
+        }
+        if ($this->reportGeo) {
+            $flags |= (1 << 5);
+        }
+        if ($this->autoarchived) {
+            $flags |= (1 << 7);
+        }
+        if ($this->inviteMembers) {
+            $flags |= (1 << 8);
+        }
+        if ($this->requestChatBroadcast) {
+            $flags |= (1 << 10);
+        }
+        if ($this->businessBotPaused) {
+            $flags |= (1 << 11);
+        }
+        if ($this->businessBotCanReply) {
+            $flags |= (1 << 12);
+        }
+        if ($this->geoDistance !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->requestChatTitle !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->requestChatDate !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->businessBotId !== null) {
+            $flags |= (1 << 13);
+        }
+        if ($this->businessBotManageUrl !== null) {
+            $flags |= (1 << 13);
+        }
+        if ($this->chargePaidMessageStars !== null) {
+            $flags |= (1 << 14);
+        }
+        if ($this->registrationMonth !== null) {
+            $flags |= (1 << 15);
+        }
+        if ($this->phoneCountry !== null) {
+            $flags |= (1 << 16);
+        }
+        if ($this->nameChangeDate !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->photoChangeDate !== null) {
+            $flags |= (1 << 18);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 6)) {
             $buffer .= Serializer::int32($this->geoDistance);
@@ -117,38 +160,36 @@ final class PeerSettings extends TlObject
         if ($flags & (1 << 18)) {
             $buffer .= Serializer::int32($this->photoChangeDate);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $reportSpam = ($flags & (1 << 0)) ? true : null;
-        $addContact = ($flags & (1 << 1)) ? true : null;
-        $blockContact = ($flags & (1 << 2)) ? true : null;
-        $shareContact = ($flags & (1 << 3)) ? true : null;
-        $needContactsException = ($flags & (1 << 4)) ? true : null;
-        $reportGeo = ($flags & (1 << 5)) ? true : null;
-        $autoarchived = ($flags & (1 << 7)) ? true : null;
-        $inviteMembers = ($flags & (1 << 8)) ? true : null;
-        $requestChatBroadcast = ($flags & (1 << 10)) ? true : null;
-        $businessBotPaused = ($flags & (1 << 11)) ? true : null;
-        $businessBotCanReply = ($flags & (1 << 12)) ? true : null;
-        $geoDistance = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
-        $requestChatTitle = ($flags & (1 << 9)) ? Deserializer::bytes($stream) : null;
-        $requestChatDate = ($flags & (1 << 9)) ? Deserializer::int32($stream) : null;
-        $businessBotId = ($flags & (1 << 13)) ? Deserializer::int64($stream) : null;
-        $businessBotManageUrl = ($flags & (1 << 13)) ? Deserializer::bytes($stream) : null;
-        $chargePaidMessageStars = ($flags & (1 << 14)) ? Deserializer::int64($stream) : null;
-        $registrationMonth = ($flags & (1 << 15)) ? Deserializer::bytes($stream) : null;
-        $phoneCountry = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
-        $nameChangeDate = ($flags & (1 << 17)) ? Deserializer::int32($stream) : null;
-        $photoChangeDate = ($flags & (1 << 18)) ? Deserializer::int32($stream) : null;
+        $reportSpam = (($flags & (1 << 0)) !== 0) ? true : null;
+        $addContact = (($flags & (1 << 1)) !== 0) ? true : null;
+        $blockContact = (($flags & (1 << 2)) !== 0) ? true : null;
+        $shareContact = (($flags & (1 << 3)) !== 0) ? true : null;
+        $needContactsException = (($flags & (1 << 4)) !== 0) ? true : null;
+        $reportGeo = (($flags & (1 << 5)) !== 0) ? true : null;
+        $autoarchived = (($flags & (1 << 7)) !== 0) ? true : null;
+        $inviteMembers = (($flags & (1 << 8)) !== 0) ? true : null;
+        $requestChatBroadcast = (($flags & (1 << 10)) !== 0) ? true : null;
+        $businessBotPaused = (($flags & (1 << 11)) !== 0) ? true : null;
+        $businessBotCanReply = (($flags & (1 << 12)) !== 0) ? true : null;
+        $geoDistance = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
+        $requestChatTitle = (($flags & (1 << 9)) !== 0) ? Deserializer::bytes($stream) : null;
+        $requestChatDate = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($stream) : null;
+        $businessBotId = (($flags & (1 << 13)) !== 0) ? Deserializer::int64($stream) : null;
+        $businessBotManageUrl = (($flags & (1 << 13)) !== 0) ? Deserializer::bytes($stream) : null;
+        $chargePaidMessageStars = (($flags & (1 << 14)) !== 0) ? Deserializer::int64($stream) : null;
+        $registrationMonth = (($flags & (1 << 15)) !== 0) ? Deserializer::bytes($stream) : null;
+        $phoneCountry = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
+        $nameChangeDate = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($stream) : null;
+        $photoChangeDate = (($flags & (1 << 18)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $reportSpam,

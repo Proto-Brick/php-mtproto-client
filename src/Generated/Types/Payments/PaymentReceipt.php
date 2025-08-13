@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractWebDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\Invoice;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PaymentRequestedInfo;
-use DigitalStars\MtprotoClient\Generated\Types\Base\ShippingOption;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractWebDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Invoice;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PaymentRequestedInfo;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ShippingOption;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/payments.paymentReceipt
@@ -56,10 +55,18 @@ final class PaymentReceipt extends AbstractPaymentReceipt
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->photo !== null) $flags |= (1 << 2);
-        if ($this->info !== null) $flags |= (1 << 0);
-        if ($this->shipping !== null) $flags |= (1 << 1);
-        if ($this->tipAmount !== null) $flags |= (1 << 3);
+        if ($this->photo !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->info !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->shipping !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->tipAmount !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->date);
         $buffer .= Serializer::int64($this->botId);
@@ -83,10 +90,8 @@ final class PaymentReceipt extends AbstractPaymentReceipt
         $buffer .= Serializer::int64($this->totalAmount);
         $buffer .= Serializer::bytes($this->credentialsTitle);
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -96,11 +101,11 @@ final class PaymentReceipt extends AbstractPaymentReceipt
         $providerId = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
-        $photo = ($flags & (1 << 2)) ? AbstractWebDocument::deserialize($stream) : null;
+        $photo = (($flags & (1 << 2)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
         $invoice = Invoice::deserialize($stream);
-        $info = ($flags & (1 << 0)) ? PaymentRequestedInfo::deserialize($stream) : null;
-        $shipping = ($flags & (1 << 1)) ? ShippingOption::deserialize($stream) : null;
-        $tipAmount = ($flags & (1 << 3)) ? Deserializer::int64($stream) : null;
+        $info = (($flags & (1 << 0)) !== 0) ? PaymentRequestedInfo::deserialize($stream) : null;
+        $shipping = (($flags & (1 << 1)) !== 0) ? ShippingOption::deserialize($stream) : null;
+        $tipAmount = (($flags & (1 << 3)) !== 0) ? Deserializer::int64($stream) : null;
         $currency = Deserializer::bytes($stream);
         $totalAmount = Deserializer::int64($stream);
         $credentialsTitle = Deserializer::bytes($stream);

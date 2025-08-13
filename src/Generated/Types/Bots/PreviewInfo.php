@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Bots;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Bots;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\BotPreviewMedia;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\BotPreviewMedia;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/bots.previewInfo
@@ -29,15 +30,13 @@ final class PreviewInfo extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::vectorOfObjects($this->media);
         $buffer .= Serializer::vectorOfStrings($this->langCodes);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $media = Deserializer::vectorOfObjects($stream, [BotPreviewMedia::class, 'deserialize']);
         $langCodes = Deserializer::vectorOfStrings($stream);

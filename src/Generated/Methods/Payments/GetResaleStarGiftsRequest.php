@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractStarGiftAttributeId;
-use DigitalStars\MtprotoClient\Generated\Types\Payments\ResaleStarGifts;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractStarGiftAttributeId;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\ResaleStarGifts;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.getResaleStarGifts
  */
-final class GetResaleStarGiftsRequest extends TlObject
+final class GetResaleStarGiftsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x7a5fa236;
     
@@ -48,10 +47,18 @@ final class GetResaleStarGiftsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->sortByPrice) $flags |= (1 << 1);
-        if ($this->sortByNum) $flags |= (1 << 2);
-        if ($this->attributesHash !== null) $flags |= (1 << 0);
-        if ($this->attributes !== null) $flags |= (1 << 3);
+        if ($this->sortByPrice) {
+            $flags |= (1 << 1);
+        }
+        if ($this->sortByNum) {
+            $flags |= (1 << 2);
+        }
+        if ($this->attributesHash !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->attributes !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int64($this->attributesHash);
@@ -62,12 +69,6 @@ final class GetResaleStarGiftsRequest extends TlObject
         }
         $buffer .= Serializer::bytes($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

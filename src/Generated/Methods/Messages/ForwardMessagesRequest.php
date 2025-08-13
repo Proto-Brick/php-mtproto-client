@@ -1,19 +1,18 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputQuickReplyShortcut;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputReplyTo;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\Generated\Types\Base\SuggestedPost;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputQuickReplyShortcut;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputReplyTo;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SuggestedPost;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.forwardMessages
  */
-final class ForwardMessagesRequest extends TlObject
+final class ForwardMessagesRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x978928ca;
     
@@ -75,21 +74,51 @@ final class ForwardMessagesRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->silent) $flags |= (1 << 5);
-        if ($this->background) $flags |= (1 << 6);
-        if ($this->withMyScore) $flags |= (1 << 8);
-        if ($this->dropAuthor) $flags |= (1 << 11);
-        if ($this->dropMediaCaptions) $flags |= (1 << 12);
-        if ($this->noforwards) $flags |= (1 << 14);
-        if ($this->allowPaidFloodskip) $flags |= (1 << 19);
-        if ($this->topMsgId !== null) $flags |= (1 << 9);
-        if ($this->replyTo !== null) $flags |= (1 << 22);
-        if ($this->scheduleDate !== null) $flags |= (1 << 10);
-        if ($this->sendAs !== null) $flags |= (1 << 13);
-        if ($this->quickReplyShortcut !== null) $flags |= (1 << 17);
-        if ($this->videoTimestamp !== null) $flags |= (1 << 20);
-        if ($this->allowPaidStars !== null) $flags |= (1 << 21);
-        if ($this->suggestedPost !== null) $flags |= (1 << 23);
+        if ($this->silent) {
+            $flags |= (1 << 5);
+        }
+        if ($this->background) {
+            $flags |= (1 << 6);
+        }
+        if ($this->withMyScore) {
+            $flags |= (1 << 8);
+        }
+        if ($this->dropAuthor) {
+            $flags |= (1 << 11);
+        }
+        if ($this->dropMediaCaptions) {
+            $flags |= (1 << 12);
+        }
+        if ($this->noforwards) {
+            $flags |= (1 << 14);
+        }
+        if ($this->allowPaidFloodskip) {
+            $flags |= (1 << 19);
+        }
+        if ($this->topMsgId !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->replyTo !== null) {
+            $flags |= (1 << 22);
+        }
+        if ($this->scheduleDate !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->sendAs !== null) {
+            $flags |= (1 << 13);
+        }
+        if ($this->quickReplyShortcut !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->videoTimestamp !== null) {
+            $flags |= (1 << 20);
+        }
+        if ($this->allowPaidStars !== null) {
+            $flags |= (1 << 21);
+        }
+        if ($this->suggestedPost !== null) {
+            $flags |= (1 << 23);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->fromPeer->serialize();
         $buffer .= Serializer::vectorOfInts($this->id);
@@ -119,12 +148,6 @@ final class ForwardMessagesRequest extends TlObject
         if ($flags & (1 << 23)) {
             $buffer .= $this->suggestedPost->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

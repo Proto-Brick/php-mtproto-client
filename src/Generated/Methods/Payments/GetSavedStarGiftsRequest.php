@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Payments\SavedStarGifts;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\SavedStarGifts;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.getSavedStarGifts
  */
-final class GetSavedStarGiftsRequest extends TlObject
+final class GetSavedStarGiftsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xa319e569;
     
@@ -54,13 +53,27 @@ final class GetSavedStarGiftsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->excludeUnsaved) $flags |= (1 << 0);
-        if ($this->excludeSaved) $flags |= (1 << 1);
-        if ($this->excludeUnlimited) $flags |= (1 << 2);
-        if ($this->excludeLimited) $flags |= (1 << 3);
-        if ($this->excludeUnique) $flags |= (1 << 4);
-        if ($this->sortByValue) $flags |= (1 << 5);
-        if ($this->collectionId !== null) $flags |= (1 << 6);
+        if ($this->excludeUnsaved) {
+            $flags |= (1 << 0);
+        }
+        if ($this->excludeSaved) {
+            $flags |= (1 << 1);
+        }
+        if ($this->excludeUnlimited) {
+            $flags |= (1 << 2);
+        }
+        if ($this->excludeLimited) {
+            $flags |= (1 << 3);
+        }
+        if ($this->excludeUnique) {
+            $flags |= (1 << 4);
+        }
+        if ($this->sortByValue) {
+            $flags |= (1 << 5);
+        }
+        if ($this->collectionId !== null) {
+            $flags |= (1 << 6);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 6)) {
@@ -68,12 +81,6 @@ final class GetSavedStarGiftsRequest extends TlObject
         }
         $buffer .= Serializer::bytes($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

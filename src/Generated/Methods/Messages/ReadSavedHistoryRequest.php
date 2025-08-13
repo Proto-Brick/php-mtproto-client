@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.readSavedHistory
  */
-final class ReadSavedHistoryRequest extends TlObject
+final class ReadSavedHistoryRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xba4a3b5b;
     
@@ -41,12 +40,6 @@ final class ReadSavedHistoryRequest extends TlObject
         $buffer .= $this->parentPeer->serialize();
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->maxId);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

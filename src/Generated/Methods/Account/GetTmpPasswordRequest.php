@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Account\TmpPassword;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputCheckPasswordSRP;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\TmpPassword;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputCheckPasswordSRP;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.getTmpPassword
  */
-final class GetTmpPasswordRequest extends TlObject
+final class GetTmpPasswordRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x449e0b51;
     
@@ -39,12 +38,6 @@ final class GetTmpPasswordRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->password->serialize();
         $buffer .= Serializer::int32($this->period);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

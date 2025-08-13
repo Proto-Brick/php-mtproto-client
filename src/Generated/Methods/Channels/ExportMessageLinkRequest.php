@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\ExportedMessageLink;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ExportedMessageLink;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/channels.exportMessageLink
  */
-final class ExportMessageLinkRequest extends TlObject
+final class ExportMessageLinkRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xe63fadeb;
     
@@ -42,17 +41,15 @@ final class ExportMessageLinkRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->grouped) $flags |= (1 << 0);
-        if ($this->thread) $flags |= (1 << 1);
+        if ($this->grouped) {
+            $flags |= (1 << 0);
+        }
+        if ($this->thread) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->channel->serialize();
         $buffer .= Serializer::int32($this->id);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

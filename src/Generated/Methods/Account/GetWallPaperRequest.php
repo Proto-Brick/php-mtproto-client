@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputWallPaper;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractWallPaper;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputWallPaper;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractWallPaper;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.getWallPaper
  */
-final class GetWallPaperRequest extends TlObject
+final class GetWallPaperRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xfc8ddbea;
     
@@ -36,12 +35,6 @@ final class GetWallPaperRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->wallpaper->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/inputBotInlineMessageMediaVenue
@@ -37,7 +36,9 @@ final class InputBotInlineMessageMediaVenue extends AbstractInputBotInlineMessag
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->replyMarkup !== null) $flags |= (1 << 2);
+        if ($this->replyMarkup !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->geoPoint->serialize();
         $buffer .= Serializer::bytes($this->title);
@@ -48,10 +49,8 @@ final class InputBotInlineMessageMediaVenue extends AbstractInputBotInlineMessag
         if ($flags & (1 << 2)) {
             $buffer .= $this->replyMarkup->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -62,7 +61,7 @@ final class InputBotInlineMessageMediaVenue extends AbstractInputBotInlineMessag
         $provider = Deserializer::bytes($stream);
         $venueId = Deserializer::bytes($stream);
         $venueType = Deserializer::bytes($stream);
-        $replyMarkup = ($flags & (1 << 2)) ? AbstractReplyMarkup::deserialize($stream) : null;
+        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($stream) : null;
 
         return new self(
             $geoPoint,

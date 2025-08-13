@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messageService
@@ -55,18 +54,42 @@ final class MessageService extends AbstractMessage
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->out) $flags |= (1 << 1);
-        if ($this->mentioned) $flags |= (1 << 4);
-        if ($this->mediaUnread) $flags |= (1 << 5);
-        if ($this->reactionsArePossible) $flags |= (1 << 9);
-        if ($this->silent) $flags |= (1 << 13);
-        if ($this->post) $flags |= (1 << 14);
-        if ($this->legacy) $flags |= (1 << 19);
-        if ($this->fromId !== null) $flags |= (1 << 8);
-        if ($this->savedPeerId !== null) $flags |= (1 << 28);
-        if ($this->replyTo !== null) $flags |= (1 << 3);
-        if ($this->reactions !== null) $flags |= (1 << 20);
-        if ($this->ttlPeriod !== null) $flags |= (1 << 25);
+        if ($this->out) {
+            $flags |= (1 << 1);
+        }
+        if ($this->mentioned) {
+            $flags |= (1 << 4);
+        }
+        if ($this->mediaUnread) {
+            $flags |= (1 << 5);
+        }
+        if ($this->reactionsArePossible) {
+            $flags |= (1 << 9);
+        }
+        if ($this->silent) {
+            $flags |= (1 << 13);
+        }
+        if ($this->post) {
+            $flags |= (1 << 14);
+        }
+        if ($this->legacy) {
+            $flags |= (1 << 19);
+        }
+        if ($this->fromId !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->savedPeerId !== null) {
+            $flags |= (1 << 28);
+        }
+        if ($this->replyTo !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->reactions !== null) {
+            $flags |= (1 << 20);
+        }
+        if ($this->ttlPeriod !== null) {
+            $flags |= (1 << 25);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
         if ($flags & (1 << 8)) {
@@ -87,30 +110,28 @@ final class MessageService extends AbstractMessage
         if ($flags & (1 << 25)) {
             $buffer .= Serializer::int32($this->ttlPeriod);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $out = ($flags & (1 << 1)) ? true : null;
-        $mentioned = ($flags & (1 << 4)) ? true : null;
-        $mediaUnread = ($flags & (1 << 5)) ? true : null;
-        $reactionsArePossible = ($flags & (1 << 9)) ? true : null;
-        $silent = ($flags & (1 << 13)) ? true : null;
-        $post = ($flags & (1 << 14)) ? true : null;
-        $legacy = ($flags & (1 << 19)) ? true : null;
+        $out = (($flags & (1 << 1)) !== 0) ? true : null;
+        $mentioned = (($flags & (1 << 4)) !== 0) ? true : null;
+        $mediaUnread = (($flags & (1 << 5)) !== 0) ? true : null;
+        $reactionsArePossible = (($flags & (1 << 9)) !== 0) ? true : null;
+        $silent = (($flags & (1 << 13)) !== 0) ? true : null;
+        $post = (($flags & (1 << 14)) !== 0) ? true : null;
+        $legacy = (($flags & (1 << 19)) !== 0) ? true : null;
         $id = Deserializer::int32($stream);
-        $fromId = ($flags & (1 << 8)) ? AbstractPeer::deserialize($stream) : null;
+        $fromId = (($flags & (1 << 8)) !== 0) ? AbstractPeer::deserialize($stream) : null;
         $peerId = AbstractPeer::deserialize($stream);
-        $savedPeerId = ($flags & (1 << 28)) ? AbstractPeer::deserialize($stream) : null;
-        $replyTo = ($flags & (1 << 3)) ? AbstractMessageReplyHeader::deserialize($stream) : null;
+        $savedPeerId = (($flags & (1 << 28)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $replyTo = (($flags & (1 << 3)) !== 0) ? AbstractMessageReplyHeader::deserialize($stream) : null;
         $date = Deserializer::int32($stream);
         $action = AbstractMessageAction::deserialize($stream);
-        $reactions = ($flags & (1 << 20)) ? MessageReactions::deserialize($stream) : null;
-        $ttlPeriod = ($flags & (1 << 25)) ? Deserializer::int32($stream) : null;
+        $reactions = (($flags & (1 << 20)) !== 0) ? MessageReactions::deserialize($stream) : null;
+        $ttlPeriod = (($flags & (1 << 25)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,

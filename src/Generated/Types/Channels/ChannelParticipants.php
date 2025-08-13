@@ -1,12 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChannelParticipant;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChannelParticipant;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/channels.channelParticipants
@@ -37,10 +36,8 @@ final class ChannelParticipants extends AbstractChannelParticipants
         $buffer .= Serializer::vectorOfObjects($this->participants);
         $buffer .= Serializer::vectorOfObjects($this->chats);
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

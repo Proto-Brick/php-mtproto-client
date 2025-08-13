@@ -1,12 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\SponsoredMessage;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SponsoredMessage;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messages.sponsoredMessages
@@ -38,9 +37,15 @@ final class SponsoredMessages extends AbstractSponsoredMessages
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->postsBetween !== null) $flags |= (1 << 0);
-        if ($this->startDelay !== null) $flags |= (1 << 1);
-        if ($this->betweenDelay !== null) $flags |= (1 << 2);
+        if ($this->postsBetween !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->startDelay !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->betweenDelay !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->postsBetween);
@@ -54,17 +59,15 @@ final class SponsoredMessages extends AbstractSponsoredMessages
         $buffer .= Serializer::vectorOfObjects($this->messages);
         $buffer .= Serializer::vectorOfObjects($this->chats);
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $postsBetween = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $startDelay = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
-        $betweenDelay = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $postsBetween = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $startDelay = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $betweenDelay = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $messages = Deserializer::vectorOfObjects($stream, [SponsoredMessage::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);

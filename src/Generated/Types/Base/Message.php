@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/message
@@ -112,46 +111,126 @@ final class Message extends AbstractMessage
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         $flags2 = 0;
-        if ($this->out) $flags |= (1 << 1);
-        if ($this->mentioned) $flags |= (1 << 4);
-        if ($this->mediaUnread) $flags |= (1 << 5);
-        if ($this->silent) $flags |= (1 << 13);
-        if ($this->post) $flags |= (1 << 14);
-        if ($this->fromScheduled) $flags |= (1 << 18);
-        if ($this->legacy) $flags |= (1 << 19);
-        if ($this->editHide) $flags |= (1 << 21);
-        if ($this->pinned) $flags |= (1 << 24);
-        if ($this->noforwards) $flags |= (1 << 26);
-        if ($this->invertMedia) $flags |= (1 << 27);
-        if ($this->offline) $flags2 |= (1 << 1);
-        if ($this->videoProcessingPending) $flags2 |= (1 << 4);
-        if ($this->paidSuggestedPostStars) $flags2 |= (1 << 8);
-        if ($this->paidSuggestedPostTon) $flags2 |= (1 << 9);
-        if ($this->fromId !== null) $flags |= (1 << 8);
-        if ($this->fromBoostsApplied !== null) $flags |= (1 << 29);
-        if ($this->savedPeerId !== null) $flags |= (1 << 28);
-        if ($this->fwdFrom !== null) $flags |= (1 << 2);
-        if ($this->viaBotId !== null) $flags |= (1 << 11);
-        if ($this->viaBusinessBotId !== null) $flags2 |= (1 << 0);
-        if ($this->replyTo !== null) $flags |= (1 << 3);
-        if ($this->media !== null) $flags |= (1 << 9);
-        if ($this->replyMarkup !== null) $flags |= (1 << 6);
-        if ($this->entities !== null) $flags |= (1 << 7);
-        if ($this->views !== null) $flags |= (1 << 10);
-        if ($this->forwards !== null) $flags |= (1 << 10);
-        if ($this->replies !== null) $flags |= (1 << 23);
-        if ($this->editDate !== null) $flags |= (1 << 15);
-        if ($this->postAuthor !== null) $flags |= (1 << 16);
-        if ($this->groupedId !== null) $flags |= (1 << 17);
-        if ($this->reactions !== null) $flags |= (1 << 20);
-        if ($this->restrictionReason !== null) $flags |= (1 << 22);
-        if ($this->ttlPeriod !== null) $flags |= (1 << 25);
-        if ($this->quickReplyShortcutId !== null) $flags |= (1 << 30);
-        if ($this->effect !== null) $flags2 |= (1 << 2);
-        if ($this->factcheck !== null) $flags2 |= (1 << 3);
-        if ($this->reportDeliveryUntilDate !== null) $flags2 |= (1 << 5);
-        if ($this->paidMessageStars !== null) $flags2 |= (1 << 6);
-        if ($this->suggestedPost !== null) $flags2 |= (1 << 7);
+        if ($this->out) {
+            $flags |= (1 << 1);
+        }
+        if ($this->mentioned) {
+            $flags |= (1 << 4);
+        }
+        if ($this->mediaUnread) {
+            $flags |= (1 << 5);
+        }
+        if ($this->silent) {
+            $flags |= (1 << 13);
+        }
+        if ($this->post) {
+            $flags |= (1 << 14);
+        }
+        if ($this->fromScheduled) {
+            $flags |= (1 << 18);
+        }
+        if ($this->legacy) {
+            $flags |= (1 << 19);
+        }
+        if ($this->editHide) {
+            $flags |= (1 << 21);
+        }
+        if ($this->pinned) {
+            $flags |= (1 << 24);
+        }
+        if ($this->noforwards) {
+            $flags |= (1 << 26);
+        }
+        if ($this->invertMedia) {
+            $flags |= (1 << 27);
+        }
+        if ($this->offline) {
+            $flags2 |= (1 << 1);
+        }
+        if ($this->videoProcessingPending) {
+            $flags2 |= (1 << 4);
+        }
+        if ($this->paidSuggestedPostStars) {
+            $flags2 |= (1 << 8);
+        }
+        if ($this->paidSuggestedPostTon) {
+            $flags2 |= (1 << 9);
+        }
+        if ($this->fromId !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->fromBoostsApplied !== null) {
+            $flags |= (1 << 29);
+        }
+        if ($this->savedPeerId !== null) {
+            $flags |= (1 << 28);
+        }
+        if ($this->fwdFrom !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->viaBotId !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->viaBusinessBotId !== null) {
+            $flags2 |= (1 << 0);
+        }
+        if ($this->replyTo !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->media !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->replyMarkup !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->views !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->forwards !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->replies !== null) {
+            $flags |= (1 << 23);
+        }
+        if ($this->editDate !== null) {
+            $flags |= (1 << 15);
+        }
+        if ($this->postAuthor !== null) {
+            $flags |= (1 << 16);
+        }
+        if ($this->groupedId !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->reactions !== null) {
+            $flags |= (1 << 20);
+        }
+        if ($this->restrictionReason !== null) {
+            $flags |= (1 << 22);
+        }
+        if ($this->ttlPeriod !== null) {
+            $flags |= (1 << 25);
+        }
+        if ($this->quickReplyShortcutId !== null) {
+            $flags |= (1 << 30);
+        }
+        if ($this->effect !== null) {
+            $flags2 |= (1 << 2);
+        }
+        if ($this->factcheck !== null) {
+            $flags2 |= (1 << 3);
+        }
+        if ($this->reportDeliveryUntilDate !== null) {
+            $flags2 |= (1 << 5);
+        }
+        if ($this->paidMessageStars !== null) {
+            $flags2 |= (1 << 6);
+        }
+        if ($this->suggestedPost !== null) {
+            $flags2 |= (1 << 7);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int32($this->id);
@@ -233,59 +312,57 @@ final class Message extends AbstractMessage
         if ($flags2 & (1 << 7)) {
             $buffer .= $this->suggestedPost->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $out = ($flags & (1 << 1)) ? true : null;
-        $mentioned = ($flags & (1 << 4)) ? true : null;
-        $mediaUnread = ($flags & (1 << 5)) ? true : null;
-        $silent = ($flags & (1 << 13)) ? true : null;
-        $post = ($flags & (1 << 14)) ? true : null;
-        $fromScheduled = ($flags & (1 << 18)) ? true : null;
-        $legacy = ($flags & (1 << 19)) ? true : null;
-        $editHide = ($flags & (1 << 21)) ? true : null;
-        $pinned = ($flags & (1 << 24)) ? true : null;
-        $noforwards = ($flags & (1 << 26)) ? true : null;
-        $invertMedia = ($flags & (1 << 27)) ? true : null;
+        $out = (($flags & (1 << 1)) !== 0) ? true : null;
+        $mentioned = (($flags & (1 << 4)) !== 0) ? true : null;
+        $mediaUnread = (($flags & (1 << 5)) !== 0) ? true : null;
+        $silent = (($flags & (1 << 13)) !== 0) ? true : null;
+        $post = (($flags & (1 << 14)) !== 0) ? true : null;
+        $fromScheduled = (($flags & (1 << 18)) !== 0) ? true : null;
+        $legacy = (($flags & (1 << 19)) !== 0) ? true : null;
+        $editHide = (($flags & (1 << 21)) !== 0) ? true : null;
+        $pinned = (($flags & (1 << 24)) !== 0) ? true : null;
+        $noforwards = (($flags & (1 << 26)) !== 0) ? true : null;
+        $invertMedia = (($flags & (1 << 27)) !== 0) ? true : null;
         $flags2 = Deserializer::int32($stream);
-        $offline = ($flags2 & (1 << 1)) ? true : null;
-        $videoProcessingPending = ($flags2 & (1 << 4)) ? true : null;
-        $paidSuggestedPostStars = ($flags2 & (1 << 8)) ? true : null;
-        $paidSuggestedPostTon = ($flags2 & (1 << 9)) ? true : null;
+        $offline = (($flags2 & (1 << 1)) !== 0) ? true : null;
+        $videoProcessingPending = (($flags2 & (1 << 4)) !== 0) ? true : null;
+        $paidSuggestedPostStars = (($flags2 & (1 << 8)) !== 0) ? true : null;
+        $paidSuggestedPostTon = (($flags2 & (1 << 9)) !== 0) ? true : null;
         $id = Deserializer::int32($stream);
-        $fromId = ($flags & (1 << 8)) ? AbstractPeer::deserialize($stream) : null;
-        $fromBoostsApplied = ($flags & (1 << 29)) ? Deserializer::int32($stream) : null;
+        $fromId = (($flags & (1 << 8)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $fromBoostsApplied = (($flags & (1 << 29)) !== 0) ? Deserializer::int32($stream) : null;
         $peerId = AbstractPeer::deserialize($stream);
-        $savedPeerId = ($flags & (1 << 28)) ? AbstractPeer::deserialize($stream) : null;
-        $fwdFrom = ($flags & (1 << 2)) ? MessageFwdHeader::deserialize($stream) : null;
-        $viaBotId = ($flags & (1 << 11)) ? Deserializer::int64($stream) : null;
-        $viaBusinessBotId = ($flags2 & (1 << 0)) ? Deserializer::int64($stream) : null;
-        $replyTo = ($flags & (1 << 3)) ? AbstractMessageReplyHeader::deserialize($stream) : null;
+        $savedPeerId = (($flags & (1 << 28)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $fwdFrom = (($flags & (1 << 2)) !== 0) ? MessageFwdHeader::deserialize($stream) : null;
+        $viaBotId = (($flags & (1 << 11)) !== 0) ? Deserializer::int64($stream) : null;
+        $viaBusinessBotId = (($flags2 & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
+        $replyTo = (($flags & (1 << 3)) !== 0) ? AbstractMessageReplyHeader::deserialize($stream) : null;
         $date = Deserializer::int32($stream);
         $message = Deserializer::bytes($stream);
-        $media = ($flags & (1 << 9)) ? AbstractMessageMedia::deserialize($stream) : null;
-        $replyMarkup = ($flags & (1 << 6)) ? AbstractReplyMarkup::deserialize($stream) : null;
-        $entities = ($flags & (1 << 7)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $views = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
-        $forwards = ($flags & (1 << 10)) ? Deserializer::int32($stream) : null;
-        $replies = ($flags & (1 << 23)) ? MessageReplies::deserialize($stream) : null;
-        $editDate = ($flags & (1 << 15)) ? Deserializer::int32($stream) : null;
-        $postAuthor = ($flags & (1 << 16)) ? Deserializer::bytes($stream) : null;
-        $groupedId = ($flags & (1 << 17)) ? Deserializer::int64($stream) : null;
-        $reactions = ($flags & (1 << 20)) ? MessageReactions::deserialize($stream) : null;
-        $restrictionReason = ($flags & (1 << 22)) ? Deserializer::vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
-        $ttlPeriod = ($flags & (1 << 25)) ? Deserializer::int32($stream) : null;
-        $quickReplyShortcutId = ($flags & (1 << 30)) ? Deserializer::int32($stream) : null;
-        $effect = ($flags2 & (1 << 2)) ? Deserializer::int64($stream) : null;
-        $factcheck = ($flags2 & (1 << 3)) ? FactCheck::deserialize($stream) : null;
-        $reportDeliveryUntilDate = ($flags2 & (1 << 5)) ? Deserializer::int32($stream) : null;
-        $paidMessageStars = ($flags2 & (1 << 6)) ? Deserializer::int64($stream) : null;
-        $suggestedPost = ($flags2 & (1 << 7)) ? SuggestedPost::deserialize($stream) : null;
+        $media = (($flags & (1 << 9)) !== 0) ? AbstractMessageMedia::deserialize($stream) : null;
+        $replyMarkup = (($flags & (1 << 6)) !== 0) ? AbstractReplyMarkup::deserialize($stream) : null;
+        $entities = (($flags & (1 << 7)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $views = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
+        $forwards = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
+        $replies = (($flags & (1 << 23)) !== 0) ? MessageReplies::deserialize($stream) : null;
+        $editDate = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($stream) : null;
+        $postAuthor = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
+        $groupedId = (($flags & (1 << 17)) !== 0) ? Deserializer::int64($stream) : null;
+        $reactions = (($flags & (1 << 20)) !== 0) ? MessageReactions::deserialize($stream) : null;
+        $restrictionReason = (($flags & (1 << 22)) !== 0) ? Deserializer::vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
+        $ttlPeriod = (($flags & (1 << 25)) !== 0) ? Deserializer::int32($stream) : null;
+        $quickReplyShortcutId = (($flags & (1 << 30)) !== 0) ? Deserializer::int32($stream) : null;
+        $effect = (($flags2 & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;
+        $factcheck = (($flags2 & (1 << 3)) !== 0) ? FactCheck::deserialize($stream) : null;
+        $reportDeliveryUntilDate = (($flags2 & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
+        $paidMessageStars = (($flags2 & (1 << 6)) !== 0) ? Deserializer::int64($stream) : null;
+        $suggestedPost = (($flags2 & (1 << 7)) !== 0) ? SuggestedPost::deserialize($stream) : null;
 
         return new self(
             $id,

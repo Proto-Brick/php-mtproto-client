@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/wallPaperSettings
@@ -41,15 +42,33 @@ final class WallPaperSettings extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->blur) $flags |= (1 << 1);
-        if ($this->motion) $flags |= (1 << 2);
-        if ($this->backgroundColor !== null) $flags |= (1 << 0);
-        if ($this->secondBackgroundColor !== null) $flags |= (1 << 4);
-        if ($this->thirdBackgroundColor !== null) $flags |= (1 << 5);
-        if ($this->fourthBackgroundColor !== null) $flags |= (1 << 6);
-        if ($this->intensity !== null) $flags |= (1 << 3);
-        if ($this->rotation !== null) $flags |= (1 << 4);
-        if ($this->emoticon !== null) $flags |= (1 << 7);
+        if ($this->blur) {
+            $flags |= (1 << 1);
+        }
+        if ($this->motion) {
+            $flags |= (1 << 2);
+        }
+        if ($this->backgroundColor !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->secondBackgroundColor !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->thirdBackgroundColor !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->fourthBackgroundColor !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->intensity !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->rotation !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->emoticon !== null) {
+            $flags |= (1 << 7);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->backgroundColor);
@@ -72,26 +91,24 @@ final class WallPaperSettings extends TlObject
         if ($flags & (1 << 7)) {
             $buffer .= Serializer::bytes($this->emoticon);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $blur = ($flags & (1 << 1)) ? true : null;
-        $motion = ($flags & (1 << 2)) ? true : null;
-        $backgroundColor = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $secondBackgroundColor = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $thirdBackgroundColor = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
-        $fourthBackgroundColor = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
-        $intensity = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
-        $rotation = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $emoticon = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
+        $blur = (($flags & (1 << 1)) !== 0) ? true : null;
+        $motion = (($flags & (1 << 2)) !== 0) ? true : null;
+        $backgroundColor = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $secondBackgroundColor = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $thirdBackgroundColor = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
+        $fourthBackgroundColor = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
+        $intensity = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $rotation = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $emoticon = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(
             $blur,

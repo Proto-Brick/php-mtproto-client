@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Auth;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/auth.sentCode
@@ -31,8 +30,12 @@ final class SentCode extends AbstractSentCode
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->nextType !== null) $flags |= (1 << 1);
-        if ($this->timeout !== null) $flags |= (1 << 2);
+        if ($this->nextType !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->timeout !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->type->serialize();
         $buffer .= Serializer::bytes($this->phoneCodeHash);
@@ -42,18 +45,16 @@ final class SentCode extends AbstractSentCode
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::int32($this->timeout);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
         $type = AbstractSentCodeType::deserialize($stream);
         $phoneCodeHash = Deserializer::bytes($stream);
-        $nextType = ($flags & (1 << 1)) ? CodeType::deserialize($stream) : null;
-        $timeout = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $nextType = (($flags & (1 << 1)) !== 0) ? CodeType::deserialize($stream) : null;
+        $timeout = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $type,

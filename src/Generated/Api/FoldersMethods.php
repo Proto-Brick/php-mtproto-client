@@ -1,17 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Api;
+namespace ProtoBrick\MTProtoClient\Generated\Api;
 
-use DigitalStars\MtprotoClient\Client;
-use DigitalStars\MtprotoClient\Generated\Methods\Folders\EditPeerFoldersRequest;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputFolderPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShort;
-use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortChatMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\UpdateShortSentMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\Updates;
-use DigitalStars\MtprotoClient\Generated\Types\Base\UpdatesCombined;
-use DigitalStars\MtprotoClient\Generated\Types\Base\UpdatesTooLong;
+use ProtoBrick\MTProtoClient\Client;
+use ProtoBrick\MTProtoClient\Generated\Methods\Folders\EditPeerFoldersRequest;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputFolderPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShort;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShortChatMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShortMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShortSentMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Updates;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdatesCombined;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdatesTooLong;
 
 
 /**

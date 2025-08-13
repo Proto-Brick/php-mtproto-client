@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Account\SentEmailCode;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractEmailVerifyPurpose;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\SentEmailCode;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractEmailVerifyPurpose;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.sendVerifyEmailCode
  */
-final class SendVerifyEmailCodeRequest extends TlObject
+final class SendVerifyEmailCodeRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x98e037bb;
     
@@ -39,12 +38,6 @@ final class SendVerifyEmailCodeRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->purpose->serialize();
         $buffer .= Serializer::bytes($this->email);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

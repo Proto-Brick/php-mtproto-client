@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.clickSponsoredMessage
  */
-final class ClickSponsoredMessageRequest extends TlObject
+final class ClickSponsoredMessageRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x8235057e;
     
@@ -38,16 +37,14 @@ final class ClickSponsoredMessageRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->media) $flags |= (1 << 0);
-        if ($this->fullscreen) $flags |= (1 << 1);
+        if ($this->media) {
+            $flags |= (1 << 0);
+        }
+        if ($this->fullscreen) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->randomId);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Auth;
 
-use DigitalStars\MtprotoClient\Generated\Types\Auth\AbstractAuthorization;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractEmailVerification;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Auth\AbstractAuthorization;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractEmailVerification;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/auth.signIn
  */
-final class SignInRequest extends TlObject
+final class SignInRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x8d52a951;
     
@@ -42,8 +41,12 @@ final class SignInRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->phoneCode !== null) $flags |= (1 << 0);
-        if ($this->emailVerification !== null) $flags |= (1 << 1);
+        if ($this->phoneCode !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->emailVerification !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->phoneNumber);
         $buffer .= Serializer::bytes($this->phoneCodeHash);
@@ -53,12 +56,6 @@ final class SignInRequest extends TlObject
         if ($flags & (1 << 1)) {
             $buffer .= $this->emailVerification->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

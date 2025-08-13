@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\EmojiKeywordsDifference;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\EmojiKeywordsDifference;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.getEmojiKeywordsDifference
  */
-final class GetEmojiKeywordsDifferenceRequest extends TlObject
+final class GetEmojiKeywordsDifferenceRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x1508b6af;
     
@@ -38,12 +37,6 @@ final class GetEmojiKeywordsDifferenceRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::bytes($this->langCode);
         $buffer .= Serializer::int32($this->fromVersion);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

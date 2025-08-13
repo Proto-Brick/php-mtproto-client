@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/inputInvoiceStarGiftResale
@@ -29,19 +28,19 @@ final class InputInvoiceStarGiftResale extends AbstractInputInvoice
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->ton) $flags |= (1 << 0);
+        if ($this->ton) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->slug);
         $buffer .= $this->toId->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $ton = ($flags & (1 << 0)) ? true : null;
+        $ton = (($flags & (1 << 0)) !== 0) ? true : null;
         $slug = Deserializer::bytes($stream);
         $toId = AbstractInputPeer::deserialize($stream);
 

@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Auth;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/auth.SentCode
  */
@@ -17,7 +20,7 @@ abstract class AbstractSentCode extends TlObject
             0x5e002502 => SentCode::deserialize($stream),
             0x2390fe44 => SentCodeSuccess::deserialize($stream),
             0xd7cef980 => SentCodePaymentRequired::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type auth.SentCode. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type auth.SentCode. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

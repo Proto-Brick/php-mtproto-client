@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Phone;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PhoneCallProtocol;
-use DigitalStars\MtprotoClient\Generated\Types\Phone\PhoneCall;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PhoneCallProtocol;
+use ProtoBrick\MTProtoClient\Generated\Types\Phone\PhoneCall;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/phone.requestCall
  */
-final class RequestCallRequest extends TlObject
+final class RequestCallRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x42ff96ed;
     
@@ -45,18 +44,14 @@ final class RequestCallRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->video) $flags |= (1 << 0);
+        if ($this->video) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->userId->serialize();
         $buffer .= Serializer::int32($this->randomId);
         $buffer .= Serializer::bytes($this->gAHash);
         $buffer .= $this->protocol->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

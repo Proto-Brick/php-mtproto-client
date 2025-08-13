@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Help;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Help;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/help.peerColorProfileSet
@@ -31,10 +30,8 @@ final class PeerColorProfileSet extends AbstractPeerColorSet
         $buffer .= Serializer::vectorOfInts($this->paletteColors);
         $buffer .= Serializer::vectorOfInts($this->bgColors);
         $buffer .= Serializer::vectorOfInts($this->storyColors);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

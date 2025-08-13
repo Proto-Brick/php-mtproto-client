@@ -1,27 +1,27 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Api;
+namespace ProtoBrick\MTProtoClient\Generated\Api;
 
-use DigitalStars\MtprotoClient\Client;
-use DigitalStars\MtprotoClient\Generated\Methods\Updates\GetChannelDifferenceRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Updates\GetDifferenceRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Updates\GetStateRequest;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChannelMessagesFilter;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\ChannelMessagesFilter;
-use DigitalStars\MtprotoClient\Generated\Types\Base\ChannelMessagesFilterEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputChannelEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputChannelFromMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\AbstractChannelDifference;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\AbstractDifference;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\ChannelDifference;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\ChannelDifferenceEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\ChannelDifferenceTooLong;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\Difference;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\DifferenceEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\DifferenceSlice;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\DifferenceTooLong;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\State;
+use ProtoBrick\MTProtoClient\Client;
+use ProtoBrick\MTProtoClient\Generated\Methods\Updates\GetChannelDifferenceRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Updates\GetDifferenceRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Updates\GetStateRequest;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChannelMessagesFilter;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ChannelMessagesFilter;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ChannelMessagesFilterEmpty;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputChannelEmpty;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputChannelFromMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\AbstractChannelDifference;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\AbstractDifference;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\ChannelDifference;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\ChannelDifferenceEmpty;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\ChannelDifferenceTooLong;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\Difference;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\DifferenceEmpty;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\DifferenceSlice;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\DifferenceTooLong;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\State;
 
 
 /**

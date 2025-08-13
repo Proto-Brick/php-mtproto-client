@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messageMediaPhoto
@@ -29,9 +28,15 @@ final class MessageMediaPhoto extends AbstractMessageMedia
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->spoiler) $flags |= (1 << 3);
-        if ($this->photo !== null) $flags |= (1 << 0);
-        if ($this->ttlSeconds !== null) $flags |= (1 << 2);
+        if ($this->spoiler) {
+            $flags |= (1 << 3);
+        }
+        if ($this->photo !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->ttlSeconds !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= $this->photo->serialize();
@@ -39,17 +44,15 @@ final class MessageMediaPhoto extends AbstractMessageMedia
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::int32($this->ttlSeconds);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $spoiler = ($flags & (1 << 3)) ? true : null;
-        $photo = ($flags & (1 << 0)) ? AbstractPhoto::deserialize($stream) : null;
-        $ttlSeconds = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $spoiler = (($flags & (1 << 3)) !== 0) ? true : null;
+        $photo = (($flags & (1 << 0)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
+        $ttlSeconds = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $spoiler,

@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractExportedChatInvite;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StarsSubscriptionPricing;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractExportedChatInvite;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StarsSubscriptionPricing;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.exportChatInvite
  */
-final class ExportChatInviteRequest extends TlObject
+final class ExportChatInviteRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xa455de90;
     
@@ -49,12 +48,24 @@ final class ExportChatInviteRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->legacyRevokePermanent) $flags |= (1 << 2);
-        if ($this->requestNeeded) $flags |= (1 << 3);
-        if ($this->expireDate !== null) $flags |= (1 << 0);
-        if ($this->usageLimit !== null) $flags |= (1 << 1);
-        if ($this->title !== null) $flags |= (1 << 4);
-        if ($this->subscriptionPricing !== null) $flags |= (1 << 5);
+        if ($this->legacyRevokePermanent) {
+            $flags |= (1 << 2);
+        }
+        if ($this->requestNeeded) {
+            $flags |= (1 << 3);
+        }
+        if ($this->expireDate !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->usageLimit !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->title !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->subscriptionPricing !== null) {
+            $flags |= (1 << 5);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
@@ -69,12 +80,6 @@ final class ExportChatInviteRequest extends TlObject
         if ($flags & (1 << 5)) {
             $buffer .= $this->subscriptionPricing->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

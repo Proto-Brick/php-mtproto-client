@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Auth;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/auth.reportMissingCode
  */
-final class ReportMissingCodeRequest extends TlObject
+final class ReportMissingCodeRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xcb9deff6;
     
@@ -40,12 +39,6 @@ final class ReportMissingCodeRequest extends TlObject
         $buffer .= Serializer::bytes($this->phoneNumber);
         $buffer .= Serializer::bytes($this->phoneCodeHash);
         $buffer .= Serializer::bytes($this->mnc);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

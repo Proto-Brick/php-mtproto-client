@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Chatlists;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Chatlists;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputChatlist;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputChatlist;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/chatlists.getLeaveChatlistSuggestions
  */
-final class GetLeaveChatlistSuggestionsRequest extends TlObject
+final class GetLeaveChatlistSuggestionsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xfdbcd714;
     
@@ -36,12 +35,6 @@ final class GetLeaveChatlistSuggestionsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->chatlist->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

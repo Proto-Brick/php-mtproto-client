@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.setBotCallbackAnswer
  */
-final class SetBotCallbackAnswerRequest extends TlObject
+final class SetBotCallbackAnswerRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xd58f130a;
     
@@ -42,9 +41,15 @@ final class SetBotCallbackAnswerRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->alert) $flags |= (1 << 1);
-        if ($this->message !== null) $flags |= (1 << 0);
-        if ($this->url !== null) $flags |= (1 << 2);
+        if ($this->alert) {
+            $flags |= (1 << 1);
+        }
+        if ($this->message !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->url !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->queryId);
         if ($flags & (1 << 0)) {
@@ -54,12 +59,6 @@ final class SetBotCallbackAnswerRequest extends TlObject
             $buffer .= Serializer::bytes($this->url);
         }
         $buffer .= Serializer::int32($this->cacheTime);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

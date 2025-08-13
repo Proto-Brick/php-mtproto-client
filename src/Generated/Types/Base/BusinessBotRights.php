@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/businessBotRights
@@ -51,46 +52,72 @@ final class BusinessBotRights extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->reply) $flags |= (1 << 0);
-        if ($this->readMessages) $flags |= (1 << 1);
-        if ($this->deleteSentMessages) $flags |= (1 << 2);
-        if ($this->deleteReceivedMessages) $flags |= (1 << 3);
-        if ($this->editName) $flags |= (1 << 4);
-        if ($this->editBio) $flags |= (1 << 5);
-        if ($this->editProfilePhoto) $flags |= (1 << 6);
-        if ($this->editUsername) $flags |= (1 << 7);
-        if ($this->viewGifts) $flags |= (1 << 8);
-        if ($this->sellGifts) $flags |= (1 << 9);
-        if ($this->changeGiftSettings) $flags |= (1 << 10);
-        if ($this->transferAndUpgradeGifts) $flags |= (1 << 11);
-        if ($this->transferStars) $flags |= (1 << 12);
-        if ($this->manageStories) $flags |= (1 << 13);
+        if ($this->reply) {
+            $flags |= (1 << 0);
+        }
+        if ($this->readMessages) {
+            $flags |= (1 << 1);
+        }
+        if ($this->deleteSentMessages) {
+            $flags |= (1 << 2);
+        }
+        if ($this->deleteReceivedMessages) {
+            $flags |= (1 << 3);
+        }
+        if ($this->editName) {
+            $flags |= (1 << 4);
+        }
+        if ($this->editBio) {
+            $flags |= (1 << 5);
+        }
+        if ($this->editProfilePhoto) {
+            $flags |= (1 << 6);
+        }
+        if ($this->editUsername) {
+            $flags |= (1 << 7);
+        }
+        if ($this->viewGifts) {
+            $flags |= (1 << 8);
+        }
+        if ($this->sellGifts) {
+            $flags |= (1 << 9);
+        }
+        if ($this->changeGiftSettings) {
+            $flags |= (1 << 10);
+        }
+        if ($this->transferAndUpgradeGifts) {
+            $flags |= (1 << 11);
+        }
+        if ($this->transferStars) {
+            $flags |= (1 << 12);
+        }
+        if ($this->manageStories) {
+            $flags |= (1 << 13);
+        }
         $buffer .= Serializer::int32($flags);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $reply = ($flags & (1 << 0)) ? true : null;
-        $readMessages = ($flags & (1 << 1)) ? true : null;
-        $deleteSentMessages = ($flags & (1 << 2)) ? true : null;
-        $deleteReceivedMessages = ($flags & (1 << 3)) ? true : null;
-        $editName = ($flags & (1 << 4)) ? true : null;
-        $editBio = ($flags & (1 << 5)) ? true : null;
-        $editProfilePhoto = ($flags & (1 << 6)) ? true : null;
-        $editUsername = ($flags & (1 << 7)) ? true : null;
-        $viewGifts = ($flags & (1 << 8)) ? true : null;
-        $sellGifts = ($flags & (1 << 9)) ? true : null;
-        $changeGiftSettings = ($flags & (1 << 10)) ? true : null;
-        $transferAndUpgradeGifts = ($flags & (1 << 11)) ? true : null;
-        $transferStars = ($flags & (1 << 12)) ? true : null;
-        $manageStories = ($flags & (1 << 13)) ? true : null;
+        $reply = (($flags & (1 << 0)) !== 0) ? true : null;
+        $readMessages = (($flags & (1 << 1)) !== 0) ? true : null;
+        $deleteSentMessages = (($flags & (1 << 2)) !== 0) ? true : null;
+        $deleteReceivedMessages = (($flags & (1 << 3)) !== 0) ? true : null;
+        $editName = (($flags & (1 << 4)) !== 0) ? true : null;
+        $editBio = (($flags & (1 << 5)) !== 0) ? true : null;
+        $editProfilePhoto = (($flags & (1 << 6)) !== 0) ? true : null;
+        $editUsername = (($flags & (1 << 7)) !== 0) ? true : null;
+        $viewGifts = (($flags & (1 << 8)) !== 0) ? true : null;
+        $sellGifts = (($flags & (1 << 9)) !== 0) ? true : null;
+        $changeGiftSettings = (($flags & (1 << 10)) !== 0) ? true : null;
+        $transferAndUpgradeGifts = (($flags & (1 << 11)) !== 0) ? true : null;
+        $transferStars = (($flags & (1 << 12)) !== 0) ? true : null;
+        $manageStories = (($flags & (1 << 13)) !== 0) ? true : null;
 
         return new self(
             $reply,

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/inputStorePaymentPremiumGiveaway
@@ -43,11 +42,21 @@ final class InputStorePaymentPremiumGiveaway extends AbstractInputStorePaymentPu
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->onlyNewSubscribers) $flags |= (1 << 0);
-        if ($this->winnersAreVisible) $flags |= (1 << 3);
-        if ($this->additionalPeers !== null) $flags |= (1 << 1);
-        if ($this->countriesIso2 !== null) $flags |= (1 << 2);
-        if ($this->prizeDescription !== null) $flags |= (1 << 4);
+        if ($this->onlyNewSubscribers) {
+            $flags |= (1 << 0);
+        }
+        if ($this->winnersAreVisible) {
+            $flags |= (1 << 3);
+        }
+        if ($this->additionalPeers !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->countriesIso2 !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->prizeDescription !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->boostPeer->serialize();
         if ($flags & (1 << 1)) {
@@ -63,20 +72,18 @@ final class InputStorePaymentPremiumGiveaway extends AbstractInputStorePaymentPu
         $buffer .= Serializer::int32($this->untilDate);
         $buffer .= Serializer::bytes($this->currency);
         $buffer .= Serializer::int64($this->amount);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $onlyNewSubscribers = ($flags & (1 << 0)) ? true : null;
-        $winnersAreVisible = ($flags & (1 << 3)) ? true : null;
+        $onlyNewSubscribers = (($flags & (1 << 0)) !== 0) ? true : null;
+        $winnersAreVisible = (($flags & (1 << 3)) !== 0) ? true : null;
         $boostPeer = AbstractInputPeer::deserialize($stream);
-        $additionalPeers = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']) : null;
-        $countriesIso2 = ($flags & (1 << 2)) ? Deserializer::vectorOfStrings($stream) : null;
-        $prizeDescription = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
+        $additionalPeers = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']) : null;
+        $countriesIso2 = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfStrings($stream) : null;
+        $prizeDescription = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
         $randomId = Deserializer::int64($stream);
         $untilDate = Deserializer::int32($stream);
         $currency = Deserializer::bytes($stream);

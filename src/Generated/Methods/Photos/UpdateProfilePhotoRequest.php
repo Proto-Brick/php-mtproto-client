@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Photos;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Photos;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPhoto;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Photos\Photo;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPhoto;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Photos\Photo;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/photos.updateProfilePhoto
  */
-final class UpdateProfilePhotoRequest extends TlObject
+final class UpdateProfilePhotoRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x9e82039;
     
@@ -41,19 +40,17 @@ final class UpdateProfilePhotoRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->fallback) $flags |= (1 << 0);
-        if ($this->bot !== null) $flags |= (1 << 1);
+        if ($this->fallback) {
+            $flags |= (1 << 0);
+        }
+        if ($this->bot !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 1)) {
             $buffer .= $this->bot->serialize();
         }
         $buffer .= $this->id->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

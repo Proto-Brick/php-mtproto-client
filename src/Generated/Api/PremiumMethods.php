@@ -1,28 +1,28 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Api;
+namespace ProtoBrick\MTProtoClient\Generated\Api;
 
-use DigitalStars\MtprotoClient\Client;
-use DigitalStars\MtprotoClient\Generated\Methods\Premium\ApplyBoostRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Premium\GetBoostsListRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Premium\GetBoostsStatusRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Premium\GetMyBoostsRequest;
-use DigitalStars\MtprotoClient\Generated\Methods\Premium\GetUserBoostsRequest;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerChannelFromMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerChat;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerSelf;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputPeerUserFromMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserEmpty;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserFromMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputUserSelf;
-use DigitalStars\MtprotoClient\Generated\Types\Premium\BoostsList;
-use DigitalStars\MtprotoClient\Generated\Types\Premium\BoostsStatus;
-use DigitalStars\MtprotoClient\Generated\Types\Premium\MyBoosts;
+use ProtoBrick\MTProtoClient\Client;
+use ProtoBrick\MTProtoClient\Generated\Methods\Premium\ApplyBoostRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Premium\GetBoostsListRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Premium\GetBoostsStatusRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Premium\GetMyBoostsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Premium\GetUserBoostsRequest;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerChannelFromMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerEmpty;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerSelf;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerUserFromMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserEmpty;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserFromMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserSelf;
+use ProtoBrick\MTProtoClient\Generated\Types\Premium\BoostsList;
+use ProtoBrick\MTProtoClient\Generated\Types\Premium\BoostsStatus;
+use ProtoBrick\MTProtoClient\Generated\Types\Premium\MyBoosts;
 
 
 /**

@@ -1,13 +1,12 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StickerKeyword;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StickerPack;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StickerSet as BaseStickerSet;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StickerKeyword;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StickerPack;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StickerSet as BaseStickerSet;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messages.stickerSet
@@ -38,10 +37,8 @@ final class StickerSet extends AbstractStickerSet
         $buffer .= Serializer::vectorOfObjects($this->packs);
         $buffer .= Serializer::vectorOfObjects($this->keywords);
         $buffer .= Serializer::vectorOfObjects($this->documents);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

@@ -1,12 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractWebDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\Invoice;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractWebDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Invoice;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/payments.paymentReceiptStars
@@ -46,7 +45,9 @@ final class PaymentReceiptStars extends AbstractPaymentReceipt
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->photo !== null) $flags |= (1 << 2);
+        if ($this->photo !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->date);
         $buffer .= Serializer::int64($this->botId);
@@ -60,10 +61,8 @@ final class PaymentReceiptStars extends AbstractPaymentReceipt
         $buffer .= Serializer::int64($this->totalAmount);
         $buffer .= Serializer::bytes($this->transactionId);
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -72,7 +71,7 @@ final class PaymentReceiptStars extends AbstractPaymentReceipt
         $botId = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
-        $photo = ($flags & (1 << 2)) ? AbstractWebDocument::deserialize($stream) : null;
+        $photo = (($flags & (1 << 2)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
         $invoice = Invoice::deserialize($stream);
         $currency = Deserializer::bytes($stream);
         $totalAmount = Deserializer::int64($stream);

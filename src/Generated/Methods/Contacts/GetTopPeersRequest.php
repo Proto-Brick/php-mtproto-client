@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Contacts;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Contacts;
 
-use DigitalStars\MtprotoClient\Generated\Types\Contacts\AbstractTopPeers;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Contacts\AbstractTopPeers;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/contacts.getTopPeers
  */
-final class GetTopPeersRequest extends TlObject
+final class GetTopPeersRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x973478b6;
     
@@ -57,25 +56,37 @@ final class GetTopPeersRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->correspondents) $flags |= (1 << 0);
-        if ($this->botsPm) $flags |= (1 << 1);
-        if ($this->botsInline) $flags |= (1 << 2);
-        if ($this->phoneCalls) $flags |= (1 << 3);
-        if ($this->forwardUsers) $flags |= (1 << 4);
-        if ($this->forwardChats) $flags |= (1 << 5);
-        if ($this->groups) $flags |= (1 << 10);
-        if ($this->channels) $flags |= (1 << 15);
-        if ($this->botsApp) $flags |= (1 << 16);
+        if ($this->correspondents) {
+            $flags |= (1 << 0);
+        }
+        if ($this->botsPm) {
+            $flags |= (1 << 1);
+        }
+        if ($this->botsInline) {
+            $flags |= (1 << 2);
+        }
+        if ($this->phoneCalls) {
+            $flags |= (1 << 3);
+        }
+        if ($this->forwardUsers) {
+            $flags |= (1 << 4);
+        }
+        if ($this->forwardChats) {
+            $flags |= (1 << 5);
+        }
+        if ($this->groups) {
+            $flags |= (1 << 10);
+        }
+        if ($this->channels) {
+            $flags |= (1 << 15);
+        }
+        if ($this->botsApp) {
+            $flags |= (1 << 16);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->offset);
         $buffer .= Serializer::int32($this->limit);
         $buffer .= Serializer::int64($this->hash);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

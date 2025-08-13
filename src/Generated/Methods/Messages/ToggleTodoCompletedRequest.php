@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.toggleTodoCompleted
  */
-final class ToggleTodoCompletedRequest extends TlObject
+final class ToggleTodoCompletedRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xd3e03124;
     
@@ -45,12 +44,6 @@ final class ToggleTodoCompletedRequest extends TlObject
         $buffer .= Serializer::int32($this->msgId);
         $buffer .= Serializer::vectorOfInts($this->completed);
         $buffer .= Serializer::vectorOfInts($this->incompleted);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

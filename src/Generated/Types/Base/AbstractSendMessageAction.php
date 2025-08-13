@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/SendMessageAction
  */
@@ -32,7 +35,7 @@ abstract class AbstractSendMessageAction extends TlObject
             0xb05ac6b1 => SendMessageChooseStickerAction::deserialize($stream),
             0x25972bcb => SendMessageEmojiInteraction::deserialize($stream),
             0xb665902e => SendMessageEmojiInteractionSeen::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type SendMessageAction. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type SendMessageAction. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

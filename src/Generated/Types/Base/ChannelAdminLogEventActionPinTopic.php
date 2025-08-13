@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/channelAdminLogEventActionPinTopic
@@ -27,8 +26,12 @@ final class ChannelAdminLogEventActionPinTopic extends AbstractChannelAdminLogEv
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->prevTopic !== null) $flags |= (1 << 0);
-        if ($this->newTopic !== null) $flags |= (1 << 1);
+        if ($this->prevTopic !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->newTopic !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= $this->prevTopic->serialize();
@@ -36,16 +39,14 @@ final class ChannelAdminLogEventActionPinTopic extends AbstractChannelAdminLogEv
         if ($flags & (1 << 1)) {
             $buffer .= $this->newTopic->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $prevTopic = ($flags & (1 << 0)) ? AbstractForumTopic::deserialize($stream) : null;
-        $newTopic = ($flags & (1 << 1)) ? AbstractForumTopic::deserialize($stream) : null;
+        $prevTopic = (($flags & (1 << 0)) !== 0) ? AbstractForumTopic::deserialize($stream) : null;
+        $newTopic = (($flags & (1 << 1)) !== 0) ? AbstractForumTopic::deserialize($stream) : null;
 
         return new self(
             $prevTopic,

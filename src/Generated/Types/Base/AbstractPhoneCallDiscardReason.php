@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/PhoneCallDiscardReason
  */
@@ -19,7 +22,7 @@ abstract class AbstractPhoneCallDiscardReason extends TlObject
             0x57adc690 => PhoneCallDiscardReasonHangup::deserialize($stream),
             0xfaf7e8c9 => PhoneCallDiscardReasonBusy::deserialize($stream),
             0x9fbbf1f7 => PhoneCallDiscardReasonMigrateConferenceCall::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type PhoneCallDiscardReason. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type PhoneCallDiscardReason. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\AffectedHistory;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AffectedHistory;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.unpinAllMessages
  */
-final class UnpinAllMessagesRequest extends TlObject
+final class UnpinAllMessagesRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x62dd747;
     
@@ -40,8 +39,12 @@ final class UnpinAllMessagesRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->topMsgId !== null) $flags |= (1 << 0);
-        if ($this->savedPeerId !== null) $flags |= (1 << 1);
+        if ($this->topMsgId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->savedPeerId !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
@@ -50,12 +53,6 @@ final class UnpinAllMessagesRequest extends TlObject
         if ($flags & (1 << 1)) {
             $buffer .= $this->savedPeerId->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

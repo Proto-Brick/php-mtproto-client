@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Phone;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputPhoneCall;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PhoneCallProtocol;
-use DigitalStars\MtprotoClient\Generated\Types\Phone\PhoneCall;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPhoneCall;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PhoneCallProtocol;
+use ProtoBrick\MTProtoClient\Generated\Types\Phone\PhoneCall;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/phone.confirmCall
  */
-final class ConfirmCallRequest extends TlObject
+final class ConfirmCallRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x2efe1722;
     
@@ -46,12 +45,6 @@ final class ConfirmCallRequest extends TlObject
         $buffer .= Serializer::bytes($this->gA);
         $buffer .= Serializer::int64($this->keyFingerprint);
         $buffer .= $this->protocol->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

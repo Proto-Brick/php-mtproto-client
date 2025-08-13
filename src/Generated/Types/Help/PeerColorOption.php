@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Help;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Help;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/help.peerColorOption
@@ -35,11 +36,21 @@ final class PeerColorOption extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->hidden) $flags |= (1 << 0);
-        if ($this->colors !== null) $flags |= (1 << 1);
-        if ($this->darkColors !== null) $flags |= (1 << 2);
-        if ($this->channelMinLevel !== null) $flags |= (1 << 3);
-        if ($this->groupMinLevel !== null) $flags |= (1 << 4);
+        if ($this->hidden) {
+            $flags |= (1 << 0);
+        }
+        if ($this->colors !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->darkColors !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->channelMinLevel !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->groupMinLevel !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->colorId);
         if ($flags & (1 << 1)) {
@@ -54,23 +65,21 @@ final class PeerColorOption extends TlObject
         if ($flags & (1 << 4)) {
             $buffer .= Serializer::int32($this->groupMinLevel);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $hidden = ($flags & (1 << 0)) ? true : null;
+        $hidden = (($flags & (1 << 0)) !== 0) ? true : null;
         $colorId = Deserializer::int32($stream);
-        $colors = ($flags & (1 << 1)) ? AbstractPeerColorSet::deserialize($stream) : null;
-        $darkColors = ($flags & (1 << 2)) ? AbstractPeerColorSet::deserialize($stream) : null;
-        $channelMinLevel = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
-        $groupMinLevel = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $colors = (($flags & (1 << 1)) !== 0) ? AbstractPeerColorSet::deserialize($stream) : null;
+        $darkColors = (($flags & (1 << 2)) !== 0) ? AbstractPeerColorSet::deserialize($stream) : null;
+        $channelMinLevel = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $groupMinLevel = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $colorId,

@@ -1,14 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Stats;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Stats;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractPostInteractionCounters;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractStatsGraph;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StatsAbsValueAndPrev;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StatsDateRangeDays;
-use DigitalStars\MtprotoClient\Generated\Types\Base\StatsPercentValue;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractPostInteractionCounters;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractStatsGraph;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StatsAbsValueAndPrev;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StatsDateRangeDays;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StatsPercentValue;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/stats.broadcastStats
@@ -93,15 +94,13 @@ final class BroadcastStats extends TlObject
         $buffer .= $this->storyInteractionsGraph->serialize();
         $buffer .= $this->storyReactionsByEmotionGraph->serialize();
         $buffer .= Serializer::vectorOfObjects($this->recentPostsInteractions);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $period = StatsDateRangeDays::deserialize($stream);
         $followers = StatsAbsValueAndPrev::deserialize($stream);

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/updateChannelUserTyping
@@ -31,7 +30,9 @@ final class UpdateChannelUserTyping extends AbstractUpdate
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->topMsgId !== null) $flags |= (1 << 0);
+        if ($this->topMsgId !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->channelId);
         if ($flags & (1 << 0)) {
@@ -39,16 +40,14 @@ final class UpdateChannelUserTyping extends AbstractUpdate
         }
         $buffer .= $this->fromId->serialize();
         $buffer .= $this->action->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
         $channelId = Deserializer::int64($stream);
-        $topMsgId = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $fromId = AbstractPeer::deserialize($stream);
         $action = AbstractSendMessageAction::deserialize($stream);
 

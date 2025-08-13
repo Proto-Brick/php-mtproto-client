@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/inputMediaGeoLive
@@ -33,10 +32,18 @@ final class InputMediaGeoLive extends AbstractInputMedia
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->stopped) $flags |= (1 << 0);
-        if ($this->heading !== null) $flags |= (1 << 2);
-        if ($this->period !== null) $flags |= (1 << 1);
-        if ($this->proximityNotificationRadius !== null) $flags |= (1 << 3);
+        if ($this->stopped) {
+            $flags |= (1 << 0);
+        }
+        if ($this->heading !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->period !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->proximityNotificationRadius !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->geoPoint->serialize();
         if ($flags & (1 << 2)) {
@@ -48,19 +55,17 @@ final class InputMediaGeoLive extends AbstractInputMedia
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::int32($this->proximityNotificationRadius);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $stopped = ($flags & (1 << 0)) ? true : null;
+        $stopped = (($flags & (1 << 0)) !== 0) ? true : null;
         $geoPoint = AbstractInputGeoPoint::deserialize($stream);
-        $heading = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
-        $period = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
-        $proximityNotificationRadius = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $heading = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $period = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $proximityNotificationRadius = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $geoPoint,

@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputQuickReplyShortcut;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputReplyTo;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputQuickReplyShortcut;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputReplyTo;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.sendInlineBotResult
  */
-final class SendInlineBotResultRequest extends TlObject
+final class SendInlineBotResultRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xc0cf7646;
     
@@ -62,15 +61,33 @@ final class SendInlineBotResultRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->silent) $flags |= (1 << 5);
-        if ($this->background) $flags |= (1 << 6);
-        if ($this->clearDraft) $flags |= (1 << 7);
-        if ($this->hideVia) $flags |= (1 << 11);
-        if ($this->replyTo !== null) $flags |= (1 << 0);
-        if ($this->scheduleDate !== null) $flags |= (1 << 10);
-        if ($this->sendAs !== null) $flags |= (1 << 13);
-        if ($this->quickReplyShortcut !== null) $flags |= (1 << 17);
-        if ($this->allowPaidStars !== null) $flags |= (1 << 21);
+        if ($this->silent) {
+            $flags |= (1 << 5);
+        }
+        if ($this->background) {
+            $flags |= (1 << 6);
+        }
+        if ($this->clearDraft) {
+            $flags |= (1 << 7);
+        }
+        if ($this->hideVia) {
+            $flags |= (1 << 11);
+        }
+        if ($this->replyTo !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->scheduleDate !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->sendAs !== null) {
+            $flags |= (1 << 13);
+        }
+        if ($this->quickReplyShortcut !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->allowPaidStars !== null) {
+            $flags |= (1 << 21);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
@@ -91,12 +108,6 @@ final class SendInlineBotResultRequest extends TlObject
         if ($flags & (1 << 21)) {
             $buffer .= Serializer::int64($this->allowPaidStars);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

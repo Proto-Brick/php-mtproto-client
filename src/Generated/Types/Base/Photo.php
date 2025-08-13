@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/photo
@@ -39,8 +38,12 @@ final class Photo extends AbstractPhoto
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->hasStickers) $flags |= (1 << 0);
-        if ($this->videoSizes !== null) $flags |= (1 << 1);
+        if ($this->hasStickers) {
+            $flags |= (1 << 0);
+        }
+        if ($this->videoSizes !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::int64($this->accessHash);
@@ -51,21 +54,19 @@ final class Photo extends AbstractPhoto
             $buffer .= Serializer::vectorOfObjects($this->videoSizes);
         }
         $buffer .= Serializer::int32($this->dcId);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $hasStickers = ($flags & (1 << 0)) ? true : null;
+        $hasStickers = (($flags & (1 << 0)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $accessHash = Deserializer::int64($stream);
         $fileReference = Deserializer::bytes($stream);
         $date = Deserializer::int32($stream);
         $sizes = Deserializer::vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']);
-        $videoSizes = ($flags & (1 << 1)) ? Deserializer::vectorOfObjects($stream, [AbstractVideoSize::class, 'deserialize']) : null;
+        $videoSizes = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractVideoSize::class, 'deserialize']) : null;
         $dcId = Deserializer::int32($stream);
 
         return new self(

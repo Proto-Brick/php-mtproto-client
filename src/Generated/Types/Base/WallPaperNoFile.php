@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/wallPaperNoFile
@@ -31,26 +30,30 @@ final class WallPaperNoFile extends AbstractWallPaper
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->default_) $flags |= (1 << 1);
-        if ($this->dark) $flags |= (1 << 4);
-        if ($this->settings !== null) $flags |= (1 << 2);
+        if ($this->default_) {
+            $flags |= (1 << 1);
+        }
+        if ($this->dark) {
+            $flags |= (1 << 4);
+        }
+        if ($this->settings !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 2)) {
             $buffer .= $this->settings->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $id = Deserializer::int64($stream);
         $flags = Deserializer::int32($stream);
-        $default_ = ($flags & (1 << 1)) ? true : null;
-        $dark = ($flags & (1 << 4)) ? true : null;
-        $settings = ($flags & (1 << 2)) ? WallPaperSettings::deserialize($stream) : null;
+        $default_ = (($flags & (1 << 1)) !== 0) ? true : null;
+        $dark = (($flags & (1 << 4)) !== 0) ? true : null;
+        $settings = (($flags & (1 << 2)) !== 0) ? WallPaperSettings::deserialize($stream) : null;
 
         return new self(
             $id,

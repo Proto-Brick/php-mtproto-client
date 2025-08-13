@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Auth;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Auth;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/auth.sentCodeTypeEmailCode
@@ -35,10 +34,18 @@ final class SentCodeTypeEmailCode extends AbstractSentCodeType
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->appleSigninAllowed) $flags |= (1 << 0);
-        if ($this->googleSigninAllowed) $flags |= (1 << 1);
-        if ($this->resetAvailablePeriod !== null) $flags |= (1 << 3);
-        if ($this->resetPendingDate !== null) $flags |= (1 << 4);
+        if ($this->appleSigninAllowed) {
+            $flags |= (1 << 0);
+        }
+        if ($this->googleSigninAllowed) {
+            $flags |= (1 << 1);
+        }
+        if ($this->resetAvailablePeriod !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->resetPendingDate !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->emailPattern);
         $buffer .= Serializer::int32($this->length);
@@ -48,20 +55,18 @@ final class SentCodeTypeEmailCode extends AbstractSentCodeType
         if ($flags & (1 << 4)) {
             $buffer .= Serializer::int32($this->resetPendingDate);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $appleSigninAllowed = ($flags & (1 << 0)) ? true : null;
-        $googleSigninAllowed = ($flags & (1 << 1)) ? true : null;
+        $appleSigninAllowed = (($flags & (1 << 0)) !== 0) ? true : null;
+        $googleSigninAllowed = (($flags & (1 << 1)) !== 0) ? true : null;
         $emailPattern = Deserializer::bytes($stream);
         $length = Deserializer::int32($stream);
-        $resetAvailablePeriod = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
-        $resetPendingDate = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $resetAvailablePeriod = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $resetPendingDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $emailPattern,

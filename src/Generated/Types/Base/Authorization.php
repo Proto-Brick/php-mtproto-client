@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/authorization
@@ -59,12 +60,24 @@ final class Authorization extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->current) $flags |= (1 << 0);
-        if ($this->officialApp) $flags |= (1 << 1);
-        if ($this->passwordPending) $flags |= (1 << 2);
-        if ($this->encryptedRequestsDisabled) $flags |= (1 << 3);
-        if ($this->callRequestsDisabled) $flags |= (1 << 4);
-        if ($this->unconfirmed) $flags |= (1 << 5);
+        if ($this->current) {
+            $flags |= (1 << 0);
+        }
+        if ($this->officialApp) {
+            $flags |= (1 << 1);
+        }
+        if ($this->passwordPending) {
+            $flags |= (1 << 2);
+        }
+        if ($this->encryptedRequestsDisabled) {
+            $flags |= (1 << 3);
+        }
+        if ($this->callRequestsDisabled) {
+            $flags |= (1 << 4);
+        }
+        if ($this->unconfirmed) {
+            $flags |= (1 << 5);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->hash);
         $buffer .= Serializer::bytes($this->deviceModel);
@@ -78,23 +91,21 @@ final class Authorization extends TlObject
         $buffer .= Serializer::bytes($this->ip);
         $buffer .= Serializer::bytes($this->country);
         $buffer .= Serializer::bytes($this->region);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $current = ($flags & (1 << 0)) ? true : null;
-        $officialApp = ($flags & (1 << 1)) ? true : null;
-        $passwordPending = ($flags & (1 << 2)) ? true : null;
-        $encryptedRequestsDisabled = ($flags & (1 << 3)) ? true : null;
-        $callRequestsDisabled = ($flags & (1 << 4)) ? true : null;
-        $unconfirmed = ($flags & (1 << 5)) ? true : null;
+        $current = (($flags & (1 << 0)) !== 0) ? true : null;
+        $officialApp = (($flags & (1 << 1)) !== 0) ? true : null;
+        $passwordPending = (($flags & (1 << 2)) !== 0) ? true : null;
+        $encryptedRequestsDisabled = (($flags & (1 << 3)) !== 0) ? true : null;
+        $callRequestsDisabled = (($flags & (1 << 4)) !== 0) ? true : null;
+        $unconfirmed = (($flags & (1 << 5)) !== 0) ? true : null;
         $hash = Deserializer::int64($stream);
         $deviceModel = Deserializer::bytes($stream);
         $platform = Deserializer::bytes($stream);

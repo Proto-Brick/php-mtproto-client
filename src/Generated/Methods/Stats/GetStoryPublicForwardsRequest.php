@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Stats;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Stats;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Stats\PublicForwards;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Stats\PublicForwards;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/stats.getStoryPublicForwards
  */
-final class GetStoryPublicForwardsRequest extends TlObject
+final class GetStoryPublicForwardsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xa6437ef6;
     
@@ -45,12 +44,6 @@ final class GetStoryPublicForwardsRequest extends TlObject
         $buffer .= Serializer::int32($this->id);
         $buffer .= Serializer::bytes($this->offset);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

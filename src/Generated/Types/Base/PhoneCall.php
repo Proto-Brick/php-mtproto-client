@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/phoneCall
@@ -51,10 +50,18 @@ final class PhoneCall extends AbstractPhoneCall
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->p2pAllowed) $flags |= (1 << 5);
-        if ($this->video) $flags |= (1 << 6);
-        if ($this->conferenceSupported) $flags |= (1 << 8);
-        if ($this->customParameters !== null) $flags |= (1 << 7);
+        if ($this->p2pAllowed) {
+            $flags |= (1 << 5);
+        }
+        if ($this->video) {
+            $flags |= (1 << 6);
+        }
+        if ($this->conferenceSupported) {
+            $flags |= (1 << 8);
+        }
+        if ($this->customParameters !== null) {
+            $flags |= (1 << 7);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::int64($this->accessHash);
@@ -69,17 +76,15 @@ final class PhoneCall extends AbstractPhoneCall
         if ($flags & (1 << 7)) {
             $buffer .= Serializer::serializeDataJSON($this->customParameters);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $p2pAllowed = ($flags & (1 << 5)) ? true : null;
-        $video = ($flags & (1 << 6)) ? true : null;
-        $conferenceSupported = ($flags & (1 << 8)) ? true : null;
+        $p2pAllowed = (($flags & (1 << 5)) !== 0) ? true : null;
+        $video = (($flags & (1 << 6)) !== 0) ? true : null;
+        $conferenceSupported = (($flags & (1 << 8)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $accessHash = Deserializer::int64($stream);
         $date = Deserializer::int32($stream);
@@ -90,7 +95,7 @@ final class PhoneCall extends AbstractPhoneCall
         $protocol = PhoneCallProtocol::deserialize($stream);
         $connections = Deserializer::vectorOfObjects($stream, [AbstractPhoneConnection::class, 'deserialize']);
         $startDate = Deserializer::int32($stream);
-        $customParameters = ($flags & (1 << 7)) ? Deserializer::deserializeDataJSON($stream) : null;
+        $customParameters = (($flags & (1 << 7)) !== 0) ? Deserializer::deserializeDataJSON($stream) : null;
 
         return new self(
             $id,

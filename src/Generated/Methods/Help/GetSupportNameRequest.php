@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Help;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Help;
 
-use DigitalStars\MtprotoClient\Generated\Types\Help\SupportName;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Help\SupportName;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/help.getSupportName
  */
-final class GetSupportNameRequest extends TlObject
+final class GetSupportNameRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xd360e72c;
     
@@ -28,13 +27,6 @@ final class GetSupportNameRequest extends TlObject
     
     public function serialize(): string
     {
-        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-
-        return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
+        return Serializer::int32(self::CONSTRUCTOR_ID);
     }
 }

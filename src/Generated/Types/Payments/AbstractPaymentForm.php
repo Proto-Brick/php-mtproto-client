@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/payments.PaymentForm
  */
@@ -17,7 +20,7 @@ abstract class AbstractPaymentForm extends TlObject
             0xa0058751 => PaymentForm::deserialize($stream),
             0x7bf6b15c => PaymentFormStars::deserialize($stream),
             0xb425cfe1 => PaymentFormStarGift::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type payments.PaymentForm. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type payments.PaymentForm. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

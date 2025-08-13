@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractDocument;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractDocument;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messages.foundStickers
@@ -30,22 +29,22 @@ final class FoundStickers extends AbstractFoundStickers
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->nextOffset !== null) $flags |= (1 << 0);
+        if ($this->nextOffset !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->nextOffset);
         }
         $buffer .= Serializer::int64($this->hash);
         $buffer .= Serializer::vectorOfObjects($this->stickers);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $nextOffset = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
+        $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $hash = Deserializer::int64($stream);
         $stickers = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
 

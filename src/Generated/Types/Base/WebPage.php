@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/webPage
@@ -63,22 +62,54 @@ final class WebPage extends AbstractWebPage
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->hasLargeMedia) $flags |= (1 << 13);
-        if ($this->videoCoverPhoto) $flags |= (1 << 14);
-        if ($this->type !== null) $flags |= (1 << 0);
-        if ($this->siteName !== null) $flags |= (1 << 1);
-        if ($this->title !== null) $flags |= (1 << 2);
-        if ($this->description !== null) $flags |= (1 << 3);
-        if ($this->photo !== null) $flags |= (1 << 4);
-        if ($this->embedUrl !== null) $flags |= (1 << 5);
-        if ($this->embedType !== null) $flags |= (1 << 5);
-        if ($this->embedWidth !== null) $flags |= (1 << 6);
-        if ($this->embedHeight !== null) $flags |= (1 << 6);
-        if ($this->duration !== null) $flags |= (1 << 7);
-        if ($this->author !== null) $flags |= (1 << 8);
-        if ($this->document !== null) $flags |= (1 << 9);
-        if ($this->cachedPage !== null) $flags |= (1 << 10);
-        if ($this->attributes !== null) $flags |= (1 << 12);
+        if ($this->hasLargeMedia) {
+            $flags |= (1 << 13);
+        }
+        if ($this->videoCoverPhoto) {
+            $flags |= (1 << 14);
+        }
+        if ($this->type !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->siteName !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->title !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->description !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->photo !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->embedUrl !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->embedType !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->embedWidth !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->embedHeight !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->duration !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->author !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->document !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->cachedPage !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->attributes !== null) {
+            $flags |= (1 << 12);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::bytes($this->url);
@@ -126,34 +157,32 @@ final class WebPage extends AbstractWebPage
         if ($flags & (1 << 12)) {
             $buffer .= Serializer::vectorOfObjects($this->attributes);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $hasLargeMedia = ($flags & (1 << 13)) ? true : null;
-        $videoCoverPhoto = ($flags & (1 << 14)) ? true : null;
+        $hasLargeMedia = (($flags & (1 << 13)) !== 0) ? true : null;
+        $videoCoverPhoto = (($flags & (1 << 14)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $url = Deserializer::bytes($stream);
         $displayUrl = Deserializer::bytes($stream);
         $hash = Deserializer::int32($stream);
-        $type = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
-        $siteName = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $title = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
-        $description = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
-        $photo = ($flags & (1 << 4)) ? AbstractPhoto::deserialize($stream) : null;
-        $embedUrl = ($flags & (1 << 5)) ? Deserializer::bytes($stream) : null;
-        $embedType = ($flags & (1 << 5)) ? Deserializer::bytes($stream) : null;
-        $embedWidth = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
-        $embedHeight = ($flags & (1 << 6)) ? Deserializer::int32($stream) : null;
-        $duration = ($flags & (1 << 7)) ? Deserializer::int32($stream) : null;
-        $author = ($flags & (1 << 8)) ? Deserializer::bytes($stream) : null;
-        $document = ($flags & (1 << 9)) ? AbstractDocument::deserialize($stream) : null;
-        $cachedPage = ($flags & (1 << 10)) ? Page::deserialize($stream) : null;
-        $attributes = ($flags & (1 << 12)) ? Deserializer::vectorOfObjects($stream, [AbstractWebPageAttribute::class, 'deserialize']) : null;
+        $type = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $siteName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $title = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
+        $description = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
+        $photo = (($flags & (1 << 4)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
+        $embedUrl = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
+        $embedType = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
+        $embedWidth = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
+        $embedHeight = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
+        $duration = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($stream) : null;
+        $author = (($flags & (1 << 8)) !== 0) ? Deserializer::bytes($stream) : null;
+        $document = (($flags & (1 << 9)) !== 0) ? AbstractDocument::deserialize($stream) : null;
+        $cachedPage = (($flags & (1 << 10)) !== 0) ? Page::deserialize($stream) : null;
+        $attributes = (($flags & (1 << 12)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractWebPageAttribute::class, 'deserialize']) : null;
 
         return new self(
             $id,

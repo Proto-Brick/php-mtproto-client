@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Smsjobs;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Smsjobs;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/smsjobs.finishJob
  */
-final class FinishJobRequest extends TlObject
+final class FinishJobRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x4f1ebf24;
     
@@ -36,18 +35,14 @@ final class FinishJobRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->error !== null) $flags |= (1 << 0);
+        if ($this->error !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->jobId);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::bytes($this->error);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

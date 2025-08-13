@@ -1,19 +1,18 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputMedia;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputReplyTo;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
-use DigitalStars\MtprotoClient\Generated\Types\Base\SuggestedPost;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputMedia;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputReplyTo;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessageEntity;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SuggestedPost;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.saveDraft
  */
-final class SaveDraftRequest extends TlObject
+final class SaveDraftRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x54ae308e;
     
@@ -55,13 +54,27 @@ final class SaveDraftRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->noWebpage) $flags |= (1 << 1);
-        if ($this->invertMedia) $flags |= (1 << 6);
-        if ($this->replyTo !== null) $flags |= (1 << 4);
-        if ($this->entities !== null) $flags |= (1 << 3);
-        if ($this->media !== null) $flags |= (1 << 5);
-        if ($this->effect !== null) $flags |= (1 << 7);
-        if ($this->suggestedPost !== null) $flags |= (1 << 8);
+        if ($this->noWebpage) {
+            $flags |= (1 << 1);
+        }
+        if ($this->invertMedia) {
+            $flags |= (1 << 6);
+        }
+        if ($this->replyTo !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->media !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->effect !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->suggestedPost !== null) {
+            $flags |= (1 << 8);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 4)) {
             $buffer .= $this->replyTo->serialize();
@@ -80,12 +93,6 @@ final class SaveDraftRequest extends TlObject
         if ($flags & (1 << 8)) {
             $buffer .= $this->suggestedPost->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

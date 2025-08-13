@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Upload;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Upload;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/upload.saveBigFilePart
  */
-final class SaveBigFilePartRequest extends TlObject
+final class SaveBigFilePartRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xde7b673d;
     
@@ -43,12 +42,6 @@ final class SaveBigFilePartRequest extends TlObject
         $buffer .= Serializer::int32($this->filePart);
         $buffer .= Serializer::int32($this->fileTotalParts);
         $buffer .= Serializer::bytes($this->bytes);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

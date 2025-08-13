@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/langPackStringPluralized
@@ -37,11 +36,21 @@ final class LangPackStringPluralized extends AbstractLangPackString
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->zeroValue !== null) $flags |= (1 << 0);
-        if ($this->oneValue !== null) $flags |= (1 << 1);
-        if ($this->twoValue !== null) $flags |= (1 << 2);
-        if ($this->fewValue !== null) $flags |= (1 << 3);
-        if ($this->manyValue !== null) $flags |= (1 << 4);
+        if ($this->zeroValue !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->oneValue !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->twoValue !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->fewValue !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->manyValue !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->key);
         if ($flags & (1 << 0)) {
@@ -60,20 +69,18 @@ final class LangPackStringPluralized extends AbstractLangPackString
             $buffer .= Serializer::bytes($this->manyValue);
         }
         $buffer .= Serializer::bytes($this->otherValue);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
         $key = Deserializer::bytes($stream);
-        $zeroValue = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
-        $oneValue = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $twoValue = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
-        $fewValue = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
-        $manyValue = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
+        $zeroValue = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $oneValue = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $twoValue = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
+        $fewValue = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
+        $manyValue = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
         $otherValue = Deserializer::bytes($stream);
 
         return new self(

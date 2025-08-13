@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.verifyPhone
  */
-final class VerifyPhoneRequest extends TlObject
+final class VerifyPhoneRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x4dd3a7f6;
     
@@ -40,12 +39,6 @@ final class VerifyPhoneRequest extends TlObject
         $buffer .= Serializer::bytes($this->phoneNumber);
         $buffer .= Serializer::bytes($this->phoneCodeHash);
         $buffer .= Serializer::bytes($this->phoneCode);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

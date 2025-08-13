@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messageActionStarGift
@@ -51,19 +50,45 @@ final class MessageActionStarGift extends AbstractMessageAction
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->nameHidden) $flags |= (1 << 0);
-        if ($this->saved) $flags |= (1 << 2);
-        if ($this->converted) $flags |= (1 << 3);
-        if ($this->upgraded) $flags |= (1 << 5);
-        if ($this->refunded) $flags |= (1 << 9);
-        if ($this->canUpgrade) $flags |= (1 << 10);
-        if ($this->message !== null) $flags |= (1 << 1);
-        if ($this->convertStars !== null) $flags |= (1 << 4);
-        if ($this->upgradeMsgId !== null) $flags |= (1 << 5);
-        if ($this->upgradeStars !== null) $flags |= (1 << 8);
-        if ($this->fromId !== null) $flags |= (1 << 11);
-        if ($this->peer !== null) $flags |= (1 << 12);
-        if ($this->savedId !== null) $flags |= (1 << 12);
+        if ($this->nameHidden) {
+            $flags |= (1 << 0);
+        }
+        if ($this->saved) {
+            $flags |= (1 << 2);
+        }
+        if ($this->converted) {
+            $flags |= (1 << 3);
+        }
+        if ($this->upgraded) {
+            $flags |= (1 << 5);
+        }
+        if ($this->refunded) {
+            $flags |= (1 << 9);
+        }
+        if ($this->canUpgrade) {
+            $flags |= (1 << 10);
+        }
+        if ($this->message !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->convertStars !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->upgradeMsgId !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->upgradeStars !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->fromId !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->peer !== null) {
+            $flags |= (1 << 12);
+        }
+        if ($this->savedId !== null) {
+            $flags |= (1 << 12);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->gift->serialize();
         if ($flags & (1 << 1)) {
@@ -87,28 +112,26 @@ final class MessageActionStarGift extends AbstractMessageAction
         if ($flags & (1 << 12)) {
             $buffer .= Serializer::int64($this->savedId);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $nameHidden = ($flags & (1 << 0)) ? true : null;
-        $saved = ($flags & (1 << 2)) ? true : null;
-        $converted = ($flags & (1 << 3)) ? true : null;
-        $upgraded = ($flags & (1 << 5)) ? true : null;
-        $refunded = ($flags & (1 << 9)) ? true : null;
-        $canUpgrade = ($flags & (1 << 10)) ? true : null;
+        $nameHidden = (($flags & (1 << 0)) !== 0) ? true : null;
+        $saved = (($flags & (1 << 2)) !== 0) ? true : null;
+        $converted = (($flags & (1 << 3)) !== 0) ? true : null;
+        $upgraded = (($flags & (1 << 5)) !== 0) ? true : null;
+        $refunded = (($flags & (1 << 9)) !== 0) ? true : null;
+        $canUpgrade = (($flags & (1 << 10)) !== 0) ? true : null;
         $gift = AbstractStarGift::deserialize($stream);
-        $message = ($flags & (1 << 1)) ? TextWithEntities::deserialize($stream) : null;
-        $convertStars = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;
-        $upgradeMsgId = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
-        $upgradeStars = ($flags & (1 << 8)) ? Deserializer::int64($stream) : null;
-        $fromId = ($flags & (1 << 11)) ? AbstractPeer::deserialize($stream) : null;
-        $peer = ($flags & (1 << 12)) ? AbstractPeer::deserialize($stream) : null;
-        $savedId = ($flags & (1 << 12)) ? Deserializer::int64($stream) : null;
+        $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;
+        $convertStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
+        $upgradeMsgId = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
+        $upgradeStars = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($stream) : null;
+        $fromId = (($flags & (1 << 11)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $peer = (($flags & (1 << 12)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $savedId = (($flags & (1 << 12)) !== 0) ? Deserializer::int64($stream) : null;
 
         return new self(
             $gift,

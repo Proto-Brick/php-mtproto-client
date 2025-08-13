@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputTheme;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputThemeSettings;
-use DigitalStars\MtprotoClient\Generated\Types\Base\Theme;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputTheme;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputThemeSettings;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Theme;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.updateTheme
  */
-final class UpdateThemeRequest extends TlObject
+final class UpdateThemeRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x2bf40ccc;
     
@@ -48,10 +47,18 @@ final class UpdateThemeRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->slug !== null) $flags |= (1 << 0);
-        if ($this->title !== null) $flags |= (1 << 1);
-        if ($this->document !== null) $flags |= (1 << 2);
-        if ($this->settings !== null) $flags |= (1 << 3);
+        if ($this->slug !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->title !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->document !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->settings !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->format);
         $buffer .= $this->theme->serialize();
@@ -67,12 +74,6 @@ final class UpdateThemeRequest extends TlObject
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::vectorOfObjects($this->settings);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

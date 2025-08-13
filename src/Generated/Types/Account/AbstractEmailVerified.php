@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Account;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/account.EmailVerified
  */
@@ -16,7 +19,7 @@ abstract class AbstractEmailVerified extends TlObject
         return match ($constructorId) {
             0x2b96cd1b => EmailVerified::deserialize($stream),
             0xe1bb0d61 => EmailVerifiedLogin::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type account.EmailVerified. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type account.EmailVerified. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

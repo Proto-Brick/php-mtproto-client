@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/botInfo
@@ -43,16 +44,36 @@ final class BotInfo extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->hasPreviewMedias) $flags |= (1 << 6);
-        if ($this->userId !== null) $flags |= (1 << 0);
-        if ($this->description !== null) $flags |= (1 << 1);
-        if ($this->descriptionPhoto !== null) $flags |= (1 << 4);
-        if ($this->descriptionDocument !== null) $flags |= (1 << 5);
-        if ($this->commands !== null) $flags |= (1 << 2);
-        if ($this->menuButton !== null) $flags |= (1 << 3);
-        if ($this->privacyPolicyUrl !== null) $flags |= (1 << 7);
-        if ($this->appSettings !== null) $flags |= (1 << 8);
-        if ($this->verifierSettings !== null) $flags |= (1 << 9);
+        if ($this->hasPreviewMedias) {
+            $flags |= (1 << 6);
+        }
+        if ($this->userId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->description !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->descriptionPhoto !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->descriptionDocument !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->commands !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->menuButton !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->privacyPolicyUrl !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->appSettings !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->verifierSettings !== null) {
+            $flags |= (1 << 9);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int64($this->userId);
@@ -81,27 +102,25 @@ final class BotInfo extends TlObject
         if ($flags & (1 << 9)) {
             $buffer .= $this->verifierSettings->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $hasPreviewMedias = ($flags & (1 << 6)) ? true : null;
-        $userId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
-        $description = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $descriptionPhoto = ($flags & (1 << 4)) ? AbstractPhoto::deserialize($stream) : null;
-        $descriptionDocument = ($flags & (1 << 5)) ? AbstractDocument::deserialize($stream) : null;
-        $commands = ($flags & (1 << 2)) ? Deserializer::vectorOfObjects($stream, [BotCommand::class, 'deserialize']) : null;
-        $menuButton = ($flags & (1 << 3)) ? AbstractBotMenuButton::deserialize($stream) : null;
-        $privacyPolicyUrl = ($flags & (1 << 7)) ? Deserializer::bytes($stream) : null;
-        $appSettings = ($flags & (1 << 8)) ? BotAppSettings::deserialize($stream) : null;
-        $verifierSettings = ($flags & (1 << 9)) ? BotVerifierSettings::deserialize($stream) : null;
+        $hasPreviewMedias = (($flags & (1 << 6)) !== 0) ? true : null;
+        $userId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
+        $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $descriptionPhoto = (($flags & (1 << 4)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
+        $descriptionDocument = (($flags & (1 << 5)) !== 0) ? AbstractDocument::deserialize($stream) : null;
+        $commands = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfObjects($stream, [BotCommand::class, 'deserialize']) : null;
+        $menuButton = (($flags & (1 << 3)) !== 0) ? AbstractBotMenuButton::deserialize($stream) : null;
+        $privacyPolicyUrl = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
+        $appSettings = (($flags & (1 << 8)) !== 0) ? BotAppSettings::deserialize($stream) : null;
+        $verifierSettings = (($flags & (1 << 9)) !== 0) ? BotVerifierSettings::deserialize($stream) : null;
 
         return new self(
             $hasPreviewMedias,

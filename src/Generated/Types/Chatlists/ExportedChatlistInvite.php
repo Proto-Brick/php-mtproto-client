@@ -1,11 +1,12 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Chatlists;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Chatlists;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractDialogFilter;
-use DigitalStars\MtprotoClient\Generated\Types\Base\ExportedChatlistInvite as BaseExportedChatlistInvite;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractDialogFilter;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ExportedChatlistInvite as BaseExportedChatlistInvite;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/chatlists.exportedChatlistInvite
@@ -30,15 +31,13 @@ final class ExportedChatlistInvite extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->filter->serialize();
         $buffer .= $this->invite->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $filter = AbstractDialogFilter::deserialize($stream);
         $invite = BaseExportedChatlistInvite::deserialize($stream);

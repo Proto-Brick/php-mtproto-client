@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/inputMediaInvoice
@@ -41,10 +40,18 @@ final class InputMediaInvoice extends AbstractInputMedia
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->photo !== null) $flags |= (1 << 0);
-        if ($this->provider !== null) $flags |= (1 << 3);
-        if ($this->startParam !== null) $flags |= (1 << 1);
-        if ($this->extendedMedia !== null) $flags |= (1 << 2);
+        if ($this->photo !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->provider !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->startParam !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->extendedMedia !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->title);
         $buffer .= Serializer::bytes($this->description);
@@ -63,23 +70,21 @@ final class InputMediaInvoice extends AbstractInputMedia
         if ($flags & (1 << 2)) {
             $buffer .= $this->extendedMedia->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
-        $photo = ($flags & (1 << 0)) ? InputWebDocument::deserialize($stream) : null;
+        $photo = (($flags & (1 << 0)) !== 0) ? InputWebDocument::deserialize($stream) : null;
         $invoice = Invoice::deserialize($stream);
         $payload = Deserializer::bytes($stream);
-        $provider = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
+        $provider = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
         $providerData = Deserializer::deserializeDataJSON($stream);
-        $startParam = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $extendedMedia = ($flags & (1 << 2)) ? AbstractInputMedia::deserialize($stream) : null;
+        $startParam = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $extendedMedia = (($flags & (1 << 2)) !== 0) ? AbstractInputMedia::deserialize($stream) : null;
 
         return new self(
             $title,

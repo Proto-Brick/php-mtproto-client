@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/invoice
@@ -53,19 +54,45 @@ final class Invoice extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->test) $flags |= (1 << 0);
-        if ($this->nameRequested) $flags |= (1 << 1);
-        if ($this->phoneRequested) $flags |= (1 << 2);
-        if ($this->emailRequested) $flags |= (1 << 3);
-        if ($this->shippingAddressRequested) $flags |= (1 << 4);
-        if ($this->flexible) $flags |= (1 << 5);
-        if ($this->phoneToProvider) $flags |= (1 << 6);
-        if ($this->emailToProvider) $flags |= (1 << 7);
-        if ($this->recurring) $flags |= (1 << 9);
-        if ($this->maxTipAmount !== null) $flags |= (1 << 8);
-        if ($this->suggestedTipAmounts !== null) $flags |= (1 << 8);
-        if ($this->termsUrl !== null) $flags |= (1 << 10);
-        if ($this->subscriptionPeriod !== null) $flags |= (1 << 11);
+        if ($this->test) {
+            $flags |= (1 << 0);
+        }
+        if ($this->nameRequested) {
+            $flags |= (1 << 1);
+        }
+        if ($this->phoneRequested) {
+            $flags |= (1 << 2);
+        }
+        if ($this->emailRequested) {
+            $flags |= (1 << 3);
+        }
+        if ($this->shippingAddressRequested) {
+            $flags |= (1 << 4);
+        }
+        if ($this->flexible) {
+            $flags |= (1 << 5);
+        }
+        if ($this->phoneToProvider) {
+            $flags |= (1 << 6);
+        }
+        if ($this->emailToProvider) {
+            $flags |= (1 << 7);
+        }
+        if ($this->recurring) {
+            $flags |= (1 << 9);
+        }
+        if ($this->maxTipAmount !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->suggestedTipAmounts !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->termsUrl !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->subscriptionPeriod !== null) {
+            $flags |= (1 << 11);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->currency);
         $buffer .= Serializer::vectorOfObjects($this->prices);
@@ -81,32 +108,30 @@ final class Invoice extends TlObject
         if ($flags & (1 << 11)) {
             $buffer .= Serializer::int32($this->subscriptionPeriod);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $test = ($flags & (1 << 0)) ? true : null;
-        $nameRequested = ($flags & (1 << 1)) ? true : null;
-        $phoneRequested = ($flags & (1 << 2)) ? true : null;
-        $emailRequested = ($flags & (1 << 3)) ? true : null;
-        $shippingAddressRequested = ($flags & (1 << 4)) ? true : null;
-        $flexible = ($flags & (1 << 5)) ? true : null;
-        $phoneToProvider = ($flags & (1 << 6)) ? true : null;
-        $emailToProvider = ($flags & (1 << 7)) ? true : null;
-        $recurring = ($flags & (1 << 9)) ? true : null;
+        $test = (($flags & (1 << 0)) !== 0) ? true : null;
+        $nameRequested = (($flags & (1 << 1)) !== 0) ? true : null;
+        $phoneRequested = (($flags & (1 << 2)) !== 0) ? true : null;
+        $emailRequested = (($flags & (1 << 3)) !== 0) ? true : null;
+        $shippingAddressRequested = (($flags & (1 << 4)) !== 0) ? true : null;
+        $flexible = (($flags & (1 << 5)) !== 0) ? true : null;
+        $phoneToProvider = (($flags & (1 << 6)) !== 0) ? true : null;
+        $emailToProvider = (($flags & (1 << 7)) !== 0) ? true : null;
+        $recurring = (($flags & (1 << 9)) !== 0) ? true : null;
         $currency = Deserializer::bytes($stream);
         $prices = Deserializer::vectorOfObjects($stream, [LabeledPrice::class, 'deserialize']);
-        $maxTipAmount = ($flags & (1 << 8)) ? Deserializer::int64($stream) : null;
-        $suggestedTipAmounts = ($flags & (1 << 8)) ? Deserializer::vectorOfLongs($stream) : null;
-        $termsUrl = ($flags & (1 << 10)) ? Deserializer::bytes($stream) : null;
-        $subscriptionPeriod = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
+        $maxTipAmount = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($stream) : null;
+        $suggestedTipAmounts = (($flags & (1 << 8)) !== 0) ? Deserializer::vectorOfLongs($stream) : null;
+        $termsUrl = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($stream) : null;
+        $subscriptionPeriod = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $currency,

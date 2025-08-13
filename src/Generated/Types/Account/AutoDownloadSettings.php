@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AutoDownloadSettings as BaseAutoDownloadSettings;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AutoDownloadSettings as BaseAutoDownloadSettings;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/account.autoDownloadSettings
@@ -32,15 +33,13 @@ final class AutoDownloadSettings extends TlObject
         $buffer .= $this->low->serialize();
         $buffer .= $this->medium->serialize();
         $buffer .= $this->high->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $low = BaseAutoDownloadSettings::deserialize($stream);
         $medium = BaseAutoDownloadSettings::deserialize($stream);

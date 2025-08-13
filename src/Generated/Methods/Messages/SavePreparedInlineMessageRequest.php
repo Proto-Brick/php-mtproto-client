@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputBotInlineResult;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InlineQueryPeerType;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\BotPreparedInlineMessage;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputBotInlineResult;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InlineQueryPeerType;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\BotPreparedInlineMessage;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.savePreparedInlineMessage
  */
-final class SavePreparedInlineMessageRequest extends TlObject
+final class SavePreparedInlineMessageRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xf21f7f2f;
     
@@ -42,19 +41,15 @@ final class SavePreparedInlineMessageRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->peerTypes !== null) $flags |= (1 << 0);
+        if ($this->peerTypes !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->result->serialize();
         $buffer .= $this->userId->serialize();
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::vectorOfObjects($this->peerTypes);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

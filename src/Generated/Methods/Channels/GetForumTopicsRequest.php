@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\ForumTopics;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\ForumTopics;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/channels.getForumTopics
  */
-final class GetForumTopicsRequest extends TlObject
+final class GetForumTopicsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xde560d1;
     
@@ -46,7 +45,9 @@ final class GetForumTopicsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->q !== null) $flags |= (1 << 0);
+        if ($this->q !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->channel->serialize();
         if ($flags & (1 << 0)) {
@@ -56,12 +57,6 @@ final class GetForumTopicsRequest extends TlObject
         $buffer .= Serializer::int32($this->offsetId);
         $buffer .= Serializer::int32($this->offsetTopic);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

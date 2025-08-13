@@ -1,8 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+
 /**
  * @see https://core.telegram.org/type/payments.PaymentReceipt
  */
@@ -16,7 +19,7 @@ abstract class AbstractPaymentReceipt extends TlObject
         return match ($constructorId) {
             0x70c4fe03 => PaymentReceipt::deserialize($stream),
             0xdabbf83a => PaymentReceiptStars::deserialize($stream),
-            default => throw new \Exception(sprintf('Unknown constructor ID for type payments.PaymentReceipt. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
+            default => throw new RuntimeException(sprintf('Unknown constructor ID for type payments.PaymentReceipt. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
 }

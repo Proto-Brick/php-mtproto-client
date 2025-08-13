@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Help;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Help;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputAppEvent;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputAppEvent;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/help.saveAppLog
  */
-final class SaveAppLogRequest extends TlObject
+final class SaveAppLogRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x6f02f748;
     
@@ -35,12 +34,6 @@ final class SaveAppLogRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::vectorOfObjects($this->events);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

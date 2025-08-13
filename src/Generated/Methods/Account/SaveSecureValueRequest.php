@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputSecureValue;
-use DigitalStars\MtprotoClient\Generated\Types\Base\SecureValue;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputSecureValue;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SecureValue;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.saveSecureValue
  */
-final class SaveSecureValueRequest extends TlObject
+final class SaveSecureValueRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x899fe31d;
     
@@ -39,12 +38,6 @@ final class SaveSecureValueRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->value->serialize();
         $buffer .= Serializer::int64($this->secureSecretId);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

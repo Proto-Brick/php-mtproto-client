@@ -1,11 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Help;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Help;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessageEntity;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/help.appUpdate
@@ -41,10 +40,18 @@ final class AppUpdate extends AbstractAppUpdate
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->canNotSkip) $flags |= (1 << 0);
-        if ($this->document !== null) $flags |= (1 << 1);
-        if ($this->url !== null) $flags |= (1 << 2);
-        if ($this->sticker !== null) $flags |= (1 << 3);
+        if ($this->canNotSkip) {
+            $flags |= (1 << 0);
+        }
+        if ($this->document !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->url !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->sticker !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
         $buffer .= Serializer::bytes($this->version);
@@ -59,22 +66,20 @@ final class AppUpdate extends AbstractAppUpdate
         if ($flags & (1 << 3)) {
             $buffer .= $this->sticker->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $canNotSkip = ($flags & (1 << 0)) ? true : null;
+        $canNotSkip = (($flags & (1 << 0)) !== 0) ? true : null;
         $id = Deserializer::int32($stream);
         $version = Deserializer::bytes($stream);
         $text = Deserializer::bytes($stream);
         $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
-        $document = ($flags & (1 << 1)) ? AbstractDocument::deserialize($stream) : null;
-        $url = ($flags & (1 << 2)) ? Deserializer::bytes($stream) : null;
-        $sticker = ($flags & (1 << 3)) ? AbstractDocument::deserialize($stream) : null;
+        $document = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($stream) : null;
+        $url = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
+        $sticker = (($flags & (1 << 3)) !== 0) ? AbstractDocument::deserialize($stream) : null;
 
         return new self(
             $id,

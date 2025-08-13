@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/inputStickerSetItem
@@ -31,8 +32,12 @@ final class InputStickerSetItem extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->maskCoords !== null) $flags |= (1 << 0);
-        if ($this->keywords !== null) $flags |= (1 << 1);
+        if ($this->maskCoords !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->keywords !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->document->serialize();
         $buffer .= Serializer::bytes($this->emoji);
@@ -42,21 +47,19 @@ final class InputStickerSetItem extends TlObject
         if ($flags & (1 << 1)) {
             $buffer .= Serializer::bytes($this->keywords);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
         $document = AbstractInputDocument::deserialize($stream);
         $emoji = Deserializer::bytes($stream);
-        $maskCoords = ($flags & (1 << 0)) ? MaskCoords::deserialize($stream) : null;
-        $keywords = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $maskCoords = (($flags & (1 << 0)) !== 0) ? MaskCoords::deserialize($stream) : null;
+        $keywords = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(
             $document,

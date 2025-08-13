@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/updateBotEditBusinessMessage
@@ -31,7 +30,9 @@ final class UpdateBotEditBusinessMessage extends AbstractUpdate
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->replyToMessage !== null) $flags |= (1 << 0);
+        if ($this->replyToMessage !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->connectionId);
         $buffer .= $this->message->serialize();
@@ -39,17 +40,15 @@ final class UpdateBotEditBusinessMessage extends AbstractUpdate
             $buffer .= $this->replyToMessage->serialize();
         }
         $buffer .= Serializer::int32($this->qts);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
         $connectionId = Deserializer::bytes($stream);
         $message = AbstractMessage::deserialize($stream);
-        $replyToMessage = ($flags & (1 << 0)) ? AbstractMessage::deserialize($stream) : null;
+        $replyToMessage = (($flags & (1 << 0)) !== 0) ? AbstractMessage::deserialize($stream) : null;
         $qts = Deserializer::int32($stream);
 
         return new self(

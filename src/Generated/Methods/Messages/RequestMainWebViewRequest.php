@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\WebViewResult;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\WebViewResult;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.requestMainWebView
  */
-final class RequestMainWebViewRequest extends TlObject
+final class RequestMainWebViewRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xc9e01e7b;
     
@@ -49,10 +48,18 @@ final class RequestMainWebViewRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->compact) $flags |= (1 << 7);
-        if ($this->fullscreen) $flags |= (1 << 8);
-        if ($this->startParam !== null) $flags |= (1 << 1);
-        if ($this->themeParams !== null) $flags |= (1 << 0);
+        if ($this->compact) {
+            $flags |= (1 << 7);
+        }
+        if ($this->fullscreen) {
+            $flags |= (1 << 8);
+        }
+        if ($this->startParam !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->themeParams !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= $this->bot->serialize();
@@ -63,12 +70,6 @@ final class RequestMainWebViewRequest extends TlObject
             $buffer .= Serializer::serializeDataJSON($this->themeParams);
         }
         $buffer .= Serializer::bytes($this->platform);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

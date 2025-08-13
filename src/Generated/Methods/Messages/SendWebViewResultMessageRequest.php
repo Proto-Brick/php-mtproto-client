@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputBotInlineResult;
-use DigitalStars\MtprotoClient\Generated\Types\Base\WebViewMessageSent;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputBotInlineResult;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\WebViewMessageSent;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.sendWebViewResultMessage
  */
-final class SendWebViewResultMessageRequest extends TlObject
+final class SendWebViewResultMessageRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xa4314f5;
     
@@ -39,12 +38,6 @@ final class SendWebViewResultMessageRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::bytes($this->botQueryId);
         $buffer .= $this->result->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

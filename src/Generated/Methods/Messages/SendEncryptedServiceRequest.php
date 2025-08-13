@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputEncryptedChat;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\AbstractSentEncryptedMessage;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputEncryptedChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AbstractSentEncryptedMessage;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.sendEncryptedService
  */
-final class SendEncryptedServiceRequest extends TlObject
+final class SendEncryptedServiceRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x32d439a4;
     
@@ -42,12 +41,6 @@ final class SendEncryptedServiceRequest extends TlObject
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int64($this->randomId);
         $buffer .= Serializer::bytes($this->data);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

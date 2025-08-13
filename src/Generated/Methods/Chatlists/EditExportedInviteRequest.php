@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Chatlists;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Chatlists;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\ExportedChatlistInvite;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InputChatlist;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ExportedChatlistInvite;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputChatlist;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/chatlists.editExportedInvite
  */
-final class EditExportedInviteRequest extends TlObject
+final class EditExportedInviteRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x653db63d;
     
@@ -43,8 +42,12 @@ final class EditExportedInviteRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->title !== null) $flags |= (1 << 1);
-        if ($this->peers !== null) $flags |= (1 << 2);
+        if ($this->title !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->peers !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->chatlist->serialize();
         $buffer .= Serializer::bytes($this->slug);
@@ -54,12 +57,6 @@ final class EditExportedInviteRequest extends TlObject
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::vectorOfObjects($this->peers);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

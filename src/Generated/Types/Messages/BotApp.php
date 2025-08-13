@@ -1,10 +1,11 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractBotApp;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractBotApp;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/messages.botApp
@@ -32,25 +33,29 @@ final class BotApp extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->inactive) $flags |= (1 << 0);
-        if ($this->requestWriteAccess) $flags |= (1 << 1);
-        if ($this->hasSettings) $flags |= (1 << 2);
+        if ($this->inactive) {
+            $flags |= (1 << 0);
+        }
+        if ($this->requestWriteAccess) {
+            $flags |= (1 << 1);
+        }
+        if ($this->hasSettings) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->app->serialize();
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $inactive = ($flags & (1 << 0)) ? true : null;
-        $requestWriteAccess = ($flags & (1 << 1)) ? true : null;
-        $hasSettings = ($flags & (1 << 2)) ? true : null;
+        $inactive = (($flags & (1 << 0)) !== 0) ? true : null;
+        $requestWriteAccess = (($flags & (1 << 1)) !== 0) ? true : null;
+        $hasSettings = (($flags & (1 << 2)) !== 0) ? true : null;
         $app = AbstractBotApp::deserialize($stream);
 
         return new self(

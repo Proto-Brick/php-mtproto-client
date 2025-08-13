@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/channelFull
@@ -154,62 +153,174 @@ final class ChannelFull extends AbstractChatFull
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
         $flags2 = 0;
-        if ($this->canViewParticipants) $flags |= (1 << 3);
-        if ($this->canSetUsername) $flags |= (1 << 6);
-        if ($this->canSetStickers) $flags |= (1 << 7);
-        if ($this->hiddenPrehistory) $flags |= (1 << 10);
-        if ($this->canSetLocation) $flags |= (1 << 16);
-        if ($this->hasScheduled) $flags |= (1 << 19);
-        if ($this->canViewStats) $flags |= (1 << 20);
-        if ($this->blocked) $flags |= (1 << 22);
-        if ($this->canDeleteChannel) $flags2 |= (1 << 0);
-        if ($this->antispam) $flags2 |= (1 << 1);
-        if ($this->participantsHidden) $flags2 |= (1 << 2);
-        if ($this->translationsDisabled) $flags2 |= (1 << 3);
-        if ($this->storiesPinnedAvailable) $flags2 |= (1 << 5);
-        if ($this->viewForumAsMessages) $flags2 |= (1 << 6);
-        if ($this->restrictedSponsored) $flags2 |= (1 << 11);
-        if ($this->canViewRevenue) $flags2 |= (1 << 12);
-        if ($this->paidMediaAllowed) $flags2 |= (1 << 14);
-        if ($this->canViewStarsRevenue) $flags2 |= (1 << 15);
-        if ($this->paidReactionsAvailable) $flags2 |= (1 << 16);
-        if ($this->stargiftsAvailable) $flags2 |= (1 << 19);
-        if ($this->paidMessagesAvailable) $flags2 |= (1 << 20);
-        if ($this->participantsCount !== null) $flags |= (1 << 0);
-        if ($this->adminsCount !== null) $flags |= (1 << 1);
-        if ($this->kickedCount !== null) $flags |= (1 << 2);
-        if ($this->bannedCount !== null) $flags |= (1 << 2);
-        if ($this->onlineCount !== null) $flags |= (1 << 13);
-        if ($this->exportedInvite !== null) $flags |= (1 << 23);
-        if ($this->migratedFromChatId !== null) $flags |= (1 << 4);
-        if ($this->migratedFromMaxId !== null) $flags |= (1 << 4);
-        if ($this->pinnedMsgId !== null) $flags |= (1 << 5);
-        if ($this->stickerset !== null) $flags |= (1 << 8);
-        if ($this->availableMinId !== null) $flags |= (1 << 9);
-        if ($this->folderId !== null) $flags |= (1 << 11);
-        if ($this->linkedChatId !== null) $flags |= (1 << 14);
-        if ($this->location !== null) $flags |= (1 << 15);
-        if ($this->slowmodeSeconds !== null) $flags |= (1 << 17);
-        if ($this->slowmodeNextSendDate !== null) $flags |= (1 << 18);
-        if ($this->statsDc !== null) $flags |= (1 << 12);
-        if ($this->call !== null) $flags |= (1 << 21);
-        if ($this->ttlPeriod !== null) $flags |= (1 << 24);
-        if ($this->pendingSuggestions !== null) $flags |= (1 << 25);
-        if ($this->groupcallDefaultJoinAs !== null) $flags |= (1 << 26);
-        if ($this->themeEmoticon !== null) $flags |= (1 << 27);
-        if ($this->requestsPending !== null) $flags |= (1 << 28);
-        if ($this->recentRequesters !== null) $flags |= (1 << 28);
-        if ($this->defaultSendAs !== null) $flags |= (1 << 29);
-        if ($this->availableReactions !== null) $flags |= (1 << 30);
-        if ($this->reactionsLimit !== null) $flags2 |= (1 << 13);
-        if ($this->stories !== null) $flags2 |= (1 << 4);
-        if ($this->wallpaper !== null) $flags2 |= (1 << 7);
-        if ($this->boostsApplied !== null) $flags2 |= (1 << 8);
-        if ($this->boostsUnrestrict !== null) $flags2 |= (1 << 9);
-        if ($this->emojiset !== null) $flags2 |= (1 << 10);
-        if ($this->botVerification !== null) $flags2 |= (1 << 17);
-        if ($this->stargiftsCount !== null) $flags2 |= (1 << 18);
-        if ($this->sendPaidMessagesStars !== null) $flags2 |= (1 << 21);
+        if ($this->canViewParticipants) {
+            $flags |= (1 << 3);
+        }
+        if ($this->canSetUsername) {
+            $flags |= (1 << 6);
+        }
+        if ($this->canSetStickers) {
+            $flags |= (1 << 7);
+        }
+        if ($this->hiddenPrehistory) {
+            $flags |= (1 << 10);
+        }
+        if ($this->canSetLocation) {
+            $flags |= (1 << 16);
+        }
+        if ($this->hasScheduled) {
+            $flags |= (1 << 19);
+        }
+        if ($this->canViewStats) {
+            $flags |= (1 << 20);
+        }
+        if ($this->blocked) {
+            $flags |= (1 << 22);
+        }
+        if ($this->canDeleteChannel) {
+            $flags2 |= (1 << 0);
+        }
+        if ($this->antispam) {
+            $flags2 |= (1 << 1);
+        }
+        if ($this->participantsHidden) {
+            $flags2 |= (1 << 2);
+        }
+        if ($this->translationsDisabled) {
+            $flags2 |= (1 << 3);
+        }
+        if ($this->storiesPinnedAvailable) {
+            $flags2 |= (1 << 5);
+        }
+        if ($this->viewForumAsMessages) {
+            $flags2 |= (1 << 6);
+        }
+        if ($this->restrictedSponsored) {
+            $flags2 |= (1 << 11);
+        }
+        if ($this->canViewRevenue) {
+            $flags2 |= (1 << 12);
+        }
+        if ($this->paidMediaAllowed) {
+            $flags2 |= (1 << 14);
+        }
+        if ($this->canViewStarsRevenue) {
+            $flags2 |= (1 << 15);
+        }
+        if ($this->paidReactionsAvailable) {
+            $flags2 |= (1 << 16);
+        }
+        if ($this->stargiftsAvailable) {
+            $flags2 |= (1 << 19);
+        }
+        if ($this->paidMessagesAvailable) {
+            $flags2 |= (1 << 20);
+        }
+        if ($this->participantsCount !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->adminsCount !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->kickedCount !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->bannedCount !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->onlineCount !== null) {
+            $flags |= (1 << 13);
+        }
+        if ($this->exportedInvite !== null) {
+            $flags |= (1 << 23);
+        }
+        if ($this->migratedFromChatId !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->migratedFromMaxId !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->pinnedMsgId !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->stickerset !== null) {
+            $flags |= (1 << 8);
+        }
+        if ($this->availableMinId !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->folderId !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->linkedChatId !== null) {
+            $flags |= (1 << 14);
+        }
+        if ($this->location !== null) {
+            $flags |= (1 << 15);
+        }
+        if ($this->slowmodeSeconds !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->slowmodeNextSendDate !== null) {
+            $flags |= (1 << 18);
+        }
+        if ($this->statsDc !== null) {
+            $flags |= (1 << 12);
+        }
+        if ($this->call !== null) {
+            $flags |= (1 << 21);
+        }
+        if ($this->ttlPeriod !== null) {
+            $flags |= (1 << 24);
+        }
+        if ($this->pendingSuggestions !== null) {
+            $flags |= (1 << 25);
+        }
+        if ($this->groupcallDefaultJoinAs !== null) {
+            $flags |= (1 << 26);
+        }
+        if ($this->themeEmoticon !== null) {
+            $flags |= (1 << 27);
+        }
+        if ($this->requestsPending !== null) {
+            $flags |= (1 << 28);
+        }
+        if ($this->recentRequesters !== null) {
+            $flags |= (1 << 28);
+        }
+        if ($this->defaultSendAs !== null) {
+            $flags |= (1 << 29);
+        }
+        if ($this->availableReactions !== null) {
+            $flags |= (1 << 30);
+        }
+        if ($this->reactionsLimit !== null) {
+            $flags2 |= (1 << 13);
+        }
+        if ($this->stories !== null) {
+            $flags2 |= (1 << 4);
+        }
+        if ($this->wallpaper !== null) {
+            $flags2 |= (1 << 7);
+        }
+        if ($this->boostsApplied !== null) {
+            $flags2 |= (1 << 8);
+        }
+        if ($this->boostsUnrestrict !== null) {
+            $flags2 |= (1 << 9);
+        }
+        if ($this->emojiset !== null) {
+            $flags2 |= (1 << 10);
+        }
+        if ($this->botVerification !== null) {
+            $flags2 |= (1 << 17);
+        }
+        if ($this->stargiftsCount !== null) {
+            $flags2 |= (1 << 18);
+        }
+        if ($this->sendPaidMessagesStars !== null) {
+            $flags2 |= (1 << 21);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int64($this->id);
@@ -326,80 +437,78 @@ final class ChannelFull extends AbstractChatFull
         if ($flags2 & (1 << 21)) {
             $buffer .= Serializer::int64($this->sendPaidMessagesStars);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $canViewParticipants = ($flags & (1 << 3)) ? true : null;
-        $canSetUsername = ($flags & (1 << 6)) ? true : null;
-        $canSetStickers = ($flags & (1 << 7)) ? true : null;
-        $hiddenPrehistory = ($flags & (1 << 10)) ? true : null;
-        $canSetLocation = ($flags & (1 << 16)) ? true : null;
-        $hasScheduled = ($flags & (1 << 19)) ? true : null;
-        $canViewStats = ($flags & (1 << 20)) ? true : null;
-        $blocked = ($flags & (1 << 22)) ? true : null;
+        $canViewParticipants = (($flags & (1 << 3)) !== 0) ? true : null;
+        $canSetUsername = (($flags & (1 << 6)) !== 0) ? true : null;
+        $canSetStickers = (($flags & (1 << 7)) !== 0) ? true : null;
+        $hiddenPrehistory = (($flags & (1 << 10)) !== 0) ? true : null;
+        $canSetLocation = (($flags & (1 << 16)) !== 0) ? true : null;
+        $hasScheduled = (($flags & (1 << 19)) !== 0) ? true : null;
+        $canViewStats = (($flags & (1 << 20)) !== 0) ? true : null;
+        $blocked = (($flags & (1 << 22)) !== 0) ? true : null;
         $flags2 = Deserializer::int32($stream);
-        $canDeleteChannel = ($flags2 & (1 << 0)) ? true : null;
-        $antispam = ($flags2 & (1 << 1)) ? true : null;
-        $participantsHidden = ($flags2 & (1 << 2)) ? true : null;
-        $translationsDisabled = ($flags2 & (1 << 3)) ? true : null;
-        $storiesPinnedAvailable = ($flags2 & (1 << 5)) ? true : null;
-        $viewForumAsMessages = ($flags2 & (1 << 6)) ? true : null;
-        $restrictedSponsored = ($flags2 & (1 << 11)) ? true : null;
-        $canViewRevenue = ($flags2 & (1 << 12)) ? true : null;
-        $paidMediaAllowed = ($flags2 & (1 << 14)) ? true : null;
-        $canViewStarsRevenue = ($flags2 & (1 << 15)) ? true : null;
-        $paidReactionsAvailable = ($flags2 & (1 << 16)) ? true : null;
-        $stargiftsAvailable = ($flags2 & (1 << 19)) ? true : null;
-        $paidMessagesAvailable = ($flags2 & (1 << 20)) ? true : null;
+        $canDeleteChannel = (($flags2 & (1 << 0)) !== 0) ? true : null;
+        $antispam = (($flags2 & (1 << 1)) !== 0) ? true : null;
+        $participantsHidden = (($flags2 & (1 << 2)) !== 0) ? true : null;
+        $translationsDisabled = (($flags2 & (1 << 3)) !== 0) ? true : null;
+        $storiesPinnedAvailable = (($flags2 & (1 << 5)) !== 0) ? true : null;
+        $viewForumAsMessages = (($flags2 & (1 << 6)) !== 0) ? true : null;
+        $restrictedSponsored = (($flags2 & (1 << 11)) !== 0) ? true : null;
+        $canViewRevenue = (($flags2 & (1 << 12)) !== 0) ? true : null;
+        $paidMediaAllowed = (($flags2 & (1 << 14)) !== 0) ? true : null;
+        $canViewStarsRevenue = (($flags2 & (1 << 15)) !== 0) ? true : null;
+        $paidReactionsAvailable = (($flags2 & (1 << 16)) !== 0) ? true : null;
+        $stargiftsAvailable = (($flags2 & (1 << 19)) !== 0) ? true : null;
+        $paidMessagesAvailable = (($flags2 & (1 << 20)) !== 0) ? true : null;
         $id = Deserializer::int64($stream);
         $about = Deserializer::bytes($stream);
-        $participantsCount = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $adminsCount = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
-        $kickedCount = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
-        $bannedCount = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
-        $onlineCount = ($flags & (1 << 13)) ? Deserializer::int32($stream) : null;
+        $participantsCount = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $adminsCount = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $kickedCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $bannedCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $onlineCount = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($stream) : null;
         $readInboxMaxId = Deserializer::int32($stream);
         $readOutboxMaxId = Deserializer::int32($stream);
         $unreadCount = Deserializer::int32($stream);
         $chatPhoto = AbstractPhoto::deserialize($stream);
         $notifySettings = PeerNotifySettings::deserialize($stream);
-        $exportedInvite = ($flags & (1 << 23)) ? AbstractExportedChatInvite::deserialize($stream) : null;
+        $exportedInvite = (($flags & (1 << 23)) !== 0) ? AbstractExportedChatInvite::deserialize($stream) : null;
         $botInfo = Deserializer::vectorOfObjects($stream, [BotInfo::class, 'deserialize']);
-        $migratedFromChatId = ($flags & (1 << 4)) ? Deserializer::int64($stream) : null;
-        $migratedFromMaxId = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
-        $pinnedMsgId = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
-        $stickerset = ($flags & (1 << 8)) ? StickerSet::deserialize($stream) : null;
-        $availableMinId = ($flags & (1 << 9)) ? Deserializer::int32($stream) : null;
-        $folderId = ($flags & (1 << 11)) ? Deserializer::int32($stream) : null;
-        $linkedChatId = ($flags & (1 << 14)) ? Deserializer::int64($stream) : null;
-        $location = ($flags & (1 << 15)) ? AbstractChannelLocation::deserialize($stream) : null;
-        $slowmodeSeconds = ($flags & (1 << 17)) ? Deserializer::int32($stream) : null;
-        $slowmodeNextSendDate = ($flags & (1 << 18)) ? Deserializer::int32($stream) : null;
-        $statsDc = ($flags & (1 << 12)) ? Deserializer::int32($stream) : null;
+        $migratedFromChatId = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
+        $migratedFromMaxId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $pinnedMsgId = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
+        $stickerset = (($flags & (1 << 8)) !== 0) ? StickerSet::deserialize($stream) : null;
+        $availableMinId = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($stream) : null;
+        $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
+        $linkedChatId = (($flags & (1 << 14)) !== 0) ? Deserializer::int64($stream) : null;
+        $location = (($flags & (1 << 15)) !== 0) ? AbstractChannelLocation::deserialize($stream) : null;
+        $slowmodeSeconds = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($stream) : null;
+        $slowmodeNextSendDate = (($flags & (1 << 18)) !== 0) ? Deserializer::int32($stream) : null;
+        $statsDc = (($flags & (1 << 12)) !== 0) ? Deserializer::int32($stream) : null;
         $pts = Deserializer::int32($stream);
-        $call = ($flags & (1 << 21)) ? AbstractInputGroupCall::deserialize($stream) : null;
-        $ttlPeriod = ($flags & (1 << 24)) ? Deserializer::int32($stream) : null;
-        $pendingSuggestions = ($flags & (1 << 25)) ? Deserializer::vectorOfStrings($stream) : null;
-        $groupcallDefaultJoinAs = ($flags & (1 << 26)) ? AbstractPeer::deserialize($stream) : null;
-        $themeEmoticon = ($flags & (1 << 27)) ? Deserializer::bytes($stream) : null;
-        $requestsPending = ($flags & (1 << 28)) ? Deserializer::int32($stream) : null;
-        $recentRequesters = ($flags & (1 << 28)) ? Deserializer::vectorOfLongs($stream) : null;
-        $defaultSendAs = ($flags & (1 << 29)) ? AbstractPeer::deserialize($stream) : null;
-        $availableReactions = ($flags & (1 << 30)) ? AbstractChatReactions::deserialize($stream) : null;
-        $reactionsLimit = ($flags2 & (1 << 13)) ? Deserializer::int32($stream) : null;
-        $stories = ($flags2 & (1 << 4)) ? PeerStories::deserialize($stream) : null;
-        $wallpaper = ($flags2 & (1 << 7)) ? AbstractWallPaper::deserialize($stream) : null;
-        $boostsApplied = ($flags2 & (1 << 8)) ? Deserializer::int32($stream) : null;
-        $boostsUnrestrict = ($flags2 & (1 << 9)) ? Deserializer::int32($stream) : null;
-        $emojiset = ($flags2 & (1 << 10)) ? StickerSet::deserialize($stream) : null;
-        $botVerification = ($flags2 & (1 << 17)) ? BotVerification::deserialize($stream) : null;
-        $stargiftsCount = ($flags2 & (1 << 18)) ? Deserializer::int32($stream) : null;
-        $sendPaidMessagesStars = ($flags2 & (1 << 21)) ? Deserializer::int64($stream) : null;
+        $call = (($flags & (1 << 21)) !== 0) ? AbstractInputGroupCall::deserialize($stream) : null;
+        $ttlPeriod = (($flags & (1 << 24)) !== 0) ? Deserializer::int32($stream) : null;
+        $pendingSuggestions = (($flags & (1 << 25)) !== 0) ? Deserializer::vectorOfStrings($stream) : null;
+        $groupcallDefaultJoinAs = (($flags & (1 << 26)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $themeEmoticon = (($flags & (1 << 27)) !== 0) ? Deserializer::bytes($stream) : null;
+        $requestsPending = (($flags & (1 << 28)) !== 0) ? Deserializer::int32($stream) : null;
+        $recentRequesters = (($flags & (1 << 28)) !== 0) ? Deserializer::vectorOfLongs($stream) : null;
+        $defaultSendAs = (($flags & (1 << 29)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $availableReactions = (($flags & (1 << 30)) !== 0) ? AbstractChatReactions::deserialize($stream) : null;
+        $reactionsLimit = (($flags2 & (1 << 13)) !== 0) ? Deserializer::int32($stream) : null;
+        $stories = (($flags2 & (1 << 4)) !== 0) ? PeerStories::deserialize($stream) : null;
+        $wallpaper = (($flags2 & (1 << 7)) !== 0) ? AbstractWallPaper::deserialize($stream) : null;
+        $boostsApplied = (($flags2 & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
+        $boostsUnrestrict = (($flags2 & (1 << 9)) !== 0) ? Deserializer::int32($stream) : null;
+        $emojiset = (($flags2 & (1 << 10)) !== 0) ? StickerSet::deserialize($stream) : null;
+        $botVerification = (($flags2 & (1 << 17)) !== 0) ? BotVerification::deserialize($stream) : null;
+        $stargiftsCount = (($flags2 & (1 << 18)) !== 0) ? Deserializer::int32($stream) : null;
+        $sendPaidMessagesStars = (($flags2 & (1 << 21)) !== 0) ? Deserializer::int64($stream) : null;
 
         return new self(
             $id,

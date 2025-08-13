@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\AbstractSavedDialogs;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AbstractSavedDialogs;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.getSavedDialogs
  */
-final class GetSavedDialogsRequest extends TlObject
+final class GetSavedDialogsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x1e91fc99;
     
@@ -48,8 +47,12 @@ final class GetSavedDialogsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->excludePinned) $flags |= (1 << 0);
-        if ($this->parentPeer !== null) $flags |= (1 << 1);
+        if ($this->excludePinned) {
+            $flags |= (1 << 0);
+        }
+        if ($this->parentPeer !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 1)) {
             $buffer .= $this->parentPeer->serialize();
@@ -59,12 +62,6 @@ final class GetSavedDialogsRequest extends TlObject
         $buffer .= $this->offsetPeer->serialize();
         $buffer .= Serializer::int32($this->limit);
         $buffer .= Serializer::int64($this->hash);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

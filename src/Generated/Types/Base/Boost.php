@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/boost
@@ -45,14 +46,30 @@ final class Boost extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->gift) $flags |= (1 << 1);
-        if ($this->giveaway) $flags |= (1 << 2);
-        if ($this->unclaimed) $flags |= (1 << 3);
-        if ($this->userId !== null) $flags |= (1 << 0);
-        if ($this->giveawayMsgId !== null) $flags |= (1 << 2);
-        if ($this->usedGiftSlug !== null) $flags |= (1 << 4);
-        if ($this->multiplier !== null) $flags |= (1 << 5);
-        if ($this->stars !== null) $flags |= (1 << 6);
+        if ($this->gift) {
+            $flags |= (1 << 1);
+        }
+        if ($this->giveaway) {
+            $flags |= (1 << 2);
+        }
+        if ($this->unclaimed) {
+            $flags |= (1 << 3);
+        }
+        if ($this->userId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->giveawayMsgId !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->usedGiftSlug !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->multiplier !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->stars !== null) {
+            $flags |= (1 << 6);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->id);
         if ($flags & (1 << 0)) {
@@ -72,28 +89,26 @@ final class Boost extends TlObject
         if ($flags & (1 << 6)) {
             $buffer .= Serializer::int64($this->stars);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $gift = ($flags & (1 << 1)) ? true : null;
-        $giveaway = ($flags & (1 << 2)) ? true : null;
-        $unclaimed = ($flags & (1 << 3)) ? true : null;
+        $gift = (($flags & (1 << 1)) !== 0) ? true : null;
+        $giveaway = (($flags & (1 << 2)) !== 0) ? true : null;
+        $unclaimed = (($flags & (1 << 3)) !== 0) ? true : null;
         $id = Deserializer::bytes($stream);
-        $userId = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
-        $giveawayMsgId = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
+        $userId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
+        $giveawayMsgId = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $date = Deserializer::int32($stream);
         $expires = Deserializer::int32($stream);
-        $usedGiftSlug = ($flags & (1 << 4)) ? Deserializer::bytes($stream) : null;
-        $multiplier = ($flags & (1 << 5)) ? Deserializer::int32($stream) : null;
-        $stars = ($flags & (1 << 6)) ? Deserializer::int64($stream) : null;
+        $usedGiftSlug = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
+        $multiplier = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
+        $stars = (($flags & (1 << 6)) !== 0) ? Deserializer::int64($stream) : null;
 
         return new self(
             $id,

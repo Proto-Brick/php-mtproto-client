@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Upload;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Upload;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputFileLocation;
-use DigitalStars\MtprotoClient\Generated\Types\Base\FileHash;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputFileLocation;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\FileHash;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/upload.getFileHashes
  */
-final class GetFileHashesRequest extends TlObject
+final class GetFileHashesRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x9156982a;
     
@@ -39,12 +38,6 @@ final class GetFileHashesRequest extends TlObject
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->location->serialize();
         $buffer .= Serializer::int64($this->offset);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/botApp
@@ -39,7 +38,9 @@ final class BotApp extends AbstractBotApp
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->document !== null) $flags |= (1 << 0);
+        if ($this->document !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
         $buffer .= Serializer::int64($this->accessHash);
@@ -51,10 +52,8 @@ final class BotApp extends AbstractBotApp
             $buffer .= $this->document->serialize();
         }
         $buffer .= Serializer::int64($this->hash);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -65,7 +64,7 @@ final class BotApp extends AbstractBotApp
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
         $photo = AbstractPhoto::deserialize($stream);
-        $document = ($flags & (1 << 0)) ? AbstractDocument::deserialize($stream) : null;
+        $document = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($stream) : null;
         $hash = Deserializer::int64($stream);
 
         return new self(

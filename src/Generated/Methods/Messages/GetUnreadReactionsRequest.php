@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\AbstractMessages;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AbstractMessages;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.getUnreadReactions
  */
-final class GetUnreadReactionsRequest extends TlObject
+final class GetUnreadReactionsRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xbd7f90ac;
     
@@ -50,8 +49,12 @@ final class GetUnreadReactionsRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->topMsgId !== null) $flags |= (1 << 0);
-        if ($this->savedPeerId !== null) $flags |= (1 << 1);
+        if ($this->topMsgId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->savedPeerId !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
@@ -65,12 +68,6 @@ final class GetUnreadReactionsRequest extends TlObject
         $buffer .= Serializer::int32($this->limit);
         $buffer .= Serializer::int32($this->maxId);
         $buffer .= Serializer::int32($this->minId);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

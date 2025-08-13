@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputInvoice;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPaymentCredentials;
-use DigitalStars\MtprotoClient\Generated\Types\Payments\AbstractPaymentResult;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputInvoice;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPaymentCredentials;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractPaymentResult;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.sendPaymentForm
  */
-final class SendPaymentFormRequest extends TlObject
+final class SendPaymentFormRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x2d03522f;
     
@@ -47,9 +46,15 @@ final class SendPaymentFormRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->requestedInfoId !== null) $flags |= (1 << 0);
-        if ($this->shippingOptionId !== null) $flags |= (1 << 1);
-        if ($this->tipAmount !== null) $flags |= (1 << 2);
+        if ($this->requestedInfoId !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->shippingOptionId !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->tipAmount !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->formId);
         $buffer .= $this->invoice->serialize();
@@ -63,12 +68,6 @@ final class SendPaymentFormRequest extends TlObject
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::int64($this->tipAmount);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

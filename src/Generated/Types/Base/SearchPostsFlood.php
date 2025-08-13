@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/searchPostsFlood
@@ -33,8 +34,12 @@ final class SearchPostsFlood extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->queryIsFree) $flags |= (1 << 0);
-        if ($this->waitTill !== null) $flags |= (1 << 1);
+        if ($this->queryIsFree) {
+            $flags |= (1 << 0);
+        }
+        if ($this->waitTill !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->totalDaily);
         $buffer .= Serializer::int32($this->remains);
@@ -42,21 +47,19 @@ final class SearchPostsFlood extends TlObject
             $buffer .= Serializer::int32($this->waitTill);
         }
         $buffer .= Serializer::int64($this->starsAmount);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $queryIsFree = ($flags & (1 << 0)) ? true : null;
+        $queryIsFree = (($flags & (1 << 0)) !== 0) ? true : null;
         $totalDaily = Deserializer::int32($stream);
         $remains = Deserializer::int32($stream);
-        $waitTill = ($flags & (1 << 1)) ? Deserializer::int32($stream) : null;
+        $waitTill = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $starsAmount = Deserializer::int64($stream);
 
         return new self(

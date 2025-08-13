@@ -1,13 +1,12 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChat;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessage;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\SearchPostsFlood;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SearchPostsFlood;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messages.messagesSlice
@@ -43,10 +42,18 @@ final class MessagesSlice extends AbstractMessages
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->inexact) $flags |= (1 << 1);
-        if ($this->nextRate !== null) $flags |= (1 << 0);
-        if ($this->offsetIdOffset !== null) $flags |= (1 << 2);
-        if ($this->searchFlood !== null) $flags |= (1 << 3);
+        if ($this->inexact) {
+            $flags |= (1 << 1);
+        }
+        if ($this->nextRate !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->offsetIdOffset !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->searchFlood !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->count);
         if ($flags & (1 << 0)) {
@@ -61,19 +68,17 @@ final class MessagesSlice extends AbstractMessages
         $buffer .= Serializer::vectorOfObjects($this->messages);
         $buffer .= Serializer::vectorOfObjects($this->chats);
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $inexact = ($flags & (1 << 1)) ? true : null;
+        $inexact = (($flags & (1 << 1)) !== 0) ? true : null;
         $count = Deserializer::int32($stream);
-        $nextRate = ($flags & (1 << 0)) ? Deserializer::int32($stream) : null;
-        $offsetIdOffset = ($flags & (1 << 2)) ? Deserializer::int32($stream) : null;
-        $searchFlood = ($flags & (1 << 3)) ? SearchPostsFlood::deserialize($stream) : null;
+        $nextRate = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        $offsetIdOffset = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $searchFlood = (($flags & (1 << 3)) !== 0) ? SearchPostsFlood::deserialize($stream) : null;
         $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);

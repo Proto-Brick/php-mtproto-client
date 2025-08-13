@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/page
@@ -39,10 +40,18 @@ final class Page extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->part) $flags |= (1 << 0);
-        if ($this->rtl) $flags |= (1 << 1);
-        if ($this->v2) $flags |= (1 << 2);
-        if ($this->views !== null) $flags |= (1 << 3);
+        if ($this->part) {
+            $flags |= (1 << 0);
+        }
+        if ($this->rtl) {
+            $flags |= (1 << 1);
+        }
+        if ($this->v2) {
+            $flags |= (1 << 2);
+        }
+        if ($this->views !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->url);
         $buffer .= Serializer::vectorOfObjects($this->blocks);
@@ -51,25 +60,23 @@ final class Page extends TlObject
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::int32($this->views);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $part = ($flags & (1 << 0)) ? true : null;
-        $rtl = ($flags & (1 << 1)) ? true : null;
-        $v2 = ($flags & (1 << 2)) ? true : null;
+        $part = (($flags & (1 << 0)) !== 0) ? true : null;
+        $rtl = (($flags & (1 << 1)) !== 0) ? true : null;
+        $v2 = (($flags & (1 << 2)) !== 0) ? true : null;
         $url = Deserializer::bytes($stream);
         $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
         $photos = Deserializer::vectorOfObjects($stream, [AbstractPhoto::class, 'deserialize']);
         $documents = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
-        $views = ($flags & (1 << 3)) ? Deserializer::int32($stream) : null;
+        $views = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $url,

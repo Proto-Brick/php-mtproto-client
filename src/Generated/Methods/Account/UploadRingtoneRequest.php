@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Account;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractDocument;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputFile;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputFile;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/account.uploadRingtone
  */
-final class UploadRingtoneRequest extends TlObject
+final class UploadRingtoneRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x831a83a2;
     
@@ -42,12 +41,6 @@ final class UploadRingtoneRequest extends TlObject
         $buffer .= $this->file->serialize();
         $buffer .= Serializer::bytes($this->fileName);
         $buffer .= Serializer::bytes($this->mimeType);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

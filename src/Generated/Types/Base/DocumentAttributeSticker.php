@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/documentAttributeSticker
@@ -31,26 +30,28 @@ final class DocumentAttributeSticker extends AbstractDocumentAttribute
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->mask) $flags |= (1 << 1);
-        if ($this->maskCoords !== null) $flags |= (1 << 0);
+        if ($this->mask) {
+            $flags |= (1 << 1);
+        }
+        if ($this->maskCoords !== null) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->alt);
         $buffer .= $this->stickerset->serialize();
         if ($flags & (1 << 0)) {
             $buffer .= $this->maskCoords->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $mask = ($flags & (1 << 1)) ? true : null;
+        $mask = (($flags & (1 << 1)) !== 0) ? true : null;
         $alt = Deserializer::bytes($stream);
         $stickerset = AbstractInputStickerSet::deserialize($stream);
-        $maskCoords = ($flags & (1 << 0)) ? MaskCoords::deserialize($stream) : null;
+        $maskCoords = (($flags & (1 << 0)) !== 0) ? MaskCoords::deserialize($stream) : null;
 
         return new self(
             $alt,

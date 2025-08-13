@@ -1,10 +1,9 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Upload;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Upload;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\FileHash;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\FileHash;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/upload.fileCdnRedirect
@@ -38,10 +37,8 @@ final class FileCdnRedirect extends AbstractFile
         $buffer .= Serializer::bytes($this->encryptionKey);
         $buffer .= Serializer::bytes($this->encryptionIv);
         $buffer .= Serializer::vectorOfObjects($this->fileHashes);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID

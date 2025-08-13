@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/updateBotInlineQuery
@@ -35,8 +34,12 @@ final class UpdateBotInlineQuery extends AbstractUpdate
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->geo !== null) $flags |= (1 << 0);
-        if ($this->peerType !== null) $flags |= (1 << 1);
+        if ($this->geo !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->peerType !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->queryId);
         $buffer .= Serializer::int64($this->userId);
@@ -48,10 +51,8 @@ final class UpdateBotInlineQuery extends AbstractUpdate
             $buffer .= $this->peerType->serialize();
         }
         $buffer .= Serializer::bytes($this->offset);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -59,8 +60,8 @@ final class UpdateBotInlineQuery extends AbstractUpdate
         $queryId = Deserializer::int64($stream);
         $userId = Deserializer::int64($stream);
         $query = Deserializer::bytes($stream);
-        $geo = ($flags & (1 << 0)) ? AbstractGeoPoint::deserialize($stream) : null;
-        $peerType = ($flags & (1 << 1)) ? InlineQueryPeerType::deserialize($stream) : null;
+        $geo = (($flags & (1 << 0)) !== 0) ? AbstractGeoPoint::deserialize($stream) : null;
+        $peerType = (($flags & (1 << 1)) !== 0) ? InlineQueryPeerType::deserialize($stream) : null;
         $offset = Deserializer::bytes($stream);
 
         return new self(

@@ -1,13 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractBotInlineResult;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InlineBotSwitchPM;
-use DigitalStars\MtprotoClient\Generated\Types\Base\InlineBotWebView;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractBotInlineResult;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InlineBotSwitchPM;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InlineBotWebView;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/messages.botResults
@@ -43,10 +44,18 @@ final class BotResults extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->gallery) $flags |= (1 << 0);
-        if ($this->nextOffset !== null) $flags |= (1 << 1);
-        if ($this->switchPm !== null) $flags |= (1 << 2);
-        if ($this->switchWebview !== null) $flags |= (1 << 3);
+        if ($this->gallery) {
+            $flags |= (1 << 0);
+        }
+        if ($this->nextOffset !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->switchPm !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->switchWebview !== null) {
+            $flags |= (1 << 3);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->queryId);
         if ($flags & (1 << 1)) {
@@ -61,22 +70,20 @@ final class BotResults extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->results);
         $buffer .= Serializer::int32($this->cacheTime);
         $buffer .= Serializer::vectorOfObjects($this->users);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $gallery = ($flags & (1 << 0)) ? true : null;
+        $gallery = (($flags & (1 << 0)) !== 0) ? true : null;
         $queryId = Deserializer::int64($stream);
-        $nextOffset = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $switchPm = ($flags & (1 << 2)) ? InlineBotSwitchPM::deserialize($stream) : null;
-        $switchWebview = ($flags & (1 << 3)) ? InlineBotWebView::deserialize($stream) : null;
+        $nextOffset = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $switchPm = (($flags & (1 << 2)) !== 0) ? InlineBotSwitchPM::deserialize($stream) : null;
+        $switchWebview = (($flags & (1 << 3)) !== 0) ? InlineBotWebView::deserialize($stream) : null;
         $results = Deserializer::vectorOfObjects($stream, [AbstractBotInlineResult::class, 'deserialize']);
         $cacheTime = Deserializer::int32($stream);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);

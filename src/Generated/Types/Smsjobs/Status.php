@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Smsjobs;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Smsjobs;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/smsjobs.status
@@ -39,8 +40,12 @@ final class Status extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->allowInternational) $flags |= (1 << 0);
-        if ($this->lastGiftSlug !== null) $flags |= (1 << 1);
+        if ($this->allowInternational) {
+            $flags |= (1 << 0);
+        }
+        if ($this->lastGiftSlug !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->recentSent);
         $buffer .= Serializer::int32($this->recentSince);
@@ -51,24 +56,22 @@ final class Status extends TlObject
             $buffer .= Serializer::bytes($this->lastGiftSlug);
         }
         $buffer .= Serializer::bytes($this->termsUrl);
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
-        $allowInternational = ($flags & (1 << 0)) ? true : null;
+        $allowInternational = (($flags & (1 << 0)) !== 0) ? true : null;
         $recentSent = Deserializer::int32($stream);
         $recentSince = Deserializer::int32($stream);
         $recentRemains = Deserializer::int32($stream);
         $totalSent = Deserializer::int32($stream);
         $totalSince = Deserializer::int32($stream);
-        $lastGiftSlug = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
+        $lastGiftSlug = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $termsUrl = Deserializer::bytes($stream);
 
         return new self(

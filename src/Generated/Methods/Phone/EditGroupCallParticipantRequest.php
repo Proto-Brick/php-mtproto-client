@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Phone;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Phone;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputGroupCall;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputGroupCall;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/phone.editGroupCallParticipant
  */
-final class EditGroupCallParticipantRequest extends TlObject
+final class EditGroupCallParticipantRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xa5273abf;
     
@@ -51,12 +50,24 @@ final class EditGroupCallParticipantRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->muted !== null) $flags |= (1 << 0);
-        if ($this->volume !== null) $flags |= (1 << 1);
-        if ($this->raiseHand !== null) $flags |= (1 << 2);
-        if ($this->videoStopped !== null) $flags |= (1 << 3);
-        if ($this->videoPaused !== null) $flags |= (1 << 4);
-        if ($this->presentationPaused !== null) $flags |= (1 << 5);
+        if ($this->muted !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->volume !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->raiseHand !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->videoStopped !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->videoPaused !== null) {
+            $flags |= (1 << 4);
+        }
+        if ($this->presentationPaused !== null) {
+            $flags |= (1 << 5);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->call->serialize();
         $buffer .= $this->participant->serialize();
@@ -78,12 +89,6 @@ final class EditGroupCallParticipantRequest extends TlObject
         if ($flags & (1 << 5)) {
             $buffer .= ($this->presentationPaused ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

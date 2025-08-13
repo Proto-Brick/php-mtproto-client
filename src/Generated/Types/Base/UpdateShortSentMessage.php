@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/updateShortSentMessage
@@ -39,10 +38,18 @@ final class UpdateShortSentMessage extends AbstractUpdates
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->out) $flags |= (1 << 1);
-        if ($this->media !== null) $flags |= (1 << 9);
-        if ($this->entities !== null) $flags |= (1 << 7);
-        if ($this->ttlPeriod !== null) $flags |= (1 << 25);
+        if ($this->out) {
+            $flags |= (1 << 1);
+        }
+        if ($this->media !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 7);
+        }
+        if ($this->ttlPeriod !== null) {
+            $flags |= (1 << 25);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
         $buffer .= Serializer::int32($this->pts);
@@ -57,22 +64,20 @@ final class UpdateShortSentMessage extends AbstractUpdates
         if ($flags & (1 << 25)) {
             $buffer .= Serializer::int32($this->ttlPeriod);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
         $flags = Deserializer::int32($stream);
-        $out = ($flags & (1 << 1)) ? true : null;
+        $out = (($flags & (1 << 1)) !== 0) ? true : null;
         $id = Deserializer::int32($stream);
         $pts = Deserializer::int32($stream);
         $ptsCount = Deserializer::int32($stream);
         $date = Deserializer::int32($stream);
-        $media = ($flags & (1 << 9)) ? AbstractMessageMedia::deserialize($stream) : null;
-        $entities = ($flags & (1 << 7)) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $ttlPeriod = ($flags & (1 << 25)) ? Deserializer::int32($stream) : null;
+        $media = (($flags & (1 << 9)) !== 0) ? AbstractMessageMedia::deserialize($stream) : null;
+        $entities = (($flags & (1 << 7)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $ttlPeriod = (($flags & (1 << 25)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $id,

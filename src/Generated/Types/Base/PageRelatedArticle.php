@@ -1,9 +1,10 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/pageRelatedArticle
@@ -37,11 +38,21 @@ final class PageRelatedArticle extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->title !== null) $flags |= (1 << 0);
-        if ($this->description !== null) $flags |= (1 << 1);
-        if ($this->photoId !== null) $flags |= (1 << 2);
-        if ($this->author !== null) $flags |= (1 << 3);
-        if ($this->publishedDate !== null) $flags |= (1 << 4);
+        if ($this->title !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->description !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->photoId !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->author !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->publishedDate !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->url);
         $buffer .= Serializer::int64($this->webpageId);
@@ -60,24 +71,22 @@ final class PageRelatedArticle extends TlObject
         if ($flags & (1 << 4)) {
             $buffer .= Serializer::int32($this->publishedDate);
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         $constructorId = Deserializer::int32($stream);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new \Exception('Invalid constructor ID for ' . self::class);
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $flags = Deserializer::int32($stream);
         $url = Deserializer::bytes($stream);
         $webpageId = Deserializer::int64($stream);
-        $title = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
-        $description = ($flags & (1 << 1)) ? Deserializer::bytes($stream) : null;
-        $photoId = ($flags & (1 << 2)) ? Deserializer::int64($stream) : null;
-        $author = ($flags & (1 << 3)) ? Deserializer::bytes($stream) : null;
-        $publishedDate = ($flags & (1 << 4)) ? Deserializer::int32($stream) : null;
+        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $photoId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;
+        $author = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
+        $publishedDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(
             $url,

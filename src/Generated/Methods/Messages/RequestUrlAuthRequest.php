@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUrlAuthResult;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUrlAuthResult;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.requestUrlAuth
  */
-final class RequestUrlAuthRequest extends TlObject
+final class RequestUrlAuthRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x198fb446;
     
@@ -42,10 +41,18 @@ final class RequestUrlAuthRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->peer !== null) $flags |= (1 << 1);
-        if ($this->msgId !== null) $flags |= (1 << 1);
-        if ($this->buttonId !== null) $flags |= (1 << 1);
-        if ($this->url !== null) $flags |= (1 << 2);
+        if ($this->peer !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->msgId !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->buttonId !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->url !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 1)) {
             $buffer .= $this->peer->serialize();
@@ -59,12 +66,6 @@ final class RequestUrlAuthRequest extends TlObject
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::bytes($this->url);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

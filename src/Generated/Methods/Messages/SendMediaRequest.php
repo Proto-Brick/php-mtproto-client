@@ -1,22 +1,21 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputMedia;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputQuickReplyShortcut;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputReplyTo;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractMessageEntity;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractReplyMarkup;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\Generated\Types\Base\SuggestedPost;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputMedia;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputQuickReplyShortcut;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputReplyTo;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessageEntity;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractReplyMarkup;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\SuggestedPost;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.sendMedia
  */
-final class SendMediaRequest extends TlObject
+final class SendMediaRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xac55d9c1;
     
@@ -80,22 +79,54 @@ final class SendMediaRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->silent) $flags |= (1 << 5);
-        if ($this->background) $flags |= (1 << 6);
-        if ($this->clearDraft) $flags |= (1 << 7);
-        if ($this->noforwards) $flags |= (1 << 14);
-        if ($this->updateStickersetsOrder) $flags |= (1 << 15);
-        if ($this->invertMedia) $flags |= (1 << 16);
-        if ($this->allowPaidFloodskip) $flags |= (1 << 19);
-        if ($this->replyTo !== null) $flags |= (1 << 0);
-        if ($this->replyMarkup !== null) $flags |= (1 << 2);
-        if ($this->entities !== null) $flags |= (1 << 3);
-        if ($this->scheduleDate !== null) $flags |= (1 << 10);
-        if ($this->sendAs !== null) $flags |= (1 << 13);
-        if ($this->quickReplyShortcut !== null) $flags |= (1 << 17);
-        if ($this->effect !== null) $flags |= (1 << 18);
-        if ($this->allowPaidStars !== null) $flags |= (1 << 21);
-        if ($this->suggestedPost !== null) $flags |= (1 << 22);
+        if ($this->silent) {
+            $flags |= (1 << 5);
+        }
+        if ($this->background) {
+            $flags |= (1 << 6);
+        }
+        if ($this->clearDraft) {
+            $flags |= (1 << 7);
+        }
+        if ($this->noforwards) {
+            $flags |= (1 << 14);
+        }
+        if ($this->updateStickersetsOrder) {
+            $flags |= (1 << 15);
+        }
+        if ($this->invertMedia) {
+            $flags |= (1 << 16);
+        }
+        if ($this->allowPaidFloodskip) {
+            $flags |= (1 << 19);
+        }
+        if ($this->replyTo !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->replyMarkup !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->scheduleDate !== null) {
+            $flags |= (1 << 10);
+        }
+        if ($this->sendAs !== null) {
+            $flags |= (1 << 13);
+        }
+        if ($this->quickReplyShortcut !== null) {
+            $flags |= (1 << 17);
+        }
+        if ($this->effect !== null) {
+            $flags |= (1 << 18);
+        }
+        if ($this->allowPaidStars !== null) {
+            $flags |= (1 << 21);
+        }
+        if ($this->suggestedPost !== null) {
+            $flags |= (1 << 22);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         if ($flags & (1 << 0)) {
@@ -128,12 +159,6 @@ final class SendMediaRequest extends TlObject
         if ($flags & (1 << 22)) {
             $buffer .= $this->suggestedPost->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

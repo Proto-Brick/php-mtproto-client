@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Updates;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Updates;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractChannelMessagesFilter;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Updates\AbstractChannelDifference;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChannelMessagesFilter;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\AbstractChannelDifference;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/updates.getChannelDifference
  */
-final class GetChannelDifferenceRequest extends TlObject
+final class GetChannelDifferenceRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x3173d78;
     
@@ -45,18 +44,14 @@ final class GetChannelDifferenceRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->force) $flags |= (1 << 0);
+        if ($this->force) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->channel->serialize();
         $buffer .= $this->filter->serialize();
         $buffer .= Serializer::int32($this->pts);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

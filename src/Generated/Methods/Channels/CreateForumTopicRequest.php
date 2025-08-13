@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/channels.createForumTopic
  */
-final class CreateForumTopicRequest extends TlObject
+final class CreateForumTopicRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xf40c0224;
     
@@ -47,9 +46,15 @@ final class CreateForumTopicRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->iconColor !== null) $flags |= (1 << 0);
-        if ($this->iconEmojiId !== null) $flags |= (1 << 3);
-        if ($this->sendAs !== null) $flags |= (1 << 2);
+        if ($this->iconColor !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->iconEmojiId !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->sendAs !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->channel->serialize();
         $buffer .= Serializer::bytes($this->title);
@@ -63,12 +68,6 @@ final class CreateForumTopicRequest extends TlObject
         if ($flags & (1 << 2)) {
             $buffer .= $this->sendAs->serialize();
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

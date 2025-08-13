@@ -1,18 +1,17 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputChannel;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Base\ChannelAdminLogEventsFilter;
-use DigitalStars\MtprotoClient\Generated\Types\Channels\AdminLogResults;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChannel;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ChannelAdminLogEventsFilter;
+use ProtoBrick\MTProtoClient\Generated\Types\Channels\AdminLogResults;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/channels.getAdminLog
  */
-final class GetAdminLogRequest extends TlObject
+final class GetAdminLogRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x33ddf480;
     
@@ -50,8 +49,12 @@ final class GetAdminLogRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->eventsFilter !== null) $flags |= (1 << 0);
-        if ($this->admins !== null) $flags |= (1 << 1);
+        if ($this->eventsFilter !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->admins !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->channel->serialize();
         $buffer .= Serializer::bytes($this->q);
@@ -64,12 +67,6 @@ final class GetAdminLogRequest extends TlObject
         $buffer .= Serializer::int64($this->maxId);
         $buffer .= Serializer::int64($this->minId);
         $buffer .= Serializer::int32($this->limit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

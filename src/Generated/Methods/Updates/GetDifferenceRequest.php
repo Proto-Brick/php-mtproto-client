@@ -1,15 +1,14 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Updates;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Updates;
 
-use DigitalStars\MtprotoClient\Generated\Types\Updates\AbstractDifference;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Updates\AbstractDifference;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/updates.getDifference
  */
-final class GetDifferenceRequest extends TlObject
+final class GetDifferenceRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x19c2f763;
     
@@ -45,9 +44,15 @@ final class GetDifferenceRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->ptsLimit !== null) $flags |= (1 << 1);
-        if ($this->ptsTotalLimit !== null) $flags |= (1 << 0);
-        if ($this->qtsLimit !== null) $flags |= (1 << 2);
+        if ($this->ptsLimit !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->ptsTotalLimit !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->qtsLimit !== null) {
+            $flags |= (1 << 2);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->pts);
         if ($flags & (1 << 1)) {
@@ -61,12 +66,6 @@ final class GetDifferenceRequest extends TlObject
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::int32($this->qtsLimit);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

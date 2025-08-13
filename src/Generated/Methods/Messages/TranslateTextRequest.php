@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputPeer;
-use DigitalStars\MtprotoClient\Generated\Types\Base\TextWithEntities;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\TranslatedText;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\TextWithEntities;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\TranslatedText;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.translateText
  */
-final class TranslateTextRequest extends TlObject
+final class TranslateTextRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x63183030;
     
@@ -43,9 +42,15 @@ final class TranslateTextRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->peer !== null) $flags |= (1 << 0);
-        if ($this->id !== null) $flags |= (1 << 0);
-        if ($this->text !== null) $flags |= (1 << 1);
+        if ($this->peer !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->id !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->text !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= $this->peer->serialize();
@@ -57,12 +62,6 @@ final class TranslateTextRequest extends TlObject
             $buffer .= Serializer::vectorOfObjects($this->text);
         }
         $buffer .= Serializer::bytes($this->toLang);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

@@ -1,17 +1,16 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Payments;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputInvoice;
-use DigitalStars\MtprotoClient\Generated\Types\Base\PaymentRequestedInfo;
-use DigitalStars\MtprotoClient\Generated\Types\Payments\ValidatedRequestedInfo;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputInvoice;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PaymentRequestedInfo;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\ValidatedRequestedInfo;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/payments.validateRequestedInfo
  */
-final class ValidateRequestedInfoRequest extends TlObject
+final class ValidateRequestedInfoRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xb6c8f12b;
     
@@ -41,16 +40,12 @@ final class ValidateRequestedInfoRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->save) $flags |= (1 << 0);
+        if ($this->save) {
+            $flags |= (1 << 0);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->invoice->serialize();
         $buffer .= $this->info->serialize();
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

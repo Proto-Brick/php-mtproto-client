@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Channels;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Channels;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputGeoPoint;
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractUpdates;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputGeoPoint;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/channels.createChannel
  */
-final class CreateChannelRequest extends TlObject
+final class CreateChannelRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0x91006707;
     
@@ -52,13 +51,27 @@ final class CreateChannelRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->broadcast) $flags |= (1 << 0);
-        if ($this->megagroup) $flags |= (1 << 1);
-        if ($this->forImport) $flags |= (1 << 3);
-        if ($this->forum) $flags |= (1 << 5);
-        if ($this->geoPoint !== null) $flags |= (1 << 2);
-        if ($this->address !== null) $flags |= (1 << 2);
-        if ($this->ttlPeriod !== null) $flags |= (1 << 4);
+        if ($this->broadcast) {
+            $flags |= (1 << 0);
+        }
+        if ($this->megagroup) {
+            $flags |= (1 << 1);
+        }
+        if ($this->forImport) {
+            $flags |= (1 << 3);
+        }
+        if ($this->forum) {
+            $flags |= (1 << 5);
+        }
+        if ($this->geoPoint !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->address !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->ttlPeriod !== null) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->title);
         $buffer .= Serializer::bytes($this->about);
@@ -71,12 +84,6 @@ final class CreateChannelRequest extends TlObject
         if ($flags & (1 << 4)) {
             $buffer .= Serializer::int32($this->ttlPeriod);
         }
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }

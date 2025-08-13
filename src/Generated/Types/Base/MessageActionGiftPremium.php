@@ -1,9 +1,8 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Types\Base;
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/messageActionGiftPremium
@@ -35,9 +34,15 @@ final class MessageActionGiftPremium extends AbstractMessageAction
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
-        if ($this->cryptoCurrency !== null) $flags |= (1 << 0);
-        if ($this->cryptoAmount !== null) $flags |= (1 << 0);
-        if ($this->message !== null) $flags |= (1 << 1);
+        if ($this->cryptoCurrency !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->cryptoAmount !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->message !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->currency);
         $buffer .= Serializer::int64($this->amount);
@@ -51,10 +56,8 @@ final class MessageActionGiftPremium extends AbstractMessageAction
         if ($flags & (1 << 1)) {
             $buffer .= $this->message->serialize();
         }
-
         return $buffer;
     }
-
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
@@ -62,9 +65,9 @@ final class MessageActionGiftPremium extends AbstractMessageAction
         $currency = Deserializer::bytes($stream);
         $amount = Deserializer::int64($stream);
         $months = Deserializer::int32($stream);
-        $cryptoCurrency = ($flags & (1 << 0)) ? Deserializer::bytes($stream) : null;
-        $cryptoAmount = ($flags & (1 << 0)) ? Deserializer::int64($stream) : null;
-        $message = ($flags & (1 << 1)) ? TextWithEntities::deserialize($stream) : null;
+        $cryptoCurrency = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $cryptoAmount = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
+        $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;
 
         return new self(
             $currency,

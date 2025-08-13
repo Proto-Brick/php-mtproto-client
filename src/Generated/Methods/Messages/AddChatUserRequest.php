@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
-namespace DigitalStars\MtprotoClient\Generated\Methods\Messages;
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractInputUser;
-use DigitalStars\MtprotoClient\Generated\Types\Messages\InvitedUsers;
-use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Serializer;
-use DigitalStars\MtprotoClient\TL\TlObject;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\InvitedUsers;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/method/messages.addChatUser
  */
-final class AddChatUserRequest extends TlObject
+final class AddChatUserRequest extends RpcRequest
 {
     public const CONSTRUCTOR_ID = 0xcbc6d107;
     
@@ -42,12 +41,6 @@ final class AddChatUserRequest extends TlObject
         $buffer .= Serializer::int64($this->chatId);
         $buffer .= $this->userId->serialize();
         $buffer .= Serializer::int32($this->fwdLimit);
-
         return $buffer;
-    }
-
-    public static function deserialize(string &$stream): static
-    {
-        throw new \LogicException('Request objects are not deserializable');
     }
 }
