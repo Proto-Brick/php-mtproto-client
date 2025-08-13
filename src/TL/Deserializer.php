@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace DigitalStars\MtprotoClient\TL;
 
+use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
+
 class Deserializer
 {
     public static function peekInt32(string $stream): int
@@ -552,7 +554,7 @@ class Deserializer
     public static function deserializeMessageContainer(string &$stream): array
     {
         $constructor = self::int32($stream);
-        if ($constructor !== \DigitalStars\MtprotoClient\TL\Mtproto\Constructors::MSG_CONTAINER) {
+        if ($constructor !== Constructors::MSG_CONTAINER) {
             throw new \Exception("Expected msg_container constructor, but got " . dechex($constructor));
         }
 

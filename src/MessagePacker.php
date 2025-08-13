@@ -8,7 +8,7 @@ use DigitalStars\MtprotoClient\Auth\AuthKey;
 use DigitalStars\MtprotoClient\Crypto\Aes;
 use DigitalStars\MtprotoClient\Exception\TransportException;
 use DigitalStars\MtprotoClient\Session\Session;
-use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
+use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
 use Random\RandomException;

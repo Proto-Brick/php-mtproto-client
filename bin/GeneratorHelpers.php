@@ -729,6 +729,10 @@ trait GeneratorHelpers
         $useStatementsForFactory = [];
 
         foreach ($this->typeToConstructorsMap[$abstractType] as $constructor) {
+            $id = (int)$constructor['id'];
+            $unsigned32BitId = unpack('V', pack('l', $id))[1];
+            $hexValue = '0x' . dechex($unsigned32BitId);
+
             [$ns, $class] = $this->getNamespaceAndClassName($constructor['predicate']);
             $fullChildNamespace = self::BASE_NAMESPACE . '\\Types' . ($ns ? '\\' . $ns : '');
 
@@ -739,7 +743,7 @@ trait GeneratorHelpers
             }
 
             // Генерируем "руку" для match-выражения
-            $matchArms[] = "            {$callableClass}::CONSTRUCTOR_ID => {$callableClass}::deserialize(\$stream),";
+            $matchArms[] = "            {$hexValue} => {$callableClass}::deserialize(\$stream),";
         }
 
         // Добавляем default-ветку

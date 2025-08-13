@@ -13,7 +13,7 @@ use DigitalStars\MtprotoClient\Generated\Types\Base\JsonNumber;
 use DigitalStars\MtprotoClient\Generated\Types\Base\JsonObject;
 use DigitalStars\MtprotoClient\Generated\Types\Base\JSONObjectValue;
 use DigitalStars\MtprotoClient\Generated\Types\Base\JsonString;
-use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
+use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
 
 class Serializer
 {

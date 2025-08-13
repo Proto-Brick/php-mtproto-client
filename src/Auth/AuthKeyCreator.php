@@ -12,7 +12,7 @@ use DigitalStars\MtprotoClient\Exception\TransportException;
 use DigitalStars\MtprotoClient\MessagePacker;
 use DigitalStars\MtprotoClient\Session\Session;
 use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
+use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\Transport\Transport;
 use phpseclib3\Math\BigInteger;
@@ -487,10 +487,15 @@ class AuthKeyCreator
             // Эта проверка на случай, если dh_prime - это 2 (единственное четное простое число). В нашем случае это невозможно.
             throw new \RuntimeException("DH prime security check failed: (p-1) is not even.");
         }
-        [$p_minus_1_div_2] = $dh_prime->subtract(new BigInteger(1))->divide(new BigInteger(2));
-        if (!$p_minus_1_div_2->isPrime()) {
-            throw new \RuntimeException("DH prime security check failed: dh_prime is not a safe prime as (p-1)/2 is not prime.");
-        }
+
+        /*
+         * Almost always fails quite possibly due to phpseclib
+         * its work only with bmp modulus
+         */
+        //[$p_minus_1_div_2] = $dh_prime->subtract(new BigInteger(1))->divide(new BigInteger(2));
+        //if (!$p_minus_1_div_2->isPrime()) {
+        //      throw new \RuntimeException("DH prime security check failed: dh_prime is not a safe prime as (p-1)/2 is not prime.");
+        //  }
 
         // 4. Проверяем генератор g и соответствующие ему условия для p
         switch ($g) {

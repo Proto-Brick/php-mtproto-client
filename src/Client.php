@@ -21,7 +21,7 @@ use DigitalStars\MtprotoClient\Exception\RpcErrorException;
 use DigitalStars\MtprotoClient\Exception\TransportException;
 use DigitalStars\MtprotoClient\Session\Session;
 use DigitalStars\MtprotoClient\TL\Deserializer;
-use DigitalStars\MtprotoClient\TL\Mtproto\Constructors;
+use DigitalStars\MtprotoClient\TL\MTProto\Constructors;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
 use DigitalStars\MtprotoClient\Transport\Transport;
@@ -226,7 +226,9 @@ class Client
     {
         return async(function () use ($request, $deferred): void {
             $ackIds = $this->session->getAndClearAckQueue();
+            $time_stamp = microtime(true);
             $mainRequestPayload = $request->serialize();
+            print "[Сериализация] " . $request->getPredicate() .' - ' . round((microtime(true) - $time_stamp)*1000, 2) . "ms\n";
 
             if (!$this->session->isInitialized) {
                 $mainRequestPayload = Serializer::wrapWithInitConnection(
@@ -416,7 +418,11 @@ class Client
 
                 try {
                     $resultPayload = $this->processRpcResultBody($messageBody);
+
+                    $time_stamp = microtime(true);
                     $responseObject = $this->deserializeResponsePayload($request, $resultPayload);
+                    print "[Десериализация] " . $request->getPredicate() .' - ' . round((microtime(true) - $time_stamp)*1000, 2) . "ms\n";
+
                     if (!$this->session->isInitialized) {
                         $this->session->isInitialized = true;
                         echo "[INFO] Session initialized.\n";

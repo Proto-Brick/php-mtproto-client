@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace DigitalStars\MtprotoClient\TL\Mtproto;
+namespace DigitalStars\MtprotoClient\TL\MTProto;
 
 /**
  * Справочник ID для MTProto-конструкторов.
