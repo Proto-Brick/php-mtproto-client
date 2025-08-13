@@ -231,7 +231,7 @@ class Client
             if (!$this->session->isInitialized) {
                 $mainRequestPayload = Serializer::wrapWithInitConnection(
                     $mainRequestPayload,
-                    195,
+                    211,
                     $this->settings->api_id,
                 );
             }
