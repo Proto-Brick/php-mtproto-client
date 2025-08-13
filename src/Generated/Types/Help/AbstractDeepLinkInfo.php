@@ -14,8 +14,8 @@ abstract class AbstractDeepLinkInfo extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            DeepLinkInfoEmpty::CONSTRUCTOR_ID => DeepLinkInfoEmpty::deserialize($stream),
-            DeepLinkInfo::CONSTRUCTOR_ID => DeepLinkInfo::deserialize($stream),
+            0x66afa166 => DeepLinkInfoEmpty::deserialize($stream),
+            0x6a4ee832 => DeepLinkInfo::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.DeepLinkInfo. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

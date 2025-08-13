@@ -14,9 +14,9 @@ abstract class AbstractInputChannel extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputChannelEmpty::CONSTRUCTOR_ID => InputChannelEmpty::deserialize($stream),
-            InputChannel::CONSTRUCTOR_ID => InputChannel::deserialize($stream),
-            InputChannelFromMessage::CONSTRUCTOR_ID => InputChannelFromMessage::deserialize($stream),
+            0xee8c1e86 => InputChannelEmpty::deserialize($stream),
+            0xf35aec28 => InputChannel::deserialize($stream),
+            0x5b934f9d => InputChannelFromMessage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputChannel. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

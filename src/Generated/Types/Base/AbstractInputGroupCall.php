@@ -14,9 +14,9 @@ abstract class AbstractInputGroupCall extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputGroupCall::CONSTRUCTOR_ID => InputGroupCall::deserialize($stream),
-            InputGroupCallSlug::CONSTRUCTOR_ID => InputGroupCallSlug::deserialize($stream),
-            InputGroupCallInviteMessage::CONSTRUCTOR_ID => InputGroupCallInviteMessage::deserialize($stream),
+            0xd8aa840f => InputGroupCall::deserialize($stream),
+            0xfe06823f => InputGroupCallSlug::deserialize($stream),
+            0x8c10603f => InputGroupCallInviteMessage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputGroupCall. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

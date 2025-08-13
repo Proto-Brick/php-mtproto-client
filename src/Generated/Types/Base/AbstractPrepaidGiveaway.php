@@ -14,8 +14,8 @@ abstract class AbstractPrepaidGiveaway extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PrepaidGiveaway::CONSTRUCTOR_ID => PrepaidGiveaway::deserialize($stream),
-            PrepaidStarsGiveaway::CONSTRUCTOR_ID => PrepaidStarsGiveaway::deserialize($stream),
+            0xb2539d54 => PrepaidGiveaway::deserialize($stream),
+            0x9a9d77e0 => PrepaidStarsGiveaway::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PrepaidGiveaway. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

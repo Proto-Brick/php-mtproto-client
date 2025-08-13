@@ -14,9 +14,9 @@ abstract class AbstractChatReactions extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ChatReactionsNone::CONSTRUCTOR_ID => ChatReactionsNone::deserialize($stream),
-            ChatReactionsAll::CONSTRUCTOR_ID => ChatReactionsAll::deserialize($stream),
-            ChatReactionsSome::CONSTRUCTOR_ID => ChatReactionsSome::deserialize($stream),
+            0xeafc32bc => ChatReactionsNone::deserialize($stream),
+            0x52928bca => ChatReactionsAll::deserialize($stream),
+            0x661d4037 => ChatReactionsSome::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ChatReactions. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

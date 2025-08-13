@@ -14,8 +14,8 @@ abstract class AbstractContacts extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ContactsNotModified::CONSTRUCTOR_ID => ContactsNotModified::deserialize($stream),
-            Contacts::CONSTRUCTOR_ID => Contacts::deserialize($stream),
+            0xb74ba9d2 => ContactsNotModified::deserialize($stream),
+            0xeae87e42 => Contacts::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type contacts.Contacts. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,10 +14,10 @@ abstract class AbstractInputEncryptedFile extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputEncryptedFileEmpty::CONSTRUCTOR_ID => InputEncryptedFileEmpty::deserialize($stream),
-            InputEncryptedFileUploaded::CONSTRUCTOR_ID => InputEncryptedFileUploaded::deserialize($stream),
-            InputEncryptedFile::CONSTRUCTOR_ID => InputEncryptedFile::deserialize($stream),
-            InputEncryptedFileBigUploaded::CONSTRUCTOR_ID => InputEncryptedFileBigUploaded::deserialize($stream),
+            0x1837c364 => InputEncryptedFileEmpty::deserialize($stream),
+            0x64bd0306 => InputEncryptedFileUploaded::deserialize($stream),
+            0x5a17b5e5 => InputEncryptedFile::deserialize($stream),
+            0x2dc173c8 => InputEncryptedFileBigUploaded::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputEncryptedFile. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

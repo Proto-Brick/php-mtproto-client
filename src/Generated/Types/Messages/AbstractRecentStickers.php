@@ -14,8 +14,8 @@ abstract class AbstractRecentStickers extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            RecentStickersNotModified::CONSTRUCTOR_ID => RecentStickersNotModified::deserialize($stream),
-            RecentStickers::CONSTRUCTOR_ID => RecentStickers::deserialize($stream),
+            0xb17f890 => RecentStickersNotModified::deserialize($stream),
+            0x88d37c56 => RecentStickers::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.RecentStickers. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

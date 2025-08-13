@@ -14,8 +14,8 @@ abstract class AbstractSponsoredMessages extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SponsoredMessages::CONSTRUCTOR_ID => SponsoredMessages::deserialize($stream),
-            SponsoredMessagesEmpty::CONSTRUCTOR_ID => SponsoredMessagesEmpty::deserialize($stream),
+            0xffda656d => SponsoredMessages::deserialize($stream),
+            0x1839490f => SponsoredMessagesEmpty::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.SponsoredMessages. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

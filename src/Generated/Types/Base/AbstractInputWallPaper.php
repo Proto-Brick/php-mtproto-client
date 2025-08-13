@@ -14,9 +14,9 @@ abstract class AbstractInputWallPaper extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputWallPaper::CONSTRUCTOR_ID => InputWallPaper::deserialize($stream),
-            InputWallPaperSlug::CONSTRUCTOR_ID => InputWallPaperSlug::deserialize($stream),
-            InputWallPaperNoFile::CONSTRUCTOR_ID => InputWallPaperNoFile::deserialize($stream),
+            0xe630b979 => InputWallPaper::deserialize($stream),
+            0x72091c80 => InputWallPaperSlug::deserialize($stream),
+            0x967a462e => InputWallPaperNoFile::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputWallPaper. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

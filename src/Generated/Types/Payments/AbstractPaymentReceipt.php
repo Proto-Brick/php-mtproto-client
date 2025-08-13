@@ -14,8 +14,8 @@ abstract class AbstractPaymentReceipt extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PaymentReceipt::CONSTRUCTOR_ID => PaymentReceipt::deserialize($stream),
-            PaymentReceiptStars::CONSTRUCTOR_ID => PaymentReceiptStars::deserialize($stream),
+            0x70c4fe03 => PaymentReceipt::deserialize($stream),
+            0xdabbf83a => PaymentReceiptStars::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type payments.PaymentReceipt. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

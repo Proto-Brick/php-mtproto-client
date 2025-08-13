@@ -14,12 +14,12 @@ abstract class AbstractPhotoSize extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PhotoSizeEmpty::CONSTRUCTOR_ID => PhotoSizeEmpty::deserialize($stream),
-            PhotoSize::CONSTRUCTOR_ID => PhotoSize::deserialize($stream),
-            PhotoCachedSize::CONSTRUCTOR_ID => PhotoCachedSize::deserialize($stream),
-            PhotoStrippedSize::CONSTRUCTOR_ID => PhotoStrippedSize::deserialize($stream),
-            PhotoSizeProgressive::CONSTRUCTOR_ID => PhotoSizeProgressive::deserialize($stream),
-            PhotoPathSize::CONSTRUCTOR_ID => PhotoPathSize::deserialize($stream),
+            0xe17e23c => PhotoSizeEmpty::deserialize($stream),
+            0x75c78e60 => PhotoSize::deserialize($stream),
+            0x21e1ad6 => PhotoCachedSize::deserialize($stream),
+            0xe0b0bc2e => PhotoStrippedSize::deserialize($stream),
+            0xfa3efb95 => PhotoSizeProgressive::deserialize($stream),
+            0xd8214d41 => PhotoPathSize::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PhotoSize. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractPeerColorSet extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PeerColorSet::CONSTRUCTOR_ID => PeerColorSet::deserialize($stream),
-            PeerColorProfileSet::CONSTRUCTOR_ID => PeerColorProfileSet::deserialize($stream),
+            0x26219a58 => PeerColorSet::deserialize($stream),
+            0x767d61eb => PeerColorProfileSet::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.PeerColorSet. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

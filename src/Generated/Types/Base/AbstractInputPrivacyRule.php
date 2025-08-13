@@ -14,18 +14,18 @@ abstract class AbstractInputPrivacyRule extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputPrivacyValueAllowContacts::CONSTRUCTOR_ID => InputPrivacyValueAllowContacts::deserialize($stream),
-            InputPrivacyValueAllowAll::CONSTRUCTOR_ID => InputPrivacyValueAllowAll::deserialize($stream),
-            InputPrivacyValueAllowUsers::CONSTRUCTOR_ID => InputPrivacyValueAllowUsers::deserialize($stream),
-            InputPrivacyValueDisallowContacts::CONSTRUCTOR_ID => InputPrivacyValueDisallowContacts::deserialize($stream),
-            InputPrivacyValueDisallowAll::CONSTRUCTOR_ID => InputPrivacyValueDisallowAll::deserialize($stream),
-            InputPrivacyValueDisallowUsers::CONSTRUCTOR_ID => InputPrivacyValueDisallowUsers::deserialize($stream),
-            InputPrivacyValueAllowChatParticipants::CONSTRUCTOR_ID => InputPrivacyValueAllowChatParticipants::deserialize($stream),
-            InputPrivacyValueDisallowChatParticipants::CONSTRUCTOR_ID => InputPrivacyValueDisallowChatParticipants::deserialize($stream),
-            InputPrivacyValueAllowCloseFriends::CONSTRUCTOR_ID => InputPrivacyValueAllowCloseFriends::deserialize($stream),
-            InputPrivacyValueAllowPremium::CONSTRUCTOR_ID => InputPrivacyValueAllowPremium::deserialize($stream),
-            InputPrivacyValueAllowBots::CONSTRUCTOR_ID => InputPrivacyValueAllowBots::deserialize($stream),
-            InputPrivacyValueDisallowBots::CONSTRUCTOR_ID => InputPrivacyValueDisallowBots::deserialize($stream),
+            0xd09e07b => InputPrivacyValueAllowContacts::deserialize($stream),
+            0x184b35ce => InputPrivacyValueAllowAll::deserialize($stream),
+            0x131cc67f => InputPrivacyValueAllowUsers::deserialize($stream),
+            0xba52007 => InputPrivacyValueDisallowContacts::deserialize($stream),
+            0xd66b66c9 => InputPrivacyValueDisallowAll::deserialize($stream),
+            0x90110467 => InputPrivacyValueDisallowUsers::deserialize($stream),
+            0x840649cf => InputPrivacyValueAllowChatParticipants::deserialize($stream),
+            0xe94f0f86 => InputPrivacyValueDisallowChatParticipants::deserialize($stream),
+            0x2f453e49 => InputPrivacyValueAllowCloseFriends::deserialize($stream),
+            0x77cdc9f1 => InputPrivacyValueAllowPremium::deserialize($stream),
+            0x5a4fcce5 => InputPrivacyValueAllowBots::deserialize($stream),
+            0xc4e57915 => InputPrivacyValueDisallowBots::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputPrivacyRule. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

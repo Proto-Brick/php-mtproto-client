@@ -14,8 +14,8 @@ abstract class AbstractPostInteractionCounters extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PostInteractionCountersMessage::CONSTRUCTOR_ID => PostInteractionCountersMessage::deserialize($stream),
-            PostInteractionCountersStory::CONSTRUCTOR_ID => PostInteractionCountersStory::deserialize($stream),
+            0xe7058e7f => PostInteractionCountersMessage::deserialize($stream),
+            0x8a480e27 => PostInteractionCountersStory::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PostInteractionCounters. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

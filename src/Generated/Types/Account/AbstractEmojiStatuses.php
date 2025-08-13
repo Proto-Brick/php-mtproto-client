@@ -14,8 +14,8 @@ abstract class AbstractEmojiStatuses extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            EmojiStatusesNotModified::CONSTRUCTOR_ID => EmojiStatusesNotModified::deserialize($stream),
-            EmojiStatuses::CONSTRUCTOR_ID => EmojiStatuses::deserialize($stream),
+            0xd08ce645 => EmojiStatusesNotModified::deserialize($stream),
+            0x90c467d1 => EmojiStatuses::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type account.EmojiStatuses. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

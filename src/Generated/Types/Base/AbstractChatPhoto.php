@@ -14,8 +14,8 @@ abstract class AbstractChatPhoto extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ChatPhotoEmpty::CONSTRUCTOR_ID => ChatPhotoEmpty::deserialize($stream),
-            ChatPhoto::CONSTRUCTOR_ID => ChatPhoto::deserialize($stream),
+            0x37c1011c => ChatPhotoEmpty::deserialize($stream),
+            0x1c6e1c11 => ChatPhoto::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ChatPhoto. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

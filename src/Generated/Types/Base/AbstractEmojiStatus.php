@@ -14,10 +14,10 @@ abstract class AbstractEmojiStatus extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            EmojiStatusEmpty::CONSTRUCTOR_ID => EmojiStatusEmpty::deserialize($stream),
-            EmojiStatus::CONSTRUCTOR_ID => EmojiStatus::deserialize($stream),
-            EmojiStatusCollectible::CONSTRUCTOR_ID => EmojiStatusCollectible::deserialize($stream),
-            InputEmojiStatusCollectible::CONSTRUCTOR_ID => InputEmojiStatusCollectible::deserialize($stream),
+            0x2de11aae => EmojiStatusEmpty::deserialize($stream),
+            0xe7ff068a => EmojiStatus::deserialize($stream),
+            0x7184603b => EmojiStatusCollectible::deserialize($stream),
+            0x7141dbf => InputEmojiStatusCollectible::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type EmojiStatus. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

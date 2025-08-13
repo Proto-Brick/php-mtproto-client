@@ -14,10 +14,10 @@ abstract class AbstractStickerSetCovered extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            StickerSetCovered::CONSTRUCTOR_ID => StickerSetCovered::deserialize($stream),
-            StickerSetMultiCovered::CONSTRUCTOR_ID => StickerSetMultiCovered::deserialize($stream),
-            StickerSetFullCovered::CONSTRUCTOR_ID => StickerSetFullCovered::deserialize($stream),
-            StickerSetNoCovered::CONSTRUCTOR_ID => StickerSetNoCovered::deserialize($stream),
+            0x6410a5d2 => StickerSetCovered::deserialize($stream),
+            0x3407e51b => StickerSetMultiCovered::deserialize($stream),
+            0x40d13c0e => StickerSetFullCovered::deserialize($stream),
+            0x77b15d1c => StickerSetNoCovered::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type StickerSetCovered. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

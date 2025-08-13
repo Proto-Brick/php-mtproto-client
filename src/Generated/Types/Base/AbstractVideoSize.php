@@ -14,9 +14,9 @@ abstract class AbstractVideoSize extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            VideoSize::CONSTRUCTOR_ID => VideoSize::deserialize($stream),
-            VideoSizeEmojiMarkup::CONSTRUCTOR_ID => VideoSizeEmojiMarkup::deserialize($stream),
-            VideoSizeStickerMarkup::CONSTRUCTOR_ID => VideoSizeStickerMarkup::deserialize($stream),
+            0xde33b094 => VideoSize::deserialize($stream),
+            0xf85c413c => VideoSizeEmojiMarkup::deserialize($stream),
+            0xda082fe => VideoSizeStickerMarkup::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type VideoSize. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractQuickReplies extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            QuickReplies::CONSTRUCTOR_ID => QuickReplies::deserialize($stream),
-            QuickRepliesNotModified::CONSTRUCTOR_ID => QuickRepliesNotModified::deserialize($stream),
+            0xc68d6695 => QuickReplies::deserialize($stream),
+            0x5f91eb5b => QuickRepliesNotModified::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.QuickReplies. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

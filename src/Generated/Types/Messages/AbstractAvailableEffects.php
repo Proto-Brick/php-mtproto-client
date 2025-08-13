@@ -14,8 +14,8 @@ abstract class AbstractAvailableEffects extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            AvailableEffectsNotModified::CONSTRUCTOR_ID => AvailableEffectsNotModified::deserialize($stream),
-            AvailableEffects::CONSTRUCTOR_ID => AvailableEffects::deserialize($stream),
+            0xd1ed9a5b => AvailableEffectsNotModified::deserialize($stream),
+            0xbddb616e => AvailableEffects::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.AvailableEffects. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

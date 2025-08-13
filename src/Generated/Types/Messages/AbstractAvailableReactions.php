@@ -14,8 +14,8 @@ abstract class AbstractAvailableReactions extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            AvailableReactionsNotModified::CONSTRUCTOR_ID => AvailableReactionsNotModified::deserialize($stream),
-            AvailableReactions::CONSTRUCTOR_ID => AvailableReactions::deserialize($stream),
+            0x9f071957 => AvailableReactionsNotModified::deserialize($stream),
+            0x768e3aad => AvailableReactions::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.AvailableReactions. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

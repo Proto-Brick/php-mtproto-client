@@ -14,8 +14,8 @@ abstract class AbstractSavedRingtones extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SavedRingtonesNotModified::CONSTRUCTOR_ID => SavedRingtonesNotModified::deserialize($stream),
-            SavedRingtones::CONSTRUCTOR_ID => SavedRingtones::deserialize($stream),
+            0xfbf6e8b1 => SavedRingtonesNotModified::deserialize($stream),
+            0xc1e92cc5 => SavedRingtones::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type account.SavedRingtones. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractForumTopic extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ForumTopicDeleted::CONSTRUCTOR_ID => ForumTopicDeleted::deserialize($stream),
-            ForumTopic::CONSTRUCTOR_ID => ForumTopic::deserialize($stream),
+            0x23f109b => ForumTopicDeleted::deserialize($stream),
+            0x71701da9 => ForumTopic::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ForumTopic. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

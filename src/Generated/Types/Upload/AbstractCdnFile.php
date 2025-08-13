@@ -14,8 +14,8 @@ abstract class AbstractCdnFile extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            CdnFileReuploadNeeded::CONSTRUCTOR_ID => CdnFileReuploadNeeded::deserialize($stream),
-            CdnFile::CONSTRUCTOR_ID => CdnFile::deserialize($stream),
+            0xeea8e46e => CdnFileReuploadNeeded::deserialize($stream),
+            0xa99fca4f => CdnFile::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type upload.CdnFile. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

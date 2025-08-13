@@ -14,13 +14,13 @@ abstract class AbstractInputPeer extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputPeerEmpty::CONSTRUCTOR_ID => InputPeerEmpty::deserialize($stream),
-            InputPeerSelf::CONSTRUCTOR_ID => InputPeerSelf::deserialize($stream),
-            InputPeerChat::CONSTRUCTOR_ID => InputPeerChat::deserialize($stream),
-            InputPeerUser::CONSTRUCTOR_ID => InputPeerUser::deserialize($stream),
-            InputPeerChannel::CONSTRUCTOR_ID => InputPeerChannel::deserialize($stream),
-            InputPeerUserFromMessage::CONSTRUCTOR_ID => InputPeerUserFromMessage::deserialize($stream),
-            InputPeerChannelFromMessage::CONSTRUCTOR_ID => InputPeerChannelFromMessage::deserialize($stream),
+            0x7f3b18ea => InputPeerEmpty::deserialize($stream),
+            0x7da07ec9 => InputPeerSelf::deserialize($stream),
+            0x35a95cb9 => InputPeerChat::deserialize($stream),
+            0xdde8a54c => InputPeerUser::deserialize($stream),
+            0x27bcbbfc => InputPeerChannel::deserialize($stream),
+            0xa87b0a1c => InputPeerUserFromMessage::deserialize($stream),
+            0xbd2a0840 => InputPeerChannelFromMessage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputPeer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

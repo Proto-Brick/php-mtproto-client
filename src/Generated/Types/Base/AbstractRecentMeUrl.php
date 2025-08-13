@@ -14,11 +14,11 @@ abstract class AbstractRecentMeUrl extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            RecentMeUrlUnknown::CONSTRUCTOR_ID => RecentMeUrlUnknown::deserialize($stream),
-            RecentMeUrlUser::CONSTRUCTOR_ID => RecentMeUrlUser::deserialize($stream),
-            RecentMeUrlChat::CONSTRUCTOR_ID => RecentMeUrlChat::deserialize($stream),
-            RecentMeUrlChatInvite::CONSTRUCTOR_ID => RecentMeUrlChatInvite::deserialize($stream),
-            RecentMeUrlStickerSet::CONSTRUCTOR_ID => RecentMeUrlStickerSet::deserialize($stream),
+            0x46e1d13d => RecentMeUrlUnknown::deserialize($stream),
+            0xb92c09e2 => RecentMeUrlUser::deserialize($stream),
+            0xb2da71d2 => RecentMeUrlChat::deserialize($stream),
+            0xeb49081d => RecentMeUrlChatInvite::deserialize($stream),
+            0xbc0a57dc => RecentMeUrlStickerSet::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type RecentMeUrl. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

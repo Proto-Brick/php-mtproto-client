@@ -14,9 +14,9 @@ abstract class AbstractStoryReaction extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            StoryReaction::CONSTRUCTOR_ID => StoryReaction::deserialize($stream),
-            StoryReactionPublicForward::CONSTRUCTOR_ID => StoryReactionPublicForward::deserialize($stream),
-            StoryReactionPublicRepost::CONSTRUCTOR_ID => StoryReactionPublicRepost::deserialize($stream),
+            0x6090d6d5 => StoryReaction::deserialize($stream),
+            0xbbab2643 => StoryReactionPublicForward::deserialize($stream),
+            0xcfcd0f13 => StoryReactionPublicRepost::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type StoryReaction. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

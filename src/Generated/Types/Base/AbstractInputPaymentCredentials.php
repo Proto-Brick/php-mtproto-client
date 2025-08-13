@@ -14,10 +14,10 @@ abstract class AbstractInputPaymentCredentials extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputPaymentCredentialsSaved::CONSTRUCTOR_ID => InputPaymentCredentialsSaved::deserialize($stream),
-            InputPaymentCredentials::CONSTRUCTOR_ID => InputPaymentCredentials::deserialize($stream),
-            InputPaymentCredentialsApplePay::CONSTRUCTOR_ID => InputPaymentCredentialsApplePay::deserialize($stream),
-            InputPaymentCredentialsGooglePay::CONSTRUCTOR_ID => InputPaymentCredentialsGooglePay::deserialize($stream),
+            0xc10eb2cf => InputPaymentCredentialsSaved::deserialize($stream),
+            0x3417d728 => InputPaymentCredentials::deserialize($stream),
+            0xaa1c39f => InputPaymentCredentialsApplePay::deserialize($stream),
+            0x8ac32801 => InputPaymentCredentialsGooglePay::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputPaymentCredentials. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

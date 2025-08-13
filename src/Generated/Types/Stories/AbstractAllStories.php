@@ -14,8 +14,8 @@ abstract class AbstractAllStories extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            AllStoriesNotModified::CONSTRUCTOR_ID => AllStoriesNotModified::deserialize($stream),
-            AllStories::CONSTRUCTOR_ID => AllStories::deserialize($stream),
+            0x1158fe3e => AllStoriesNotModified::deserialize($stream),
+            0x6efc5e81 => AllStories::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type stories.AllStories. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

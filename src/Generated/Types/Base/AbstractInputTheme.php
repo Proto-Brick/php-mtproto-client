@@ -14,8 +14,8 @@ abstract class AbstractInputTheme extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputTheme::CONSTRUCTOR_ID => InputTheme::deserialize($stream),
-            InputThemeSlug::CONSTRUCTOR_ID => InputThemeSlug::deserialize($stream),
+            0x3c5693e9 => InputTheme::deserialize($stream),
+            0xf5890df1 => InputThemeSlug::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputTheme. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

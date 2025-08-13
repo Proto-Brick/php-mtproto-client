@@ -14,16 +14,16 @@ abstract class AbstractInputFileLocation extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputFileLocation::CONSTRUCTOR_ID => InputFileLocation::deserialize($stream),
-            InputEncryptedFileLocation::CONSTRUCTOR_ID => InputEncryptedFileLocation::deserialize($stream),
-            InputDocumentFileLocation::CONSTRUCTOR_ID => InputDocumentFileLocation::deserialize($stream),
-            InputSecureFileLocation::CONSTRUCTOR_ID => InputSecureFileLocation::deserialize($stream),
-            InputTakeoutFileLocation::CONSTRUCTOR_ID => InputTakeoutFileLocation::deserialize($stream),
-            InputPhotoFileLocation::CONSTRUCTOR_ID => InputPhotoFileLocation::deserialize($stream),
-            InputPhotoLegacyFileLocation::CONSTRUCTOR_ID => InputPhotoLegacyFileLocation::deserialize($stream),
-            InputPeerPhotoFileLocation::CONSTRUCTOR_ID => InputPeerPhotoFileLocation::deserialize($stream),
-            InputStickerSetThumb::CONSTRUCTOR_ID => InputStickerSetThumb::deserialize($stream),
-            InputGroupCallStream::CONSTRUCTOR_ID => InputGroupCallStream::deserialize($stream),
+            0xdfdaabe1 => InputFileLocation::deserialize($stream),
+            0xf5235d55 => InputEncryptedFileLocation::deserialize($stream),
+            0xbad07584 => InputDocumentFileLocation::deserialize($stream),
+            0xcbc7ee28 => InputSecureFileLocation::deserialize($stream),
+            0x29be5899 => InputTakeoutFileLocation::deserialize($stream),
+            0x40181ffe => InputPhotoFileLocation::deserialize($stream),
+            0xd83466f3 => InputPhotoLegacyFileLocation::deserialize($stream),
+            0x37257e99 => InputPeerPhotoFileLocation::deserialize($stream),
+            0x9d84f3db => InputStickerSetThumb::deserialize($stream),
+            0x598a92a => InputGroupCallStream::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputFileLocation. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

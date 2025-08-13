@@ -14,8 +14,8 @@ abstract class AbstractUserProfilePhoto extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            UserProfilePhotoEmpty::CONSTRUCTOR_ID => UserProfilePhotoEmpty::deserialize($stream),
-            UserProfilePhoto::CONSTRUCTOR_ID => UserProfilePhoto::deserialize($stream),
+            0x4f11bae1 => UserProfilePhotoEmpty::deserialize($stream),
+            0x82d1f706 => UserProfilePhoto::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type UserProfilePhoto. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

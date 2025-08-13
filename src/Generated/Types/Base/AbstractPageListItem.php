@@ -14,8 +14,8 @@ abstract class AbstractPageListItem extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PageListItemText::CONSTRUCTOR_ID => PageListItemText::deserialize($stream),
-            PageListItemBlocks::CONSTRUCTOR_ID => PageListItemBlocks::deserialize($stream),
+            0xb92fb6cd => PageListItemText::deserialize($stream),
+            0x25e073fc => PageListItemBlocks::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PageListItem. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

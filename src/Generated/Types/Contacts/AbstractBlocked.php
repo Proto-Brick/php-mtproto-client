@@ -14,8 +14,8 @@ abstract class AbstractBlocked extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            Blocked::CONSTRUCTOR_ID => Blocked::deserialize($stream),
-            BlockedSlice::CONSTRUCTOR_ID => BlockedSlice::deserialize($stream),
+            0xade1591 => Blocked::deserialize($stream),
+            0xe1664194 => BlockedSlice::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type contacts.Blocked. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

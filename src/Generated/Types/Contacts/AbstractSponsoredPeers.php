@@ -14,8 +14,8 @@ abstract class AbstractSponsoredPeers extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SponsoredPeersEmpty::CONSTRUCTOR_ID => SponsoredPeersEmpty::deserialize($stream),
-            SponsoredPeers::CONSTRUCTOR_ID => SponsoredPeers::deserialize($stream),
+            0xea32b4b1 => SponsoredPeersEmpty::deserialize($stream),
+            0xeb032884 => SponsoredPeers::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type contacts.SponsoredPeers. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

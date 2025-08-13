@@ -14,8 +14,8 @@ abstract class AbstractUsers extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            Users::CONSTRUCTOR_ID => Users::deserialize($stream),
-            UsersSlice::CONSTRUCTOR_ID => UsersSlice::deserialize($stream),
+            0x62d706b8 => Users::deserialize($stream),
+            0x315a4974 => UsersSlice::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type users.Users. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

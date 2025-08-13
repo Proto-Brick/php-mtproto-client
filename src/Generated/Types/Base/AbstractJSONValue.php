@@ -14,12 +14,12 @@ abstract class AbstractJSONValue extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            JsonNull::CONSTRUCTOR_ID => JsonNull::deserialize($stream),
-            JsonBool::CONSTRUCTOR_ID => JsonBool::deserialize($stream),
-            JsonNumber::CONSTRUCTOR_ID => JsonNumber::deserialize($stream),
-            JsonString::CONSTRUCTOR_ID => JsonString::deserialize($stream),
-            JsonArray::CONSTRUCTOR_ID => JsonArray::deserialize($stream),
-            JsonObject::CONSTRUCTOR_ID => JsonObject::deserialize($stream),
+            0x3f6d7b68 => JsonNull::deserialize($stream),
+            0xc7345e6a => JsonBool::deserialize($stream),
+            0x2be0dfa4 => JsonNumber::deserialize($stream),
+            0xb71e767a => JsonString::deserialize($stream),
+            0xf7444763 => JsonArray::deserialize($stream),
+            0x99c1d49d => JsonObject::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type JSONValue. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

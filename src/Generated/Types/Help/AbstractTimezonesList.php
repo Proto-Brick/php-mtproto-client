@@ -14,8 +14,8 @@ abstract class AbstractTimezonesList extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            TimezonesListNotModified::CONSTRUCTOR_ID => TimezonesListNotModified::deserialize($stream),
-            TimezonesList::CONSTRUCTOR_ID => TimezonesList::deserialize($stream),
+            0x970708cc => TimezonesListNotModified::deserialize($stream),
+            0x7b74ed71 => TimezonesList::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.TimezonesList. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

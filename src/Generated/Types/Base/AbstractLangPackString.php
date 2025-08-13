@@ -14,9 +14,9 @@ abstract class AbstractLangPackString extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            LangPackString::CONSTRUCTOR_ID => LangPackString::deserialize($stream),
-            LangPackStringPluralized::CONSTRUCTOR_ID => LangPackStringPluralized::deserialize($stream),
-            LangPackStringDeleted::CONSTRUCTOR_ID => LangPackStringDeleted::deserialize($stream),
+            0xcad181f6 => LangPackString::deserialize($stream),
+            0x6c47ac9f => LangPackStringPluralized::deserialize($stream),
+            0x2979eeb2 => LangPackStringDeleted::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type LangPackString. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

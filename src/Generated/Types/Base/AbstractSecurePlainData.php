@@ -14,8 +14,8 @@ abstract class AbstractSecurePlainData extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SecurePlainPhone::CONSTRUCTOR_ID => SecurePlainPhone::deserialize($stream),
-            SecurePlainEmail::CONSTRUCTOR_ID => SecurePlainEmail::deserialize($stream),
+            0x7d6099dd => SecurePlainPhone::deserialize($stream),
+            0x21ec5a5f => SecurePlainEmail::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type SecurePlainData. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

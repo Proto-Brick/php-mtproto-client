@@ -14,8 +14,8 @@ abstract class AbstractPassportConfig extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PassportConfigNotModified::CONSTRUCTOR_ID => PassportConfigNotModified::deserialize($stream),
-            PassportConfig::CONSTRUCTOR_ID => PassportConfig::deserialize($stream),
+            0xbfb9f457 => PassportConfigNotModified::deserialize($stream),
+            0xa098d6af => PassportConfig::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.PassportConfig. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

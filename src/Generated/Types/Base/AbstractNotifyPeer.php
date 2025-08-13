@@ -14,11 +14,11 @@ abstract class AbstractNotifyPeer extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            NotifyPeer::CONSTRUCTOR_ID => NotifyPeer::deserialize($stream),
-            NotifyUsers::CONSTRUCTOR_ID => NotifyUsers::deserialize($stream),
-            NotifyChats::CONSTRUCTOR_ID => NotifyChats::deserialize($stream),
-            NotifyBroadcasts::CONSTRUCTOR_ID => NotifyBroadcasts::deserialize($stream),
-            NotifyForumTopic::CONSTRUCTOR_ID => NotifyForumTopic::deserialize($stream),
+            0x9fd40bd8 => NotifyPeer::deserialize($stream),
+            0xb4c83b4c => NotifyUsers::deserialize($stream),
+            0xc007cec3 => NotifyChats::deserialize($stream),
+            0xd612e8ef => NotifyBroadcasts::deserialize($stream),
+            0x226e6308 => NotifyForumTopic::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type NotifyPeer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

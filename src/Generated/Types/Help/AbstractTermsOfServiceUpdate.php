@@ -14,8 +14,8 @@ abstract class AbstractTermsOfServiceUpdate extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            TermsOfServiceUpdateEmpty::CONSTRUCTOR_ID => TermsOfServiceUpdateEmpty::deserialize($stream),
-            TermsOfServiceUpdate::CONSTRUCTOR_ID => TermsOfServiceUpdate::deserialize($stream),
+            0xe3309f7f => TermsOfServiceUpdateEmpty::deserialize($stream),
+            0x28ecf961 => TermsOfServiceUpdate::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.TermsOfServiceUpdate. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

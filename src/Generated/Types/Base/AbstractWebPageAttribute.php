@@ -14,11 +14,11 @@ abstract class AbstractWebPageAttribute extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            WebPageAttributeTheme::CONSTRUCTOR_ID => WebPageAttributeTheme::deserialize($stream),
-            WebPageAttributeStory::CONSTRUCTOR_ID => WebPageAttributeStory::deserialize($stream),
-            WebPageAttributeStickerSet::CONSTRUCTOR_ID => WebPageAttributeStickerSet::deserialize($stream),
-            WebPageAttributeUniqueStarGift::CONSTRUCTOR_ID => WebPageAttributeUniqueStarGift::deserialize($stream),
-            WebPageAttributeStarGiftCollection::CONSTRUCTOR_ID => WebPageAttributeStarGiftCollection::deserialize($stream),
+            0x54b56617 => WebPageAttributeTheme::deserialize($stream),
+            0x2e94c3e7 => WebPageAttributeStory::deserialize($stream),
+            0x50cc03d3 => WebPageAttributeStickerSet::deserialize($stream),
+            0xcf6f6db8 => WebPageAttributeUniqueStarGift::deserialize($stream),
+            0x31cad303 => WebPageAttributeStarGiftCollection::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type WebPageAttribute. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractWebDocument extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            WebDocument::CONSTRUCTOR_ID => WebDocument::deserialize($stream),
-            WebDocumentNoProxy::CONSTRUCTOR_ID => WebDocumentNoProxy::deserialize($stream),
+            0x1c570ed1 => WebDocument::deserialize($stream),
+            0xf9c8bcc6 => WebDocumentNoProxy::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type WebDocument. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

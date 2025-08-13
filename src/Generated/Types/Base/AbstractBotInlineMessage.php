@@ -14,13 +14,13 @@ abstract class AbstractBotInlineMessage extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            BotInlineMessageMediaAuto::CONSTRUCTOR_ID => BotInlineMessageMediaAuto::deserialize($stream),
-            BotInlineMessageText::CONSTRUCTOR_ID => BotInlineMessageText::deserialize($stream),
-            BotInlineMessageMediaGeo::CONSTRUCTOR_ID => BotInlineMessageMediaGeo::deserialize($stream),
-            BotInlineMessageMediaVenue::CONSTRUCTOR_ID => BotInlineMessageMediaVenue::deserialize($stream),
-            BotInlineMessageMediaContact::CONSTRUCTOR_ID => BotInlineMessageMediaContact::deserialize($stream),
-            BotInlineMessageMediaInvoice::CONSTRUCTOR_ID => BotInlineMessageMediaInvoice::deserialize($stream),
-            BotInlineMessageMediaWebPage::CONSTRUCTOR_ID => BotInlineMessageMediaWebPage::deserialize($stream),
+            0x764cf810 => BotInlineMessageMediaAuto::deserialize($stream),
+            0x8c7f65e2 => BotInlineMessageText::deserialize($stream),
+            0x51846fd => BotInlineMessageMediaGeo::deserialize($stream),
+            0x8a86659c => BotInlineMessageMediaVenue::deserialize($stream),
+            0x18d1cdc2 => BotInlineMessageMediaContact::deserialize($stream),
+            0x354a9b09 => BotInlineMessageMediaInvoice::deserialize($stream),
+            0x809ad9a6 => BotInlineMessageMediaWebPage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type BotInlineMessage. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

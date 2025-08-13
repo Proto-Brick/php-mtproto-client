@@ -14,12 +14,12 @@ abstract class AbstractUserStatus extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            UserStatusEmpty::CONSTRUCTOR_ID => UserStatusEmpty::deserialize($stream),
-            UserStatusOnline::CONSTRUCTOR_ID => UserStatusOnline::deserialize($stream),
-            UserStatusOffline::CONSTRUCTOR_ID => UserStatusOffline::deserialize($stream),
-            UserStatusRecently::CONSTRUCTOR_ID => UserStatusRecently::deserialize($stream),
-            UserStatusLastWeek::CONSTRUCTOR_ID => UserStatusLastWeek::deserialize($stream),
-            UserStatusLastMonth::CONSTRUCTOR_ID => UserStatusLastMonth::deserialize($stream),
+            0x9d05049 => UserStatusEmpty::deserialize($stream),
+            0xedb93949 => UserStatusOnline::deserialize($stream),
+            0x8c703f => UserStatusOffline::deserialize($stream),
+            0x7b197dc8 => UserStatusRecently::deserialize($stream),
+            0x541a1d1a => UserStatusLastWeek::deserialize($stream),
+            0x65899777 => UserStatusLastMonth::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type UserStatus. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

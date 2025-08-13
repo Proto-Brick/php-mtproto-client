@@ -14,11 +14,11 @@ abstract class AbstractEncryptedChat extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            EncryptedChatEmpty::CONSTRUCTOR_ID => EncryptedChatEmpty::deserialize($stream),
-            EncryptedChatWaiting::CONSTRUCTOR_ID => EncryptedChatWaiting::deserialize($stream),
-            EncryptedChatRequested::CONSTRUCTOR_ID => EncryptedChatRequested::deserialize($stream),
-            EncryptedChat::CONSTRUCTOR_ID => EncryptedChat::deserialize($stream),
-            EncryptedChatDiscarded::CONSTRUCTOR_ID => EncryptedChatDiscarded::deserialize($stream),
+            0xab7ec0a0 => EncryptedChatEmpty::deserialize($stream),
+            0x66b25953 => EncryptedChatWaiting::deserialize($stream),
+            0x48f1d94c => EncryptedChatRequested::deserialize($stream),
+            0x61f0d4c7 => EncryptedChat::deserialize($stream),
+            0x1e1c7c45 => EncryptedChatDiscarded::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type EncryptedChat. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

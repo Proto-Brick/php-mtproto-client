@@ -14,14 +14,14 @@ abstract class AbstractInputStorePaymentPurpose extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputStorePaymentPremiumSubscription::CONSTRUCTOR_ID => InputStorePaymentPremiumSubscription::deserialize($stream),
-            InputStorePaymentGiftPremium::CONSTRUCTOR_ID => InputStorePaymentGiftPremium::deserialize($stream),
-            InputStorePaymentPremiumGiftCode::CONSTRUCTOR_ID => InputStorePaymentPremiumGiftCode::deserialize($stream),
-            InputStorePaymentPremiumGiveaway::CONSTRUCTOR_ID => InputStorePaymentPremiumGiveaway::deserialize($stream),
-            InputStorePaymentStarsTopup::CONSTRUCTOR_ID => InputStorePaymentStarsTopup::deserialize($stream),
-            InputStorePaymentStarsGift::CONSTRUCTOR_ID => InputStorePaymentStarsGift::deserialize($stream),
-            InputStorePaymentStarsGiveaway::CONSTRUCTOR_ID => InputStorePaymentStarsGiveaway::deserialize($stream),
-            InputStorePaymentAuthCode::CONSTRUCTOR_ID => InputStorePaymentAuthCode::deserialize($stream),
+            0xa6751e66 => InputStorePaymentPremiumSubscription::deserialize($stream),
+            0x616f7fe8 => InputStorePaymentGiftPremium::deserialize($stream),
+            0xfb790393 => InputStorePaymentPremiumGiftCode::deserialize($stream),
+            0x160544ca => InputStorePaymentPremiumGiveaway::deserialize($stream),
+            0xdddd0f56 => InputStorePaymentStarsTopup::deserialize($stream),
+            0x1d741ef7 => InputStorePaymentStarsGift::deserialize($stream),
+            0x751f08fa => InputStorePaymentStarsGiveaway::deserialize($stream),
+            0x9bb2636d => InputStorePaymentAuthCode::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputStorePaymentPurpose. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

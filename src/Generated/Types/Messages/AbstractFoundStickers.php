@@ -14,8 +14,8 @@ abstract class AbstractFoundStickers extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            FoundStickersNotModified::CONSTRUCTOR_ID => FoundStickersNotModified::deserialize($stream),
-            FoundStickers::CONSTRUCTOR_ID => FoundStickers::deserialize($stream),
+            0x6010c534 => FoundStickersNotModified::deserialize($stream),
+            0x82c9e290 => FoundStickers::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.FoundStickers. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

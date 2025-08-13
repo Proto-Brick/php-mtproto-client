@@ -14,9 +14,9 @@ abstract class AbstractSponsoredMessageReportResult extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SponsoredMessageReportResultChooseOption::CONSTRUCTOR_ID => SponsoredMessageReportResultChooseOption::deserialize($stream),
-            SponsoredMessageReportResultAdsHidden::CONSTRUCTOR_ID => SponsoredMessageReportResultAdsHidden::deserialize($stream),
-            SponsoredMessageReportResultReported::CONSTRUCTOR_ID => SponsoredMessageReportResultReported::deserialize($stream),
+            0x846f9e42 => SponsoredMessageReportResultChooseOption::deserialize($stream),
+            0x3e3bcf2f => SponsoredMessageReportResultAdsHidden::deserialize($stream),
+            0xad798849 => SponsoredMessageReportResultReported::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type channels.SponsoredMessageReportResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

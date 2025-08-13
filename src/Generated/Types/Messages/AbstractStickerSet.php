@@ -14,8 +14,8 @@ abstract class AbstractStickerSet extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            StickerSet::CONSTRUCTOR_ID => StickerSet::deserialize($stream),
-            StickerSetNotModified::CONSTRUCTOR_ID => StickerSetNotModified::deserialize($stream),
+            0x6e153f16 => StickerSet::deserialize($stream),
+            0xd3f924eb => StickerSetNotModified::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.StickerSet. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

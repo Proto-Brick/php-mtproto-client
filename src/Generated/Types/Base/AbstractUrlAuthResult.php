@@ -14,9 +14,9 @@ abstract class AbstractUrlAuthResult extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            UrlAuthResultRequest::CONSTRUCTOR_ID => UrlAuthResultRequest::deserialize($stream),
-            UrlAuthResultAccepted::CONSTRUCTOR_ID => UrlAuthResultAccepted::deserialize($stream),
-            UrlAuthResultDefault::CONSTRUCTOR_ID => UrlAuthResultDefault::deserialize($stream),
+            0x92d33a0e => UrlAuthResultRequest::deserialize($stream),
+            0x8f8c0e4e => UrlAuthResultAccepted::deserialize($stream),
+            0xa9d6db1f => UrlAuthResultDefault::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type UrlAuthResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

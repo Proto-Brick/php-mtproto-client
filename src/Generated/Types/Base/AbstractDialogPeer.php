@@ -14,8 +14,8 @@ abstract class AbstractDialogPeer extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            DialogPeer::CONSTRUCTOR_ID => DialogPeer::deserialize($stream),
-            DialogPeerFolder::CONSTRUCTOR_ID => DialogPeerFolder::deserialize($stream),
+            0xe56dbf05 => DialogPeer::deserialize($stream),
+            0x514519e2 => DialogPeerFolder::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type DialogPeer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

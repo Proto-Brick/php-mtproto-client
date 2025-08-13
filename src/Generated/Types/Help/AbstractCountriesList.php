@@ -14,8 +14,8 @@ abstract class AbstractCountriesList extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            CountriesListNotModified::CONSTRUCTOR_ID => CountriesListNotModified::deserialize($stream),
-            CountriesList::CONSTRUCTOR_ID => CountriesList::deserialize($stream),
+            0x93cc1f32 => CountriesListNotModified::deserialize($stream),
+            0x87d0759e => CountriesList::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.CountriesList. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

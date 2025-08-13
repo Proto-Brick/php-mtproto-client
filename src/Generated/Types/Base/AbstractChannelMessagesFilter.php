@@ -14,8 +14,8 @@ abstract class AbstractChannelMessagesFilter extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ChannelMessagesFilterEmpty::CONSTRUCTOR_ID => ChannelMessagesFilterEmpty::deserialize($stream),
-            ChannelMessagesFilter::CONSTRUCTOR_ID => ChannelMessagesFilter::deserialize($stream),
+            0x94d42ee7 => ChannelMessagesFilterEmpty::deserialize($stream),
+            0xcd77d957 => ChannelMessagesFilter::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ChannelMessagesFilter. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

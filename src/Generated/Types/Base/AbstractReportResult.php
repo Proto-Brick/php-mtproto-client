@@ -14,9 +14,9 @@ abstract class AbstractReportResult extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ReportResultChooseOption::CONSTRUCTOR_ID => ReportResultChooseOption::deserialize($stream),
-            ReportResultAddComment::CONSTRUCTOR_ID => ReportResultAddComment::deserialize($stream),
-            ReportResultReported::CONSTRUCTOR_ID => ReportResultReported::deserialize($stream),
+            0xf0e4e0b6 => ReportResultChooseOption::deserialize($stream),
+            0x6f09ac31 => ReportResultAddComment::deserialize($stream),
+            0x8db33c4b => ReportResultReported::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ReportResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

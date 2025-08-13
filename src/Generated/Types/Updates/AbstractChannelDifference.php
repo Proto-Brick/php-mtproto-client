@@ -14,9 +14,9 @@ abstract class AbstractChannelDifference extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ChannelDifferenceEmpty::CONSTRUCTOR_ID => ChannelDifferenceEmpty::deserialize($stream),
-            ChannelDifferenceTooLong::CONSTRUCTOR_ID => ChannelDifferenceTooLong::deserialize($stream),
-            ChannelDifference::CONSTRUCTOR_ID => ChannelDifference::deserialize($stream),
+            0x3e11affb => ChannelDifferenceEmpty::deserialize($stream),
+            0xa4bcc6fe => ChannelDifferenceTooLong::deserialize($stream),
+            0x2064674e => ChannelDifference::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type updates.ChannelDifference. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractFeaturedStickers extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            FeaturedStickersNotModified::CONSTRUCTOR_ID => FeaturedStickersNotModified::deserialize($stream),
-            FeaturedStickers::CONSTRUCTOR_ID => FeaturedStickers::deserialize($stream),
+            0xc6dc0c66 => FeaturedStickersNotModified::deserialize($stream),
+            0xbe382906 => FeaturedStickers::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.FeaturedStickers. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

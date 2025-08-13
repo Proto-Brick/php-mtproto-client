@@ -14,13 +14,13 @@ abstract class AbstractUpdates extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            UpdatesTooLong::CONSTRUCTOR_ID => UpdatesTooLong::deserialize($stream),
-            UpdateShortMessage::CONSTRUCTOR_ID => UpdateShortMessage::deserialize($stream),
-            UpdateShortChatMessage::CONSTRUCTOR_ID => UpdateShortChatMessage::deserialize($stream),
-            UpdateShort::CONSTRUCTOR_ID => UpdateShort::deserialize($stream),
-            UpdatesCombined::CONSTRUCTOR_ID => UpdatesCombined::deserialize($stream),
-            Updates::CONSTRUCTOR_ID => Updates::deserialize($stream),
-            UpdateShortSentMessage::CONSTRUCTOR_ID => UpdateShortSentMessage::deserialize($stream),
+            0xe317af7e => UpdatesTooLong::deserialize($stream),
+            0x313bc7f8 => UpdateShortMessage::deserialize($stream),
+            0x4d6deea5 => UpdateShortChatMessage::deserialize($stream),
+            0x78d4dec1 => UpdateShort::deserialize($stream),
+            0x725b04c3 => UpdatesCombined::deserialize($stream),
+            0x74ae4240 => Updates::deserialize($stream),
+            0x9015e101 => UpdateShortSentMessage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type Updates. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

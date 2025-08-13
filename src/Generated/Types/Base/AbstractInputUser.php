@@ -14,10 +14,10 @@ abstract class AbstractInputUser extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputUserEmpty::CONSTRUCTOR_ID => InputUserEmpty::deserialize($stream),
-            InputUserSelf::CONSTRUCTOR_ID => InputUserSelf::deserialize($stream),
-            InputUser::CONSTRUCTOR_ID => InputUser::deserialize($stream),
-            InputUserFromMessage::CONSTRUCTOR_ID => InputUserFromMessage::deserialize($stream),
+            0xb98886cf => InputUserEmpty::deserialize($stream),
+            0xf7c1b13f => InputUserSelf::deserialize($stream),
+            0xf21158c6 => InputUser::deserialize($stream),
+            0x1da448e2 => InputUserFromMessage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputUser. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

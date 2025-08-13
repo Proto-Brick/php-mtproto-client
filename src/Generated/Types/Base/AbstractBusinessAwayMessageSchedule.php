@@ -14,9 +14,9 @@ abstract class AbstractBusinessAwayMessageSchedule extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            BusinessAwayMessageScheduleAlways::CONSTRUCTOR_ID => BusinessAwayMessageScheduleAlways::deserialize($stream),
-            BusinessAwayMessageScheduleOutsideWorkHours::CONSTRUCTOR_ID => BusinessAwayMessageScheduleOutsideWorkHours::deserialize($stream),
-            BusinessAwayMessageScheduleCustom::CONSTRUCTOR_ID => BusinessAwayMessageScheduleCustom::deserialize($stream),
+            0xc9b9e2b9 => BusinessAwayMessageScheduleAlways::deserialize($stream),
+            0xc3f2f501 => BusinessAwayMessageScheduleOutsideWorkHours::deserialize($stream),
+            0xcc4d9ecc => BusinessAwayMessageScheduleCustom::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type BusinessAwayMessageSchedule. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

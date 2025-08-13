@@ -14,8 +14,8 @@ abstract class AbstractSecureRequiredType extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SecureRequiredType::CONSTRUCTOR_ID => SecureRequiredType::deserialize($stream),
-            SecureRequiredTypeOneOf::CONSTRUCTOR_ID => SecureRequiredTypeOneOf::deserialize($stream),
+            0x829d99da => SecureRequiredType::deserialize($stream),
+            0x27477b4 => SecureRequiredTypeOneOf::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type SecureRequiredType. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

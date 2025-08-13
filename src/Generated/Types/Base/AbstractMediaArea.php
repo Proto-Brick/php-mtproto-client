@@ -14,15 +14,15 @@ abstract class AbstractMediaArea extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            MediaAreaVenue::CONSTRUCTOR_ID => MediaAreaVenue::deserialize($stream),
-            InputMediaAreaVenue::CONSTRUCTOR_ID => InputMediaAreaVenue::deserialize($stream),
-            MediaAreaGeoPoint::CONSTRUCTOR_ID => MediaAreaGeoPoint::deserialize($stream),
-            MediaAreaSuggestedReaction::CONSTRUCTOR_ID => MediaAreaSuggestedReaction::deserialize($stream),
-            MediaAreaChannelPost::CONSTRUCTOR_ID => MediaAreaChannelPost::deserialize($stream),
-            InputMediaAreaChannelPost::CONSTRUCTOR_ID => InputMediaAreaChannelPost::deserialize($stream),
-            MediaAreaUrl::CONSTRUCTOR_ID => MediaAreaUrl::deserialize($stream),
-            MediaAreaWeather::CONSTRUCTOR_ID => MediaAreaWeather::deserialize($stream),
-            MediaAreaStarGift::CONSTRUCTOR_ID => MediaAreaStarGift::deserialize($stream),
+            0xbe82db9c => MediaAreaVenue::deserialize($stream),
+            0xb282217f => InputMediaAreaVenue::deserialize($stream),
+            0xcad5452d => MediaAreaGeoPoint::deserialize($stream),
+            0x14455871 => MediaAreaSuggestedReaction::deserialize($stream),
+            0x770416af => MediaAreaChannelPost::deserialize($stream),
+            0x2271f2bf => InputMediaAreaChannelPost::deserialize($stream),
+            0x37381085 => MediaAreaUrl::deserialize($stream),
+            0x49a6549c => MediaAreaWeather::deserialize($stream),
+            0x5787686d => MediaAreaStarGift::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type MediaArea. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

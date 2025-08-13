@@ -14,15 +14,15 @@ abstract class AbstractSecureValueError extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SecureValueErrorData::CONSTRUCTOR_ID => SecureValueErrorData::deserialize($stream),
-            SecureValueErrorFrontSide::CONSTRUCTOR_ID => SecureValueErrorFrontSide::deserialize($stream),
-            SecureValueErrorReverseSide::CONSTRUCTOR_ID => SecureValueErrorReverseSide::deserialize($stream),
-            SecureValueErrorSelfie::CONSTRUCTOR_ID => SecureValueErrorSelfie::deserialize($stream),
-            SecureValueErrorFile::CONSTRUCTOR_ID => SecureValueErrorFile::deserialize($stream),
-            SecureValueErrorFiles::CONSTRUCTOR_ID => SecureValueErrorFiles::deserialize($stream),
-            SecureValueError::CONSTRUCTOR_ID => SecureValueError::deserialize($stream),
-            SecureValueErrorTranslationFile::CONSTRUCTOR_ID => SecureValueErrorTranslationFile::deserialize($stream),
-            SecureValueErrorTranslationFiles::CONSTRUCTOR_ID => SecureValueErrorTranslationFiles::deserialize($stream),
+            0xe8a40bd9 => SecureValueErrorData::deserialize($stream),
+            0xbe3dfa => SecureValueErrorFrontSide::deserialize($stream),
+            0x868a2aa5 => SecureValueErrorReverseSide::deserialize($stream),
+            0xe537ced6 => SecureValueErrorSelfie::deserialize($stream),
+            0x7a700873 => SecureValueErrorFile::deserialize($stream),
+            0x666220e9 => SecureValueErrorFiles::deserialize($stream),
+            0x869d758f => SecureValueError::deserialize($stream),
+            0xa1144770 => SecureValueErrorTranslationFile::deserialize($stream),
+            0x34636dd8 => SecureValueErrorTranslationFiles::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type SecureValueError. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

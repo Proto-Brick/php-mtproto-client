@@ -14,14 +14,14 @@ abstract class AbstractInputBotInlineMessage extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputBotInlineMessageMediaAuto::CONSTRUCTOR_ID => InputBotInlineMessageMediaAuto::deserialize($stream),
-            InputBotInlineMessageText::CONSTRUCTOR_ID => InputBotInlineMessageText::deserialize($stream),
-            InputBotInlineMessageMediaGeo::CONSTRUCTOR_ID => InputBotInlineMessageMediaGeo::deserialize($stream),
-            InputBotInlineMessageMediaVenue::CONSTRUCTOR_ID => InputBotInlineMessageMediaVenue::deserialize($stream),
-            InputBotInlineMessageMediaContact::CONSTRUCTOR_ID => InputBotInlineMessageMediaContact::deserialize($stream),
-            InputBotInlineMessageGame::CONSTRUCTOR_ID => InputBotInlineMessageGame::deserialize($stream),
-            InputBotInlineMessageMediaInvoice::CONSTRUCTOR_ID => InputBotInlineMessageMediaInvoice::deserialize($stream),
-            InputBotInlineMessageMediaWebPage::CONSTRUCTOR_ID => InputBotInlineMessageMediaWebPage::deserialize($stream),
+            0x3380c786 => InputBotInlineMessageMediaAuto::deserialize($stream),
+            0x3dcd7a87 => InputBotInlineMessageText::deserialize($stream),
+            0x96929a85 => InputBotInlineMessageMediaGeo::deserialize($stream),
+            0x417bbf11 => InputBotInlineMessageMediaVenue::deserialize($stream),
+            0xa6edbffd => InputBotInlineMessageMediaContact::deserialize($stream),
+            0x4b425864 => InputBotInlineMessageGame::deserialize($stream),
+            0xd7e78225 => InputBotInlineMessageMediaInvoice::deserialize($stream),
+            0xbddcc510 => InputBotInlineMessageMediaWebPage::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputBotInlineMessage. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

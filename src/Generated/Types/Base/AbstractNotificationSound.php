@@ -14,10 +14,10 @@ abstract class AbstractNotificationSound extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            NotificationSoundDefault::CONSTRUCTOR_ID => NotificationSoundDefault::deserialize($stream),
-            NotificationSoundNone::CONSTRUCTOR_ID => NotificationSoundNone::deserialize($stream),
-            NotificationSoundLocal::CONSTRUCTOR_ID => NotificationSoundLocal::deserialize($stream),
-            NotificationSoundRingtone::CONSTRUCTOR_ID => NotificationSoundRingtone::deserialize($stream),
+            0x97e8bebe => NotificationSoundDefault::deserialize($stream),
+            0x6f0c34df => NotificationSoundNone::deserialize($stream),
+            0x830b9ae4 => NotificationSoundLocal::deserialize($stream),
+            0xff6c8049 => NotificationSoundRingtone::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type NotificationSound. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

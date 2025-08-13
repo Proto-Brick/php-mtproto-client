@@ -14,8 +14,8 @@ abstract class AbstractPublicForward extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PublicForwardMessage::CONSTRUCTOR_ID => PublicForwardMessage::deserialize($stream),
-            PublicForwardStory::CONSTRUCTOR_ID => PublicForwardStory::deserialize($stream),
+            0x1f2bf4a => PublicForwardMessage::deserialize($stream),
+            0xedf3add0 => PublicForwardStory::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PublicForward. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractPhoneConnection extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PhoneConnection::CONSTRUCTOR_ID => PhoneConnection::deserialize($stream),
-            PhoneConnectionWebrtc::CONSTRUCTOR_ID => PhoneConnectionWebrtc::deserialize($stream),
+            0x9cc123c7 => PhoneConnection::deserialize($stream),
+            0x635fe375 => PhoneConnectionWebrtc::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PhoneConnection. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

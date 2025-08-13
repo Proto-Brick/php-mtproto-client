@@ -14,8 +14,8 @@ abstract class AbstractSentEncryptedMessage extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SentEncryptedMessage::CONSTRUCTOR_ID => SentEncryptedMessage::deserialize($stream),
-            SentEncryptedFile::CONSTRUCTOR_ID => SentEncryptedFile::deserialize($stream),
+            0x560f8935 => SentEncryptedMessage::deserialize($stream),
+            0x9493ff32 => SentEncryptedFile::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.SentEncryptedMessage. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

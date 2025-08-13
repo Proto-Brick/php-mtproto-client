@@ -14,8 +14,8 @@ abstract class AbstractBotApp extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            BotAppNotModified::CONSTRUCTOR_ID => BotAppNotModified::deserialize($stream),
-            BotApp::CONSTRUCTOR_ID => BotApp::deserialize($stream),
+            0x5da674b7 => BotAppNotModified::deserialize($stream),
+            0x95fcd1d6 => BotApp::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type BotApp. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

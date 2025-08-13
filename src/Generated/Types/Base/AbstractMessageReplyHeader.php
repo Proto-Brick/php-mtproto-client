@@ -14,8 +14,8 @@ abstract class AbstractMessageReplyHeader extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            MessageReplyHeader::CONSTRUCTOR_ID => MessageReplyHeader::deserialize($stream),
-            MessageReplyStoryHeader::CONSTRUCTOR_ID => MessageReplyStoryHeader::deserialize($stream),
+            0x6917560b => MessageReplyHeader::deserialize($stream),
+            0xe5af939 => MessageReplyStoryHeader::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type MessageReplyHeader. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

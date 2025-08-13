@@ -14,9 +14,9 @@ abstract class AbstractInputReplyTo extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputReplyToMessage::CONSTRUCTOR_ID => InputReplyToMessage::deserialize($stream),
-            InputReplyToStory::CONSTRUCTOR_ID => InputReplyToStory::deserialize($stream),
-            InputReplyToMonoForum::CONSTRUCTOR_ID => InputReplyToMonoForum::deserialize($stream),
+            0x869fbe10 => InputReplyToMessage::deserialize($stream),
+            0x5881323a => InputReplyToStory::deserialize($stream),
+            0x69d66c45 => InputReplyToMonoForum::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputReplyTo. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

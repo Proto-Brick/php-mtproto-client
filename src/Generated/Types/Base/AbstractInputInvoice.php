@@ -14,17 +14,17 @@ abstract class AbstractInputInvoice extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputInvoiceMessage::CONSTRUCTOR_ID => InputInvoiceMessage::deserialize($stream),
-            InputInvoiceSlug::CONSTRUCTOR_ID => InputInvoiceSlug::deserialize($stream),
-            InputInvoicePremiumGiftCode::CONSTRUCTOR_ID => InputInvoicePremiumGiftCode::deserialize($stream),
-            InputInvoiceStars::CONSTRUCTOR_ID => InputInvoiceStars::deserialize($stream),
-            InputInvoiceChatInviteSubscription::CONSTRUCTOR_ID => InputInvoiceChatInviteSubscription::deserialize($stream),
-            InputInvoiceStarGift::CONSTRUCTOR_ID => InputInvoiceStarGift::deserialize($stream),
-            InputInvoiceStarGiftUpgrade::CONSTRUCTOR_ID => InputInvoiceStarGiftUpgrade::deserialize($stream),
-            InputInvoiceStarGiftTransfer::CONSTRUCTOR_ID => InputInvoiceStarGiftTransfer::deserialize($stream),
-            InputInvoicePremiumGiftStars::CONSTRUCTOR_ID => InputInvoicePremiumGiftStars::deserialize($stream),
-            InputInvoiceBusinessBotTransferStars::CONSTRUCTOR_ID => InputInvoiceBusinessBotTransferStars::deserialize($stream),
-            InputInvoiceStarGiftResale::CONSTRUCTOR_ID => InputInvoiceStarGiftResale::deserialize($stream),
+            0xc5b56859 => InputInvoiceMessage::deserialize($stream),
+            0xc326caef => InputInvoiceSlug::deserialize($stream),
+            0x98986c0d => InputInvoicePremiumGiftCode::deserialize($stream),
+            0x65f00ce3 => InputInvoiceStars::deserialize($stream),
+            0x34e793f1 => InputInvoiceChatInviteSubscription::deserialize($stream),
+            0xe8625e92 => InputInvoiceStarGift::deserialize($stream),
+            0x4d818d5d => InputInvoiceStarGiftUpgrade::deserialize($stream),
+            0x4a5f5bd9 => InputInvoiceStarGiftTransfer::deserialize($stream),
+            0xdabab2ef => InputInvoicePremiumGiftStars::deserialize($stream),
+            0xf4997e42 => InputInvoiceBusinessBotTransferStars::deserialize($stream),
+            0xc39f5324 => InputInvoiceStarGiftResale::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputInvoice. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractInputCollectible extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputCollectibleUsername::CONSTRUCTOR_ID => InputCollectibleUsername::deserialize($stream),
-            InputCollectiblePhone::CONSTRUCTOR_ID => InputCollectiblePhone::deserialize($stream),
+            0xe39460a9 => InputCollectibleUsername::deserialize($stream),
+            0xa2e214a4 => InputCollectiblePhone::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputCollectible. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

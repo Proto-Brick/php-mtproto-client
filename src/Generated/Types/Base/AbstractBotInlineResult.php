@@ -14,8 +14,8 @@ abstract class AbstractBotInlineResult extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            BotInlineResult::CONSTRUCTOR_ID => BotInlineResult::deserialize($stream),
-            BotInlineMediaResult::CONSTRUCTOR_ID => BotInlineMediaResult::deserialize($stream),
+            0x11965f3a => BotInlineResult::deserialize($stream),
+            0x17db940b => BotInlineMediaResult::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type BotInlineResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

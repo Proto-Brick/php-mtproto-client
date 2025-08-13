@@ -14,9 +14,9 @@ abstract class AbstractMessagePeerVote extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            MessagePeerVote::CONSTRUCTOR_ID => MessagePeerVote::deserialize($stream),
-            MessagePeerVoteInputOption::CONSTRUCTOR_ID => MessagePeerVoteInputOption::deserialize($stream),
-            MessagePeerVoteMultiple::CONSTRUCTOR_ID => MessagePeerVoteMultiple::deserialize($stream),
+            0xb6cc2d5c => MessagePeerVote::deserialize($stream),
+            0x74cda504 => MessagePeerVoteInputOption::deserialize($stream),
+            0x4628f6e6 => MessagePeerVoteMultiple::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type MessagePeerVote. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

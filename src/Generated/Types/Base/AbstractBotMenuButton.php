@@ -14,9 +14,9 @@ abstract class AbstractBotMenuButton extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            BotMenuButtonDefault::CONSTRUCTOR_ID => BotMenuButtonDefault::deserialize($stream),
-            BotMenuButtonCommands::CONSTRUCTOR_ID => BotMenuButtonCommands::deserialize($stream),
-            BotMenuButton::CONSTRUCTOR_ID => BotMenuButton::deserialize($stream),
+            0x7533a588 => BotMenuButtonDefault::deserialize($stream),
+            0x4258c205 => BotMenuButtonCommands::deserialize($stream),
+            0xc7b57ce6 => BotMenuButton::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type BotMenuButton. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

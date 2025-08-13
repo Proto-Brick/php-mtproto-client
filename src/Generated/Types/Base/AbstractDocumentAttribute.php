@@ -14,14 +14,14 @@ abstract class AbstractDocumentAttribute extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            DocumentAttributeImageSize::CONSTRUCTOR_ID => DocumentAttributeImageSize::deserialize($stream),
-            DocumentAttributeAnimated::CONSTRUCTOR_ID => DocumentAttributeAnimated::deserialize($stream),
-            DocumentAttributeSticker::CONSTRUCTOR_ID => DocumentAttributeSticker::deserialize($stream),
-            DocumentAttributeVideo::CONSTRUCTOR_ID => DocumentAttributeVideo::deserialize($stream),
-            DocumentAttributeAudio::CONSTRUCTOR_ID => DocumentAttributeAudio::deserialize($stream),
-            DocumentAttributeFilename::CONSTRUCTOR_ID => DocumentAttributeFilename::deserialize($stream),
-            DocumentAttributeHasStickers::CONSTRUCTOR_ID => DocumentAttributeHasStickers::deserialize($stream),
-            DocumentAttributeCustomEmoji::CONSTRUCTOR_ID => DocumentAttributeCustomEmoji::deserialize($stream),
+            0x6c37c15c => DocumentAttributeImageSize::deserialize($stream),
+            0x11b58939 => DocumentAttributeAnimated::deserialize($stream),
+            0x6319d612 => DocumentAttributeSticker::deserialize($stream),
+            0x43c57c48 => DocumentAttributeVideo::deserialize($stream),
+            0x9852f9c6 => DocumentAttributeAudio::deserialize($stream),
+            0x15590068 => DocumentAttributeFilename::deserialize($stream),
+            0x9801d2f7 => DocumentAttributeHasStickers::deserialize($stream),
+            0xfd149899 => DocumentAttributeCustomEmoji::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type DocumentAttribute. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

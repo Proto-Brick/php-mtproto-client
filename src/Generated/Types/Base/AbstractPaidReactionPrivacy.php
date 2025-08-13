@@ -14,9 +14,9 @@ abstract class AbstractPaidReactionPrivacy extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PaidReactionPrivacyDefault::CONSTRUCTOR_ID => PaidReactionPrivacyDefault::deserialize($stream),
-            PaidReactionPrivacyAnonymous::CONSTRUCTOR_ID => PaidReactionPrivacyAnonymous::deserialize($stream),
-            PaidReactionPrivacyPeer::CONSTRUCTOR_ID => PaidReactionPrivacyPeer::deserialize($stream),
+            0x206ad49e => PaidReactionPrivacyDefault::deserialize($stream),
+            0x1f0c1ad9 => PaidReactionPrivacyAnonymous::deserialize($stream),
+            0xdc6cfcf0 => PaidReactionPrivacyPeer::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PaidReactionPrivacy. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractMessageExtendedMedia extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            MessageExtendedMediaPreview::CONSTRUCTOR_ID => MessageExtendedMediaPreview::deserialize($stream),
-            MessageExtendedMedia::CONSTRUCTOR_ID => MessageExtendedMedia::deserialize($stream),
+            0xad628cc8 => MessageExtendedMediaPreview::deserialize($stream),
+            0xee479c64 => MessageExtendedMedia::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type MessageExtendedMedia. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,9 +14,9 @@ abstract class AbstractStarGiftAttributeId extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            StarGiftAttributeIdModel::CONSTRUCTOR_ID => StarGiftAttributeIdModel::deserialize($stream),
-            StarGiftAttributeIdPattern::CONSTRUCTOR_ID => StarGiftAttributeIdPattern::deserialize($stream),
-            StarGiftAttributeIdBackdrop::CONSTRUCTOR_ID => StarGiftAttributeIdBackdrop::deserialize($stream),
+            0x48aaae3c => StarGiftAttributeIdModel::deserialize($stream),
+            0x4a162433 => StarGiftAttributeIdPattern::deserialize($stream),
+            0x1f01c757 => StarGiftAttributeIdBackdrop::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type StarGiftAttributeId. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

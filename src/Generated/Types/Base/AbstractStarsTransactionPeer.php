@@ -14,14 +14,14 @@ abstract class AbstractStarsTransactionPeer extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            StarsTransactionPeerUnsupported::CONSTRUCTOR_ID => StarsTransactionPeerUnsupported::deserialize($stream),
-            StarsTransactionPeerAppStore::CONSTRUCTOR_ID => StarsTransactionPeerAppStore::deserialize($stream),
-            StarsTransactionPeerPlayMarket::CONSTRUCTOR_ID => StarsTransactionPeerPlayMarket::deserialize($stream),
-            StarsTransactionPeerPremiumBot::CONSTRUCTOR_ID => StarsTransactionPeerPremiumBot::deserialize($stream),
-            StarsTransactionPeerFragment::CONSTRUCTOR_ID => StarsTransactionPeerFragment::deserialize($stream),
-            StarsTransactionPeer::CONSTRUCTOR_ID => StarsTransactionPeer::deserialize($stream),
-            StarsTransactionPeerAds::CONSTRUCTOR_ID => StarsTransactionPeerAds::deserialize($stream),
-            StarsTransactionPeerAPI::CONSTRUCTOR_ID => StarsTransactionPeerAPI::deserialize($stream),
+            0x95f2bfe4 => StarsTransactionPeerUnsupported::deserialize($stream),
+            0xb457b375 => StarsTransactionPeerAppStore::deserialize($stream),
+            0x7b560a0b => StarsTransactionPeerPlayMarket::deserialize($stream),
+            0x250dbaf8 => StarsTransactionPeerPremiumBot::deserialize($stream),
+            0xe92fd902 => StarsTransactionPeerFragment::deserialize($stream),
+            0xd80da15d => StarsTransactionPeer::deserialize($stream),
+            0x60682812 => StarsTransactionPeerAds::deserialize($stream),
+            0xf9677aad => StarsTransactionPeerAPI::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type StarsTransactionPeer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

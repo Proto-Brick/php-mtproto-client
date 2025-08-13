@@ -14,9 +14,9 @@ abstract class AbstractInputWebFileLocation extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputWebFileLocation::CONSTRUCTOR_ID => InputWebFileLocation::deserialize($stream),
-            InputWebFileGeoPointLocation::CONSTRUCTOR_ID => InputWebFileGeoPointLocation::deserialize($stream),
-            InputWebFileAudioAlbumThumbLocation::CONSTRUCTOR_ID => InputWebFileAudioAlbumThumbLocation::deserialize($stream),
+            0xc239d686 => InputWebFileLocation::deserialize($stream),
+            0x9f2221c9 => InputWebFileGeoPointLocation::deserialize($stream),
+            0xf46fe924 => InputWebFileAudioAlbumThumbLocation::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputWebFileLocation. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

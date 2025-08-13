@@ -14,10 +14,10 @@ abstract class AbstractStarGiftAttribute extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            StarGiftAttributeModel::CONSTRUCTOR_ID => StarGiftAttributeModel::deserialize($stream),
-            StarGiftAttributePattern::CONSTRUCTOR_ID => StarGiftAttributePattern::deserialize($stream),
-            StarGiftAttributeBackdrop::CONSTRUCTOR_ID => StarGiftAttributeBackdrop::deserialize($stream),
-            StarGiftAttributeOriginalDetails::CONSTRUCTOR_ID => StarGiftAttributeOriginalDetails::deserialize($stream),
+            0x39d99013 => StarGiftAttributeModel::deserialize($stream),
+            0x13acff19 => StarGiftAttributePattern::deserialize($stream),
+            0xd93d859c => StarGiftAttributeBackdrop::deserialize($stream),
+            0xe0bff26c => StarGiftAttributeOriginalDetails::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type StarGiftAttribute. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

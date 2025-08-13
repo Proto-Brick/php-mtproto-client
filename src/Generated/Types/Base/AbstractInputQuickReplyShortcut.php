@@ -14,8 +14,8 @@ abstract class AbstractInputQuickReplyShortcut extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputQuickReplyShortcut::CONSTRUCTOR_ID => InputQuickReplyShortcut::deserialize($stream),
-            InputQuickReplyShortcutId::CONSTRUCTOR_ID => InputQuickReplyShortcutId::deserialize($stream),
+            0x24596d41 => InputQuickReplyShortcut::deserialize($stream),
+            0x1190cf1 => InputQuickReplyShortcutId::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputQuickReplyShortcut. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

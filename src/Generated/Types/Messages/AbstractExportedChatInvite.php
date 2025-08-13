@@ -14,8 +14,8 @@ abstract class AbstractExportedChatInvite extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ExportedChatInvite::CONSTRUCTOR_ID => ExportedChatInvite::deserialize($stream),
-            ExportedChatInviteReplaced::CONSTRUCTOR_ID => ExportedChatInviteReplaced::deserialize($stream),
+            0x1871be50 => ExportedChatInvite::deserialize($stream),
+            0x222600ef => ExportedChatInviteReplaced::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.ExportedChatInvite. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractWallPapers extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            WallPapersNotModified::CONSTRUCTOR_ID => WallPapersNotModified::deserialize($stream),
-            WallPapers::CONSTRUCTOR_ID => WallPapers::deserialize($stream),
+            0x1c199183 => WallPapersNotModified::deserialize($stream),
+            0xcdc3858c => WallPapers::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type account.WallPapers. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

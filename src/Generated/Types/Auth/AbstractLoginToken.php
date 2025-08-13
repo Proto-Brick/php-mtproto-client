@@ -14,9 +14,9 @@ abstract class AbstractLoginToken extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            LoginToken::CONSTRUCTOR_ID => LoginToken::deserialize($stream),
-            LoginTokenMigrateTo::CONSTRUCTOR_ID => LoginTokenMigrateTo::deserialize($stream),
-            LoginTokenSuccess::CONSTRUCTOR_ID => LoginTokenSuccess::deserialize($stream),
+            0x629f1980 => LoginToken::deserialize($stream),
+            0x68e9916 => LoginTokenMigrateTo::deserialize($stream),
+            0x390d5c5e => LoginTokenSuccess::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type auth.LoginToken. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

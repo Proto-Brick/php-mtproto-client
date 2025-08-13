@@ -14,9 +14,9 @@ abstract class AbstractTopPeers extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            TopPeersNotModified::CONSTRUCTOR_ID => TopPeersNotModified::deserialize($stream),
-            TopPeers::CONSTRUCTOR_ID => TopPeers::deserialize($stream),
-            TopPeersDisabled::CONSTRUCTOR_ID => TopPeersDisabled::deserialize($stream),
+            0xde266ef5 => TopPeersNotModified::deserialize($stream),
+            0x70b772a8 => TopPeers::deserialize($stream),
+            0xb52c939d => TopPeersDisabled::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type contacts.TopPeers. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

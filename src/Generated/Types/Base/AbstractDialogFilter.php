@@ -14,9 +14,9 @@ abstract class AbstractDialogFilter extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            DialogFilter::CONSTRUCTOR_ID => DialogFilter::deserialize($stream),
-            DialogFilterDefault::CONSTRUCTOR_ID => DialogFilterDefault::deserialize($stream),
-            DialogFilterChatlist::CONSTRUCTOR_ID => DialogFilterChatlist::deserialize($stream),
+            0xaa472651 => DialogFilter::deserialize($stream),
+            0x363293ae => DialogFilterDefault::deserialize($stream),
+            0x96537bd7 => DialogFilterChatlist::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type DialogFilter. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

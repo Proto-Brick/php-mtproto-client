@@ -14,9 +14,9 @@ abstract class AbstractResetPasswordResult extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ResetPasswordFailedWait::CONSTRUCTOR_ID => ResetPasswordFailedWait::deserialize($stream),
-            ResetPasswordRequestedWait::CONSTRUCTOR_ID => ResetPasswordRequestedWait::deserialize($stream),
-            ResetPasswordOk::CONSTRUCTOR_ID => ResetPasswordOk::deserialize($stream),
+            0xe3779861 => ResetPasswordFailedWait::deserialize($stream),
+            0xe9effc7d => ResetPasswordRequestedWait::deserialize($stream),
+            0xe926d63e => ResetPasswordOk::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type account.ResetPasswordResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

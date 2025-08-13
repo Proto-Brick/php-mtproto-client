@@ -14,9 +14,9 @@ abstract class AbstractStatsGraph extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            StatsGraphAsync::CONSTRUCTOR_ID => StatsGraphAsync::deserialize($stream),
-            StatsGraphError::CONSTRUCTOR_ID => StatsGraphError::deserialize($stream),
-            StatsGraph::CONSTRUCTOR_ID => StatsGraph::deserialize($stream),
+            0x4a27eb2d => StatsGraphAsync::deserialize($stream),
+            0xbedc9822 => StatsGraphError::deserialize($stream),
+            0x8ea464b6 => StatsGraph::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type StatsGraph. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,10 +14,10 @@ abstract class AbstractInputBotInlineResult extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputBotInlineResult::CONSTRUCTOR_ID => InputBotInlineResult::deserialize($stream),
-            InputBotInlineResultPhoto::CONSTRUCTOR_ID => InputBotInlineResultPhoto::deserialize($stream),
-            InputBotInlineResultDocument::CONSTRUCTOR_ID => InputBotInlineResultDocument::deserialize($stream),
-            InputBotInlineResultGame::CONSTRUCTOR_ID => InputBotInlineResultGame::deserialize($stream),
+            0x88bf9319 => InputBotInlineResult::deserialize($stream),
+            0xa8d864a7 => InputBotInlineResultPhoto::deserialize($stream),
+            0xfff8fdc4 => InputBotInlineResultDocument::deserialize($stream),
+            0x4fa417f2 => InputBotInlineResultGame::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputBotInlineResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

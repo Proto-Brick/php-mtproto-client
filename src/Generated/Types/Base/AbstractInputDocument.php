@@ -14,8 +14,8 @@ abstract class AbstractInputDocument extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputDocumentEmpty::CONSTRUCTOR_ID => InputDocumentEmpty::deserialize($stream),
-            InputDocument::CONSTRUCTOR_ID => InputDocument::deserialize($stream),
+            0x72f0eaae => InputDocumentEmpty::deserialize($stream),
+            0x1abfb575 => InputDocument::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputDocument. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,13 +14,13 @@ abstract class AbstractBotCommandScope extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            BotCommandScopeDefault::CONSTRUCTOR_ID => BotCommandScopeDefault::deserialize($stream),
-            BotCommandScopeUsers::CONSTRUCTOR_ID => BotCommandScopeUsers::deserialize($stream),
-            BotCommandScopeChats::CONSTRUCTOR_ID => BotCommandScopeChats::deserialize($stream),
-            BotCommandScopeChatAdmins::CONSTRUCTOR_ID => BotCommandScopeChatAdmins::deserialize($stream),
-            BotCommandScopePeer::CONSTRUCTOR_ID => BotCommandScopePeer::deserialize($stream),
-            BotCommandScopePeerAdmins::CONSTRUCTOR_ID => BotCommandScopePeerAdmins::deserialize($stream),
-            BotCommandScopePeerUser::CONSTRUCTOR_ID => BotCommandScopePeerUser::deserialize($stream),
+            0x2f6cb2ab => BotCommandScopeDefault::deserialize($stream),
+            0x3c4f04d8 => BotCommandScopeUsers::deserialize($stream),
+            0x6fe1a881 => BotCommandScopeChats::deserialize($stream),
+            0xb9aa606a => BotCommandScopeChatAdmins::deserialize($stream),
+            0xdb9d897d => BotCommandScopePeer::deserialize($stream),
+            0x3fd863d1 => BotCommandScopePeerAdmins::deserialize($stream),
+            0xa1321f3 => BotCommandScopePeerUser::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type BotCommandScope. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

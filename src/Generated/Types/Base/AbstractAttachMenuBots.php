@@ -14,8 +14,8 @@ abstract class AbstractAttachMenuBots extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            AttachMenuBotsNotModified::CONSTRUCTOR_ID => AttachMenuBotsNotModified::deserialize($stream),
-            AttachMenuBots::CONSTRUCTOR_ID => AttachMenuBots::deserialize($stream),
+            0xf1d88a5c => AttachMenuBotsNotModified::deserialize($stream),
+            0x3c4301c0 => AttachMenuBots::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type AttachMenuBots. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

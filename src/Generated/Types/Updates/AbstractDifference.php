@@ -14,10 +14,10 @@ abstract class AbstractDifference extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            DifferenceEmpty::CONSTRUCTOR_ID => DifferenceEmpty::deserialize($stream),
-            Difference::CONSTRUCTOR_ID => Difference::deserialize($stream),
-            DifferenceSlice::CONSTRUCTOR_ID => DifferenceSlice::deserialize($stream),
-            DifferenceTooLong::CONSTRUCTOR_ID => DifferenceTooLong::deserialize($stream),
+            0x5d75a138 => DifferenceEmpty::deserialize($stream),
+            0xf49ca0 => Difference::deserialize($stream),
+            0xa8fb1981 => DifferenceSlice::deserialize($stream),
+            0x4afe8f6d => DifferenceTooLong::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type updates.Difference. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,9 +14,9 @@ abstract class AbstractRequestPeerType extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            RequestPeerTypeUser::CONSTRUCTOR_ID => RequestPeerTypeUser::deserialize($stream),
-            RequestPeerTypeChat::CONSTRUCTOR_ID => RequestPeerTypeChat::deserialize($stream),
-            RequestPeerTypeBroadcast::CONSTRUCTOR_ID => RequestPeerTypeBroadcast::deserialize($stream),
+            0x5f3b8a00 => RequestPeerTypeUser::deserialize($stream),
+            0xc9f06e1b => RequestPeerTypeChat::deserialize($stream),
+            0x339bef6c => RequestPeerTypeBroadcast::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type RequestPeerType. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

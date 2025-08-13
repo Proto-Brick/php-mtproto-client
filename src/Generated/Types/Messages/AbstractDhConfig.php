@@ -14,8 +14,8 @@ abstract class AbstractDhConfig extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            DhConfigNotModified::CONSTRUCTOR_ID => DhConfigNotModified::deserialize($stream),
-            DhConfig::CONSTRUCTOR_ID => DhConfig::deserialize($stream),
+            0xc0e24635 => DhConfigNotModified::deserialize($stream),
+            0x2c221edd => DhConfig::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.DhConfig. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

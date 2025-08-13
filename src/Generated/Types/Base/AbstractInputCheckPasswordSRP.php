@@ -14,8 +14,8 @@ abstract class AbstractInputCheckPasswordSRP extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputCheckPasswordEmpty::CONSTRUCTOR_ID => InputCheckPasswordEmpty::deserialize($stream),
-            InputCheckPasswordSRP::CONSTRUCTOR_ID => InputCheckPasswordSRP::deserialize($stream),
+            0x9880f658 => InputCheckPasswordEmpty::deserialize($stream),
+            0xd27ff082 => InputCheckPasswordSRP::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputCheckPasswordSRP. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

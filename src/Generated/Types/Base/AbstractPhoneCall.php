@@ -14,12 +14,12 @@ abstract class AbstractPhoneCall extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PhoneCallEmpty::CONSTRUCTOR_ID => PhoneCallEmpty::deserialize($stream),
-            PhoneCallWaiting::CONSTRUCTOR_ID => PhoneCallWaiting::deserialize($stream),
-            PhoneCallRequested::CONSTRUCTOR_ID => PhoneCallRequested::deserialize($stream),
-            PhoneCallAccepted::CONSTRUCTOR_ID => PhoneCallAccepted::deserialize($stream),
-            PhoneCall::CONSTRUCTOR_ID => PhoneCall::deserialize($stream),
-            PhoneCallDiscarded::CONSTRUCTOR_ID => PhoneCallDiscarded::deserialize($stream),
+            0x5366c915 => PhoneCallEmpty::deserialize($stream),
+            0xc5226f17 => PhoneCallWaiting::deserialize($stream),
+            0x14b0ed0c => PhoneCallRequested::deserialize($stream),
+            0x3660c311 => PhoneCallAccepted::deserialize($stream),
+            0x30535af5 => PhoneCall::deserialize($stream),
+            0x50ca4de1 => PhoneCallDiscarded::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PhoneCall. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

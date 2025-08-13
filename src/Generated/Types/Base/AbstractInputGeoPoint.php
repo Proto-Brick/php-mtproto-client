@@ -14,8 +14,8 @@ abstract class AbstractInputGeoPoint extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputGeoPointEmpty::CONSTRUCTOR_ID => InputGeoPointEmpty::deserialize($stream),
-            InputGeoPoint::CONSTRUCTOR_ID => InputGeoPoint::deserialize($stream),
+            0xe4c123d6 => InputGeoPointEmpty::deserialize($stream),
+            0x48222faf => InputGeoPoint::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputGeoPoint. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

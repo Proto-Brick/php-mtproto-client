@@ -14,8 +14,8 @@ abstract class AbstractInputSecureFile extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputSecureFileUploaded::CONSTRUCTOR_ID => InputSecureFileUploaded::deserialize($stream),
-            InputSecureFile::CONSTRUCTOR_ID => InputSecureFile::deserialize($stream),
+            0x3334b0f0 => InputSecureFileUploaded::deserialize($stream),
+            0x5367e5be => InputSecureFile::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputSecureFile. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

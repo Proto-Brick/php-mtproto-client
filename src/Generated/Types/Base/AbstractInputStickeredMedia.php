@@ -14,8 +14,8 @@ abstract class AbstractInputStickeredMedia extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputStickeredMediaPhoto::CONSTRUCTOR_ID => InputStickeredMediaPhoto::deserialize($stream),
-            InputStickeredMediaDocument::CONSTRUCTOR_ID => InputStickeredMediaDocument::deserialize($stream),
+            0x4a992157 => InputStickeredMediaPhoto::deserialize($stream),
+            0x438865b => InputStickeredMediaDocument::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputStickeredMedia. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

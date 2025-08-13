@@ -14,8 +14,8 @@ abstract class AbstractGiveawayInfo extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            GiveawayInfo::CONSTRUCTOR_ID => GiveawayInfo::deserialize($stream),
-            GiveawayInfoResults::CONSTRUCTOR_ID => GiveawayInfoResults::deserialize($stream),
+            0x4367daa0 => GiveawayInfo::deserialize($stream),
+            0xe175e66f => GiveawayInfoResults::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type payments.GiveawayInfo. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -14,8 +14,8 @@ abstract class AbstractAppUpdate extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            AppUpdate::CONSTRUCTOR_ID => AppUpdate::deserialize($stream),
-            NoAppUpdate::CONSTRUCTOR_ID => NoAppUpdate::deserialize($stream),
+            0xccbbce30 => AppUpdate::deserialize($stream),
+            0xc45a6536 => NoAppUpdate::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.AppUpdate. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

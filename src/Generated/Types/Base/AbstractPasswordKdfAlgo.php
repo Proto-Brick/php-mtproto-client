@@ -14,8 +14,8 @@ abstract class AbstractPasswordKdfAlgo extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PasswordKdfAlgoUnknown::CONSTRUCTOR_ID => PasswordKdfAlgoUnknown::deserialize($stream),
-            PasswordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow::CONSTRUCTOR_ID => PasswordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow::deserialize($stream),
+            0xd45ab096 => PasswordKdfAlgoUnknown::deserialize($stream),
+            0x3a912d4a => PasswordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PasswordKdfAlgo. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

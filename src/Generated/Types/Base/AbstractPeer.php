@@ -14,9 +14,9 @@ abstract class AbstractPeer extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PeerUser::CONSTRUCTOR_ID => PeerUser::deserialize($stream),
-            PeerChat::CONSTRUCTOR_ID => PeerChat::deserialize($stream),
-            PeerChannel::CONSTRUCTOR_ID => PeerChannel::deserialize($stream),
+            0x59511722 => PeerUser::deserialize($stream),
+            0x36c6019a => PeerChat::deserialize($stream),
+            0xa2a5371e => PeerChannel::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type Peer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

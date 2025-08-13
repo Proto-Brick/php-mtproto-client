@@ -14,11 +14,11 @@ abstract class AbstractInputNotifyPeer extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputNotifyPeer::CONSTRUCTOR_ID => InputNotifyPeer::deserialize($stream),
-            InputNotifyUsers::CONSTRUCTOR_ID => InputNotifyUsers::deserialize($stream),
-            InputNotifyChats::CONSTRUCTOR_ID => InputNotifyChats::deserialize($stream),
-            InputNotifyBroadcasts::CONSTRUCTOR_ID => InputNotifyBroadcasts::deserialize($stream),
-            InputNotifyForumTopic::CONSTRUCTOR_ID => InputNotifyForumTopic::deserialize($stream),
+            0xb8bc5b0c => InputNotifyPeer::deserialize($stream),
+            0x193b4417 => InputNotifyUsers::deserialize($stream),
+            0x4a95e84e => InputNotifyChats::deserialize($stream),
+            0xb1db7c7e => InputNotifyBroadcasts::deserialize($stream),
+            0x5c467992 => InputNotifyForumTopic::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputNotifyPeer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

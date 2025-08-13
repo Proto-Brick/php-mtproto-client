@@ -14,12 +14,12 @@ abstract class AbstractChannelParticipant extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            ChannelParticipant::CONSTRUCTOR_ID => ChannelParticipant::deserialize($stream),
-            ChannelParticipantSelf::CONSTRUCTOR_ID => ChannelParticipantSelf::deserialize($stream),
-            ChannelParticipantCreator::CONSTRUCTOR_ID => ChannelParticipantCreator::deserialize($stream),
-            ChannelParticipantAdmin::CONSTRUCTOR_ID => ChannelParticipantAdmin::deserialize($stream),
-            ChannelParticipantBanned::CONSTRUCTOR_ID => ChannelParticipantBanned::deserialize($stream),
-            ChannelParticipantLeft::CONSTRUCTOR_ID => ChannelParticipantLeft::deserialize($stream),
+            0xcb397619 => ChannelParticipant::deserialize($stream),
+            0x4f607bef => ChannelParticipantSelf::deserialize($stream),
+            0x2fe601d3 => ChannelParticipantCreator::deserialize($stream),
+            0x34c3bb53 => ChannelParticipantAdmin::deserialize($stream),
+            0x6df8014e => ChannelParticipantBanned::deserialize($stream),
+            0x1b03f006 => ChannelParticipantLeft::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type ChannelParticipant. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

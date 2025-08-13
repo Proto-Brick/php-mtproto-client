@@ -14,8 +14,8 @@ abstract class AbstractSavedDialog extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SavedDialog::CONSTRUCTOR_ID => SavedDialog::deserialize($stream),
-            MonoForumDialog::CONSTRUCTOR_ID => MonoForumDialog::deserialize($stream),
+            0xbd87cb6c => SavedDialog::deserialize($stream),
+            0x64407ea7 => MonoForumDialog::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type SavedDialog. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

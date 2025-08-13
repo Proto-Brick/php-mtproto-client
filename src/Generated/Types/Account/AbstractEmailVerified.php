@@ -14,8 +14,8 @@ abstract class AbstractEmailVerified extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            EmailVerified::CONSTRUCTOR_ID => EmailVerified::deserialize($stream),
-            EmailVerifiedLogin::CONSTRUCTOR_ID => EmailVerifiedLogin::deserialize($stream),
+            0x2b96cd1b => EmailVerified::deserialize($stream),
+            0xe1bb0d61 => EmailVerifiedLogin::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type account.EmailVerified. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

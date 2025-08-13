@@ -14,8 +14,8 @@ abstract class AbstractEmojiGroups extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            EmojiGroupsNotModified::CONSTRUCTOR_ID => EmojiGroupsNotModified::deserialize($stream),
-            EmojiGroups::CONSTRUCTOR_ID => EmojiGroups::deserialize($stream),
+            0x6fb4ad87 => EmojiGroupsNotModified::deserialize($stream),
+            0x881fb94b => EmojiGroups::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.EmojiGroups. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

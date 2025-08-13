@@ -14,18 +14,18 @@ abstract class AbstractInputStickerSet extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            InputStickerSetEmpty::CONSTRUCTOR_ID => InputStickerSetEmpty::deserialize($stream),
-            InputStickerSetID::CONSTRUCTOR_ID => InputStickerSetID::deserialize($stream),
-            InputStickerSetShortName::CONSTRUCTOR_ID => InputStickerSetShortName::deserialize($stream),
-            InputStickerSetAnimatedEmoji::CONSTRUCTOR_ID => InputStickerSetAnimatedEmoji::deserialize($stream),
-            InputStickerSetDice::CONSTRUCTOR_ID => InputStickerSetDice::deserialize($stream),
-            InputStickerSetAnimatedEmojiAnimations::CONSTRUCTOR_ID => InputStickerSetAnimatedEmojiAnimations::deserialize($stream),
-            InputStickerSetPremiumGifts::CONSTRUCTOR_ID => InputStickerSetPremiumGifts::deserialize($stream),
-            InputStickerSetEmojiGenericAnimations::CONSTRUCTOR_ID => InputStickerSetEmojiGenericAnimations::deserialize($stream),
-            InputStickerSetEmojiDefaultStatuses::CONSTRUCTOR_ID => InputStickerSetEmojiDefaultStatuses::deserialize($stream),
-            InputStickerSetEmojiDefaultTopicIcons::CONSTRUCTOR_ID => InputStickerSetEmojiDefaultTopicIcons::deserialize($stream),
-            InputStickerSetEmojiChannelDefaultStatuses::CONSTRUCTOR_ID => InputStickerSetEmojiChannelDefaultStatuses::deserialize($stream),
-            InputStickerSetTonGifts::CONSTRUCTOR_ID => InputStickerSetTonGifts::deserialize($stream),
+            0xffb62b95 => InputStickerSetEmpty::deserialize($stream),
+            0x9de7a269 => InputStickerSetID::deserialize($stream),
+            0x861cc8a0 => InputStickerSetShortName::deserialize($stream),
+            0x28703c8 => InputStickerSetAnimatedEmoji::deserialize($stream),
+            0xe67f520e => InputStickerSetDice::deserialize($stream),
+            0xcde3739 => InputStickerSetAnimatedEmojiAnimations::deserialize($stream),
+            0xc88b3b02 => InputStickerSetPremiumGifts::deserialize($stream),
+            0x4c4d4ce => InputStickerSetEmojiGenericAnimations::deserialize($stream),
+            0x29d0f5ee => InputStickerSetEmojiDefaultStatuses::deserialize($stream),
+            0x44c1f8e9 => InputStickerSetEmojiDefaultTopicIcons::deserialize($stream),
+            0x49748553 => InputStickerSetEmojiChannelDefaultStatuses::deserialize($stream),
+            0x1cf671a0 => InputStickerSetTonGifts::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type InputStickerSet. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

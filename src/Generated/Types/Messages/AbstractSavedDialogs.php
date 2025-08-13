@@ -14,9 +14,9 @@ abstract class AbstractSavedDialogs extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            SavedDialogs::CONSTRUCTOR_ID => SavedDialogs::deserialize($stream),
-            SavedDialogsSlice::CONSTRUCTOR_ID => SavedDialogsSlice::deserialize($stream),
-            SavedDialogsNotModified::CONSTRUCTOR_ID => SavedDialogsNotModified::deserialize($stream),
+            0xf83ae221 => SavedDialogs::deserialize($stream),
+            0x44ba9dd9 => SavedDialogsSlice::deserialize($stream),
+            0xc01f6fe8 => SavedDialogsNotModified::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type messages.SavedDialogs. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

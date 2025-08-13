@@ -14,8 +14,8 @@ abstract class AbstractPromoData extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PromoDataEmpty::CONSTRUCTOR_ID => PromoDataEmpty::deserialize($stream),
-            PromoData::CONSTRUCTOR_ID => PromoData::deserialize($stream),
+            0x98f6ac75 => PromoDataEmpty::deserialize($stream),
+            0x8a4d87a => PromoData::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type help.PromoData. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

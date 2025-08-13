@@ -14,8 +14,8 @@ abstract class AbstractGroupCall extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            GroupCallDiscarded::CONSTRUCTOR_ID => GroupCallDiscarded::deserialize($stream),
-            GroupCall::CONSTRUCTOR_ID => GroupCall::deserialize($stream),
+            0x7780bcb4 => GroupCallDiscarded::deserialize($stream),
+            0x553b0ba1 => GroupCall::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type GroupCall. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

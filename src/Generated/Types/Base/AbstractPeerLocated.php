@@ -14,8 +14,8 @@ abstract class AbstractPeerLocated extends TlObject
         $constructorId = Deserializer::peekInt32($stream);
         
         return match ($constructorId) {
-            PeerLocated::CONSTRUCTOR_ID => PeerLocated::deserialize($stream),
-            PeerSelfLocated::CONSTRUCTOR_ID => PeerSelfLocated::deserialize($stream),
+            0xca461b5d => PeerLocated::deserialize($stream),
+            0xf8ec284b => PeerSelfLocated::deserialize($stream),
             default => throw new \Exception(sprintf('Unknown constructor ID for type PeerLocated. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }
