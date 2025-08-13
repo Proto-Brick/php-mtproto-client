@@ -42,7 +42,7 @@ final class GetPaymentFormRequest extends TlObject
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->invoice->serialize();
         if ($flags & (1 << 0)) {
-            $buffer .= Serializer::bytes(json_encode($this->themeParams, JSON_FORCE_OBJECT));
+            $buffer .= Serializer::serializeDataJSON($this->themeParams);
         }
 
         return $buffer;

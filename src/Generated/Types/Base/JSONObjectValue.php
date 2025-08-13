@@ -16,18 +16,18 @@ final class JSONObjectValue extends TlObject
     
     /**
      * @param string $key
-     * @param array $value
+     * @param AbstractJSONValue $value
      */
     public function __construct(
         public readonly string $key,
-        public readonly array $value
+        public readonly AbstractJSONValue $value
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::bytes($this->key);
-        $buffer .= (new DataJSON(json_encode($this->value, JSON_FORCE_OBJECT)))->serialize();
+        $buffer .= $this->value->serialize();
 
         return $buffer;
     }
@@ -39,7 +39,7 @@ final class JSONObjectValue extends TlObject
             throw new \Exception('Invalid constructor ID for ' . self::class);
         }
         $key = Deserializer::bytes($stream);
-        $value = Deserializer::deserializeJsonValue($stream);
+        $value = AbstractJSONValue::deserialize($stream);
 
         return new self(
             $key,

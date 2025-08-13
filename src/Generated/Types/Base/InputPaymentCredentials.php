@@ -29,7 +29,7 @@ final class InputPaymentCredentials extends AbstractInputPaymentCredentials
         $flags = 0;
         if ($this->save) $flags |= (1 << 0);
         $buffer .= Serializer::int32($flags);
-        $buffer .= Serializer::bytes(json_encode($this->data, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->data);
 
         return $buffer;
     }

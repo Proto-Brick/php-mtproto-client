@@ -15,7 +15,7 @@ final class JsonArray extends AbstractJSONValue
     public string $predicate = 'jsonArray';
     
     /**
-     * @param list<array> $value
+     * @param list<AbstractJSONValue> $value
      */
     public function __construct(
         public readonly array $value
@@ -32,7 +32,7 @@ final class JsonArray extends AbstractJSONValue
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $value = Deserializer::vectorOfObjects($stream, [Deserializer::class, 'deserialize']);
+        $value = Deserializer::vectorOfObjects($stream, [AbstractJSONValue::class, 'deserialize']);
 
         return new self(
             $value

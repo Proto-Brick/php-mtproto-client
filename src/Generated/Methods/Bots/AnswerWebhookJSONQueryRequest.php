@@ -36,7 +36,7 @@ final class AnswerWebhookJSONQueryRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::int64($this->queryId);
-        $buffer .= Serializer::bytes(json_encode($this->data, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->data);
 
         return $buffer;
     }

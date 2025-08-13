@@ -64,7 +64,7 @@ final class PhoneCall extends AbstractPhoneCall
         $buffer .= Serializer::vectorOfObjects($this->connections);
         $buffer .= Serializer::int32($this->startDate);
         if ($flags & (1 << 7)) {
-            $buffer .= Serializer::bytes(json_encode($this->customParameters, JSON_FORCE_OBJECT));
+            $buffer .= Serializer::serializeDataJSON($this->customParameters);
         }
 
         return $buffer;

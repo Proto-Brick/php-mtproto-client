@@ -38,7 +38,7 @@ final class TermsOfService extends TlObject
         if ($this->popup) $flags |= (1 << 0);
         if ($this->minAgeConfirm !== null) $flags |= (1 << 1);
         $buffer .= Serializer::int32($flags);
-        $buffer .= Serializer::bytes(json_encode($this->id, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->id);
         $buffer .= Serializer::bytes($this->text);
         $buffer .= Serializer::vectorOfObjects($this->entities);
         if ($flags & (1 << 1)) {

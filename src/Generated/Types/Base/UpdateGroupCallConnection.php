@@ -29,7 +29,7 @@ final class UpdateGroupCallConnection extends AbstractUpdate
         $flags = 0;
         if ($this->presentation) $flags |= (1 << 0);
         $buffer .= Serializer::int32($flags);
-        $buffer .= Serializer::bytes(json_encode($this->params, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->params);
 
         return $buffer;
     }

@@ -38,7 +38,7 @@ final class JoinGroupCallPresentationRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->call->serialize();
-        $buffer .= Serializer::bytes(json_encode($this->params, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->params);
 
         return $buffer;
     }

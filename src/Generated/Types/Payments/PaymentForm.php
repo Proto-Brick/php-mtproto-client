@@ -85,7 +85,7 @@ final class PaymentForm extends AbstractPaymentForm
             $buffer .= Serializer::bytes($this->nativeProvider);
         }
         if ($flags & (1 << 4)) {
-            $buffer .= Serializer::bytes(json_encode($this->nativeParams, JSON_FORCE_OBJECT));
+            $buffer .= Serializer::serializeDataJSON($this->nativeParams);
         }
         if ($flags & (1 << 6)) {
             $buffer .= Serializer::vectorOfObjects($this->additionalMethods);

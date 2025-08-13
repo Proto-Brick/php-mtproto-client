@@ -28,7 +28,7 @@ final class PassportConfig extends AbstractPassportConfig
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::int32($this->hash);
-        $buffer .= Serializer::bytes(json_encode($this->countriesLangs, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->countriesLangs);
 
         return $buffer;
     }

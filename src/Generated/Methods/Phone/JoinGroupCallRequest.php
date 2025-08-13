@@ -56,7 +56,7 @@ final class JoinGroupCallRequest extends TlObject
         if ($flags & (1 << 1)) {
             $buffer .= Serializer::bytes($this->inviteHash);
         }
-        $buffer .= Serializer::bytes(json_encode($this->params, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->params);
 
         return $buffer;
     }

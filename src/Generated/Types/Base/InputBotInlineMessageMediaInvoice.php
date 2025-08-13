@@ -50,7 +50,7 @@ final class InputBotInlineMessageMediaInvoice extends AbstractInputBotInlineMess
         $buffer .= $this->invoice->serialize();
         $buffer .= Serializer::bytes($this->payload);
         $buffer .= Serializer::bytes($this->provider);
-        $buffer .= Serializer::bytes(json_encode($this->providerData, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->providerData);
         if ($flags & (1 << 2)) {
             $buffer .= $this->replyMarkup->serialize();
         }

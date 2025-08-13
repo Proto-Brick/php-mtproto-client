@@ -24,7 +24,7 @@ final class InputPaymentCredentialsApplePay extends AbstractInputPaymentCredenti
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-        $buffer .= Serializer::bytes(json_encode($this->paymentData, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->paymentData);
 
         return $buffer;
     }

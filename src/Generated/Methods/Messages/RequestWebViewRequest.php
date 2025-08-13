@@ -79,7 +79,7 @@ final class RequestWebViewRequest extends TlObject
             $buffer .= Serializer::bytes($this->startParam);
         }
         if ($flags & (1 << 2)) {
-            $buffer .= Serializer::bytes(json_encode($this->themeParams, JSON_FORCE_OBJECT));
+            $buffer .= Serializer::serializeDataJSON($this->themeParams);
         }
         $buffer .= Serializer::bytes($this->platform);
         if ($flags & (1 << 0)) {

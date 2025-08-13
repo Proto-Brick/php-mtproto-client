@@ -18,13 +18,13 @@ final class InputAppEvent extends TlObject
      * @param float $time
      * @param string $type
      * @param int $peer
-     * @param array $data
+     * @param AbstractJSONValue $data
      */
     public function __construct(
         public readonly float $time,
         public readonly string $type,
         public readonly int $peer,
-        public readonly array $data
+        public readonly AbstractJSONValue $data
     ) {}
     
     public function serialize(): string
@@ -33,7 +33,7 @@ final class InputAppEvent extends TlObject
         $buffer .= pack('d', $this->time);
         $buffer .= Serializer::bytes($this->type);
         $buffer .= Serializer::int64($this->peer);
-        $buffer .= (new DataJSON(json_encode($this->data, JSON_FORCE_OBJECT)))->serialize();
+        $buffer .= $this->data->serialize();
 
         return $buffer;
     }
@@ -47,7 +47,7 @@ final class InputAppEvent extends TlObject
         $time = Deserializer::double($stream);
         $type = Deserializer::bytes($stream);
         $peer = Deserializer::int64($stream);
-        $data = Deserializer::deserializeJsonValue($stream);
+        $data = AbstractJSONValue::deserialize($stream);
 
         return new self(
             $time,

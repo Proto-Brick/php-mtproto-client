@@ -30,7 +30,7 @@ final class SendMessageEmojiInteraction extends AbstractSendMessageAction
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::bytes($this->emoticon);
         $buffer .= Serializer::int32($this->msgId);
-        $buffer .= Serializer::bytes(json_encode($this->interaction, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->interaction);
 
         return $buffer;
     }

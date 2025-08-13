@@ -56,7 +56,7 @@ final class InputMediaInvoice extends AbstractInputMedia
         if ($flags & (1 << 3)) {
             $buffer .= Serializer::bytes($this->provider);
         }
-        $buffer .= Serializer::bytes(json_encode($this->providerData, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->providerData);
         if ($flags & (1 << 1)) {
             $buffer .= Serializer::bytes($this->startParam);
         }

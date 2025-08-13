@@ -37,7 +37,7 @@ final class SaveCallDebugRequest extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->peer->serialize();
-        $buffer .= Serializer::bytes(json_encode($this->debug, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->debug);
 
         return $buffer;
     }

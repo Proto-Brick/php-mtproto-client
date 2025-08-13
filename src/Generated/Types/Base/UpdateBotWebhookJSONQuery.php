@@ -29,7 +29,7 @@ final class UpdateBotWebhookJSONQuery extends AbstractUpdate
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::int64($this->queryId);
-        $buffer .= Serializer::bytes(json_encode($this->data, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->data);
         $buffer .= Serializer::int32($this->timeout);
 
         return $buffer;

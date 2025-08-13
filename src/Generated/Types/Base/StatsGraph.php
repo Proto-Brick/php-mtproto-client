@@ -29,7 +29,7 @@ final class StatsGraph extends AbstractStatsGraph
         $flags = 0;
         if ($this->zoomToken !== null) $flags |= (1 << 0);
         $buffer .= Serializer::int32($flags);
-        $buffer .= Serializer::bytes(json_encode($this->json, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->json);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::bytes($this->zoomToken);
         }

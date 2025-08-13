@@ -1,7 +1,7 @@
 <?php declare(strict_types=1);
 namespace DigitalStars\MtprotoClient\Generated\Types\Help;
 
-use DigitalStars\MtprotoClient\Generated\Types\Base\DataJSON;
+use DigitalStars\MtprotoClient\Generated\Types\Base\AbstractJSONValue;
 use DigitalStars\MtprotoClient\TL\Deserializer;
 use DigitalStars\MtprotoClient\TL\Serializer;
 use DigitalStars\MtprotoClient\TL\TlObject;
@@ -17,18 +17,18 @@ final class AppConfig extends AbstractAppConfig
     
     /**
      * @param int $hash
-     * @param array $config
+     * @param AbstractJSONValue $config
      */
     public function __construct(
         public readonly int $hash,
-        public readonly array $config
+        public readonly AbstractJSONValue $config
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::int32($this->hash);
-        $buffer .= (new DataJSON(json_encode($this->config, JSON_FORCE_OBJECT)))->serialize();
+        $buffer .= $this->config->serialize();
 
         return $buffer;
     }
@@ -37,7 +37,7 @@ final class AppConfig extends AbstractAppConfig
     {
         Deserializer::int32($stream); // Constructor ID
         $hash = Deserializer::int32($stream);
-        $config = Deserializer::deserializeJsonValue($stream);
+        $config = AbstractJSONValue::deserialize($stream);
 
         return new self(
             $hash,

@@ -37,7 +37,7 @@ final class AssignPlayMarketTransactionRequest extends TlObject
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-        $buffer .= Serializer::bytes(json_encode($this->receipt, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->receipt);
         $buffer .= $this->purpose->serialize();
 
         return $buffer;

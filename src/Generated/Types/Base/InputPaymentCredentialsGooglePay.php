@@ -24,7 +24,7 @@ final class InputPaymentCredentialsGooglePay extends AbstractInputPaymentCredent
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
-        $buffer .= Serializer::bytes(json_encode($this->paymentToken, JSON_FORCE_OBJECT));
+        $buffer .= Serializer::serializeDataJSON($this->paymentToken);
 
         return $buffer;
     }
