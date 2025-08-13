@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+
 require_once __DIR__ . '/GeneratorHelpers.php';
 
 /**
@@ -30,9 +35,10 @@ class GeneratorTL
     ];
     private const API_SCHEMA_PATH = __DIR__ . '/../schema/TL_telegram_v211.json';
     private const OUTPUT_DIR = __DIR__ . '/../src/Generated';
-    private const BASE_NAMESPACE = 'DigitalStars\\MtprotoClient\\Generated';
+    private const BASE_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated';
     private const GENERATED_METHODS_NAMESPACE = self::BASE_NAMESPACE . '\\Methods';
-    private const TL_OBJECT_FQN = 'DigitalStars\\MtprotoClient\\TL\\TlObject';
+    private const TL_OBJECT_FQN = TlObject::class;
+    private const RPC_REQUEST_FQN = RpcRequest::class;
 
     private array $schema;
     public array $abstractTypes = [];
@@ -166,10 +172,11 @@ class GeneratorTL
 
         namespace {$fullNamespace};
 
-        use DigitalStars\MtprotoClient\TL\Contracts\TlObjectInterface;
-        use DigitalStars\MtprotoClient\TL\Deserializer;
-        use DigitalStars\MtprotoClient\TL\Serializer;
+        use ProtoBrick\MTProtoClient\TL\Contracts\TlObjectInterface;
+        use ProtoBrick\MTProtoClient\TL\Deserializer;
+        use ProtoBrick\MTProtoClient\TL\Serializer;
         use RuntimeException;
+        use ValueError;
 
         /**
          * @see https://core.telegram.org/type/{$enumType}
@@ -188,7 +195,7 @@ class GeneratorTL
                 \$constructorId = Deserializer::int32(\$stream);
                 try {
                     return self::from(\$constructorId);
-                } catch (\ValueError \$e) {
+                } catch (ValueError \$e) {
                     throw new RuntimeException(sprintf(
                         'Unknown constructor ID for enum %s. Received ID: 0x%s (signed: %d)',
                         self::class,
@@ -306,17 +313,36 @@ class GeneratorTL
         }
 
         // --- Extends logic ---
-        $baseClass = $this->registerUse(self::TL_OBJECT_FQN, $className, null);
-        $extends = $baseClass;
+        $extends = '';
         $parentFqcn = null;
-        $isConcreteOfAbstract = !$isMethod && isset($this->abstractTypes[$parentType]);
-        if ($isConcreteOfAbstract) {
-            $parentFqcn = $this->resolveCustomType($parentType);
-            $extends = $this->registerUse($parentFqcn, $className, null);
+        $isConcreteOfAbstract = false;
+
+        if ($isMethod) {
+            $baseClassFqn = self::RPC_REQUEST_FQN;
+            $parentFqcn = $baseClassFqn; // Устанавливаем для корректной работы registerUse
+            $extends = $this->registerUse($baseClassFqn, $className, null);
+        } else {
+            $isConcreteOfAbstract = isset($this->abstractTypes[$parentType]);
+            if ($isConcreteOfAbstract) {
+                // Если класс наследуется от нашего абстрактного класса,
+                // то TlObject уже будет доступен через него.
+                $parentFqcn = $this->resolveCustomType($parentType);
+                $extends = $this->registerUse($parentFqcn, $className, null);
+            } else {
+                // Только если это "корневой" DTO, он наследуется напрямую от TlObject.
+                $baseClassFqn = self::TL_OBJECT_FQN;
+                $extends = $this->registerUse($baseClassFqn, $className, null);
+            }
         }
 
-        $this->registerUse('DigitalStars\\MtprotoClient\\TL\\Serializer', $className, null);
-        $this->registerUse('DigitalStars\\MtprotoClient\\TL\\Deserializer', $className, null);
+        $this->registerUse(Serializer::class, $className, $parentFqcn);
+        if (!$isMethod) {
+            $this->registerUse(Deserializer::class, $className, $parentFqcn);
+            if (!$isConcreteOfAbstract) {
+                // Только "корневые" DTO выбрасывают это исключение при проверке constructorId
+                $this->registerUse(\RuntimeException::class, $className, $parentFqcn);
+            }
+        }
 
         // --- Constructor, Properties and other Use statements ---
         $constructorData = $this->buildConstructorParams($item['params'], $className, $parentFqcn);
@@ -326,9 +352,7 @@ class GeneratorTL
         // --- Method-specific content ---
         $methodSpecifics = '';
         if ($isMethod) {
-            $this->registerUse('DigitalStars\\MtprotoClient\\TL\\Serializer', $className, null);
             $methodSpecifics = $this->buildMethodSpecificContent($item, $className, $parentFqcn);
-            $this->registerUse('LogicException', $className, null);
         }
 
         // --- Serializer/Deserializer content ---

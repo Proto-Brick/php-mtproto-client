@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use ProtoBrick\MTProtoClient\Client;
+
 require_once __DIR__ . '/GeneratorHelpers.php';
 
 class ApiGenerator
@@ -10,9 +12,9 @@ class ApiGenerator
 
     private const API_SCHEMA_PATH = __DIR__ . '/../schema/TL_telegram_v211.json';
     private const OUTPUT_DIR = __DIR__ . '/../src/Generated/Api';
-    private const BASE_NAMESPACE = 'DigitalStars\\MtprotoClient\\Generated\\Api';
-    private const GENERATED_METHODS_NAMESPACE = 'DigitalStars\\MtprotoClient\\Generated\\Methods';
-    private const CLIENT_FQN = 'DigitalStars\\MtprotoClient\\Client';
+    private const BASE_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Api';
+    private const GENERATED_METHODS_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Methods';
+    private const CLIENT_FQN = Client::class;
 
     private array $schema;
     private array $typeToConstructorsMap;
@@ -90,20 +92,26 @@ class ApiGenerator
         $methodsContent = [];
 
         foreach ($methods as $method) {
-            $methodName = lcfirst($this->snakeToCamel(explode('.', $method['method'])[1]));
+            $methodParts = explode('.', $method['method']);
+            $methodName = lcfirst($this->snakeToCamel(end($methodParts)));
 
             $apiMethodParams = $this->buildApiMethodParams($method['params'], $className);
             $paramDefs = $apiMethodParams['definitions'];
             $paramVarsStr = $apiMethodParams['call_vars'];
             $paramDocs = $apiMethodParams['param_docs'];
 
-            $returnTypeInfo = $this->getTypeInfo($method['type'], $className);
+            $returnTypeInfo = $this->resolvePhpTypeInfo($method['type'], $className, null);
+
+            $returnDocType = $returnTypeInfo['phpdoc_type'];
+            if (!str_contains($returnTypeInfo['native_type'], '?')) {
+                $returnDocType = str_replace('|null', '', $returnDocType);
+            }
 
             $phpdoc = "    /**\n";
             if (!empty($paramDocs)) {
                 $phpdoc .= implode("\n", $paramDocs) . "\n";
             }
-            $phpdoc .= "     * @return {$returnTypeInfo['phpdoc_type']}\n";
+            $phpdoc .= "     * @return {$returnDocType}\n";
             $phpdoc .= "     * @see https://core.telegram.org/method/{$method['method']}\n";
             $phpdoc .= "     * @api\n";
             $phpdoc .= "     */\n";
@@ -116,8 +124,11 @@ class ApiGenerator
             if ($returnTypeInfo['native_type'] === 'bool') $call = "(bool) {$call}";
             if ($returnTypeInfo['native_type'] === 'int') $call = "(int) {$call}";
 
+            // Убираем `?` из нативного типа для возвращаемого значения, так как callSync вернет null или объект
+            $nativeReturnType = $returnTypeInfo['native_type'];
+
             $methodsContent[] = $phpdoc . <<<PHP
-                public function {$methodName}({$paramDefs}): {$returnTypeInfo['native_type']}
+                public function {$methodName}({$paramDefs}): {$nativeReturnType}
                 {
                     return {$call};
                 }
@@ -130,7 +141,7 @@ class ApiGenerator
 
         $fileContent = <<<PHP
             <?php declare(strict_types=1);
-            namespace DigitalStars\\MtprotoClient\\Generated\\Api;
+            namespace ProtoBrick\\MTProtoClient\\Generated\\Api;
             {$useBlock}
             /**
              * DO NOT EDIT. This file is generated automatically.
@@ -146,43 +157,6 @@ class ApiGenerator
             PHP;
 
         $this->writeFile($filePath, $fileContent);
-    }
-
-    private function getTypeInfo(string $tlType, string $currentClassName): array
-    {
-        $fqn = $this->mapTlTypeToPhp($tlType, $currentClassName);
-        $isBuiltIn = in_array($fqn, ['bool', 'int', 'string', 'float', 'array'], true);
-
-        $nativeType = $isBuiltIn ? $fqn : "?" . $this->registerUse($fqn, $currentClassName, null);
-
-        $phpdocTypes = [];
-        if ($tlType === 'Bool') {
-            $phpdocTypes[] = 'bool';
-        } elseif (str_starts_with($tlType, 'Vector<')) {
-            $innerTypeTl = substr($tlType, 7, -1);
-            // Рекурсивный вызов для внутреннего типа ГАРАНТИРУЕТ его регистрацию
-            $innerTypeInfo = $this->getTypeInfo($innerTypeTl, $currentClassName);
-            $innerDocType = str_replace('|null', '', $innerTypeInfo['phpdoc_type']);
-            $phpdocTypes[] = "list<{$innerDocType}>";
-        } elseif (isset($this->abstractTypes[$tlType])) {
-            foreach ($this->typeToConstructorsMap[$tlType] as $constructor) {
-                $predicate = $constructor['predicate'];
-                if (in_array($predicate, ['boolFalse', 'boolTrue'], true)) continue;
-                $childFqn = $this->mapTlTypeToPhp($predicate, $currentClassName);
-                $phpdocTypes[] = $this->registerUse($childFqn, $currentClassName, null);
-            }
-        } else {
-            $phpdocTypes[] = $isBuiltIn ? $fqn : $this->registerUse($fqn, $currentClassName, null);
-        }
-
-        if (!$isBuiltIn) {
-            $phpdocTypes[] = 'null';
-        }
-
-        return [
-            'native_type' => $nativeType,
-            'phpdoc_type' => implode('|', array_unique($phpdocTypes)),
-        ];
     }
 
     private function buildApiMethodParams(array $params, string $currentClassName): array
@@ -212,23 +186,29 @@ class ApiGenerator
             $actualType = $isConditional ? explode('?', $originalTlType)[1] : $originalTlType;
             if ($actualType === 'true' || $actualType === 'Bool') $actualType = 'bool';
 
-            $typeInfo = $this->getTypeInfo($actualType, $currentClassName);
+            $typeInfo = $this->resolvePhpTypeInfo($actualType, $currentClassName, null);
 
             $docType = $typeInfo['phpdoc_type'];
-            if (!$isConditional) {
-                $docType = str_replace('|null', '', $docType);
-            } else {
-                // Если тип и так nullable (объект), то |null уже есть. Если нет, добавляем.
-                if(!str_contains($docType, 'null')) {
+            $nativeType = $typeInfo['native_type'];
+
+            if ($isConditional) {
+                // Если тип уже nullable (объект или union), то |null в phpdoc уже есть.
+                if (!str_contains($docType, 'null')) {
                     $docType .= '|null';
                 }
+                // Нативный тип тоже делаем nullable
+                if (!str_starts_with($nativeType, '?')) {
+                    $nativeType = '?' . $nativeType;
+                }
+            } else {
+                // Убираем nullable из документации и тайп-хинта
+                $docType = str_replace('|null', '', $docType);
+                $nativeType = str_replace('?', '', $nativeType);
             }
+
             $paramDocs[] = "     * @param {$docType} \${$paramName}";
 
-            $baseNativeType = str_replace('?', '', $typeInfo['native_type']);
-            $typeHint = $isConditional ? "?{$baseNativeType}" : $baseNativeType;
-
-            $paramDef = "{$typeHint} \${$paramName}";
+            $paramDef = "{$nativeType} \${$paramName}";
             if ($isConditional) {
                 $paramDef .= " = null";
             }

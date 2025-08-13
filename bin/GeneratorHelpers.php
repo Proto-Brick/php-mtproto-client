@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+
 trait GeneratorHelpers
 {
-    private const GENERATED_TYPES_NAMESPACE = 'DigitalStars\\MtprotoClient\\Generated\\Types';
+    private const GENERATED_TYPES_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Types';
 
     /**
      * @var array<string, string> Карта [КороткоеИмяКласса => ПолноеИмяКласса] для отслеживания конфликтов.
@@ -29,7 +31,7 @@ trait GeneratorHelpers
     private function registerUse(string $fqn, string $currentClassName, ?string $parentFqcn): string
     {
         $fqn = $this->escapeFqn($fqn);
-        if (!str_contains($fqn, '\\')) {
+        if ($this->isPrimitiveType($fqn)) {
             return $fqn;
         }
 
@@ -260,16 +262,11 @@ trait GeneratorHelpers
         ksort($useStatements);
 
         $escapedCurrentNamespace = $this->escapeFqn($currentNamespace);
-        $escapedParentFqcn = $parentFqcn ? $this->escapeFqn($parentFqcn) : null;
+//        $escapedParentFqcn = $parentFqcn ? $this->escapeFqn($parentFqcn) : null;
 
         foreach ($useStatements as $useFqn => $aliasOrTrue) {
             $useFqn = $this->escapeFqn($useFqn);
             $parentOfUse = substr($useFqn, 0, (int) strrpos($useFqn, '\\'));
-
-            // Правило 1: Не импортировать родительский класс.
-            if ($escapedParentFqcn === $useFqn) {
-                continue;
-            }
 
             // Правило 2: Не импортировать классы из того же неймспейса.
             if ($escapedCurrentNamespace === $parentOfUse) {
@@ -496,11 +493,11 @@ trait GeneratorHelpers
         array $sortedPropertyNames,
         string $currentClassName,
         ?string $parentFqcn
-    ): string  {
+    ): string {
         $params = $item['params'];
 
-        // --- Тело serialize() ---
-        $serializeBody = "        \$buffer = Serializer::int32(self::CONSTRUCTOR_ID);\n";
+        // --- Логика для serialize() ---
+        $serializeParts = [];
         $flagCalculations = "";
         $flagDefinitions = array_filter($params, static fn($p) => $p['type'] === '#');
 
@@ -520,18 +517,21 @@ trait GeneratorHelpers
                     $check = str_ends_with($param['type'], '?true')
                         ? "\$this->{$propName}"
                         : "\$this->{$propName} !== null";
-                    $flagCalculations .= "        if ({$check}) \${$flagVarName} |= (1 << {$bit});\n";
+
+                    // ИЗМЕНЕНИЕ: Делаем if многострочным для лучшей читаемости
+                    $flagCalculations .= "        if ({$check}) {\n";
+                    $flagCalculations .= "            \${$flagVarName} |= (1 << {$bit});\n";
+                    $flagCalculations .= "        }\n";
                 }
             }
-            $serializeBody .= $flagCalculations;
         }
 
-        // Шаг 3: Проходим по всем параметрам в их ИСХОДНОМ порядке и генерируем код сериализации
+        // Шаг 3: Проходим по всем параметрам в их ИСХОДНОМ порядке и собираем код сериализации
         foreach ($params as $param) {
             $propName = $this->sanitizeParamName($param['name']);
 
             if ($param['type'] === '#') {
-                $serializeBody .= "        \$buffer .= Serializer::int32(\${$propName});\n";
+                $serializeParts[] = "        \$buffer .= Serializer::int32(\${$propName});";
                 continue;
             }
 
@@ -540,26 +540,48 @@ trait GeneratorHelpers
                 $flagVarName = $this->sanitizeParamName($m[1]);
                 $actualType = $m[3];
                 if ($actualType !== 'true') {
-                    $serializeBody .= "        if (\${$flagVarName} & (1 << {$m[2]})) {\n";
-                    $serializeBody .= "            \$buffer .= " . $this->getSerializationCodeForType("\$this->{$propName}", $actualType) . ";\n";
-                    $serializeBody .= "        }\n";
+                    $serializationCode = "            \$buffer .= " . $this->getSerializationCodeForType("\$this->{$propName}", $actualType) . ";";
+                    $serializeParts[] = "        if (\${$flagVarName} & (1 << {$m[2]})) {\n{$serializationCode}\n        }";
                 }
             } else {
-                $serializeBody .= "        \$buffer .= " . $this->getSerializationCodeForType("\$this->{$propName}", $param['type']) . ";\n";
+                $serializeParts[] = "        \$buffer .= " . $this->getSerializationCodeForType("\$this->{$propName}", $param['type']) . ";";
             }
         }
 
-        // --- Тело deserialize() ---
-        $deserializeBody = "";
-        if ($isMethod) {
-            $deserializeBody = "        throw new \LogicException('Request objects are not deserializable');";
+        // --- Собираем тело метода serialize() ---
+        $serializeBody = '';
+        if (empty($serializeParts) && empty($flagCalculations)) {
+            // Оптимизация: нет параметров, возвращаем сразу ID.
+            $serializeBody = "        return Serializer::int32(self::CONSTRUCTOR_ID);";
         } else {
+            // Стандартная логика с буфером.
+            $serializeBody = "        \$buffer = Serializer::int32(self::CONSTRUCTOR_ID);\n";
+            if ($flagCalculations) {
+                $serializeBody .= $flagCalculations;
+            }
+            $serializeBody .= implode("\n", $serializeParts);
+            $serializeBody .= "\n        return \$buffer;";
+        }
+
+
+        $serializeMethod = <<<PHP
+    
+        public function serialize(): string
+        {
+    {$serializeBody}
+        }
+    PHP;
+
+        // --- Логика для deserialize() (остается без изменений) ---
+        $deserializeMethod = '';
+        if (!$isMethod) {
+            $deserializeBody = '';
             if ($isConcreteOfAbstract) {
                 $deserializeBody = "        Deserializer::int32(\$stream); // Constructor ID\n";
             } else {
                 $deserializeBody = "        \$constructorId = Deserializer::int32(\$stream);\n" .
                     "        if (\$constructorId !== self::CONSTRUCTOR_ID) {\n" .
-                    "            throw new \Exception('Invalid constructor ID for ' . self::class);\n" .
+                    "            throw new RuntimeException('Invalid constructor ID for ' . self::class);\n" .
                     "        }\n";
             }
 
@@ -581,14 +603,13 @@ trait GeneratorHelpers
                     $expression = ($actualType === 'true')
                         ? "true"
                         : $this->getDeserializationCodeForType($actualType, $currentClassName, $parentFqcn);
-
-                    $deserializeBody .= "        \${$propName} = (\${$flagVarName} & (1 << {$m[2]})) ? {$expression} : null;\n";
+                    // ИЗМЕНЕНИЕ: Добавляем строгую проверку !== 0 и здесь для консистентности
+                    $deserializeBody .= "        \${$propName} = ((\${$flagVarName} & (1 << {$m[2]})) !== 0) ? {$expression} : null;\n";
                 } else {
                     $deserializeBody .= "        \${$propName} = " . $this->getDeserializationCodeForType($param['type'], $currentClassName, $parentFqcn) . ";\n";
                 }
             }
 
-            // Собираем вызов конструктора, используя $sortedPropertyNames, чтобы порядок аргументов совпал
             $constructorArgsForCall = [];
             foreach ($sortedPropertyNames as $propName) {
                 if (isset($localVars[$propName])) {
@@ -600,23 +621,78 @@ trait GeneratorHelpers
                 : "\n            " . implode(",\n            ", $constructorArgsForCall) . "\n        ";
 
             $deserializeBody .= "\n        return new self({$constructorCall});";
-        }
 
-        $content = <<<PHP
-    
-        public function serialize(): string
-        {
-    {$serializeBody}
-            return \$buffer;
-        }
+            $deserializeMethod = <<<PHP
     
         public static function deserialize(string &\$stream): static
         {
     {$deserializeBody}
         }
     PHP;
+        }
 
-        return $content;
+        return $serializeMethod . $deserializeMethod;
+    }
+
+    /**
+     * @param string $tlType
+     * @param string $currentClassName Контекст класса, где будет использован тип (для управления use)
+     * @param string|null $parentFqcn FQN родительского класса (для управления use)
+     * @return array{native_type: string, phpdoc_type: string}
+     */
+    private function resolvePhpTypeInfo(string $tlType, string $currentClassName, ?string $parentFqcn): array
+    {
+        // --- Обработка Vector ---
+        if (str_starts_with($tlType, 'Vector<')) {
+            $innerTlType = substr($tlType, 7, -1);
+            $innerTypeInfo = $this->resolvePhpTypeInfo($innerTlType, $currentClassName, $parentFqcn);
+            // Убираем `|null` для внутреннего типа, если он есть
+            $innerDocType = str_replace('|null', '', $innerTypeInfo['phpdoc_type']);
+
+            return [
+                'native_type' => 'array',
+                'phpdoc_type' => "list<{$innerDocType}>",
+            ];
+        }
+
+        // --- Обработка примитивов и специальных типов ---
+        $fqn = $this->mapTlTypeToPhp($tlType, $currentClassName);
+        $isBuiltIn = !str_contains($fqn, '\\');
+
+        if ($isBuiltIn) {
+            return [
+                'native_type' => $fqn,
+                'phpdoc_type' => $fqn,
+            ];
+        }
+
+        // --- Обработка абстрактных типов (Union Types) ---
+        if (isset($this->abstractTypes[$tlType])) {
+            $phpdocTypes = [];
+            // Все наследники абстрактного типа являются объектами, поэтому `?` обязателен
+            $nativeType = '?' . $this->registerUse($fqn, $currentClassName, $parentFqcn);
+
+            foreach ($this->typeToConstructorsMap[$tlType] as $constructor) {
+                $childPredicate = $constructor['predicate'];
+                // Пропускаем псевдо-типы
+                if (in_array($childPredicate, ['boolFalse', 'boolTrue', 'null'], true)) continue;
+
+                $childFqn = $this->mapTlTypeToPhp($childPredicate, $currentClassName);
+                $phpdocTypes[] = $this->registerUse($childFqn, $currentClassName, $parentFqcn);
+            }
+            $phpdocType = implode('|', array_unique($phpdocTypes)) . '|null';
+
+            return [
+                'native_type' => $nativeType,
+                'phpdoc_type' => $phpdocType,
+            ];
+        }
+
+        // --- Обработка обычных объектов и enum'ов ---
+        return [
+            'native_type' => '?' . $this->registerUse($fqn, $currentClassName, $parentFqcn),
+            'phpdoc_type' => $this->registerUse($fqn, $currentClassName, $parentFqcn) . '|null',
+        ];
     }
 
     private function getSerializationCodeForType(string $varName, string $tlType): string
@@ -659,9 +735,6 @@ trait GeneratorHelpers
     private function getDeserializationCodeForType(string $tlType, $currentClassName, ?string $parentFqcn): string
     {
         if ($special = $this->getSpecialTypeHandling($tlType)) {
-            if ($tlType === 'DataJSON' || $tlType === 'JSONValue') {
-                $this->registerUse('DigitalStars\\MtprotoClient\\Generated\\Types\\Base\\DataJSON', $currentClassName, $parentFqcn);
-            }
             return $special['deserialize_tpl'];
         }
 
@@ -716,17 +789,31 @@ trait GeneratorHelpers
         }
     }
 
+    private function isPrimitiveType(string $type): bool
+    {
+        return in_array(strtolower($type), [
+            'int', 'string', 'float', 'bool', 'array', 'true', 'null', 'mixed', 'void', 'object'
+        ], true);
+    }
+
     private function buildAbstractDeserializerBody(string $abstractType): string
     {
-        [$parentNamespace, ] = $this->getNamespaceAndClassName($abstractType);
-        $fullParentNamespace = self::BASE_NAMESPACE . '\\Types' . ($parentNamespace ? '\\' . $parentNamespace : '');
+        [$namespace, $className] = $this->getNamespaceAndClassName($abstractType);
+        $fullNamespace = self::BASE_NAMESPACE . '\\Types' . ($namespace ? '\\' . $namespace : '');
+        $baseClass = basename(str_replace('\\', '/', self::TL_OBJECT_FQN));
+        $abstractClassName = 'Abstract' . $className;
 
-        $matchArms = []; // Используем массив вместо конкатенации строк
+        $matchArms = [];
         if (empty($this->typeToConstructorsMap[$abstractType])) {
             return '';
         }
 
-        $useStatementsForFactory = [];
+        // Собираем все зависимости для use-блока в один массив
+        $dependencies = [
+            self::TL_OBJECT_FQN => true,
+            Deserializer::class => true,
+            \RuntimeException::class => true,
+        ];
 
         foreach ($this->typeToConstructorsMap[$abstractType] as $constructor) {
             $id = (int)$constructor['id'];
@@ -735,56 +822,47 @@ trait GeneratorHelpers
 
             [$ns, $class] = $this->getNamespaceAndClassName($constructor['predicate']);
             $fullChildNamespace = self::BASE_NAMESPACE . '\\Types' . ($ns ? '\\' . $ns : '');
+            $childFqcn = $fullChildNamespace . '\\' . $class;
 
-            $callableClass = $class;
-            $fqcn = $fullChildNamespace . '\\' . $class;
-            if ($fullParentNamespace !== $fullChildNamespace) {
-                $useStatementsForFactory[$fqcn] = true;
+            // Добавляем дочерний класс в зависимости, если он в другом неймспейсе
+            if ($fullNamespace !== $fullChildNamespace) {
+                $dependencies[$childFqcn] = true;
             }
 
-            // Генерируем "руку" для match-выражения
-            $matchArms[] = "            {$hexValue} => {$callableClass}::deserialize(\$stream),";
+            $matchArms[] = "            {$hexValue} => {$class}::deserialize(\$stream),";
         }
 
-        // Добавляем default-ветку
-        $matchArms[] = "            default => throw new \Exception(sprintf('Unknown constructor ID for type {$abstractType}. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex(\$constructorId), unpack('l', pack('V', \$constructorId))[1], \$constructorId)),";
+        // Убираем \ перед Exception в default-ветке
+        $matchArms[] = "            default => throw new RuntimeException(sprintf('Unknown constructor ID for type {$abstractType}. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex(\$constructorId), unpack('l', pack('V', \$constructorId))[1], \$constructorId)),";
 
         $cases = implode("\n", $matchArms);
-        $useBlock = $this->buildUseBlock($useStatementsForFactory, $fullParentNamespace, null);
 
-        // Добавляем @var static, чтобы помочь статическим анализаторам (PHPStan/Psalm)
-        // правильно вывести тип после сложного match-выражения. Без этого они
-        // могут ошибочно посчитать, что возвращаемый тип несовместим со static.
+        // Собираем ЕДИНСТВЕННЫЙ use-блок для всего файла
+        $useBlock = $this->buildUseBlock($dependencies, $fullNamespace, null);
+
         $body = <<<PHP
-        public static function deserialize(string &\$stream): static
-        {
-            // Peek at the constructor ID to determine the concrete type
-            \$constructorId = Deserializer::peekInt32(\$stream);
-            
-            return match (\$constructorId) {
-    {$cases}
-            };
-        }
-    PHP;
-
-        [$namespace, $className] = $this->getNamespaceAndClassName($abstractType);
-        $abstractClassName = 'Abstract' . $className;
-        $fullNamespace = self::BASE_NAMESPACE . '\\Types' . ($namespace ? '\\' . $namespace : '');
-        $baseClass = basename(str_replace('\\', '/', self::TL_OBJECT_FQN));
+    public static function deserialize(string &\$stream): static
+    {
+        // Peek at the constructor ID to determine the concrete type
+        \$constructorId = Deserializer::peekInt32(\$stream);
+        
+        return match (\$constructorId) {
+{$cases}
+        };
+    }
+PHP;
 
         return <<<PHP
-    <?php declare(strict_types=1);
-    namespace {$fullNamespace};
-
-    use DigitalStars\\MtprotoClient\\TL\\Deserializer;
-    use {$this->escapeFqn(self::TL_OBJECT_FQN)};{$useBlock}
-    /**
-     * @see https://core.telegram.org/type/{$abstractType}
-     */
-    abstract class {$abstractClassName} extends {$baseClass}
-    {
-    {$body}
-    }
-    PHP;
+<?php declare(strict_types=1);
+namespace {$fullNamespace};
+{$useBlock}
+/**
+ * @see https://core.telegram.org/type/{$abstractType}
+ */
+abstract class {$abstractClassName} extends {$baseClass}
+{
+{$body}
+}
+PHP;
     }
 }
