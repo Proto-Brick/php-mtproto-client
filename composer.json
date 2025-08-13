@@ -1,25 +1,28 @@
 {
-  "name": "digitalstars/php-mtproto-client",
-  "description": "PHP client library for the Telegram MTProto API",
+  "name": "protobrick/mtproto-client",
+  "description": "Async low-level PHP client library for Telegram MTProto API. Build userbots with user phone authentication.",
   "license": "MIT",
   "type": "library",
   "minimum-stability": "dev",
   "prefer-stable": true,
-  "homepage": "https://github.com/digitalstars/php-mtproto-client",
+  "homepage": "https://github.com/Proto-Brick/php-mtproto-client",
   "keywords": [
     "php",
     "async",
     "telegram",
     "mtproto",
     "api",
+    "amphp",
     "telegram-api",
+    "tdlib",
     "protocol",
     "library",
     "wrapper",
     "sdk",
     "client",
     "userbot",
-    "authorization"
+    "authorization",
+    "protobrick"
   ],
   "require": {
     "php-64bit": ">=8.2",
