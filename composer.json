@@ -23,6 +23,7 @@
   ],
   "require": {
     "php-64bit": ">=8.2",
+    "ext-zlib": "*",
     "ext-openssl": "*",
     "phpseclib/phpseclib": "^3.0",
     "amphp/sync": "^2.3",
