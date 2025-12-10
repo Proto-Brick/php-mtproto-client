@@ -7,7 +7,6 @@ namespace ProtoBrick\MTProtoClient\Auth;
 use ProtoBrick\MTProtoClient\Crypto\Ige;
 use ProtoBrick\MTProtoClient\Crypto\Rsa;
 use ProtoBrick\MTProtoClient\Domain\Factorizer;
-use ProtoBrick\MTProtoClient\Exception\FactorizationException;
 use ProtoBrick\MTProtoClient\Exception\TransportException;
 use ProtoBrick\MTProtoClient\MessagePacker;
 use ProtoBrick\MTProtoClient\Session\Session;
@@ -42,19 +41,16 @@ class AuthKeyCreator
         echo "Step 1 (req_pq): OK\n";
 
         // Шаг 2: Факторизация pq
-        $pq = new BigInteger($resPQData['pq'], 256);
-        [$p_val, $q_val] = Factorizer::factorize($pq);
+        $pqBig = new BigInteger($resPQData['pq'], 256);
+        [$pInt, $qInt] = Factorizer::factorize($pqBig->toString());
 
-        if (!$pq->equals($p_val->multiply($q_val))) {
-            throw new FactorizationException("Factorization failed: p * q does not equal original pq.");
-        }
+        $pBytes = Serializer::intToBinary($pInt);
+        $qBytes = Serializer::intToBinary($qInt);
 
-        $p = $p_val->toBytes(false); // false для big-endian
-        $q = $q_val->toBytes(false);
-        echo "Step 2 (factorization): OK (p=$p_val, q=$q_val)\n";
+        echo "Step 2 (factorization): OK (p=$pInt, q=$qInt)\n";
 
         // Шаг 3: req_DH_params
-        $serverDhParams = $this->sendReqDhParams($resPQData, $p, $q);
+        $serverDhParams = $this->sendReqDhParams($resPQData, $pBytes, $qBytes);
         echo "Step 3 (req_DH_params): OK\n";
 
         // Шаг 4: set_client_DH_params
@@ -131,7 +127,7 @@ class AuthKeyCreator
     /**
      * Шаг 3: Отправка запроса req_DH_params.
      */
-    private function sendReqDhParams(array $resPQData, string $p, string $q): array
+    private function sendReqDhParams(array $resPQData, string $pBytes, string $qBytes): array
     {
         $publicKeyPem = null;
         $foundFingerprint_int = null;
@@ -158,8 +154,8 @@ class AuthKeyCreator
         $innerDataPayload =
             Serializer::int32(Constructors::P_Q_INNER_DATA_DC)
             . Serializer::bytes($pq_big)
-            . Serializer::bytes($p)
-            . Serializer::bytes($q)
+            . Serializer::bytes($pBytes)
+            . Serializer::bytes($qBytes)
             . Serializer::raw128($resPQData['original_nonce'])
             . Serializer::raw128($resPQData['server_nonce'])
             . Serializer::raw256($newNonce)
@@ -173,8 +169,8 @@ class AuthKeyCreator
             Serializer::int32(Constructors::REQ_DH_PARAMS)
             . Serializer::raw128($resPQData['nonce'])
             . Serializer::raw128($resPQData['server_nonce'])
-            . Serializer::bytes($p)
-            . Serializer::bytes($q)
+            . Serializer::bytes($pBytes)
+            . Serializer::bytes($qBytes)
             . Serializer::int64($foundFingerprint_int)
             . Serializer::bytes($encryptedInnerData);
 

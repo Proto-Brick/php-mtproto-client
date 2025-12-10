@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ProtoBrick\MTProtoClient\Crypto;
 
 use phpseclib3\Math\BigInteger;
+use ProtoBrick\MTProtoClient\TL\Serializer;
 
 class Rsa
 {
@@ -43,8 +44,8 @@ class Rsa
             $n = $details['rsa']['n'];
             $e = $details['rsa']['e'];
 
-            $n_tl_bytes = $this->serializeBytes($n);
-            $e_tl_bytes = $this->serializeBytes($e);
+            $n_tl_bytes = Serializer::bytes($n);
+            $e_tl_bytes = Serializer::bytes($e);
             $dataForHash = $n_tl_bytes . $e_tl_bytes;
 
             if (\strlen($n) === 257 && $n[0] === "\0") {
@@ -64,36 +65,23 @@ class Rsa
         return null;
     }
 
-    // Вспомогательный метод для сериализации байтовой строки по правилам TL.
-    // Эта логика взята из вашего TL\Serializer::bytes
-    private function serializeBytes(string $value): string
-    {
-        $len = \strlen($value);
-        if ($len <= 253) {
-            $prefix = \chr($len);
-            $paddingLen = (4 - (($len + 1) % 4)) % 4;
-        } else {
-            $prefix = "\xfe" . substr(pack('V', $len), 0, 3);
-            $paddingLen = (4 - $len % 4) % 4;
-        }
-        return $prefix . $value . str_repeat("\x00", $paddingLen);
-    }
-
-
     public function encryptPqInnerData(string $data, string $publicKeyPem): string
     {
         $details = openssl_pkey_get_details(openssl_pkey_get_public($publicKeyPem));
         if (!$details || !isset($details['rsa']['n'])) {
             throw new \RuntimeException("Could not get RSA key details.");
         }
+
         $modulus_n = new BigInteger($details['rsa']['n'], 256);
 
-        while (true) {
-            if (\strlen($data) > 144) { // Официальная документация указывает на 192, но примеры показывают, что данные обычно короче
-                throw new \InvalidArgumentException("Data for RSA_PAD must not exceed 144 bytes for this step.");
-            }
-            $data_with_padding = $data . random_bytes(192 - \strlen($data));
+        if (\strlen($data) > 144) { // Официальная документация указывает на 192, но примеры показывают, что данные обычно короче
+            throw new \InvalidArgumentException("Data for RSA_PAD must not exceed 144 bytes for this step.");
+        }
 
+        $paddingLen = 192 - \strlen($data);
+
+        for ($i = 0; $i < 20; $i++) {
+            $data_with_padding = $data . random_bytes($paddingLen);
             $data_pad_reversed = strrev($data_with_padding);
             $temp_key = random_bytes(32);
             $data_with_hash = $data_pad_reversed . hash('sha256', $temp_key . $data_with_padding, true);
@@ -105,19 +93,17 @@ class Rsa
             $key_aes_encrypted = $temp_key_xor . $aes_encrypted;
 
             if ((new BigInteger($key_aes_encrypted, 256))->compare($modulus_n) < 0) {
-                break;
+                $encryptedData = '';
+                if (!openssl_public_encrypt($key_aes_encrypted, $encryptedData, $publicKeyPem, OPENSSL_NO_PADDING)) {
+                    throw new \RuntimeException("Failed to encrypt with RSA: " . openssl_error_string());
+                }
+                if (\strlen($encryptedData) !== 256) {
+                    throw new \RuntimeException("RSA encryption result is not 256 bytes long.");
+                }
+                return $encryptedData;
             }
         }
 
-        $encryptedData = '';
-        if (!openssl_public_encrypt($key_aes_encrypted, $encryptedData, $publicKeyPem, OPENSSL_NO_PADDING)) {
-            throw new \RuntimeException("Failed to encrypt with RSA: " . openssl_error_string());
-        }
-
-        if (\strlen($encryptedData) !== 256) {
-            throw new \RuntimeException("RSA encryption result is not 256 bytes long.");
-        }
-
-        return $encryptedData;
+        throw new \RuntimeException("Failed to generate a valid RSA-encrypted payload (m < n check) for req_DH_params within 20 attempts.");
     }
 }

@@ -34,7 +34,6 @@
     "revolt/event-loop": "^1.0"
   },
   "suggest": {
-    "ext-ffi": "Для максимальной производительности при создании ключа авторизации (использует скомпилированный C++ модуль).",
     "ext-gmp": "Install the gmp extension to speed up authorization",
     "ext-bcmath": "Install the bcmath extension to speed up authorization",
     "ext-openssl": "Install the openssl extension for faster crypto"

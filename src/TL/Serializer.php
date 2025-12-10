@@ -86,6 +86,17 @@ class Serializer
         return $prefix . $value . str_repeat("\x00", $paddingLen);
     }
 
+    /**
+     * Преобразует int в сырую бинарную строку (Big-Endian) минимальной длины.
+     * Аналог toBytes(false) из BigInteger.
+     * Используется для p и q.
+     */
+    public static function intToBinary(int $number): string
+    {
+        $binary = ltrim(pack('J', $number), "\x00");
+        return $binary === '' ? "\x00" : $binary;
+    }
+
     public static function vectorOfObjects(array $items): string
     {
         if (empty($items)) {
