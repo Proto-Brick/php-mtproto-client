@@ -1,6 +1,6 @@
 {
   "name": "protobrick/mtproto-client",
-  "description": "Async low-level PHP client library for Telegram MTProto API. Build userbots with user phone authentication.",
+  "description": "Async low-level pure PHP client library for Telegram MTProto API. Build userbots with user phone authentication",
   "license": "MIT",
   "type": "library",
   "minimum-stability": "dev",
@@ -20,6 +20,7 @@
     "wrapper",
     "sdk",
     "client",
+    "bot",
     "userbot",
     "authorization",
     "protobrick"
@@ -27,7 +28,6 @@
   "require": {
     "php-64bit": ">=8.2",
     "ext-zlib": "*",
-    "ext-openssl": "*",
     "phpseclib/phpseclib": "^3.0",
     "amphp/sync": "^2.3",
     "amphp/socket": "^2.3",
@@ -36,7 +36,7 @@
   "suggest": {
     "ext-gmp": "Install the gmp extension to speed up authorization",
     "ext-bcmath": "Install the bcmath extension to speed up authorization",
-    "ext-openssl": "Install the openssl extension for faster crypto"
+    "ext-openssl": "Speeds up crypto operations (AES/RSA) significantly"
   },
   "autoload": {
     "psr-4": {

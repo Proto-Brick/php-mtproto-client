@@ -222,6 +222,11 @@ class Client
         });
     }
 
+    public function getSettings(): Settings
+    {
+        return $this->settings;
+    }
+
     private function sendPacketAndRegister(RpcRequest $request, DeferredFuture $deferred): Future
     {
         return async(function () use ($request, $deferred): void {

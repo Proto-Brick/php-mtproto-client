@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace ProtoBrick\MTProtoClient\Crypto;
 
+use phpseclib3\Crypt\PublicKeyLoader;
+use phpseclib3\Crypt\RSA as PhpseclibRSA;
+use phpseclib3\Crypt\Common\PublicKey as PhpseclibPublicKey;
 use phpseclib3\Math\BigInteger;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 
@@ -31,29 +34,49 @@ class Rsa
         '-----END RSA PUBLIC KEY-----',
     ];
 
+    private bool $useOpenSsl;
+
+    public function __construct()
+    {
+        $this->useOpenSsl = extension_loaded('openssl');
+    }
+
     public function findKeyByFingerprint(int $fingerprint): ?string
     {
+        foreach (self::TELEGRAM_PUBLIC_KEYS as $keyPem) {
+            if ($this->useOpenSsl) {
+                $details = openssl_pkey_get_details(openssl_pkey_get_public($keyPem));
+                if (!$details || !isset($details['rsa'])) {
+                    continue;
+                }
 
-        // Убрал отладочный вывод для чистоты
-        foreach (self::TELEGRAM_PUBLIC_KEYS as $keyIndex => $keyPem) {
-            $details = openssl_pkey_get_details(openssl_pkey_get_public($keyPem));
-            if (!$details || !isset($details['rsa'])) {
-                continue;
+                $n = $details['rsa']['n'];
+                $e = $details['rsa']['e'];
+
+                if (\strlen($n) === 257 && $n[0] === "\0") {
+                    $n = substr($n, 1);
+                }
+            } else {
+                try {
+                    /** @var PhpseclibPublicKey $key */
+                    $key = PublicKeyLoader::load($keyPem);
+                    $raw = $key->toString('Raw');
+
+                    if (!isset($raw['n'], $raw['e'])) {
+                        continue;
+                    }
+
+                    $n = $raw['n']->toBytes();
+                    $e = $raw['e']->toBytes();
+                } catch (\Throwable) {
+                    continue;
+                }
             }
-
-            $n = $details['rsa']['n'];
-            $e = $details['rsa']['e'];
 
             $n_tl_bytes = Serializer::bytes($n);
             $e_tl_bytes = Serializer::bytes($e);
             $dataForHash = $n_tl_bytes . $e_tl_bytes;
 
-            if (\strlen($n) === 257 && $n[0] === "\0") {
-                $n = substr($n, 1);
-                echo "  n after normalization (len=" . \strlen($n) . "): " . bin2hex($n) . "\n";
-            }
-
-            // Вычисляем SHA1 и берем последние 8 байт (64 младших бита)
             $fingerprint_part_be = substr(sha1($dataForHash, true), -8);
             $calculatedFingerprint_int = unpack('q', $fingerprint_part_be)[1];
 
@@ -67,15 +90,28 @@ class Rsa
 
     public function encryptPqInnerData(string $data, string $publicKeyPem): string
     {
-        $details = openssl_pkey_get_details(openssl_pkey_get_public($publicKeyPem));
-        if (!$details || !isset($details['rsa']['n'])) {
-            throw new \RuntimeException("Could not get RSA key details.");
+        $phpseclibKey = null;
+
+        if ($this->useOpenSsl) {
+            $details = openssl_pkey_get_details(openssl_pkey_get_public($publicKeyPem));
+            if (!$details || !isset($details['rsa']['n'])) {
+                throw new \RuntimeException("Could not get RSA key details via OpenSSL.");
+            }
+
+            $modulusBigInt = new BigInteger($details['rsa']['n'], 256);
+        } else {
+            /** @var PhpseclibPublicKey $phpseclibKey */
+            $phpseclibKey = PublicKeyLoader::load($publicKeyPem);
+
+            $raw = $phpseclibKey->toString('Raw');
+            if (!isset($raw['n'])) {
+                throw new \RuntimeException("Invalid RSA key format in phpseclib.");
+            }
+            $modulusBigInt = $raw['n'];
         }
 
-        $modulus_n = new BigInteger($details['rsa']['n'], 256);
-
-        if (\strlen($data) > 144) { // Официальная документация указывает на 192, но примеры показывают, что данные обычно короче
-            throw new \InvalidArgumentException("Data for RSA_PAD must not exceed 144 bytes for this step.");
+        if (\strlen($data) > 144) {
+            throw new \InvalidArgumentException("Data for RSA_PAD must not exceed 144 bytes.");
         }
 
         $paddingLen = 192 - \strlen($data);
@@ -92,18 +128,32 @@ class Rsa
             $temp_key_xor = $temp_key ^ hash('sha256', $aes_encrypted, true);
             $key_aes_encrypted = $temp_key_xor . $aes_encrypted;
 
-            if ((new BigInteger($key_aes_encrypted, 256))->compare($modulus_n) < 0) {
-                $encryptedData = '';
-                if (!openssl_public_encrypt($key_aes_encrypted, $encryptedData, $publicKeyPem, OPENSSL_NO_PADDING)) {
-                    throw new \RuntimeException("Failed to encrypt with RSA: " . openssl_error_string());
+            if ((new BigInteger($key_aes_encrypted, 256))->compare($modulusBigInt) < 0) {
+                if ($this->useOpenSsl) {
+                    $encryptedData = '';
+                    if (!openssl_public_encrypt(
+                        $key_aes_encrypted,
+                        $encryptedData,
+                        $publicKeyPem,
+                        OPENSSL_NO_PADDING
+                    )) {
+                        throw new \RuntimeException("Failed to encrypt with RSA OpenSSL: " . openssl_error_string());
+                    }
+                    if (\strlen($encryptedData) !== 256) {
+                        throw new \RuntimeException("RSA encryption result is not 256 bytes long.");
+                    }
+                    return $encryptedData;
                 }
-                if (\strlen($encryptedData) !== 256) {
-                    throw new \RuntimeException("RSA encryption result is not 256 bytes long.");
-                }
+
+                $key = $phpseclibKey->withPadding(PhpseclibRSA::ENCRYPTION_NONE);
+                $encryptedData = $key->encrypt($key_aes_encrypted);
+
                 return $encryptedData;
             }
         }
 
-        throw new \RuntimeException("Failed to generate a valid RSA-encrypted payload (m < n check) for req_DH_params within 20 attempts.");
+        throw new \RuntimeException(
+            "Failed to generate a valid RSA-encrypted payload (m < n check) within 20 attempts."
+        );
     }
 }
