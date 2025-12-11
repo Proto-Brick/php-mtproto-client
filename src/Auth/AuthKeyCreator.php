@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace ProtoBrick\MTProtoClient\Auth;
 
+use ProtoBrick\MTProtoClient\Crypto\Factorizer;
 use ProtoBrick\MTProtoClient\Crypto\Ige;
 use ProtoBrick\MTProtoClient\Crypto\Rsa;
-use ProtoBrick\MTProtoClient\Domain\Factorizer;
 use ProtoBrick\MTProtoClient\Exception\TransportException;
 use ProtoBrick\MTProtoClient\MessagePacker;
 use ProtoBrick\MTProtoClient\Session\Session;

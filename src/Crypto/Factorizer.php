@@ -1,6 +1,6 @@
 <?php
 
-namespace ProtoBrick\MTProtoClient\Domain;
+namespace ProtoBrick\MTProtoClient\Crypto;
 
 use ProtoBrick\MTProtoClient\Exception\FactorizationException;
 use Exception;

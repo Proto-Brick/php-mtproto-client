@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace ProtoBrick\MTProtoClient\Auth;
 
 use ProtoBrick\MTProtoClient\Client;
-use ProtoBrick\MTProtoClient\Crypto\SRP;
+use ProtoBrick\MTProtoClient\Crypto\Srp;
 use ProtoBrick\MTProtoClient\Exception\RpcErrorException;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetPasswordRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\CheckPasswordRequest;
@@ -83,7 +83,7 @@ readonly class Authenticator
                 }
 
                 $password = $passwordProvider();
-                $srpInput = SRP::compute($passwordSettings, $password);
+                $srpInput = Srp::compute($passwordSettings, $password);
 
                 $auth = $this->client->callSync(new CheckPasswordRequest($srpInput));
                 if ($auth instanceof Authorization) {
@@ -112,7 +112,5 @@ readonly class Authenticator
 
             throw $e;
         }
-
-        throw new \RuntimeException("Authorization failed to complete.");
     }
 }

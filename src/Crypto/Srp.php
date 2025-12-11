@@ -18,7 +18,7 @@ use Random\RandomException;
  *
  * @see https://core.telegram.org/api/srp
  */
-class SRP
+class Srp
 {
     /**
      * Computes SRP parameters for Cloud Password (2FA) verification.
