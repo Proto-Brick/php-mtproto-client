@@ -68,7 +68,99 @@ class GeneratorTL
         $this->generateAbstractClasses();
         $this->generateConcreteClasses('constructors', 'Types');
         $this->generateConcreteClasses('methods', 'Methods');
+        $this->generatePeerPropertyMap();
         echo "Generation complete! Files are in '" . realpath(self::OUTPUT_DIR) . "' directory.\n";
+    }
+
+    private function generatePeerPropertyMap(): void
+    {
+        echo "Generating PeerPropertyMap...\n";
+
+        $map = [];
+
+        foreach ($this->schema['constructors'] as $constructor) {
+            $predicate = $constructor['predicate'];
+
+            if (isset($this->concreteTypeToConstructorMap[$constructor['type']]) && $this->concreteTypeToConstructorMap[$constructor['type']] === $predicate) {
+                // Случай, когда тип == конструктор (единственная реализация)
+                [$namespace, $className] = $this->getNamespaceAndClassName($constructor['type']);
+            } else {
+                [$namespace, $className] = $this->getNamespaceAndClassName($predicate);
+            }
+
+            $fullNamespace = self::BASE_NAMESPACE . '\\Types' . ($namespace ? '\\' . $namespace : '');
+            $fqcn = $fullNamespace . '\\' . $className;
+
+            $propertiesToScan = [];
+
+            foreach ($constructor['params'] as $param) {
+                $type = $param['type'];
+
+                // Пропускаем флаги (#)
+                if ($type === '#') continue;
+
+                // Очищаем тип от '?' (flags.0?User)
+                if (str_contains($type, '?')) {
+                    $parts = explode('?', $type);
+                    $type = end($parts);
+                }
+
+                // Логика определения: нужно ли сканировать это поле?
+                // Нам нужно сканировать поле, если это НЕ примитив.
+                // Примитивы в схеме TL: int, long, int128, int256, double, string, bytes, Bool, true
+
+                $isPrimitive = in_array(strtolower($type), [
+                    'int', 'long', 'int128', 'int256', 'double', 'string', 'bytes', 'bool', 'true', 'null'
+                ], true);
+
+                // Если это Vector<Primitive>, тоже пропускаем
+                if (!$isPrimitive && str_starts_with($type, 'Vector<')) {
+                    $inner = substr($type, 7, -1); // "Vector<int>" -> "int"
+                    if (in_array(strtolower($inner), ['int', 'long', 'string', 'bytes', 'double', 'bool'], true)) {
+                        $isPrimitive = true;
+                    }
+                }
+
+                // Если это НЕ примитив, значит там может лежать объект (User, Chat, Message и т.д.),
+                // который нужно проверить рекурсивно.
+                if (!$isPrimitive) {
+                    $propertiesToScan[] = $this->sanitizeParamName($param['name']);
+                }
+            }
+
+            // Если у класса есть сложные свойства, добавляем в карту.
+            // Ключ карты — полное имя класса (без начального слэша, как возвращает get_class)
+            if (!empty($propertiesToScan)) {
+                // Убираем ведущий слеш для соответствия get_class()
+                $cleanFqcn = ltrim($fqcn, '\\');
+                $map[$cleanFqcn] = $propertiesToScan;
+            }
+        }
+
+        // --- Генерация файла с использованием короткого синтаксиса массива [] ---
+        $lines = [];
+        $lines[] = '<?php';
+        $lines[] = '';
+        $lines[] = 'return [';
+
+        foreach ($map as $className => $properties) {
+            // Экранируем кавычки в имени класса (на всякий случай)
+            $safeClass = str_replace("'", "\\'", $className);
+
+            // Формируем список свойств в формате ['prop1', 'prop2']
+            $safeProps = array_map(fn($p) => "'" . str_replace("'", "\\'", $p) . "'", $properties);
+            $propsList = '[' . implode(', ', $safeProps) . ']';
+
+            // Добавляем строку в массив
+            $lines[] = "    '$safeClass' => $propsList,";
+        }
+
+        $lines[] = '];';
+
+        $content = implode("\n", $lines) . "\n";
+
+        $outputPath = self::OUTPUT_DIR . '/PeerPropertyMap.php';
+        file_put_contents($outputPath, $content);
     }
 
     private function cleanup(): void

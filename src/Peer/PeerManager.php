@@ -16,9 +16,18 @@ class PeerManager
 {
     private ?Client $client = null;
 
+    /** @var array<string, string[]> */
+    private static array $propertyMap = [];
+
     public function __construct(
         private readonly PeerStorage $storage
     ) {
+        if (empty(self::$propertyMap)) {
+            $mapPath = __DIR__ . '/../Generated/PeerPropertyMap.php';
+            if (file_exists($mapPath)) {
+                self::$propertyMap = require $mapPath;
+            }
+        }
     }
 
     public function setClient(Client $client): void
@@ -110,37 +119,30 @@ class PeerManager
             return;
         }
 
-        // Определяем тип по имени класса
-        $class = get_class($object);
+        if (property_exists($object, 'id')) {
+            $class = get_class($object);
+            $id = $object->id;
+            $type = null;
 
-        // Быстрая проверка на наличие ID
-        if (!property_exists($object, 'id')) {
-            $this->scanProperties($object);
-            return;
-        }
+            if (str_contains($class, 'User') && !str_contains($class, 'Empty')) {
+                $type = 'user';
+            } elseif (str_contains($class, 'Channel') && !str_contains($class, 'Forbidden')) {
+                $type = 'channel';
+            } elseif (str_contains($class, 'Chat') && !str_contains($class, 'Empty') && !str_contains($class, 'Channel')) {
+                $type = 'chat';
+            }
 
-        $id = $object->id;
-        $type = null;
-
-        // Эвристика определения типа
-        if (str_contains($class, 'User') && !str_contains($class, 'Empty')) {
-            $type = 'user';
-        } elseif (str_contains($class, 'Channel') && !str_contains($class, 'Forbidden')) {
-            $type = 'channel';
-        } elseif (str_contains($class, 'Chat') && !str_contains($class, 'Empty') && !str_contains($class, 'Channel')) {
-            $type = 'chat';
-        }
-
-        if ($type) {
-            $this->storage->save(
-                new PeerInfo(
-                    id: (int)$id,
-                    accessHash: (int)($object->accessHash ?? 0),
-                    type: $type,
-                    username: $object->username ?? null,
-                    phone: $object->phone ?? null
-                )
-            );
+            if ($type) {
+                $this->storage->save(
+                    new PeerInfo(
+                        id: (int)$id,
+                        accessHash: (int)($object->accessHash ?? 0),
+                        type: $type,
+                        username: $object->username ?? null,
+                        phone: $object->phone ?? null
+                    )
+                );
+            }
         }
 
         $this->scanProperties($object);
@@ -148,8 +150,20 @@ class PeerManager
 
     private function scanProperties(object $object): void
     {
-        foreach (get_object_vars($object) as $prop) {
-            $this->collect($prop);
+        $class = get_class($object);
+
+        if (isset(self::$propertyMap[$class])) {
+            foreach (self::$propertyMap[$class] as $propName) {
+                if (isset($object->$propName)) {
+                    $this->collect($object->$propName);
+                }
+            }
+        }
+        else {
+            // Fallback
+            // foreach (get_object_vars($object) as $prop) {
+            //    $this->collect($prop);
+            // }
         }
     }
 }
