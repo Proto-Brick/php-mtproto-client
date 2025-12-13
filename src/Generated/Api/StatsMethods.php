@@ -42,14 +42,17 @@ final readonly class StatsMethods
     public function __construct(private Client $client) {}
 
     /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param bool|null $dark
      * @return BroadcastStats|null
      * @see https://core.telegram.org/method/stats.getBroadcastStats
      * @api
      */
-    public function getBroadcastStats(AbstractInputChannel $channel, ?bool $dark = null): ?BroadcastStats
+    public function getBroadcastStats(AbstractInputChannel|string|int $channel, ?bool $dark = null): ?BroadcastStats
     {
+        if (is_string($channel) || is_int($channel)) {
+            $channel = $this->client->peerManager->resolve($channel);
+        }
         return $this->client->callSync(new GetBroadcastStatsRequest($channel, $dark));
     }
 
@@ -66,19 +69,22 @@ final readonly class StatsMethods
     }
 
     /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param bool|null $dark
      * @return MegagroupStats|null
      * @see https://core.telegram.org/method/stats.getMegagroupStats
      * @api
      */
-    public function getMegagroupStats(AbstractInputChannel $channel, ?bool $dark = null): ?MegagroupStats
+    public function getMegagroupStats(AbstractInputChannel|string|int $channel, ?bool $dark = null): ?MegagroupStats
     {
+        if (is_string($channel) || is_int($channel)) {
+            $channel = $this->client->peerManager->resolve($channel);
+        }
         return $this->client->callSync(new GetMegagroupStatsRequest($channel, $dark));
     }
 
     /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param int $msgId
      * @param string $offset
      * @param int $limit
@@ -86,39 +92,48 @@ final readonly class StatsMethods
      * @see https://core.telegram.org/method/stats.getMessagePublicForwards
      * @api
      */
-    public function getMessagePublicForwards(AbstractInputChannel $channel, int $msgId, string $offset, int $limit): ?PublicForwards
+    public function getMessagePublicForwards(AbstractInputChannel|string|int $channel, int $msgId, string $offset, int $limit): ?PublicForwards
     {
+        if (is_string($channel) || is_int($channel)) {
+            $channel = $this->client->peerManager->resolve($channel);
+        }
         return $this->client->callSync(new GetMessagePublicForwardsRequest($channel, $msgId, $offset, $limit));
     }
 
     /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param int $msgId
      * @param bool|null $dark
      * @return MessageStats|null
      * @see https://core.telegram.org/method/stats.getMessageStats
      * @api
      */
-    public function getMessageStats(AbstractInputChannel $channel, int $msgId, ?bool $dark = null): ?MessageStats
+    public function getMessageStats(AbstractInputChannel|string|int $channel, int $msgId, ?bool $dark = null): ?MessageStats
     {
+        if (is_string($channel) || is_int($channel)) {
+            $channel = $this->client->peerManager->resolve($channel);
+        }
         return $this->client->callSync(new GetMessageStatsRequest($channel, $msgId, $dark));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $id
      * @param bool|null $dark
      * @return StoryStats|null
      * @see https://core.telegram.org/method/stats.getStoryStats
      * @api
      */
-    public function getStoryStats(AbstractInputPeer $peer, int $id, ?bool $dark = null): ?StoryStats
+    public function getStoryStats(AbstractInputPeer|string|int $peer, int $id, ?bool $dark = null): ?StoryStats
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetStoryStatsRequest($peer, $id, $dark));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $id
      * @param string $offset
      * @param int $limit
@@ -126,8 +141,11 @@ final readonly class StatsMethods
      * @see https://core.telegram.org/method/stats.getStoryPublicForwards
      * @api
      */
-    public function getStoryPublicForwards(AbstractInputPeer $peer, int $id, string $offset, int $limit): ?PublicForwards
+    public function getStoryPublicForwards(AbstractInputPeer|string|int $peer, int $id, string $offset, int $limit): ?PublicForwards
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetStoryPublicForwardsRequest($peer, $id, $offset, $limit));
     }
 }

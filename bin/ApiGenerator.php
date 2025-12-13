@@ -16,6 +16,14 @@ class ApiGenerator
     private const GENERATED_METHODS_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Methods';
     private const CLIENT_FQN = Client::class;
 
+    private const PEER_TYPES_TO_RESOLVE = [
+        'InputPeer',
+        'InputUser',
+        'InputChannel',
+        'InputUserFromMessage',
+        'InputChannelFromMessage'
+    ];
+
     private array $schema;
     private array $typeToConstructorsMap;
     private array $enumTypes;
@@ -100,6 +108,8 @@ class ApiGenerator
             $paramVarsStr = $apiMethodParams['call_vars'];
             $paramDocs = $apiMethodParams['param_docs'];
 
+            $resolveCodeBlock = $this->generateResolveBlock($method['params']);
+
             $returnTypeInfo = $this->resolvePhpTypeInfo($method['type'], $className, null);
 
             $returnDocType = $returnTypeInfo['phpdoc_type'];
@@ -130,7 +140,7 @@ class ApiGenerator
             $methodsContent[] = $phpdoc . <<<PHP
                 public function {$methodName}({$paramDefs}): {$nativeReturnType}
                 {
-                    return {$call};
+            {$resolveCodeBlock}        return {$call};
                 }
             PHP;
         }
@@ -191,19 +201,42 @@ class ApiGenerator
             $docType = $typeInfo['phpdoc_type'];
             $nativeType = $typeInfo['native_type'];
 
-            if ($isConditional) {
-                // Если тип уже nullable (объект или union), то |null в phpdoc уже есть.
-                if (!str_contains($docType, 'null')) {
+            $isPeerType = $this->isInputPeerType($actualType);
+
+            if ($isPeerType) {
+                // 1. Очищаем тип от '?' и '|null', полученных из resolvePhpTypeInfo
+                // Это гарантирует, что мы начинаем с чистого имени класса (напр. "AbstractInputPeer")
+                $cleanType = str_replace(['?', '|null'], '', $nativeType);
+                $cleanDocType = str_replace(['|null'], '', $docType);
+
+                // 2. Строим Union Type
+                $nativeType = $cleanType . '|string|int';
+                $docType = $cleanDocType . '|string|int';
+
+                // 3. Явно добавляем null, если параметр опциональный
+                if ($isConditional) {
+                    $nativeType .= '|null';
                     $docType .= '|null';
                 }
-                // Нативный тип тоже делаем nullable
-                if (!str_starts_with($nativeType, '?')) {
-                    $nativeType = '?' . $nativeType;
-                }
             } else {
-                // Убираем nullable из документации и тайп-хинта
-                $docType = str_replace('|null', '', $docType);
-                $nativeType = str_replace('?', '', $nativeType);
+                // Стандартная логика для не-пиров
+                if ($isConditional) {
+                    // Если тип уже nullable (объект или union), то |null в phpdoc уже есть.
+                    if (!str_contains($docType, 'null')) {
+                        $docType .= '|null';
+                    }
+                    // Нативный тип тоже делаем nullable, если это не Union Type (в PHP < 8.2 нельзя ?A|B)
+                    // Но если это простой объект, добавляем ?
+                    if (!str_starts_with($nativeType, '?') && !str_contains($nativeType, '|')) {
+                        $nativeType = '?' . $nativeType;
+                    } elseif (str_contains($nativeType, '|') && !str_contains($nativeType, 'null')) {
+                        $nativeType .= '|null';
+                    }
+                } else {
+                    // Убираем nullable из документации и тайп-хинта, если поле обязательное
+                    $docType = str_replace('|null', '', $docType);
+                    $nativeType = str_replace(['?', '|null'], '', $nativeType);
+                }
             }
 
             $paramDocs[] = "     * @param {$docType} \${$paramName}";
@@ -220,5 +253,36 @@ class ApiGenerator
             'call_vars' => implode(', ', $callVars),
             'param_docs' => $paramDocs,
         ];
+    }
+
+    private function isInputPeerType(string $type): bool
+    {
+        return in_array($type, self::PEER_TYPES_TO_RESOLVE, true);
+    }
+
+    /**
+     * Генерирует PHP-код для автоматического резолвинга пиров.
+     */
+    private function generateResolveBlock(array $params): string
+    {
+        $code = "";
+        foreach ($params as $param) {
+            if ($param['type'] === '#') continue;
+
+            $originalType = $param['type'];
+            $actualType = str_contains($originalType, '?') ? explode('?', $originalType)[1] : $originalType;
+
+            if ($this->isInputPeerType($actualType)) {
+                $varName = '$' . $this->sanitizeParamName($param['name']);
+
+                $code .= <<<PHP
+        if (is_string({$varName}) || is_int({$varName})) {
+            {$varName} = \$this->client->peerManager->resolve({$varName});
+        }
+
+PHP;
+            }
+        }
+        return $code;
     }
 }

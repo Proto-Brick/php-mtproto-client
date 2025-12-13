@@ -176,25 +176,31 @@ final readonly class BotsMethods
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param BotMenuButtonDefault|BotMenuButtonCommands|BotMenuButton $button
      * @return bool
      * @see https://core.telegram.org/method/bots.setBotMenuButton
      * @api
      */
-    public function setBotMenuButton(AbstractInputUser $userId, AbstractBotMenuButton $button): bool
+    public function setBotMenuButton(AbstractInputUser|string|int $userId, AbstractBotMenuButton $button): bool
     {
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return (bool) $this->client->callSync(new SetBotMenuButtonRequest($userId, $button));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @return BotMenuButtonDefault|BotMenuButtonCommands|BotMenuButton|null
      * @see https://core.telegram.org/method/bots.getBotMenuButton
      * @api
      */
-    public function getBotMenuButton(AbstractInputUser $userId): ?AbstractBotMenuButton
+    public function getBotMenuButton(AbstractInputUser|string|int $userId): ?AbstractBotMenuButton
     {
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return $this->client->callSync(new GetBotMenuButtonRequest($userId));
     }
 
@@ -222,7 +228,7 @@ final readonly class BotsMethods
 
     /**
      * @param string $langCode
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|null $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int|null $bot
      * @param string|null $name
      * @param string|null $about
      * @param string|null $description
@@ -230,80 +236,101 @@ final readonly class BotsMethods
      * @see https://core.telegram.org/method/bots.setBotInfo
      * @api
      */
-    public function setBotInfo(string $langCode, ?AbstractInputUser $bot = null, ?string $name = null, ?string $about = null, ?string $description = null): bool
+    public function setBotInfo(string $langCode, AbstractInputUser|string|int|null $bot = null, ?string $name = null, ?string $about = null, ?string $description = null): bool
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return (bool) $this->client->callSync(new SetBotInfoRequest($langCode, $bot, $name, $about, $description));
     }
 
     /**
      * @param string $langCode
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|null $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int|null $bot
      * @return BotInfo|null
      * @see https://core.telegram.org/method/bots.getBotInfo
      * @api
      */
-    public function getBotInfo(string $langCode, ?AbstractInputUser $bot = null): ?BotInfo
+    public function getBotInfo(string $langCode, AbstractInputUser|string|int|null $bot = null): ?BotInfo
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new GetBotInfoRequest($langCode, $bot));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param list<string> $order
      * @return bool
      * @see https://core.telegram.org/method/bots.reorderUsernames
      * @api
      */
-    public function reorderUsernames(AbstractInputUser $bot, array $order): bool
+    public function reorderUsernames(AbstractInputUser|string|int $bot, array $order): bool
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return (bool) $this->client->callSync(new ReorderUsernamesRequest($bot, $order));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param string $username
      * @param bool $active
      * @return bool
      * @see https://core.telegram.org/method/bots.toggleUsername
      * @api
      */
-    public function toggleUsername(AbstractInputUser $bot, string $username, bool $active): bool
+    public function toggleUsername(AbstractInputUser|string|int $bot, string $username, bool $active): bool
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return (bool) $this->client->callSync(new ToggleUsernameRequest($bot, $username, $active));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @return bool
      * @see https://core.telegram.org/method/bots.canSendMessage
      * @api
      */
-    public function canSendMessage(AbstractInputUser $bot): bool
+    public function canSendMessage(AbstractInputUser|string|int $bot): bool
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return (bool) $this->client->callSync(new CanSendMessageRequest($bot));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/bots.allowSendMessage
      * @api
      */
-    public function allowSendMessage(AbstractInputUser $bot): ?AbstractUpdates
+    public function allowSendMessage(AbstractInputUser|string|int $bot): ?AbstractUpdates
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new AllowSendMessageRequest($bot));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param string $customMethod
      * @param array $params
      * @return array
      * @see https://core.telegram.org/method/bots.invokeWebViewCustomMethod
      * @api
      */
-    public function invokeWebViewCustomMethod(AbstractInputUser $bot, string $customMethod, array $params): array
+    public function invokeWebViewCustomMethod(AbstractInputUser|string|int $bot, string $customMethod, array $params): array
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new InvokeWebViewCustomMethodRequest($bot, $customMethod, $params));
     }
 
@@ -320,20 +347,23 @@ final readonly class BotsMethods
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param string $langCode
      * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
      * @return BotPreviewMedia|null
      * @see https://core.telegram.org/method/bots.addPreviewMedia
      * @api
      */
-    public function addPreviewMedia(AbstractInputUser $bot, string $langCode, AbstractInputMedia $media): ?BotPreviewMedia
+    public function addPreviewMedia(AbstractInputUser|string|int $bot, string $langCode, AbstractInputMedia $media): ?BotPreviewMedia
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new AddPreviewMediaRequest($bot, $langCode, $media));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param string $langCode
      * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
      * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $newMedia
@@ -341,94 +371,118 @@ final readonly class BotsMethods
      * @see https://core.telegram.org/method/bots.editPreviewMedia
      * @api
      */
-    public function editPreviewMedia(AbstractInputUser $bot, string $langCode, AbstractInputMedia $media, AbstractInputMedia $newMedia): ?BotPreviewMedia
+    public function editPreviewMedia(AbstractInputUser|string|int $bot, string $langCode, AbstractInputMedia $media, AbstractInputMedia $newMedia): ?BotPreviewMedia
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new EditPreviewMediaRequest($bot, $langCode, $media, $newMedia));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param string $langCode
      * @param list<InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo> $media
      * @return bool
      * @see https://core.telegram.org/method/bots.deletePreviewMedia
      * @api
      */
-    public function deletePreviewMedia(AbstractInputUser $bot, string $langCode, array $media): bool
+    public function deletePreviewMedia(AbstractInputUser|string|int $bot, string $langCode, array $media): bool
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return (bool) $this->client->callSync(new DeletePreviewMediaRequest($bot, $langCode, $media));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param string $langCode
      * @param list<InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo> $order
      * @return bool
      * @see https://core.telegram.org/method/bots.reorderPreviewMedias
      * @api
      */
-    public function reorderPreviewMedias(AbstractInputUser $bot, string $langCode, array $order): bool
+    public function reorderPreviewMedias(AbstractInputUser|string|int $bot, string $langCode, array $order): bool
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return (bool) $this->client->callSync(new ReorderPreviewMediasRequest($bot, $langCode, $order));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param string $langCode
      * @return PreviewInfo|null
      * @see https://core.telegram.org/method/bots.getPreviewInfo
      * @api
      */
-    public function getPreviewInfo(AbstractInputUser $bot, string $langCode): ?PreviewInfo
+    public function getPreviewInfo(AbstractInputUser|string|int $bot, string $langCode): ?PreviewInfo
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new GetPreviewInfoRequest($bot, $langCode));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @return list<BotPreviewMedia>
      * @see https://core.telegram.org/method/bots.getPreviewMedias
      * @api
      */
-    public function getPreviewMedias(AbstractInputUser $bot): array
+    public function getPreviewMedias(AbstractInputUser|string|int $bot): array
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new GetPreviewMediasRequest($bot));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusCollectible|InputEmojiStatusCollectible $emojiStatus
      * @return bool
      * @see https://core.telegram.org/method/bots.updateUserEmojiStatus
      * @api
      */
-    public function updateUserEmojiStatus(AbstractInputUser $userId, AbstractEmojiStatus $emojiStatus): bool
+    public function updateUserEmojiStatus(AbstractInputUser|string|int $userId, AbstractEmojiStatus $emojiStatus): bool
     {
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return (bool) $this->client->callSync(new UpdateUserEmojiStatusRequest($userId, $emojiStatus));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param bool $enabled
      * @return bool
      * @see https://core.telegram.org/method/bots.toggleUserEmojiStatusPermission
      * @api
      */
-    public function toggleUserEmojiStatusPermission(AbstractInputUser $bot, bool $enabled): bool
+    public function toggleUserEmojiStatusPermission(AbstractInputUser|string|int $bot, bool $enabled): bool
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return (bool) $this->client->callSync(new ToggleUserEmojiStatusPermissionRequest($bot, $enabled));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param string $fileName
      * @param string $url
      * @return bool
      * @see https://core.telegram.org/method/bots.checkDownloadFileParams
      * @api
      */
-    public function checkDownloadFileParams(AbstractInputUser $bot, string $fileName, string $url): bool
+    public function checkDownloadFileParams(AbstractInputUser|string|int $bot, string $fileName, string $url): bool
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return (bool) $this->client->callSync(new CheckDownloadFileParamsRequest($bot, $fileName, $url));
     }
 
@@ -443,40 +497,52 @@ final readonly class BotsMethods
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param int $commissionPermille
      * @param int|null $durationMonths
      * @return StarRefProgram|null
      * @see https://core.telegram.org/method/bots.updateStarRefProgram
      * @api
      */
-    public function updateStarRefProgram(AbstractInputUser $bot, int $commissionPermille, ?int $durationMonths = null): ?StarRefProgram
+    public function updateStarRefProgram(AbstractInputUser|string|int $bot, int $commissionPermille, ?int $durationMonths = null): ?StarRefProgram
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new UpdateStarRefProgramRequest($bot, $commissionPermille, $durationMonths));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param bool|null $enabled
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|null $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int|null $bot
      * @param string|null $customDescription
      * @return bool
      * @see https://core.telegram.org/method/bots.setCustomVerification
      * @api
      */
-    public function setCustomVerification(AbstractInputPeer $peer, ?bool $enabled = null, ?AbstractInputUser $bot = null, ?string $customDescription = null): bool
+    public function setCustomVerification(AbstractInputPeer|string|int $peer, ?bool $enabled = null, AbstractInputUser|string|int|null $bot = null, ?string $customDescription = null): bool
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new SetCustomVerificationRequest($peer, $enabled, $bot, $customDescription));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @return Users|UsersSlice|null
      * @see https://core.telegram.org/method/bots.getBotRecommendations
      * @api
      */
-    public function getBotRecommendations(AbstractInputUser $bot): ?AbstractUsers
+    public function getBotRecommendations(AbstractInputUser|string|int $bot): ?AbstractUsers
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new GetBotRecommendationsRequest($bot));
     }
 }

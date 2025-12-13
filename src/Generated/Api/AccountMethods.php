@@ -389,15 +389,18 @@ final readonly class AccountMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param ReportReason $reason
      * @param string $message
      * @return bool
      * @see https://core.telegram.org/method/account.reportPeer
      * @api
      */
-    public function reportPeer(AbstractInputPeer $peer, ReportReason $reason, string $message): bool
+    public function reportPeer(AbstractInputPeer|string|int $peer, ReportReason $reason, string $message): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new ReportPeerRequest($peer, $reason, $message));
     }
 
@@ -1081,7 +1084,7 @@ final readonly class AccountMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param InputPhotoEmpty|InputPhoto $photoId
      * @param ReportReason $reason
      * @param string $message
@@ -1089,8 +1092,11 @@ final readonly class AccountMethods
      * @see https://core.telegram.org/method/account.reportProfilePhoto
      * @api
      */
-    public function reportProfilePhoto(AbstractInputPeer $peer, AbstractInputPhoto $photoId, ReportReason $reason, string $message): bool
+    public function reportProfilePhoto(AbstractInputPeer|string|int $peer, AbstractInputPhoto $photoId, ReportReason $reason, string $message): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new ReportProfilePhotoRequest($peer, $photoId, $reason, $message));
     }
 
@@ -1289,13 +1295,16 @@ final readonly class AccountMethods
      * @param bool|null $users
      * @param bool|null $chats
      * @param bool|null $broadcasts
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $peer
      * @return bool
      * @see https://core.telegram.org/method/account.saveAutoSaveSettings
      * @api
      */
-    public function saveAutoSaveSettings(BaseAutoSaveSettings $settings, ?bool $users = null, ?bool $chats = null, ?bool $broadcasts = null, ?AbstractInputPeer $peer = null): bool
+    public function saveAutoSaveSettings(BaseAutoSaveSettings $settings, ?bool $users = null, ?bool $chats = null, ?bool $broadcasts = null, AbstractInputPeer|string|int|null $peer = null): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new SaveAutoSaveSettingsRequest($settings, $users, $chats, $broadcasts, $peer));
     }
 
@@ -1412,7 +1421,7 @@ final readonly class AccountMethods
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $bot
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
      * @param InputBusinessBotRecipients $recipients
      * @param bool|null $deleted
      * @param BusinessBotRights|null $rights
@@ -1420,8 +1429,11 @@ final readonly class AccountMethods
      * @see https://core.telegram.org/method/account.updateConnectedBot
      * @api
      */
-    public function updateConnectedBot(AbstractInputUser $bot, InputBusinessBotRecipients $recipients, ?bool $deleted = null, ?BusinessBotRights $rights = null): ?AbstractUpdates
+    public function updateConnectedBot(AbstractInputUser|string|int $bot, InputBusinessBotRecipients $recipients, ?bool $deleted = null, ?BusinessBotRights $rights = null): ?AbstractUpdates
     {
+        if (is_string($bot) || is_int($bot)) {
+            $bot = $this->client->peerManager->resolve($bot);
+        }
         return $this->client->callSync(new UpdateConnectedBotRequest($bot, $recipients, $deleted, $rights));
     }
 
@@ -1458,25 +1470,31 @@ final readonly class AccountMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param bool $paused
      * @return bool
      * @see https://core.telegram.org/method/account.toggleConnectedBotPaused
      * @api
      */
-    public function toggleConnectedBotPaused(AbstractInputPeer $peer, bool $paused): bool
+    public function toggleConnectedBotPaused(AbstractInputPeer|string|int $peer, bool $paused): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new ToggleConnectedBotPausedRequest($peer, $paused));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @return bool
      * @see https://core.telegram.org/method/account.disablePeerConnectedBot
      * @api
      */
-    public function disablePeerConnectedBot(AbstractInputPeer $peer): bool
+    public function disablePeerConnectedBot(AbstractInputPeer|string|int $peer): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new DisablePeerConnectedBotRequest($peer));
     }
 
@@ -1547,13 +1565,16 @@ final readonly class AccountMethods
     }
 
     /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @return bool
      * @see https://core.telegram.org/method/account.updatePersonalChannel
      * @api
      */
-    public function updatePersonalChannel(AbstractInputChannel $channel): bool
+    public function updatePersonalChannel(AbstractInputChannel|string|int $channel): bool
     {
+        if (is_string($channel) || is_int($channel)) {
+            $channel = $this->client->peerManager->resolve($channel);
+        }
         return (bool) $this->client->callSync(new UpdatePersonalChannelRequest($channel));
     }
 
@@ -1601,28 +1622,40 @@ final readonly class AccountMethods
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
      * @return PaidMessagesRevenue|null
      * @see https://core.telegram.org/method/account.getPaidMessagesRevenue
      * @api
      */
-    public function getPaidMessagesRevenue(AbstractInputUser $userId, ?AbstractInputPeer $parentPeer = null): ?PaidMessagesRevenue
+    public function getPaidMessagesRevenue(AbstractInputUser|string|int $userId, AbstractInputPeer|string|int|null $parentPeer = null): ?PaidMessagesRevenue
     {
+        if (is_string($parentPeer) || is_int($parentPeer)) {
+            $parentPeer = $this->client->peerManager->resolve($parentPeer);
+        }
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return $this->client->callSync(new GetPaidMessagesRevenueRequest($userId, $parentPeer));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param bool|null $refundCharged
      * @param bool|null $requirePayment
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $parentPeer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
      * @return bool
      * @see https://core.telegram.org/method/account.toggleNoPaidMessagesException
      * @api
      */
-    public function toggleNoPaidMessagesException(AbstractInputUser $userId, ?bool $refundCharged = null, ?bool $requirePayment = null, ?AbstractInputPeer $parentPeer = null): bool
+    public function toggleNoPaidMessagesException(AbstractInputUser|string|int $userId, ?bool $refundCharged = null, ?bool $requirePayment = null, AbstractInputPeer|string|int|null $parentPeer = null): bool
     {
+        if (is_string($parentPeer) || is_int($parentPeer)) {
+            $parentPeer = $this->client->peerManager->resolve($parentPeer);
+        }
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return (bool) $this->client->callSync(new ToggleNoPaidMessagesExceptionRequest($userId, $refundCharged, $requirePayment, $parentPeer));
     }
 }

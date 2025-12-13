@@ -7,6 +7,7 @@ namespace ProtoBrick\MTProtoClient\Auth;
 use ProtoBrick\MTProtoClient\Crypto\Factorizer;
 use ProtoBrick\MTProtoClient\Crypto\Ige;
 use ProtoBrick\MTProtoClient\Crypto\Rsa;
+use ProtoBrick\MTProtoClient\Exception\DhGenRetryException;
 use ProtoBrick\MTProtoClient\Exception\TransportException;
 use ProtoBrick\MTProtoClient\MessagePacker;
 use ProtoBrick\MTProtoClient\Session\Session;
@@ -15,6 +16,7 @@ use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 use ProtoBrick\MTProtoClient\Transport\Transport;
 use phpseclib3\Math\BigInteger;
+use Random\RandomException;
 
 class AuthKeyCreator
 {
@@ -36,28 +38,41 @@ class AuthKeyCreator
      */
     public function create(): AuthKey
     {
-        // Шаг 1: req_pq_multi
-        $resPQData = $this->sendReqPq();
-        echo "Step 1 (req_pq): OK\n";
+        $maxRetries = 5;
 
-        // Шаг 2: Факторизация pq
-        $pqBig = new BigInteger($resPQData['pq'], 256);
-        [$pInt, $qInt] = Factorizer::factorize($pqBig->toString());
+        for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
+            try {
+                // Шаг 1: req_pq_multi
+                $resPQData = $this->sendReqPq();
+                // echo "Step 1 (req_pq): OK (Attempt $attempt)\n";
 
-        $pBytes = Serializer::intToBinary($pInt);
-        $qBytes = Serializer::intToBinary($qInt);
+                // Шаг 2: Факторизация pq
+                $pqBig = new BigInteger($resPQData['pq'], 256);
+                [$pInt, $qInt] = Factorizer::factorize($pqBig->toString());
 
-        echo "Step 2 (factorization): OK (p=$pInt, q=$qInt)\n";
+                $pBytes = Serializer::intToBinary($pInt);
+                $qBytes = Serializer::intToBinary($qInt);
 
-        // Шаг 3: req_DH_params
-        $serverDhParams = $this->sendReqDhParams($resPQData, $pBytes, $qBytes);
-        echo "Step 3 (req_DH_params): OK\n";
+                // echo "Step 2 (factorization): OK\n";
 
-        // Шаг 4: set_client_DH_params
-        $authKey = $this->sendSetClientDhParams($resPQData, $serverDhParams);
-        echo "Step 4 (set_client_DH_params): OK, AuthKey created!\n";
+                // Шаг 3: req_DH_params
+                $serverDhParams = $this->sendReqDhParams($resPQData, $pBytes, $qBytes);
+                // echo "Step 3 (req_DH_params): OK\n";
 
-        return $authKey;
+                // Шаг 4: set_client_DH_params
+
+                $authKey = $this->sendSetClientDhParams($resPQData, $serverDhParams);
+                // echo "Step 4 (set_client_DH_params): OK, AuthKey created!\n";
+                echo "AuthKey created!\n";
+
+                return $authKey;
+            } catch (DhGenRetryException) {
+                echo "Server asked for retry (dh_gen_retry). Attempt $attempt/$maxRetries...\n";
+                continue;
+            }
+        }
+
+        throw new \RuntimeException("Failed to create AuthKey after $maxRetries attempts.");
     }
 
     /**
@@ -68,7 +83,8 @@ class AuthKeyCreator
      * присылает `resPQ`, который содержит, среди прочего, `server_nonce` и число `pq`.
      *
      * @return array Десериализованный ответ `resPQ`, дополненный ключом `original_nonce` для использования в последующих шагах.
-     * @throws \RuntimeException В случае ошибок транспорта, несоответствия `auth_key_id` или `nonce`.
+     * @throws TransportException
+     * @throws RandomException
      * @see https://core.telegram.org/mtproto/auth_key#1-dh-key-exchange
      */
     private function sendReqPq(): array
@@ -212,7 +228,8 @@ class AuthKeyCreator
      * @param array $resPQData Данные из ответа на req_pq (шаг 1).
      * @param array $serverDhParams Данные из ответа на req_DH_params (шаг 3).
      * @return AuthKey Готовый ключ авторизации.
-     * @throws \RuntimeException
+     * @throws DhGenRetryException
+     * @throws TransportException
      */
     public function sendSetClientDhParams(array $resPQData, array $serverDhParams): AuthKey
     {
@@ -415,38 +432,53 @@ class AuthKeyCreator
 
         $finalConstructor = Deserializer::int32($responsePayload);
 
-        // Проверяем статус ответа
-        if ($finalConstructor === Constructors::DH_GEN_FAIL) {
-            throw new \RuntimeException("DH key exchange failed: server returned dh_gen_fail.");
-        }
-        if ($finalConstructor === Constructors::DH_GEN_RETRY) {
-            throw new \RuntimeException(
-                "DH key exchange failed: server returned dh_gen_retry. (Logic for retry is not implemented).",
-            );
-        }
-        if ($finalConstructor !== Constructors::DH_GEN_OK) {
-            throw new \RuntimeException(
-                "DH key exchange failed. Final response constructor: " . dechex($finalConstructor),
-            );
-        }
+        $nonceFromServer = Deserializer::raw128($responsePayload);
+        $serverNonceFromServer = Deserializer::raw128($responsePayload);
+        $newNonceHashFromServer = Deserializer::raw128($responsePayload);
 
-        // Валидируем nonce
-        if (Deserializer::raw128($responsePayload) !== $resPQData['nonce']) {
+        if ($nonceFromServer !== $resPQData['nonce']) {
             throw new \RuntimeException("Final nonce mismatch.");
         }
-        if (Deserializer::raw128($responsePayload) !== $resPQData['server_nonce']) {
+        if ($serverNonceFromServer !== $resPQData['server_nonce']) {
             throw new \RuntimeException("Final server nonce mismatch.");
         }
 
-        $new_nonce_hash1_from_server = Deserializer::raw128($responsePayload);
+        $authKeySha = hash('sha1', $authKey->key, true);
+        $authKeyAuxHash = substr($authKeySha, 0, 8);
 
-        // Финальная и самая важная проверка new_nonce_hash
-        $auth_key_aux_hash = substr(hash('sha1', $authKey->key, true), 0, 8);
-        $dataForHash = $newNonce . "\x01" . $auth_key_aux_hash;
-        $new_nonce_hash1_calculated = substr(hash('sha1', $dataForHash, true), -16);
 
-        if ($new_nonce_hash1_from_server !== $new_nonce_hash1_calculated) {
-            throw new \RuntimeException("Final new_nonce_hash check failed. Possible MITM attack?");
+        // OK: sha1(new_nonce + \1 + aux_hash)
+        $hash1 = substr(hash('sha1', $newNonce . "\x01" . $authKeyAuxHash, true), -16);
+
+        // RETRY: sha1(new_nonce + \2 + aux_hash)
+        $hash2 = substr(hash('sha1', $newNonce . "\x02" . $authKeyAuxHash, true), -16);
+
+        // FAIL: sha1(new_nonce + \3 + aux_hash)
+        $hash3 = substr(hash('sha1', $newNonce . "\x03" . $authKeyAuxHash, true), -16);
+
+        switch ($finalConstructor) {
+            case Constructors::DH_GEN_OK:
+                if ($newNonceHashFromServer !== $hash1) {
+                    throw new \RuntimeException("Security Error: new_nonce_hash1 mismatch (OK).");
+                }
+                return;
+
+            case Constructors::DH_GEN_RETRY:
+                if ($newNonceHashFromServer !== $hash2) {
+                    throw new \RuntimeException("Security Error: new_nonce_hash2 mismatch (RETRY).");
+                }
+                throw new DhGenRetryException("Server returned dh_gen_retry");
+
+            case Constructors::DH_GEN_FAIL:
+                if ($newNonceHashFromServer !== $hash3) {
+                    throw new \RuntimeException("Security Error: new_nonce_hash3 mismatch (FAIL).");
+                }
+                throw new \RuntimeException("DH key exchange failed: server returned dh_gen_fail.");
+
+            default:
+                throw new \RuntimeException(
+                    "DH key exchange failed. Unknown response constructor: " . dechex($finalConstructor),
+                );
         }
     }
 

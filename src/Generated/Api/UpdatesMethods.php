@@ -60,7 +60,7 @@ final readonly class UpdatesMethods
     }
 
     /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage $channel
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param ChannelMessagesFilterEmpty|ChannelMessagesFilter $filter
      * @param int $pts
      * @param int $limit
@@ -69,8 +69,11 @@ final readonly class UpdatesMethods
      * @see https://core.telegram.org/method/updates.getChannelDifference
      * @api
      */
-    public function getChannelDifference(AbstractInputChannel $channel, AbstractChannelMessagesFilter $filter, int $pts, int $limit, ?bool $force = null): ?AbstractChannelDifference
+    public function getChannelDifference(AbstractInputChannel|string|int $channel, AbstractChannelMessagesFilter $filter, int $pts, int $limit, ?bool $force = null): ?AbstractChannelDifference
     {
+        if (is_string($channel) || is_int($channel)) {
+            $channel = $this->client->peerManager->resolve($channel);
+        }
         return $this->client->callSync(new GetChannelDifferenceRequest($channel, $filter, $pts, $limit, $force));
     }
 }

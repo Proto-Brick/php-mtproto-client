@@ -105,7 +105,7 @@ final readonly class PhoneMethods
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param int $randomId
      * @param string $gAHash
      * @param PhoneCallProtocol $protocol
@@ -114,8 +114,11 @@ final readonly class PhoneMethods
      * @see https://core.telegram.org/method/phone.requestCall
      * @api
      */
-    public function requestCall(AbstractInputUser $userId, int $randomId, string $gAHash, PhoneCallProtocol $protocol, ?bool $video = null): ?PhoneCall
+    public function requestCall(AbstractInputUser|string|int $userId, int $randomId, string $gAHash, PhoneCallProtocol $protocol, ?bool $video = null): ?PhoneCall
     {
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return $this->client->callSync(new RequestCallRequest($userId, $randomId, $gAHash, $protocol, $video));
     }
 
@@ -211,7 +214,7 @@ final readonly class PhoneMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $randomId
      * @param bool|null $rtmpStream
      * @param string|null $title
@@ -220,14 +223,17 @@ final readonly class PhoneMethods
      * @see https://core.telegram.org/method/phone.createGroupCall
      * @api
      */
-    public function createGroupCall(AbstractInputPeer $peer, int $randomId, ?bool $rtmpStream = null, ?string $title = null, ?int $scheduleDate = null): ?AbstractUpdates
+    public function createGroupCall(AbstractInputPeer|string|int $peer, int $randomId, ?bool $rtmpStream = null, ?string $title = null, ?int $scheduleDate = null): ?AbstractUpdates
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new CreateGroupCallRequest($peer, $randomId, $rtmpStream, $title, $scheduleDate));
     }
 
     /**
      * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $joinAs
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $joinAs
      * @param array $params
      * @param bool|null $muted
      * @param bool|null $videoStopped
@@ -238,8 +244,11 @@ final readonly class PhoneMethods
      * @see https://core.telegram.org/method/phone.joinGroupCall
      * @api
      */
-    public function joinGroupCall(AbstractInputGroupCall $call, AbstractInputPeer $joinAs, array $params, ?bool $muted = null, ?bool $videoStopped = null, ?string $inviteHash = null, ?string $publicKey = null, ?string $block = null): ?AbstractUpdates
+    public function joinGroupCall(AbstractInputGroupCall $call, AbstractInputPeer|string|int $joinAs, array $params, ?bool $muted = null, ?bool $videoStopped = null, ?string $inviteHash = null, ?string $publicKey = null, ?string $block = null): ?AbstractUpdates
     {
+        if (is_string($joinAs) || is_int($joinAs)) {
+            $joinAs = $this->client->peerManager->resolve($joinAs);
+        }
         return $this->client->callSync(new JoinGroupCallRequest($call, $joinAs, $params, $muted, $videoStopped, $inviteHash, $publicKey, $block));
     }
 
@@ -347,7 +356,7 @@ final readonly class PhoneMethods
 
     /**
      * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $participant
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
      * @param bool|null $muted
      * @param int|null $volume
      * @param bool|null $raiseHand
@@ -358,8 +367,11 @@ final readonly class PhoneMethods
      * @see https://core.telegram.org/method/phone.editGroupCallParticipant
      * @api
      */
-    public function editGroupCallParticipant(AbstractInputGroupCall $call, AbstractInputPeer $participant, ?bool $muted = null, ?int $volume = null, ?bool $raiseHand = null, ?bool $videoStopped = null, ?bool $videoPaused = null, ?bool $presentationPaused = null): ?AbstractUpdates
+    public function editGroupCallParticipant(AbstractInputGroupCall $call, AbstractInputPeer|string|int $participant, ?bool $muted = null, ?int $volume = null, ?bool $raiseHand = null, ?bool $videoStopped = null, ?bool $videoPaused = null, ?bool $presentationPaused = null): ?AbstractUpdates
     {
+        if (is_string($participant) || is_int($participant)) {
+            $participant = $this->client->peerManager->resolve($participant);
+        }
         return $this->client->callSync(new EditGroupCallParticipantRequest($call, $participant, $muted, $volume, $raiseHand, $videoStopped, $videoPaused, $presentationPaused));
     }
 
@@ -376,13 +388,16 @@ final readonly class PhoneMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @return JoinAsPeers|null
      * @see https://core.telegram.org/method/phone.getGroupCallJoinAs
      * @api
      */
-    public function getGroupCallJoinAs(AbstractInputPeer $peer): ?JoinAsPeers
+    public function getGroupCallJoinAs(AbstractInputPeer|string|int $peer): ?JoinAsPeers
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetGroupCallJoinAsRequest($peer));
     }
 
@@ -422,14 +437,20 @@ final readonly class PhoneMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $joinAs
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $joinAs
      * @return bool
      * @see https://core.telegram.org/method/phone.saveDefaultGroupCallJoinAs
      * @api
      */
-    public function saveDefaultGroupCallJoinAs(AbstractInputPeer $peer, AbstractInputPeer $joinAs): bool
+    public function saveDefaultGroupCallJoinAs(AbstractInputPeer|string|int $peer, AbstractInputPeer|string|int $joinAs): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if (is_string($joinAs) || is_int($joinAs)) {
+            $joinAs = $this->client->peerManager->resolve($joinAs);
+        }
         return (bool) $this->client->callSync(new SaveDefaultGroupCallJoinAsRequest($peer, $joinAs));
     }
 
@@ -468,14 +489,17 @@ final readonly class PhoneMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param bool $revoke
      * @return GroupCallStreamRtmpUrl|null
      * @see https://core.telegram.org/method/phone.getGroupCallStreamRtmpUrl
      * @api
      */
-    public function getGroupCallStreamRtmpUrl(AbstractInputPeer $peer, bool $revoke): ?GroupCallStreamRtmpUrl
+    public function getGroupCallStreamRtmpUrl(AbstractInputPeer|string|int $peer, bool $revoke): ?GroupCallStreamRtmpUrl
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetGroupCallStreamRtmpUrlRequest($peer, $revoke));
     }
 
@@ -537,14 +561,17 @@ final readonly class PhoneMethods
 
     /**
      * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param bool|null $video
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/phone.inviteConferenceCallParticipant
      * @api
      */
-    public function inviteConferenceCallParticipant(AbstractInputGroupCall $call, AbstractInputUser $userId, ?bool $video = null): ?AbstractUpdates
+    public function inviteConferenceCallParticipant(AbstractInputGroupCall $call, AbstractInputUser|string|int $userId, ?bool $video = null): ?AbstractUpdates
     {
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return $this->client->callSync(new InviteConferenceCallParticipantRequest($call, $userId, $video));
     }
 

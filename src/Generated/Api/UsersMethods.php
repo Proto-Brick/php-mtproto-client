@@ -52,25 +52,31 @@ final readonly class UsersMethods
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $id
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
      * @return UserFull|null
      * @see https://core.telegram.org/method/users.getFullUser
      * @api
      */
-    public function getFullUser(AbstractInputUser $id): ?UserFull
+    public function getFullUser(AbstractInputUser|string|int $id): ?UserFull
     {
+        if (is_string($id) || is_int($id)) {
+            $id = $this->client->peerManager->resolve($id);
+        }
         return $this->client->callSync(new GetFullUserRequest($id));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $id
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
      * @param list<SecureValueErrorData|SecureValueErrorFrontSide|SecureValueErrorReverseSide|SecureValueErrorSelfie|SecureValueErrorFile|SecureValueErrorFiles|SecureValueError|SecureValueErrorTranslationFile|SecureValueErrorTranslationFiles> $errors
      * @return bool
      * @see https://core.telegram.org/method/users.setSecureValueErrors
      * @api
      */
-    public function setSecureValueErrors(AbstractInputUser $id, array $errors): bool
+    public function setSecureValueErrors(AbstractInputUser|string|int $id, array $errors): bool
     {
+        if (is_string($id) || is_int($id)) {
+            $id = $this->client->peerManager->resolve($id);
+        }
         return (bool) $this->client->callSync(new SetSecureValueErrorsRequest($id, $errors));
     }
 

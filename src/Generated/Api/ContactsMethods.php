@@ -155,26 +155,32 @@ final readonly class ContactsMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $id
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $id
      * @param bool|null $myStoriesFrom
      * @return bool
      * @see https://core.telegram.org/method/contacts.block
      * @api
      */
-    public function block(AbstractInputPeer $id, ?bool $myStoriesFrom = null): bool
+    public function block(AbstractInputPeer|string|int $id, ?bool $myStoriesFrom = null): bool
     {
+        if (is_string($id) || is_int($id)) {
+            $id = $this->client->peerManager->resolve($id);
+        }
         return (bool) $this->client->callSync(new BlockRequest($id, $myStoriesFrom));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $id
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $id
      * @param bool|null $myStoriesFrom
      * @return bool
      * @see https://core.telegram.org/method/contacts.unblock
      * @api
      */
-    public function unblock(AbstractInputPeer $id, ?bool $myStoriesFrom = null): bool
+    public function unblock(AbstractInputPeer|string|int $id, ?bool $myStoriesFrom = null): bool
     {
+        if (is_string($id) || is_int($id)) {
+            $id = $this->client->peerManager->resolve($id);
+        }
         return (bool) $this->client->callSync(new UnblockRequest($id, $myStoriesFrom));
     }
 
@@ -239,13 +245,16 @@ final readonly class ContactsMethods
 
     /**
      * @param TopPeerCategory $category
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @return bool
      * @see https://core.telegram.org/method/contacts.resetTopPeerRating
      * @api
      */
-    public function resetTopPeerRating(TopPeerCategory $category, AbstractInputPeer $peer): bool
+    public function resetTopPeerRating(TopPeerCategory $category, AbstractInputPeer|string|int $peer): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new ResetTopPeerRatingRequest($category, $peer));
     }
 
@@ -281,7 +290,7 @@ final readonly class ContactsMethods
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $id
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
      * @param string $firstName
      * @param string $lastName
      * @param string $phone
@@ -290,19 +299,25 @@ final readonly class ContactsMethods
      * @see https://core.telegram.org/method/contacts.addContact
      * @api
      */
-    public function addContact(AbstractInputUser $id, string $firstName, string $lastName, string $phone, ?bool $addPhonePrivacyException = null): ?AbstractUpdates
+    public function addContact(AbstractInputUser|string|int $id, string $firstName, string $lastName, string $phone, ?bool $addPhonePrivacyException = null): ?AbstractUpdates
     {
+        if (is_string($id) || is_int($id)) {
+            $id = $this->client->peerManager->resolve($id);
+        }
         return $this->client->callSync(new AddContactRequest($id, $firstName, $lastName, $phone, $addPhonePrivacyException));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $id
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/contacts.acceptContact
      * @api
      */
-    public function acceptContact(AbstractInputUser $id): ?AbstractUpdates
+    public function acceptContact(AbstractInputUser|string|int $id): ?AbstractUpdates
     {
+        if (is_string($id) || is_int($id)) {
+            $id = $this->client->peerManager->resolve($id);
+        }
         return $this->client->callSync(new AcceptContactRequest($id));
     }
 

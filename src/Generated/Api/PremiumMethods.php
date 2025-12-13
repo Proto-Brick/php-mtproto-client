@@ -35,7 +35,7 @@ final readonly class PremiumMethods
     public function __construct(private Client $client) {}
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param string $offset
      * @param int $limit
      * @param bool|null $gifts
@@ -43,8 +43,11 @@ final readonly class PremiumMethods
      * @see https://core.telegram.org/method/premium.getBoostsList
      * @api
      */
-    public function getBoostsList(AbstractInputPeer $peer, string $offset, int $limit, ?bool $gifts = null): ?BoostsList
+    public function getBoostsList(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $gifts = null): ?BoostsList
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetBoostsListRequest($peer, $offset, $limit, $gifts));
     }
 
@@ -59,37 +62,49 @@ final readonly class PremiumMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param list<int>|null $slots
      * @return MyBoosts|null
      * @see https://core.telegram.org/method/premium.applyBoost
      * @api
      */
-    public function applyBoost(AbstractInputPeer $peer, ?array $slots = null): ?MyBoosts
+    public function applyBoost(AbstractInputPeer|string|int $peer, ?array $slots = null): ?MyBoosts
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new ApplyBoostRequest($peer, $slots));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @return BoostsStatus|null
      * @see https://core.telegram.org/method/premium.getBoostsStatus
      * @api
      */
-    public function getBoostsStatus(AbstractInputPeer $peer): ?BoostsStatus
+    public function getBoostsStatus(AbstractInputPeer|string|int $peer): ?BoostsStatus
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetBoostsStatusRequest($peer));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @return BoostsList|null
      * @see https://core.telegram.org/method/premium.getUserBoosts
      * @api
      */
-    public function getUserBoosts(AbstractInputPeer $peer, AbstractInputUser $userId): ?BoostsList
+    public function getUserBoosts(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $userId): ?BoostsList
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return $this->client->callSync(new GetUserBoostsRequest($peer, $userId));
     }
 }

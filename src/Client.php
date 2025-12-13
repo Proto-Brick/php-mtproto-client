@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ProtoBrick\MTProtoClient;
 
+use ProtoBrick\MTProtoClient\Peer\PeerManager;
 use ProtoBrick\MTProtoClient\TL\RpcRequest;
 use function Amp\async;
 
@@ -125,8 +126,10 @@ class Client
         private readonly Session $session,
         private readonly Transport $transport,
         private readonly AuthKeyCreator $authKeyCreator,
-        private readonly MessagePacker $messagePacker
+        private readonly MessagePacker $messagePacker,
+        public readonly PeerManager $peerManager
     ) {
+        $this->peerManager->setClient($this);
         // #-- API_HANDLERS_INIT_START --#
         $this->account = new AccountMethods($this);
         $this->auth = new AuthMethods($this);
@@ -167,7 +170,6 @@ class Client
     private function connectAsync(): Future
     {
         return async(function (): void {
-            // ИСПРАВЛЕНИЕ: Все вызовы транспорта теперь асинхронны и ожидаются
             $this->transport->connect()->await();
             $this->authKey = $this->authKeyStorage->get();
 
@@ -432,6 +434,7 @@ class Client
                         $this->session->isInitialized = true;
                         echo "[INFO] Session initialized.\n";
                     }
+                    $this->peerManager->collect($responseObject);
                     $this->session->save($this->authKey);
                     $deferred->complete($responseObject);
                 } catch (\Throwable $e) {

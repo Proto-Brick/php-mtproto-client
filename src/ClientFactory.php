@@ -8,6 +8,8 @@ use ProtoBrick\MTProtoClient\Auth\AuthKeyCreator;
 use ProtoBrick\MTProtoClient\Auth\Storage\FileAuthKeyStorage;
 use ProtoBrick\MTProtoClient\Crypto\Aes;
 use ProtoBrick\MTProtoClient\Crypto\Rsa;
+use ProtoBrick\MTProtoClient\Peer\PeerManager;
+use ProtoBrick\MTProtoClient\Peer\Storage\FilePeerStorage;
 use ProtoBrick\MTProtoClient\Session\Session;
 use ProtoBrick\MTProtoClient\Session\Storage\FileSessionStorage;
 use ProtoBrick\MTProtoClient\TL\Deserializer;
@@ -31,6 +33,8 @@ class ClientFactory
         $session = new Session($sessionStorage);
         $messagePacker = new MessagePacker($session, $aes);
         $authKeyCreator = new AuthKeyCreator($transport, $rsa, $messagePacker, $session);
+        $peerFileStorage = new FilePeerStorage($storagePath . '/peers.json');
+        $peerManager = new PeerManager($peerFileStorage);
 
         return new Client(
             $settings,
@@ -38,7 +42,8 @@ class ClientFactory
             $session,
             $transport,
             $authKeyCreator,
-            $messagePacker
+            $messagePacker,
+            $peerManager
         );
     }
 }

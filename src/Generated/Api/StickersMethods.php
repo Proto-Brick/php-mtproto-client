@@ -52,7 +52,7 @@ final readonly class StickersMethods
     public function __construct(private Client $client) {}
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param string $title
      * @param string $shortName
      * @param list<InputStickerSetItem> $stickers
@@ -65,8 +65,11 @@ final readonly class StickersMethods
      * @see https://core.telegram.org/method/stickers.createStickerSet
      * @api
      */
-    public function createStickerSet(AbstractInputUser $userId, string $title, string $shortName, array $stickers, ?bool $masks = null, ?bool $emojis = null, ?bool $textColor = null, ?AbstractInputDocument $thumb = null, ?string $software = null): ?AbstractStickerSet
+    public function createStickerSet(AbstractInputUser|string|int $userId, string $title, string $shortName, array $stickers, ?bool $masks = null, ?bool $emojis = null, ?bool $textColor = null, ?AbstractInputDocument $thumb = null, ?string $software = null): ?AbstractStickerSet
     {
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return $this->client->callSync(new CreateStickerSetRequest($userId, $title, $shortName, $stickers, $masks, $emojis, $textColor, $thumb, $software));
     }
 

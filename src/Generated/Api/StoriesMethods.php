@@ -154,18 +154,21 @@ final readonly class StoriesMethods
     public function __construct(private Client $client) {}
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @return CanSendStoryCount|null
      * @see https://core.telegram.org/method/stories.canSendStory
      * @api
      */
-    public function canSendStory(AbstractInputPeer $peer): ?CanSendStoryCount
+    public function canSendStory(AbstractInputPeer|string|int $peer): ?CanSendStoryCount
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new CanSendStoryRequest($peer));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
      * @param list<InputPrivacyValueAllowContacts|InputPrivacyValueAllowAll|InputPrivacyValueAllowUsers|InputPrivacyValueDisallowContacts|InputPrivacyValueDisallowAll|InputPrivacyValueDisallowUsers|InputPrivacyValueAllowChatParticipants|InputPrivacyValueDisallowChatParticipants|InputPrivacyValueAllowCloseFriends|InputPrivacyValueAllowPremium|InputPrivacyValueAllowBots|InputPrivacyValueDisallowBots> $privacyRules
      * @param int $randomId
@@ -176,20 +179,26 @@ final readonly class StoriesMethods
      * @param string|null $caption
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
      * @param int|null $period
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $fwdFromId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $fwdFromId
      * @param int|null $fwdFromStory
      * @param list<int>|null $albums
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/stories.sendStory
      * @api
      */
-    public function sendStory(AbstractInputPeer $peer, AbstractInputMedia $media, array $privacyRules, int $randomId, ?bool $pinned = null, ?bool $noforwards = null, ?bool $fwdModified = null, ?array $mediaAreas = null, ?string $caption = null, ?array $entities = null, ?int $period = null, ?AbstractInputPeer $fwdFromId = null, ?int $fwdFromStory = null, ?array $albums = null): ?AbstractUpdates
+    public function sendStory(AbstractInputPeer|string|int $peer, AbstractInputMedia $media, array $privacyRules, int $randomId, ?bool $pinned = null, ?bool $noforwards = null, ?bool $fwdModified = null, ?array $mediaAreas = null, ?string $caption = null, ?array $entities = null, ?int $period = null, AbstractInputPeer|string|int|null $fwdFromId = null, ?int $fwdFromStory = null, ?array $albums = null): ?AbstractUpdates
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if (is_string($fwdFromId) || is_int($fwdFromId)) {
+            $fwdFromId = $this->client->peerManager->resolve($fwdFromId);
+        }
         return $this->client->callSync(new SendStoryRequest($peer, $media, $privacyRules, $randomId, $pinned, $noforwards, $fwdModified, $mediaAreas, $caption, $entities, $period, $fwdFromId, $fwdFromStory, $albums));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $id
      * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo|null $media
      * @param list<MediaAreaVenue|InputMediaAreaVenue|MediaAreaGeoPoint|MediaAreaSuggestedReaction|MediaAreaChannelPost|InputMediaAreaChannelPost|MediaAreaUrl|MediaAreaWeather|MediaAreaStarGift>|null $mediaAreas
@@ -200,33 +209,42 @@ final readonly class StoriesMethods
      * @see https://core.telegram.org/method/stories.editStory
      * @api
      */
-    public function editStory(AbstractInputPeer $peer, int $id, ?AbstractInputMedia $media = null, ?array $mediaAreas = null, ?string $caption = null, ?array $entities = null, ?array $privacyRules = null): ?AbstractUpdates
+    public function editStory(AbstractInputPeer|string|int $peer, int $id, ?AbstractInputMedia $media = null, ?array $mediaAreas = null, ?string $caption = null, ?array $entities = null, ?array $privacyRules = null): ?AbstractUpdates
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new EditStoryRequest($peer, $id, $media, $mediaAreas, $caption, $entities, $privacyRules));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param list<int> $id
      * @return list<int>
      * @see https://core.telegram.org/method/stories.deleteStories
      * @api
      */
-    public function deleteStories(AbstractInputPeer $peer, array $id): array
+    public function deleteStories(AbstractInputPeer|string|int $peer, array $id): array
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new DeleteStoriesRequest($peer, $id));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param list<int> $id
      * @param bool $pinned
      * @return list<int>
      * @see https://core.telegram.org/method/stories.togglePinned
      * @api
      */
-    public function togglePinned(AbstractInputPeer $peer, array $id, bool $pinned): array
+    public function togglePinned(AbstractInputPeer|string|int $peer, array $id, bool $pinned): array
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new TogglePinnedRequest($peer, $id, $pinned));
     }
 
@@ -244,40 +262,49 @@ final readonly class StoriesMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $offsetId
      * @param int $limit
      * @return Stories|null
      * @see https://core.telegram.org/method/stories.getPinnedStories
      * @api
      */
-    public function getPinnedStories(AbstractInputPeer $peer, int $offsetId, int $limit): ?Stories
+    public function getPinnedStories(AbstractInputPeer|string|int $peer, int $offsetId, int $limit): ?Stories
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetPinnedStoriesRequest($peer, $offsetId, $limit));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $offsetId
      * @param int $limit
      * @return Stories|null
      * @see https://core.telegram.org/method/stories.getStoriesArchive
      * @api
      */
-    public function getStoriesArchive(AbstractInputPeer $peer, int $offsetId, int $limit): ?Stories
+    public function getStoriesArchive(AbstractInputPeer|string|int $peer, int $offsetId, int $limit): ?Stories
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetStoriesArchiveRequest($peer, $offsetId, $limit));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param list<int> $id
      * @return Stories|null
      * @see https://core.telegram.org/method/stories.getStoriesByID
      * @api
      */
-    public function getStoriesByID(AbstractInputPeer $peer, array $id): ?Stories
+    public function getStoriesByID(AbstractInputPeer|string|int $peer, array $id): ?Stories
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetStoriesByIDRequest($peer, $id));
     }
 
@@ -293,31 +320,37 @@ final readonly class StoriesMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $maxId
      * @return list<int>
      * @see https://core.telegram.org/method/stories.readStories
      * @api
      */
-    public function readStories(AbstractInputPeer $peer, int $maxId): array
+    public function readStories(AbstractInputPeer|string|int $peer, int $maxId): array
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new ReadStoriesRequest($peer, $maxId));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param list<int> $id
      * @return bool
      * @see https://core.telegram.org/method/stories.incrementStoryViews
      * @api
      */
-    public function incrementStoryViews(AbstractInputPeer $peer, array $id): bool
+    public function incrementStoryViews(AbstractInputPeer|string|int $peer, array $id): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new IncrementStoryViewsRequest($peer, $id));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $id
      * @param string $offset
      * @param int $limit
@@ -329,37 +362,46 @@ final readonly class StoriesMethods
      * @see https://core.telegram.org/method/stories.getStoryViewsList
      * @api
      */
-    public function getStoryViewsList(AbstractInputPeer $peer, int $id, string $offset, int $limit, ?bool $justContacts = null, ?bool $reactionsFirst = null, ?bool $forwardsFirst = null, ?string $q = null): ?StoryViewsList
+    public function getStoryViewsList(AbstractInputPeer|string|int $peer, int $id, string $offset, int $limit, ?bool $justContacts = null, ?bool $reactionsFirst = null, ?bool $forwardsFirst = null, ?string $q = null): ?StoryViewsList
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetStoryViewsListRequest($peer, $id, $offset, $limit, $justContacts, $reactionsFirst, $forwardsFirst, $q));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param list<int> $id
      * @return StoryViews|null
      * @see https://core.telegram.org/method/stories.getStoriesViews
      * @api
      */
-    public function getStoriesViews(AbstractInputPeer $peer, array $id): ?StoryViews
+    public function getStoriesViews(AbstractInputPeer|string|int $peer, array $id): ?StoryViews
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetStoriesViewsRequest($peer, $id));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $id
      * @return ExportedStoryLink|null
      * @see https://core.telegram.org/method/stories.exportStoryLink
      * @api
      */
-    public function exportStoryLink(AbstractInputPeer $peer, int $id): ?ExportedStoryLink
+    public function exportStoryLink(AbstractInputPeer|string|int $peer, int $id): ?ExportedStoryLink
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new ExportStoryLinkRequest($peer, $id));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param list<int> $id
      * @param string $option
      * @param string $message
@@ -367,8 +409,11 @@ final readonly class StoriesMethods
      * @see https://core.telegram.org/method/stories.report
      * @api
      */
-    public function report(AbstractInputPeer $peer, array $id, string $option, string $message): ?AbstractReportResult
+    public function report(AbstractInputPeer|string|int $peer, array $id, string $option, string $message): ?AbstractReportResult
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new ReportRequest($peer, $id, $option, $message));
     }
 
@@ -385,7 +430,7 @@ final readonly class StoriesMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $storyId
      * @param ReactionEmpty|ReactionEmoji|ReactionCustomEmoji|ReactionPaid $reaction
      * @param bool|null $addToRecent
@@ -393,19 +438,25 @@ final readonly class StoriesMethods
      * @see https://core.telegram.org/method/stories.sendReaction
      * @api
      */
-    public function sendReaction(AbstractInputPeer $peer, int $storyId, AbstractReaction $reaction, ?bool $addToRecent = null): ?AbstractUpdates
+    public function sendReaction(AbstractInputPeer|string|int $peer, int $storyId, AbstractReaction $reaction, ?bool $addToRecent = null): ?AbstractUpdates
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new SendReactionRequest($peer, $storyId, $reaction, $addToRecent));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @return PeerStories|null
      * @see https://core.telegram.org/method/stories.getPeerStories
      * @api
      */
-    public function getPeerStories(AbstractInputPeer $peer): ?PeerStories
+    public function getPeerStories(AbstractInputPeer|string|int $peer): ?PeerStories
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetPeerStoriesRequest($peer));
     }
 
@@ -441,19 +492,22 @@ final readonly class StoriesMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param bool $hidden
      * @return bool
      * @see https://core.telegram.org/method/stories.togglePeerStoriesHidden
      * @api
      */
-    public function togglePeerStoriesHidden(AbstractInputPeer $peer, bool $hidden): bool
+    public function togglePeerStoriesHidden(AbstractInputPeer|string|int $peer, bool $hidden): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new TogglePeerStoriesHiddenRequest($peer, $hidden));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $id
      * @param int $limit
      * @param bool|null $forwardsFirst
@@ -463,20 +517,26 @@ final readonly class StoriesMethods
      * @see https://core.telegram.org/method/stories.getStoryReactionsList
      * @api
      */
-    public function getStoryReactionsList(AbstractInputPeer $peer, int $id, int $limit, ?bool $forwardsFirst = null, ?AbstractReaction $reaction = null, ?string $offset = null): ?StoryReactionsList
+    public function getStoryReactionsList(AbstractInputPeer|string|int $peer, int $id, int $limit, ?bool $forwardsFirst = null, ?AbstractReaction $reaction = null, ?string $offset = null): ?StoryReactionsList
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetStoryReactionsListRequest($peer, $id, $limit, $forwardsFirst, $reaction, $offset));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param list<int> $id
      * @return bool
      * @see https://core.telegram.org/method/stories.togglePinnedToTop
      * @api
      */
-    public function togglePinnedToTop(AbstractInputPeer $peer, array $id): bool
+    public function togglePinnedToTop(AbstractInputPeer|string|int $peer, array $id): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new TogglePinnedToTopRequest($peer, $id));
     }
 
@@ -485,31 +545,37 @@ final readonly class StoriesMethods
      * @param int $limit
      * @param string|null $hashtag
      * @param MediaAreaVenue|InputMediaAreaVenue|MediaAreaGeoPoint|MediaAreaSuggestedReaction|MediaAreaChannelPost|InputMediaAreaChannelPost|MediaAreaUrl|MediaAreaWeather|MediaAreaStarGift|null $area
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|null $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $peer
      * @return FoundStories|null
      * @see https://core.telegram.org/method/stories.searchPosts
      * @api
      */
-    public function searchPosts(string $offset, int $limit, ?string $hashtag = null, ?AbstractMediaArea $area = null, ?AbstractInputPeer $peer = null): ?FoundStories
+    public function searchPosts(string $offset, int $limit, ?string $hashtag = null, ?AbstractMediaArea $area = null, AbstractInputPeer|string|int|null $peer = null): ?FoundStories
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new SearchPostsRequest($offset, $limit, $hashtag, $area, $peer));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param string $title
      * @param list<int> $stories
      * @return StoryAlbum|null
      * @see https://core.telegram.org/method/stories.createAlbum
      * @api
      */
-    public function createAlbum(AbstractInputPeer $peer, string $title, array $stories): ?StoryAlbum
+    public function createAlbum(AbstractInputPeer|string|int $peer, string $title, array $stories): ?StoryAlbum
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new CreateAlbumRequest($peer, $title, $stories));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $albumId
      * @param string|null $title
      * @param list<int>|null $deleteStories
@@ -519,49 +585,61 @@ final readonly class StoriesMethods
      * @see https://core.telegram.org/method/stories.updateAlbum
      * @api
      */
-    public function updateAlbum(AbstractInputPeer $peer, int $albumId, ?string $title = null, ?array $deleteStories = null, ?array $addStories = null, ?array $order = null): ?StoryAlbum
+    public function updateAlbum(AbstractInputPeer|string|int $peer, int $albumId, ?string $title = null, ?array $deleteStories = null, ?array $addStories = null, ?array $order = null): ?StoryAlbum
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new UpdateAlbumRequest($peer, $albumId, $title, $deleteStories, $addStories, $order));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param list<int> $order
      * @return bool
      * @see https://core.telegram.org/method/stories.reorderAlbums
      * @api
      */
-    public function reorderAlbums(AbstractInputPeer $peer, array $order): bool
+    public function reorderAlbums(AbstractInputPeer|string|int $peer, array $order): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new ReorderAlbumsRequest($peer, $order));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $albumId
      * @return bool
      * @see https://core.telegram.org/method/stories.deleteAlbum
      * @api
      */
-    public function deleteAlbum(AbstractInputPeer $peer, int $albumId): bool
+    public function deleteAlbum(AbstractInputPeer|string|int $peer, int $albumId): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new DeleteAlbumRequest($peer, $albumId));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $hash
      * @return AlbumsNotModified|Albums|null
      * @see https://core.telegram.org/method/stories.getAlbums
      * @api
      */
-    public function getAlbums(AbstractInputPeer $peer, int $hash): ?AbstractAlbums
+    public function getAlbums(AbstractInputPeer|string|int $peer, int $hash): ?AbstractAlbums
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetAlbumsRequest($peer, $hash));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param int $albumId
      * @param int $offset
      * @param int $limit
@@ -569,8 +647,11 @@ final readonly class StoriesMethods
      * @see https://core.telegram.org/method/stories.getAlbumStories
      * @api
      */
-    public function getAlbumStories(AbstractInputPeer $peer, int $albumId, int $offset, int $limit): ?Stories
+    public function getAlbumStories(AbstractInputPeer|string|int $peer, int $albumId, int $offset, int $limit): ?Stories
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return $this->client->callSync(new GetAlbumStoriesRequest($peer, $albumId, $offset, $limit));
     }
 }

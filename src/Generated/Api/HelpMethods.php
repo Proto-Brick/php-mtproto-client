@@ -272,26 +272,32 @@ final readonly class HelpMethods
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @return UserInfoEmpty|UserInfo|null
      * @see https://core.telegram.org/method/help.getUserInfo
      * @api
      */
-    public function getUserInfo(AbstractInputUser $userId): ?AbstractUserInfo
+    public function getUserInfo(AbstractInputUser|string|int $userId): ?AbstractUserInfo
     {
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return $this->client->callSync(new GetUserInfoRequest($userId));
     }
 
     /**
-     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage $userId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param string $message
      * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote> $entities
      * @return UserInfoEmpty|UserInfo|null
      * @see https://core.telegram.org/method/help.editUserInfo
      * @api
      */
-    public function editUserInfo(AbstractInputUser $userId, string $message, array $entities): ?AbstractUserInfo
+    public function editUserInfo(AbstractInputUser|string|int $userId, string $message, array $entities): ?AbstractUserInfo
     {
+        if (is_string($userId) || is_int($userId)) {
+            $userId = $this->client->peerManager->resolve($userId);
+        }
         return $this->client->callSync(new EditUserInfoRequest($userId, $message, $entities));
     }
 
@@ -306,25 +312,31 @@ final readonly class HelpMethods
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @return bool
      * @see https://core.telegram.org/method/help.hidePromoData
      * @api
      */
-    public function hidePromoData(AbstractInputPeer $peer): bool
+    public function hidePromoData(AbstractInputPeer|string|int $peer): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new HidePromoDataRequest($peer));
     }
 
     /**
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param string $suggestion
      * @return bool
      * @see https://core.telegram.org/method/help.dismissSuggestion
      * @api
      */
-    public function dismissSuggestion(AbstractInputPeer $peer, string $suggestion): bool
+    public function dismissSuggestion(AbstractInputPeer|string|int $peer, string $suggestion): bool
     {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         return (bool) $this->client->callSync(new DismissSuggestionRequest($peer, $suggestion));
     }
 
