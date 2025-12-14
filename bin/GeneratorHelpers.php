@@ -496,18 +496,16 @@ trait GeneratorHelpers
     ): string {
         $params = $item['params'];
 
-        // --- Логика для serialize() ---
+        // --- Логика для serialize() (БЕЗ ИЗМЕНЕНИЙ) ---
         $serializeParts = [];
         $flagCalculations = "";
         $flagDefinitions = array_filter($params, static fn($p) => $p['type'] === '#');
 
-        // Шаг 1: Инициализируем переменные для флагов
         foreach ($flagDefinitions as $flagDef) {
             $flagVarName = $this->sanitizeParamName($flagDef['name']);
             $flagCalculations .= "        \${$flagVarName} = 0;\n";
         }
 
-        // Шаг 2: Вычисляем значения флагов
         if (!empty($flagDefinitions)) {
             foreach ($params as $param) {
                 if (preg_match('/(flags\d*)\.(\d+)\?/', $param['type'], $m)) {
@@ -518,7 +516,6 @@ trait GeneratorHelpers
                         ? "\$this->{$propName}"
                         : "\$this->{$propName} !== null";
 
-                    // ИЗМЕНЕНИЕ: Делаем if многострочным для лучшей читаемости
                     $flagCalculations .= "        if ({$check}) {\n";
                     $flagCalculations .= "            \${$flagVarName} |= (1 << {$bit});\n";
                     $flagCalculations .= "        }\n";
@@ -526,7 +523,6 @@ trait GeneratorHelpers
             }
         }
 
-        // Шаг 3: Проходим по всем параметрам в их ИСХОДНОМ порядке и собираем код сериализации
         foreach ($params as $param) {
             $propName = $this->sanitizeParamName($param['name']);
 
@@ -548,13 +544,10 @@ trait GeneratorHelpers
             }
         }
 
-        // --- Собираем тело метода serialize() ---
         $serializeBody = '';
         if (empty($serializeParts) && empty($flagCalculations)) {
-            // Оптимизация: нет параметров, возвращаем сразу ID.
             $serializeBody = "        return Serializer::int32(self::CONSTRUCTOR_ID);";
         } else {
-            // Стандартная логика с буфером.
             $serializeBody = "        \$buffer = Serializer::int32(self::CONSTRUCTOR_ID);\n";
             if ($flagCalculations) {
                 $serializeBody .= $flagCalculations;
@@ -572,7 +565,7 @@ trait GeneratorHelpers
         }
     PHP;
 
-        // --- Логика для deserialize() (остается без изменений) ---
+        // --- Логика для deserialize() (ИЗМЕНЕНО) ---
         $deserializeMethod = '';
         if (!$isMethod) {
             $deserializeBody = '';
@@ -586,27 +579,39 @@ trait GeneratorHelpers
             }
 
             $localVars = [];
-            // Проходим по параметрам в ИСХОДНОМ порядке и генерируем код десериализации
+
             foreach ($params as $param) {
                 $propName = $this->sanitizeParamName($param['name']);
                 $localVars[$propName] = '$' . $propName;
 
                 if ($param['type'] === '#') {
-                    $deserializeBody .= "        \${$propName} = Deserializer::int32(\$stream);\n";
+                    // Флаги читаем всегда через int32, инлайним вручную здесь
+                    $deserializeBody .= "        \${$propName} = unpack('V', substr(\$stream, 0, 4))[1];\n";
+                    $deserializeBody .= "        \$stream = substr(\$stream, 4);\n";
                     continue;
                 }
 
                 if (str_contains($param['type'], '?')) {
+                    // Условные поля оставляем как есть (тернарные операторы), инлайнинг там сложен
                     preg_match('/(flags\d*)\.(\d+)\?(.+)/', $param['type'], $m);
                     $flagVarName = $this->sanitizeParamName($m[1]);
                     $actualType = $m[3];
                     $expression = ($actualType === 'true')
                         ? "true"
                         : $this->getDeserializationCodeForType($actualType, $currentClassName, $parentFqcn);
-                    // ИЗМЕНЕНИЕ: Добавляем строгую проверку !== 0 и здесь для консистентности
+
                     $deserializeBody .= "        \${$propName} = ((\${$flagVarName} & (1 << {$m[2]})) !== 0) ? {$expression} : null;\n";
                 } else {
-                    $deserializeBody .= "        \${$propName} = " . $this->getDeserializationCodeForType($param['type'], $currentClassName, $parentFqcn) . ";\n";
+                    // ОБЯЗАТЕЛЬНЫЕ ПОЛЯ (Попытка инлайнинга)
+                    $inlineCode = $this->getInlineDeserializationBlock("\${$propName}", $param['type']);
+
+                    if ($inlineCode) {
+                        // Если удалось сгенерировать инлайн-код
+                        $deserializeBody .= $inlineCode . "\n";
+                    } else {
+                        // Если нет (строки, объекты), используем старый метод вызова Deserializer
+                        $deserializeBody .= "        \${$propName} = " . $this->getDeserializationCodeForType($param['type'], $currentClassName, $parentFqcn) . ";\n";
+                    }
                 }
             }
 
