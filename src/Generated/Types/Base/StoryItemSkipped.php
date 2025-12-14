@@ -42,11 +42,15 @@ final class StoryItemSkipped extends AbstractStoryItem
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $closeFriends = (($flags & (1 << 8)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $expireDate = Deserializer::int32($stream);
+        $id = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $expireDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $id,

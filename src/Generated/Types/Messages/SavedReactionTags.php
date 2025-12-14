@@ -34,7 +34,8 @@ final class SavedReactionTags extends AbstractSavedReactionTags
     {
         Deserializer::int32($stream); // Constructor ID
         $tags = Deserializer::vectorOfObjects($stream, [SavedReactionTag::class, 'deserialize']);
-        $hash = Deserializer::int64($stream);
+        $hash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $tags,

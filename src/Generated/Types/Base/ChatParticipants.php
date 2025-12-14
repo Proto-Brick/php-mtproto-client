@@ -35,9 +35,11 @@ final class ChatParticipants extends AbstractChatParticipants
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $chatId = Deserializer::int64($stream);
+        $chatId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $participants = Deserializer::vectorOfObjects($stream, [AbstractChatParticipant::class, 'deserialize']);
-        $version = Deserializer::int32($stream);
+        $version = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $chatId,

@@ -42,8 +42,10 @@ final class ConnectedBot extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $botId = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $botId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $recipients = BusinessBotRecipients::deserialize($stream);
         $rights = BusinessBotRights::deserialize($stream);
 

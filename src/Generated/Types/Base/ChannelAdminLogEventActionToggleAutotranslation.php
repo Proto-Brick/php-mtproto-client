@@ -29,7 +29,8 @@ final class ChannelAdminLogEventActionToggleAutotranslation extends AbstractChan
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $newValue = (Deserializer::int32($stream) === 0x997275b5);
+        $newValue = (unpack('V', substr($stream, 0, 4))[1] === 0x997275b5);
+        $stream = substr($stream, 4);
 
         return new self(
             $newValue

@@ -63,16 +63,24 @@ final class EmojiStatusCollectible extends AbstractEmojiStatus
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $collectibleId = Deserializer::int64($stream);
-        $documentId = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $collectibleId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $documentId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $title = Deserializer::bytes($stream);
         $slug = Deserializer::bytes($stream);
-        $patternDocumentId = Deserializer::int64($stream);
-        $centerColor = Deserializer::int32($stream);
-        $edgeColor = Deserializer::int32($stream);
-        $patternColor = Deserializer::int32($stream);
-        $textColor = Deserializer::int32($stream);
+        $patternDocumentId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $centerColor = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $edgeColor = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $patternColor = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $textColor = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $until = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(

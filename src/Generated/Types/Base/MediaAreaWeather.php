@@ -40,8 +40,10 @@ final class MediaAreaWeather extends AbstractMediaArea
         Deserializer::int32($stream); // Constructor ID
         $coordinates = MediaAreaCoordinates::deserialize($stream);
         $emoji = Deserializer::bytes($stream);
-        $temperatureC = Deserializer::double($stream);
-        $color = Deserializer::int32($stream);
+        $temperatureC = unpack('d', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $color = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $coordinates,

@@ -77,17 +77,21 @@ final class InputStorePaymentPremiumGiveaway extends AbstractInputStorePaymentPu
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $onlyNewSubscribers = (($flags & (1 << 0)) !== 0) ? true : null;
         $winnersAreVisible = (($flags & (1 << 3)) !== 0) ? true : null;
         $boostPeer = AbstractInputPeer::deserialize($stream);
         $additionalPeers = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']) : null;
         $countriesIso2 = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfStrings($stream) : null;
         $prizeDescription = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
-        $randomId = Deserializer::int64($stream);
-        $untilDate = Deserializer::int32($stream);
+        $randomId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $untilDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
+        $amount = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $boostPeer,

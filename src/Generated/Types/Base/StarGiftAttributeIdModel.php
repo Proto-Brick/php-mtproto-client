@@ -29,7 +29,8 @@ final class StarGiftAttributeIdModel extends AbstractStarGiftAttributeId
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $documentId = Deserializer::int64($stream);
+        $documentId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $documentId

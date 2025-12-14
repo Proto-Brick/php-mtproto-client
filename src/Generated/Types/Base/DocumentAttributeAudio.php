@@ -60,9 +60,11 @@ final class DocumentAttributeAudio extends AbstractDocumentAttribute
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $voice = (($flags & (1 << 10)) !== 0) ? true : null;
-        $duration = Deserializer::int32($stream);
+        $duration = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $performer = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $waveform = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;

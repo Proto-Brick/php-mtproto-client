@@ -57,9 +57,12 @@ final class PaymentFormStars extends AbstractPaymentForm
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $formId = Deserializer::int64($stream);
-        $botId = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $formId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $botId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
         $photo = (($flags & (1 << 5)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;

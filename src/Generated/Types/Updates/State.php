@@ -46,11 +46,16 @@ final class State extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $pts = Deserializer::int32($stream);
-        $qts = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $seq = Deserializer::int32($stream);
-        $unreadCount = Deserializer::int32($stream);
+        $pts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $qts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $seq = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unreadCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $pts,

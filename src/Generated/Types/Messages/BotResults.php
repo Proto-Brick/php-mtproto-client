@@ -78,14 +78,17 @@ final class BotResults extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $gallery = (($flags & (1 << 0)) !== 0) ? true : null;
-        $queryId = Deserializer::int64($stream);
+        $queryId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $nextOffset = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $switchPm = (($flags & (1 << 2)) !== 0) ? InlineBotSwitchPM::deserialize($stream) : null;
         $switchWebview = (($flags & (1 << 3)) !== 0) ? InlineBotWebView::deserialize($stream) : null;
         $results = Deserializer::vectorOfObjects($stream, [AbstractBotInlineResult::class, 'deserialize']);
-        $cacheTime = Deserializer::int32($stream);
+        $cacheTime = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 
         return new self(

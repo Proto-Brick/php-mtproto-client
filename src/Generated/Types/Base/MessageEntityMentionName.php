@@ -35,9 +35,12 @@ final class MessageEntityMentionName extends AbstractMessageEntity
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $offset = Deserializer::int32($stream);
-        $length = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
+        $offset = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $length = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $offset,

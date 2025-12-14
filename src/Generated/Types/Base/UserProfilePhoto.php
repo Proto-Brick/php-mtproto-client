@@ -52,12 +52,15 @@ final class UserProfilePhoto extends AbstractUserProfilePhoto
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $hasVideo = (($flags & (1 << 0)) !== 0) ? true : null;
         $personal = (($flags & (1 << 2)) !== 0) ? true : null;
-        $photoId = Deserializer::int64($stream);
+        $photoId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $strippedThumb = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $dcId = Deserializer::int32($stream);
+        $dcId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $photoId,

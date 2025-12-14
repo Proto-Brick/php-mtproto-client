@@ -32,7 +32,8 @@ final class MessageActionRequestedPeer extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $buttonId = Deserializer::int32($stream);
+        $buttonId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $peers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
 
         return new self(

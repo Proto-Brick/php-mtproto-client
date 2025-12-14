@@ -57,12 +57,14 @@ final class MessagePeerReaction extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $big = (($flags & (1 << 0)) !== 0) ? true : null;
         $unread = (($flags & (1 << 1)) !== 0) ? true : null;
         $my = (($flags & (1 << 2)) !== 0) ? true : null;
         $peerId = AbstractPeer::deserialize($stream);
-        $date = Deserializer::int32($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $reaction = AbstractReaction::deserialize($stream);
 
         return new self(

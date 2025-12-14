@@ -52,7 +52,8 @@ final class GroupCallParticipantVideo extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $paused = (($flags & (1 << 0)) !== 0) ? true : null;
         $endpoint = Deserializer::bytes($stream);
         $sourceGroups = Deserializer::vectorOfObjects($stream, [GroupCallParticipantVideoSourceGroup::class, 'deserialize']);

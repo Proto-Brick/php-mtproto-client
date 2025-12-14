@@ -33,7 +33,8 @@ final class InputNotifyForumTopic extends AbstractInputNotifyPeer
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractInputPeer::deserialize($stream);
-        $topMsgId = Deserializer::int32($stream);
+        $topMsgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $peer,

@@ -36,7 +36,8 @@ final class SendMessageEmojiInteraction extends AbstractSendMessageAction
     {
         Deserializer::int32($stream); // Constructor ID
         $emoticon = Deserializer::bytes($stream);
-        $msgId = Deserializer::int32($stream);
+        $msgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $interaction = Deserializer::deserializeDataJSON($stream);
 
         return new self(

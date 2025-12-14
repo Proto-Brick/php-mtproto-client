@@ -72,12 +72,14 @@ final class DiscussionMessage extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
         $maxId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $readInboxMaxId = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $readOutboxMaxId = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $unreadCount = Deserializer::int32($stream);
+        $unreadCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 

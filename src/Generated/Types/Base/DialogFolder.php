@@ -54,15 +54,21 @@ final class DialogFolder extends AbstractDialog
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $pinned = (($flags & (1 << 2)) !== 0) ? true : null;
         $folder = Folder::deserialize($stream);
         $peer = AbstractPeer::deserialize($stream);
-        $topMessage = Deserializer::int32($stream);
-        $unreadMutedPeersCount = Deserializer::int32($stream);
-        $unreadUnmutedPeersCount = Deserializer::int32($stream);
-        $unreadMutedMessagesCount = Deserializer::int32($stream);
-        $unreadUnmutedMessagesCount = Deserializer::int32($stream);
+        $topMessage = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unreadMutedPeersCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unreadUnmutedPeersCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unreadMutedMessagesCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unreadUnmutedMessagesCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $folder,

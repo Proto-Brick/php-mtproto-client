@@ -95,7 +95,8 @@ final class SecureValue extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $type = SecureValueType::deserialize($stream);
         $data = (($flags & (1 << 0)) !== 0) ? SecureData::deserialize($stream) : null;
         $frontSide = (($flags & (1 << 1)) !== 0) ? AbstractSecureFile::deserialize($stream) : null;

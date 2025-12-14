@@ -45,11 +45,16 @@ final class InputWebFileGeoPointLocation extends AbstractInputWebFileLocation
     {
         Deserializer::int32($stream); // Constructor ID
         $geoPoint = AbstractInputGeoPoint::deserialize($stream);
-        $accessHash = Deserializer::int64($stream);
-        $w = Deserializer::int32($stream);
-        $h = Deserializer::int32($stream);
-        $zoom = Deserializer::int32($stream);
-        $scale = Deserializer::int32($stream);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $w = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $h = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $zoom = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $scale = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $geoPoint,

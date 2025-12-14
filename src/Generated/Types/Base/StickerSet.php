@@ -126,7 +126,8 @@ final class StickerSet extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $archived = (($flags & (1 << 1)) !== 0) ? true : null;
         $official = (($flags & (1 << 2)) !== 0) ? true : null;
         $masks = (($flags & (1 << 3)) !== 0) ? true : null;
@@ -135,16 +136,20 @@ final class StickerSet extends TlObject
         $channelEmojiStatus = (($flags & (1 << 10)) !== 0) ? true : null;
         $creator = (($flags & (1 << 11)) !== 0) ? true : null;
         $installedDate = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $title = Deserializer::bytes($stream);
         $shortName = Deserializer::bytes($stream);
         $thumbs = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']) : null;
         $thumbDcId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
         $thumbVersion = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
         $thumbDocumentId = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($stream) : null;
-        $count = Deserializer::int32($stream);
-        $hash = Deserializer::int32($stream);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $hash = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $id,

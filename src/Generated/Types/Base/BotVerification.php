@@ -40,8 +40,10 @@ final class BotVerification extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $botId = Deserializer::int64($stream);
-        $icon = Deserializer::int64($stream);
+        $botId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $icon = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $description = Deserializer::bytes($stream);
 
         return new self(

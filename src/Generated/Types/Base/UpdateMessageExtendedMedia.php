@@ -36,7 +36,8 @@ final class UpdateMessageExtendedMedia extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
-        $msgId = Deserializer::int32($stream);
+        $msgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $extendedMedia = Deserializer::vectorOfObjects($stream, [AbstractMessageExtendedMedia::class, 'deserialize']);
 
         return new self(

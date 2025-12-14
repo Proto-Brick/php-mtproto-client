@@ -52,11 +52,14 @@ final class PhoneCallProtocol extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $udpP2p = (($flags & (1 << 0)) !== 0) ? true : null;
         $udpReflector = (($flags & (1 << 1)) !== 0) ? true : null;
-        $minLayer = Deserializer::int32($stream);
-        $maxLayer = Deserializer::int32($stream);
+        $minLayer = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $maxLayer = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $libraryVersions = Deserializer::vectorOfStrings($stream);
 
         return new self(

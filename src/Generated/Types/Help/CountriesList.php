@@ -33,7 +33,8 @@ final class CountriesList extends AbstractCountriesList
     {
         Deserializer::int32($stream); // Constructor ID
         $countries = Deserializer::vectorOfObjects($stream, [Country::class, 'deserialize']);
-        $hash = Deserializer::int32($stream);
+        $hash = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $countries,

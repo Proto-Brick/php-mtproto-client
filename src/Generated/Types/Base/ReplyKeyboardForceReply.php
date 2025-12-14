@@ -46,7 +46,8 @@ final class ReplyKeyboardForceReply extends AbstractReplyMarkup
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $singleUse = (($flags & (1 << 1)) !== 0) ? true : null;
         $selective = (($flags & (1 << 2)) !== 0) ? true : null;
         $placeholder = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;

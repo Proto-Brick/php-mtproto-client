@@ -92,11 +92,13 @@ final class MessageActionGiftCode extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $viaGiveaway = (($flags & (1 << 0)) !== 0) ? true : null;
         $unclaimed = (($flags & (1 << 5)) !== 0) ? true : null;
         $boostPeer = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $months = Deserializer::int32($stream);
+        $months = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $slug = Deserializer::bytes($stream);
         $currency = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
         $amount = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;

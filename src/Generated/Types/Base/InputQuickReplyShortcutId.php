@@ -29,7 +29,8 @@ final class InputQuickReplyShortcutId extends AbstractInputQuickReplyShortcut
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $shortcutId = Deserializer::int32($stream);
+        $shortcutId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $shortcutId

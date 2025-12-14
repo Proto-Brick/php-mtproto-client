@@ -68,10 +68,12 @@ final class ThemeSettings extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $messageColorsAnimated = (($flags & (1 << 2)) !== 0) ? true : null;
         $baseTheme = BaseTheme::deserialize($stream);
-        $accentColor = Deserializer::int32($stream);
+        $accentColor = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $outboxAccentColor = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
         $messageColors = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfInts($stream) : null;
         $wallpaper = (($flags & (1 << 1)) !== 0) ? AbstractWallPaper::deserialize($stream) : null;

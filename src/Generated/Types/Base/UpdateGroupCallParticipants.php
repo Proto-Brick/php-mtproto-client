@@ -37,7 +37,8 @@ final class UpdateGroupCallParticipants extends AbstractUpdate
         Deserializer::int32($stream); // Constructor ID
         $call = AbstractInputGroupCall::deserialize($stream);
         $participants = Deserializer::vectorOfObjects($stream, [GroupCallParticipant::class, 'deserialize']);
-        $version = Deserializer::int32($stream);
+        $version = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $call,

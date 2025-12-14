@@ -58,12 +58,14 @@ final class BusinessChatLink extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $link = Deserializer::bytes($stream);
         $message = Deserializer::bytes($stream);
         $entities = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
         $title = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $views = Deserializer::int32($stream);
+        $views = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $link,

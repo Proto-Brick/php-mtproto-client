@@ -60,9 +60,11 @@ final class TranscribedAudio extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $pending = (($flags & (1 << 0)) !== 0) ? true : null;
-        $transcriptionId = Deserializer::int64($stream);
+        $transcriptionId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $text = Deserializer::bytes($stream);
         $trialRemainsNum = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $trialRemainsUntilDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;

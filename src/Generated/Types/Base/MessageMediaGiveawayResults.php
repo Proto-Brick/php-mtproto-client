@@ -88,19 +88,25 @@ final class MessageMediaGiveawayResults extends AbstractMessageMedia
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $onlyNewSubscribers = (($flags & (1 << 0)) !== 0) ? true : null;
         $refunded = (($flags & (1 << 2)) !== 0) ? true : null;
-        $channelId = Deserializer::int64($stream);
+        $channelId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $additionalPeersCount = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $launchMsgId = Deserializer::int32($stream);
-        $winnersCount = Deserializer::int32($stream);
-        $unclaimedCount = Deserializer::int32($stream);
+        $launchMsgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $winnersCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unclaimedCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $winners = Deserializer::vectorOfLongs($stream);
         $months = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
         $stars = (($flags & (1 << 5)) !== 0) ? Deserializer::int64($stream) : null;
         $prizeDescription = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $untilDate = Deserializer::int32($stream);
+        $untilDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $channelId,

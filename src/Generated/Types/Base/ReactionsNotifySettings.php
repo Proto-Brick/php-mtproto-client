@@ -55,11 +55,13 @@ final class ReactionsNotifySettings extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $messagesNotifyFrom = (($flags & (1 << 0)) !== 0) ? ReactionNotificationsFrom::deserialize($stream) : null;
         $storiesNotifyFrom = (($flags & (1 << 1)) !== 0) ? ReactionNotificationsFrom::deserialize($stream) : null;
         $sound = AbstractNotificationSound::deserialize($stream);
-        $showPreviews = (Deserializer::int32($stream) === 0x997275b5);
+        $showPreviews = (unpack('V', substr($stream, 0, 4))[1] === 0x997275b5);
+        $stream = substr($stream, 4);
 
         return new self(
             $sound,

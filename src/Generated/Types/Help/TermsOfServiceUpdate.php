@@ -32,7 +32,8 @@ final class TermsOfServiceUpdate extends AbstractTermsOfServiceUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $expires = Deserializer::int32($stream);
+        $expires = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $termsOfService = TermsOfService::deserialize($stream);
 
         return new self(

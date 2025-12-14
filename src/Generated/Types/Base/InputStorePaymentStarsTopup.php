@@ -35,9 +35,11 @@ final class InputStorePaymentStarsTopup extends AbstractInputStorePaymentPurpose
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $stars = Deserializer::int64($stream);
+        $stars = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
+        $amount = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $stars,

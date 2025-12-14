@@ -32,7 +32,8 @@ final class MessageMediaPaidMedia extends AbstractMessageMedia
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $starsAmount = Deserializer::int64($stream);
+        $starsAmount = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $extendedMedia = Deserializer::vectorOfObjects($stream, [AbstractMessageExtendedMedia::class, 'deserialize']);
 
         return new self(

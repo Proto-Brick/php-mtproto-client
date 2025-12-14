@@ -33,7 +33,8 @@ final class InputReplyToStory extends AbstractInputReplyTo
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractInputPeer::deserialize($stream);
-        $storyId = Deserializer::int32($stream);
+        $storyId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $peer,

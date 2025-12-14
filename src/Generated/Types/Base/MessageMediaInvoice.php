@@ -77,7 +77,8 @@ final class MessageMediaInvoice extends AbstractMessageMedia
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $shippingAddressRequested = (($flags & (1 << 1)) !== 0) ? true : null;
         $test = (($flags & (1 << 3)) !== 0) ? true : null;
         $title = Deserializer::bytes($stream);
@@ -85,7 +86,8 @@ final class MessageMediaInvoice extends AbstractMessageMedia
         $photo = (($flags & (1 << 0)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
         $receiptMsgId = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $currency = Deserializer::bytes($stream);
-        $totalAmount = Deserializer::int64($stream);
+        $totalAmount = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $startParam = Deserializer::bytes($stream);
         $extendedMedia = (($flags & (1 << 4)) !== 0) ? AbstractMessageExtendedMedia::deserialize($stream) : null;
 

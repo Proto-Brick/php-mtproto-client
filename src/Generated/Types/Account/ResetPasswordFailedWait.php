@@ -29,7 +29,8 @@ final class ResetPasswordFailedWait extends AbstractResetPasswordResult
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $retryDate = Deserializer::int32($stream);
+        $retryDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $retryDate

@@ -60,14 +60,17 @@ final class ForumTopics extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $orderByCreateDate = (($flags & (1 << 0)) !== 0) ? true : null;
-        $count = Deserializer::int32($stream);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $topics = Deserializer::vectorOfObjects($stream, [AbstractForumTopic::class, 'deserialize']);
         $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $pts = Deserializer::int32($stream);
+        $pts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $count,

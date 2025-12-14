@@ -57,7 +57,8 @@ final class ChatlistInvite extends AbstractChatlistInvite
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $titleNoanimate = (($flags & (1 << 1)) !== 0) ? true : null;
         $title = TextWithEntities::deserialize($stream);
         $emoticon = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;

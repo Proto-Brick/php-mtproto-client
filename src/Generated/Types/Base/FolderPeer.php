@@ -38,7 +38,8 @@ final class FolderPeer extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $peer = AbstractPeer::deserialize($stream);
-        $folderId = Deserializer::int32($stream);
+        $folderId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $peer,

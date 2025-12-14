@@ -50,10 +50,12 @@ final class StarGiftAttributeOriginalDetails extends AbstractStarGiftAttribute
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $senderId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
         $recipientId = AbstractPeer::deserialize($stream);
-        $date = Deserializer::int32($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;
 
         return new self(

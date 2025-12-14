@@ -39,9 +39,11 @@ final class UpdateGroupCallChainBlocks extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $call = AbstractInputGroupCall::deserialize($stream);
-        $subChainId = Deserializer::int32($stream);
+        $subChainId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $blocks = Deserializer::vectorOfStrings($stream);
-        $nextOffset = Deserializer::int32($stream);
+        $nextOffset = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $call,

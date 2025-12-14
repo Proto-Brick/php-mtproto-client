@@ -39,10 +39,13 @@ final class MessageEntityBlockquote extends AbstractMessageEntity
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $collapsed = (($flags & (1 << 0)) !== 0) ? true : null;
-        $offset = Deserializer::int32($stream);
-        $length = Deserializer::int32($stream);
+        $offset = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $length = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $offset,

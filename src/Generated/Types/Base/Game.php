@@ -59,9 +59,12 @@ final class Game extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $shortName = Deserializer::bytes($stream);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);

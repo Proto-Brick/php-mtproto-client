@@ -49,11 +49,13 @@ final class PollAnswerVoters extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $chosen = (($flags & (1 << 0)) !== 0) ? true : null;
         $correct = (($flags & (1 << 1)) !== 0) ? true : null;
         $option = Deserializer::bytes($stream);
-        $voters = Deserializer::int32($stream);
+        $voters = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $option,

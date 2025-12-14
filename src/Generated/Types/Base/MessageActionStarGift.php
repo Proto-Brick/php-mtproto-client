@@ -117,7 +117,8 @@ final class MessageActionStarGift extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $nameHidden = (($flags & (1 << 0)) !== 0) ? true : null;
         $saved = (($flags & (1 << 2)) !== 0) ? true : null;
         $converted = (($flags & (1 << 3)) !== 0) ? true : null;

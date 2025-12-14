@@ -41,7 +41,8 @@ final class ChannelParticipants extends AbstractChannelParticipants
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $count = Deserializer::int32($stream);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $participants = Deserializer::vectorOfObjects($stream, [AbstractChannelParticipant::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);

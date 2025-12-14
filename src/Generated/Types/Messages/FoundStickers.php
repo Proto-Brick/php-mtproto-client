@@ -43,9 +43,11 @@ final class FoundStickers extends AbstractFoundStickers
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $hash = Deserializer::int64($stream);
+        $hash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $stickers = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
 
         return new self(

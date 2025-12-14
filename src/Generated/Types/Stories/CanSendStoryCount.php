@@ -34,7 +34,8 @@ final class CanSendStoryCount extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $countRemains = Deserializer::int32($stream);
+        $countRemains = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $countRemains

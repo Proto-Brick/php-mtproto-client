@@ -54,13 +54,19 @@ final class PhoneCallRequested extends AbstractPhoneCall
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $video = (($flags & (1 << 6)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $adminId = Deserializer::int64($stream);
-        $participantId = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $adminId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $participantId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $gAHash = Deserializer::bytes($stream);
         $protocol = PhoneCallProtocol::deserialize($stream);
 

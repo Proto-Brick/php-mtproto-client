@@ -38,7 +38,8 @@ final class Contacts extends AbstractContacts
     {
         Deserializer::int32($stream); // Constructor ID
         $contacts = Deserializer::vectorOfObjects($stream, [Contact::class, 'deserialize']);
-        $savedCount = Deserializer::int32($stream);
+        $savedCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 
         return new self(

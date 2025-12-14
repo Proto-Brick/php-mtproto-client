@@ -36,7 +36,8 @@ final class StoryReaction extends AbstractStoryReaction
     {
         Deserializer::int32($stream); // Constructor ID
         $peerId = AbstractPeer::deserialize($stream);
-        $date = Deserializer::int32($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $reaction = AbstractReaction::deserialize($stream);
 
         return new self(

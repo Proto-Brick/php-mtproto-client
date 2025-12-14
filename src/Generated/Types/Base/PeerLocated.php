@@ -36,8 +36,10 @@ final class PeerLocated extends AbstractPeerLocated
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
-        $expires = Deserializer::int32($stream);
-        $distance = Deserializer::int32($stream);
+        $expires = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $distance = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $peer,

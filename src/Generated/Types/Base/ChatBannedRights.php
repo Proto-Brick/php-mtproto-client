@@ -136,7 +136,8 @@ final class ChatBannedRights extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $viewMessages = (($flags & (1 << 0)) !== 0) ? true : null;
         $sendMessages = (($flags & (1 << 1)) !== 0) ? true : null;
         $sendMedia = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -157,7 +158,8 @@ final class ChatBannedRights extends TlObject
         $sendVoices = (($flags & (1 << 23)) !== 0) ? true : null;
         $sendDocs = (($flags & (1 << 24)) !== 0) ? true : null;
         $sendPlain = (($flags & (1 << 25)) !== 0) ? true : null;
-        $untilDate = Deserializer::int32($stream);
+        $untilDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $untilDate,

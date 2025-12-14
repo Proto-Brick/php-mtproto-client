@@ -115,7 +115,8 @@ final class MessageService extends AbstractMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $out = (($flags & (1 << 1)) !== 0) ? true : null;
         $mentioned = (($flags & (1 << 4)) !== 0) ? true : null;
         $mediaUnread = (($flags & (1 << 5)) !== 0) ? true : null;
@@ -123,12 +124,14 @@ final class MessageService extends AbstractMessage
         $silent = (($flags & (1 << 13)) !== 0) ? true : null;
         $post = (($flags & (1 << 14)) !== 0) ? true : null;
         $legacy = (($flags & (1 << 19)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
+        $id = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $fromId = (($flags & (1 << 8)) !== 0) ? AbstractPeer::deserialize($stream) : null;
         $peerId = AbstractPeer::deserialize($stream);
         $savedPeerId = (($flags & (1 << 28)) !== 0) ? AbstractPeer::deserialize($stream) : null;
         $replyTo = (($flags & (1 << 3)) !== 0) ? AbstractMessageReplyHeader::deserialize($stream) : null;
-        $date = Deserializer::int32($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $action = AbstractMessageAction::deserialize($stream);
         $reactions = (($flags & (1 << 20)) !== 0) ? MessageReactions::deserialize($stream) : null;
         $ttlPeriod = (($flags & (1 << 25)) !== 0) ? Deserializer::int32($stream) : null;

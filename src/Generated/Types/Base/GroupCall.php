@@ -141,7 +141,8 @@ final class GroupCall extends AbstractGroupCall
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $joinMuted = (($flags & (1 << 1)) !== 0) ? true : null;
         $canChangeJoinMuted = (($flags & (1 << 2)) !== 0) ? true : null;
         $joinDateAsc = (($flags & (1 << 6)) !== 0) ? true : null;
@@ -152,16 +153,21 @@ final class GroupCall extends AbstractGroupCall
         $listenersHidden = (($flags & (1 << 13)) !== 0) ? true : null;
         $conference = (($flags & (1 << 14)) !== 0) ? true : null;
         $creator = (($flags & (1 << 15)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $participantsCount = Deserializer::int32($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $participantsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $title = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
         $streamDcId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
         $recordStartDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
         $scheduleDate = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($stream) : null;
         $unmutedVideoCount = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
-        $unmutedVideoLimit = Deserializer::int32($stream);
-        $version = Deserializer::int32($stream);
+        $unmutedVideoLimit = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $version = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $inviteLink = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(

@@ -37,8 +37,10 @@ final class PopularContact extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $clientId = Deserializer::int64($stream);
-        $importers = Deserializer::int32($stream);
+        $clientId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $importers = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $clientId,

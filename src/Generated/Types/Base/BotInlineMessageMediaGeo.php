@@ -63,7 +63,8 @@ final class BotInlineMessageMediaGeo extends AbstractBotInlineMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $geo = AbstractGeoPoint::deserialize($stream);
         $heading = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $period = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;

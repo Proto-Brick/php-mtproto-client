@@ -36,7 +36,8 @@ final class InputPaymentCredentials extends AbstractInputPaymentCredentials
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $save = (($flags & (1 << 0)) !== 0) ? true : null;
         $data = Deserializer::deserializeDataJSON($stream);
 

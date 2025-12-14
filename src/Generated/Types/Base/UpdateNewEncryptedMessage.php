@@ -33,7 +33,8 @@ final class UpdateNewEncryptedMessage extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $message = AbstractEncryptedMessage::deserialize($stream);
-        $qts = Deserializer::int32($stream);
+        $qts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $message,

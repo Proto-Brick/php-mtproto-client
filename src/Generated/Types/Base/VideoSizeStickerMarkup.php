@@ -36,7 +36,8 @@ final class VideoSizeStickerMarkup extends AbstractVideoSize
     {
         Deserializer::int32($stream); // Constructor ID
         $stickerset = AbstractInputStickerSet::deserialize($stream);
-        $stickerId = Deserializer::int64($stream);
+        $stickerId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $backgroundColors = Deserializer::vectorOfInts($stream);
 
         return new self(

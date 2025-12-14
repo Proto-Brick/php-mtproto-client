@@ -42,8 +42,10 @@ final class InputMediaPaidMedia extends AbstractInputMedia
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $starsAmount = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $starsAmount = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $extendedMedia = Deserializer::vectorOfObjects($stream, [AbstractInputMedia::class, 'deserialize']);
         $payload = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
 

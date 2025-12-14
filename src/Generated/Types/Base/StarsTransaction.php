@@ -237,7 +237,8 @@ final class StarsTransaction extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $refund = (($flags & (1 << 3)) !== 0) ? true : null;
         $pending = (($flags & (1 << 4)) !== 0) ? true : null;
         $failed = (($flags & (1 << 6)) !== 0) ? true : null;
@@ -248,7 +249,8 @@ final class StarsTransaction extends TlObject
         $stargiftResale = (($flags & (1 << 22)) !== 0) ? true : null;
         $id = Deserializer::bytes($stream);
         $amount = AbstractStarsAmount::deserialize($stream);
-        $date = Deserializer::int32($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $peer = AbstractStarsTransactionPeer::deserialize($stream);
         $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;

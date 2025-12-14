@@ -40,9 +40,12 @@ final class StatsGroupTopPoster extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $userId = Deserializer::int64($stream);
-        $messages = Deserializer::int32($stream);
-        $avgChars = Deserializer::int32($stream);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $messages = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $avgChars = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $userId,

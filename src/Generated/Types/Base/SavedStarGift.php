@@ -152,14 +152,16 @@ final class SavedStarGift extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $nameHidden = (($flags & (1 << 0)) !== 0) ? true : null;
         $unsaved = (($flags & (1 << 5)) !== 0) ? true : null;
         $refunded = (($flags & (1 << 9)) !== 0) ? true : null;
         $canUpgrade = (($flags & (1 << 10)) !== 0) ? true : null;
         $pinnedToTop = (($flags & (1 << 12)) !== 0) ? true : null;
         $fromId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $date = Deserializer::int32($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $gift = AbstractStarGift::deserialize($stream);
         $message = (($flags & (1 << 2)) !== 0) ? TextWithEntities::deserialize($stream) : null;
         $msgId = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;

@@ -62,11 +62,13 @@ final class PhoneCallDiscarded extends AbstractPhoneCall
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $needRating = (($flags & (1 << 2)) !== 0) ? true : null;
         $needDebug = (($flags & (1 << 3)) !== 0) ? true : null;
         $video = (($flags & (1 << 6)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $reason = (($flags & (1 << 0)) !== 0) ? AbstractPhoneCallDiscardReason::deserialize($stream) : null;
         $duration = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
 

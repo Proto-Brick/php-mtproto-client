@@ -57,11 +57,13 @@ final class FactCheck extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $needCheck = (($flags & (1 << 0)) !== 0) ? true : null;
         $country = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $text = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;
-        $hash = Deserializer::int64($stream);
+        $hash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $hash,

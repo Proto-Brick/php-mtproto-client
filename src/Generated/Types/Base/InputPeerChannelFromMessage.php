@@ -36,8 +36,10 @@ final class InputPeerChannelFromMessage extends AbstractInputPeer
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractInputPeer::deserialize($stream);
-        $msgId = Deserializer::int32($stream);
-        $channelId = Deserializer::int64($stream);
+        $msgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $channelId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $peer,

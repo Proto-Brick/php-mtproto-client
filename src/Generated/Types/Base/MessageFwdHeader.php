@@ -126,12 +126,14 @@ final class MessageFwdHeader extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $imported = (($flags & (1 << 7)) !== 0) ? true : null;
         $savedOut = (($flags & (1 << 11)) !== 0) ? true : null;
         $fromId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
         $fromName = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
-        $date = Deserializer::int32($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $channelPost = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $postAuthor = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
         $savedFromPeer = (($flags & (1 << 4)) !== 0) ? AbstractPeer::deserialize($stream) : null;

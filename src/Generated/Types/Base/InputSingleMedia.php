@@ -50,9 +50,11 @@ final class InputSingleMedia extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $media = AbstractInputMedia::deserialize($stream);
-        $randomId = Deserializer::int64($stream);
+        $randomId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $message = Deserializer::bytes($stream);
         $entities = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
 

@@ -40,9 +40,12 @@ final class SearchResultsPosition extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $msgId = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $offset = Deserializer::int32($stream);
+        $msgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $offset = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $msgId,

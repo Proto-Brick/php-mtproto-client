@@ -54,7 +54,8 @@ final class InputBotInlineMessageMediaVenue extends AbstractInputBotInlineMessag
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $geoPoint = AbstractInputGeoPoint::deserialize($stream);
         $title = Deserializer::bytes($stream);
         $address = Deserializer::bytes($stream);

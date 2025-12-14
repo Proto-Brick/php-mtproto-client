@@ -70,7 +70,8 @@ final class InputBotInlineMessageMediaWebPage extends AbstractInputBotInlineMess
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $invertMedia = (($flags & (1 << 3)) !== 0) ? true : null;
         $forceLargeMedia = (($flags & (1 << 4)) !== 0) ? true : null;
         $forceSmallMedia = (($flags & (1 << 5)) !== 0) ? true : null;

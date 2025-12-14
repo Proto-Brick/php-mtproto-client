@@ -32,7 +32,8 @@ final class VideoSizeEmojiMarkup extends AbstractVideoSize
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $emojiId = Deserializer::int64($stream);
+        $emojiId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $backgroundColors = Deserializer::vectorOfInts($stream);
 
         return new self(

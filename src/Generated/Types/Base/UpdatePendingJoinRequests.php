@@ -36,7 +36,8 @@ final class UpdatePendingJoinRequests extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
-        $requestsPending = Deserializer::int32($stream);
+        $requestsPending = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $recentRequesters = Deserializer::vectorOfLongs($stream);
 
         return new self(

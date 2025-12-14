@@ -48,11 +48,15 @@ final class VideoSize extends AbstractVideoSize
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $type = Deserializer::bytes($stream);
-        $w = Deserializer::int32($stream);
-        $h = Deserializer::int32($stream);
-        $size = Deserializer::int32($stream);
+        $w = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $h = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $size = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $videoStartTs = (($flags & (1 << 0)) !== 0) ? Deserializer::double($stream) : null;
 
         return new self(

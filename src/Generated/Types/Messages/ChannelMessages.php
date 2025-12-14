@@ -63,10 +63,13 @@ final class ChannelMessages extends AbstractMessages
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $inexact = (($flags & (1 << 1)) !== 0) ? true : null;
-        $pts = Deserializer::int32($stream);
-        $count = Deserializer::int32($stream);
+        $pts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $offsetIdOffset = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
         $topics = Deserializer::vectorOfObjects($stream, [AbstractForumTopic::class, 'deserialize']);

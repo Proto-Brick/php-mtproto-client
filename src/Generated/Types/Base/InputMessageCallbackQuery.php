@@ -32,8 +32,10 @@ final class InputMessageCallbackQuery extends AbstractInputMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int32($stream);
-        $queryId = Deserializer::int64($stream);
+        $id = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $queryId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $id,

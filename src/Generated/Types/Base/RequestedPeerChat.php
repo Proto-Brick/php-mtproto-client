@@ -47,8 +47,10 @@ final class RequestedPeerChat extends AbstractRequestedPeer
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $chatId = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $chatId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $photo = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
 

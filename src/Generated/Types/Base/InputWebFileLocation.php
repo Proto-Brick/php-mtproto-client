@@ -33,7 +33,8 @@ final class InputWebFileLocation extends AbstractInputWebFileLocation
     {
         Deserializer::int32($stream); // Constructor ID
         $url = Deserializer::bytes($stream);
-        $accessHash = Deserializer::int64($stream);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $url,

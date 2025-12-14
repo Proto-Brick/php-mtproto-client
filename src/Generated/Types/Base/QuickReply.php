@@ -43,10 +43,13 @@ final class QuickReply extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $shortcutId = Deserializer::int32($stream);
+        $shortcutId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $shortcut = Deserializer::bytes($stream);
-        $topMessage = Deserializer::int32($stream);
-        $count = Deserializer::int32($stream);
+        $topMessage = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $shortcutId,

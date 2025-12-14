@@ -32,8 +32,10 @@ final class DocumentAttributeImageSize extends AbstractDocumentAttribute
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $w = Deserializer::int32($stream);
-        $h = Deserializer::int32($stream);
+        $w = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $h = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $w,

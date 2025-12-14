@@ -42,9 +42,11 @@ final class InputInvoicePremiumGiftStars extends AbstractInputInvoice
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $userId = AbstractInputUser::deserialize($stream);
-        $months = Deserializer::int32($stream);
+        $months = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $message = (($flags & (1 << 0)) !== 0) ? TextWithEntities::deserialize($stream) : null;
 
         return new self(

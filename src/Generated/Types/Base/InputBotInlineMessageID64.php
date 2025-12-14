@@ -38,10 +38,14 @@ final class InputBotInlineMessageID64 extends AbstractInputBotInlineMessageID
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $dcId = Deserializer::int32($stream);
-        $ownerId = Deserializer::int64($stream);
-        $id = Deserializer::int32($stream);
-        $accessHash = Deserializer::int64($stream);
+        $dcId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $ownerId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $id = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $dcId,

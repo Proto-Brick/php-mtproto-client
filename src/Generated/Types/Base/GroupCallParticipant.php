@@ -140,7 +140,8 @@ final class GroupCallParticipant extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $muted = (($flags & (1 << 0)) !== 0) ? true : null;
         $left = (($flags & (1 << 1)) !== 0) ? true : null;
         $canSelfUnmute = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -152,9 +153,11 @@ final class GroupCallParticipant extends TlObject
         $self = (($flags & (1 << 12)) !== 0) ? true : null;
         $videoJoined = (($flags & (1 << 15)) !== 0) ? true : null;
         $peer = AbstractPeer::deserialize($stream);
-        $date = Deserializer::int32($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $activeDate = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $source = Deserializer::int32($stream);
+        $source = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $volume = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($stream) : null;
         $about = (($flags & (1 << 11)) !== 0) ? Deserializer::bytes($stream) : null;
         $raiseHandRating = (($flags & (1 << 13)) !== 0) ? Deserializer::int64($stream) : null;

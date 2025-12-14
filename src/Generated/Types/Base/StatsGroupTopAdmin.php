@@ -43,10 +43,14 @@ final class StatsGroupTopAdmin extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $userId = Deserializer::int64($stream);
-        $deleted = Deserializer::int32($stream);
-        $kicked = Deserializer::int32($stream);
-        $banned = Deserializer::int32($stream);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $deleted = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $kicked = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $banned = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $userId,

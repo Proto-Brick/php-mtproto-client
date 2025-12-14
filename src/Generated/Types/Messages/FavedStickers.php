@@ -37,7 +37,8 @@ final class FavedStickers extends AbstractFavedStickers
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
+        $hash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $packs = Deserializer::vectorOfObjects($stream, [StickerPack::class, 'deserialize']);
         $stickers = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
 

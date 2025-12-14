@@ -35,9 +35,12 @@ final class UpdateEncryptedMessagesRead extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $chatId = Deserializer::int32($stream);
-        $maxDate = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
+        $chatId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $maxDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $chatId,

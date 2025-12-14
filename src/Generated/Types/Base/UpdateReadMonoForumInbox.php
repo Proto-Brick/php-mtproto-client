@@ -35,9 +35,11 @@ final class UpdateReadMonoForumInbox extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $channelId = Deserializer::int64($stream);
+        $channelId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $savedPeerId = AbstractPeer::deserialize($stream);
-        $readMaxId = Deserializer::int32($stream);
+        $readMaxId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $channelId,

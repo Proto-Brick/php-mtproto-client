@@ -40,9 +40,12 @@ final class HighScore extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $pos = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
-        $score = Deserializer::int32($stream);
+        $pos = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $score = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $pos,

@@ -54,7 +54,8 @@ final class WebViewResult extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $fullsize = (($flags & (1 << 1)) !== 0) ? true : null;
         $fullscreen = (($flags & (1 << 2)) !== 0) ? true : null;
         $queryId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;

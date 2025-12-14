@@ -55,14 +55,17 @@ final class InputKeyboardButtonRequestPeer extends AbstractKeyboardButton
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $nameRequested = (($flags & (1 << 0)) !== 0) ? true : null;
         $usernameRequested = (($flags & (1 << 1)) !== 0) ? true : null;
         $photoRequested = (($flags & (1 << 2)) !== 0) ? true : null;
         $text = Deserializer::bytes($stream);
-        $buttonId = Deserializer::int32($stream);
+        $buttonId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $peerType = AbstractRequestPeerType::deserialize($stream);
-        $maxQuantity = Deserializer::int32($stream);
+        $maxQuantity = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $text,

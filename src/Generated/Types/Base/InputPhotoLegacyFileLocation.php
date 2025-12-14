@@ -44,12 +44,17 @@ final class InputPhotoLegacyFileLocation extends AbstractInputFileLocation
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $fileReference = Deserializer::bytes($stream);
-        $volumeId = Deserializer::int64($stream);
-        $localId = Deserializer::int32($stream);
-        $secret = Deserializer::int64($stream);
+        $volumeId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $localId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $secret = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $id,

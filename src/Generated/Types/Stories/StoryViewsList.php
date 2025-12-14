@@ -65,11 +65,16 @@ final class StoryViewsList extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $count = Deserializer::int32($stream);
-        $viewsCount = Deserializer::int32($stream);
-        $forwardsCount = Deserializer::int32($stream);
-        $reactionsCount = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $viewsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $forwardsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $reactionsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $views = Deserializer::vectorOfObjects($stream, [AbstractStoryView::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);

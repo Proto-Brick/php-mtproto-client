@@ -45,12 +45,15 @@ final class MessageActionPrizeStars extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $unclaimed = (($flags & (1 << 0)) !== 0) ? true : null;
-        $stars = Deserializer::int64($stream);
+        $stars = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $transactionId = Deserializer::bytes($stream);
         $boostPeer = AbstractPeer::deserialize($stream);
-        $giveawayMsgId = Deserializer::int32($stream);
+        $giveawayMsgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $stars,

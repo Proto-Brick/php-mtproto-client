@@ -38,7 +38,8 @@ final class AttachMenuBotIconColor extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $name = Deserializer::bytes($stream);
-        $color = Deserializer::int32($stream);
+        $color = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $name,

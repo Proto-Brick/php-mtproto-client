@@ -38,10 +38,14 @@ final class PrepaidGiveaway extends AbstractPrepaidGiveaway
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int64($stream);
-        $months = Deserializer::int32($stream);
-        $quantity = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $months = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $quantity = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $id,

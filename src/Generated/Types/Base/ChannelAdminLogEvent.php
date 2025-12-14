@@ -43,9 +43,12 @@ final class ChannelAdminLogEvent extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $id = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $action = AbstractChannelAdminLogEventAction::deserialize($stream);
 
         return new self(

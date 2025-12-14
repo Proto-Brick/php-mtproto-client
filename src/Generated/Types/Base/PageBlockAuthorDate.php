@@ -33,7 +33,8 @@ final class PageBlockAuthorDate extends AbstractPageBlock
     {
         Deserializer::int32($stream); // Constructor ID
         $author = AbstractRichText::deserialize($stream);
-        $publishedDate = Deserializer::int32($stream);
+        $publishedDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $author,

@@ -38,7 +38,8 @@ final class StarGiftAttributeCounter extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $attribute = AbstractStarGiftAttributeId::deserialize($stream);
-        $count = Deserializer::int32($stream);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $attribute,

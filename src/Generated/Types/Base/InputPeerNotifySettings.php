@@ -89,7 +89,8 @@ final class InputPeerNotifySettings extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $showPreviews = (($flags & (1 << 0)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
         $silent = (($flags & (1 << 1)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
         $muteUntil = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;

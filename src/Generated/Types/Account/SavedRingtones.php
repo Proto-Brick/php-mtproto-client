@@ -33,7 +33,8 @@ final class SavedRingtones extends AbstractSavedRingtones
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
+        $hash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $ringtones = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
 
         return new self(

@@ -105,19 +105,24 @@ final class Chat extends AbstractChat implements PeerEntity
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $creator = (($flags & (1 << 0)) !== 0) ? true : null;
         $left = (($flags & (1 << 2)) !== 0) ? true : null;
         $deactivated = (($flags & (1 << 5)) !== 0) ? true : null;
         $callActive = (($flags & (1 << 23)) !== 0) ? true : null;
         $callNotEmpty = (($flags & (1 << 24)) !== 0) ? true : null;
         $noforwards = (($flags & (1 << 25)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $title = Deserializer::bytes($stream);
         $photo = AbstractChatPhoto::deserialize($stream);
-        $participantsCount = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $version = Deserializer::int32($stream);
+        $participantsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $version = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $migratedTo = (($flags & (1 << 6)) !== 0) ? AbstractInputChannel::deserialize($stream) : null;
         $adminRights = (($flags & (1 << 14)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
         $defaultBannedRights = (($flags & (1 << 18)) !== 0) ? ChatBannedRights::deserialize($stream) : null;

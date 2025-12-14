@@ -29,7 +29,8 @@ final class UserStatusOffline extends AbstractUserStatus
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $wasOnline = Deserializer::int32($stream);
+        $wasOnline = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $wasOnline

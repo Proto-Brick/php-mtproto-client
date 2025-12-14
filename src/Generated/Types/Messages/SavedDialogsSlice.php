@@ -45,7 +45,8 @@ final class SavedDialogsSlice extends AbstractSavedDialogs
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $count = Deserializer::int32($stream);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $dialogs = Deserializer::vectorOfObjects($stream, [AbstractSavedDialog::class, 'deserialize']);
         $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);

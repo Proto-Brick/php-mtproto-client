@@ -35,7 +35,8 @@ final class InputCheckPasswordSRP extends AbstractInputCheckPasswordSRP
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $srpId = Deserializer::int64($stream);
+        $srpId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $a = Deserializer::bytes($stream);
         $m1 = Deserializer::bytes($stream);
 

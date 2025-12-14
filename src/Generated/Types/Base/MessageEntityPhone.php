@@ -32,8 +32,10 @@ final class MessageEntityPhone extends AbstractMessageEntity
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $offset = Deserializer::int32($stream);
-        $length = Deserializer::int32($stream);
+        $offset = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $length = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $offset,

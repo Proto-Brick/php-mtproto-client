@@ -71,14 +71,18 @@ final class GiveawayInfoResults extends AbstractGiveawayInfo
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $winner = (($flags & (1 << 0)) !== 0) ? true : null;
         $refunded = (($flags & (1 << 1)) !== 0) ? true : null;
-        $startDate = Deserializer::int32($stream);
+        $startDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $giftCodeSlug = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
         $starsPrize = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
-        $finishDate = Deserializer::int32($stream);
-        $winnersCount = Deserializer::int32($stream);
+        $finishDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $winnersCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $activatedCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(

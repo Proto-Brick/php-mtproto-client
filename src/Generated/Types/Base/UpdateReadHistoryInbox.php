@@ -51,13 +51,18 @@ final class UpdateReadHistoryInbox extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $folderId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $peer = AbstractPeer::deserialize($stream);
-        $maxId = Deserializer::int32($stream);
-        $stillUnreadCount = Deserializer::int32($stream);
-        $pts = Deserializer::int32($stream);
-        $ptsCount = Deserializer::int32($stream);
+        $maxId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $stillUnreadCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $pts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $peer,

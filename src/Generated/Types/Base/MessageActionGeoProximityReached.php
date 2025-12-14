@@ -37,7 +37,8 @@ final class MessageActionGeoProximityReached extends AbstractMessageAction
         Deserializer::int32($stream); // Constructor ID
         $fromId = AbstractPeer::deserialize($stream);
         $toId = AbstractPeer::deserialize($stream);
-        $distance = Deserializer::int32($stream);
+        $distance = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $fromId,

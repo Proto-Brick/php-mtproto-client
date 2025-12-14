@@ -42,7 +42,8 @@ final class SecureSecretSettings extends TlObject
         }
         $secureAlgo = AbstractSecurePasswordKdfAlgo::deserialize($stream);
         $secureSecret = Deserializer::bytes($stream);
-        $secureSecretId = Deserializer::int64($stream);
+        $secureSecretId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $secureAlgo,

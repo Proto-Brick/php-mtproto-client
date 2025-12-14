@@ -99,17 +99,24 @@ final class Dialog extends AbstractDialog
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $pinned = (($flags & (1 << 2)) !== 0) ? true : null;
         $unreadMark = (($flags & (1 << 3)) !== 0) ? true : null;
         $viewForumAsMessages = (($flags & (1 << 6)) !== 0) ? true : null;
         $peer = AbstractPeer::deserialize($stream);
-        $topMessage = Deserializer::int32($stream);
-        $readInboxMaxId = Deserializer::int32($stream);
-        $readOutboxMaxId = Deserializer::int32($stream);
-        $unreadCount = Deserializer::int32($stream);
-        $unreadMentionsCount = Deserializer::int32($stream);
-        $unreadReactionsCount = Deserializer::int32($stream);
+        $topMessage = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $readInboxMaxId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $readOutboxMaxId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unreadCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unreadMentionsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unreadReactionsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $notifySettings = PeerNotifySettings::deserialize($stream);
         $pts = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $draft = (($flags & (1 << 1)) !== 0) ? AbstractDraftMessage::deserialize($stream) : null;

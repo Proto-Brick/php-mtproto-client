@@ -33,7 +33,8 @@ final class PaymentFormStarGift extends AbstractPaymentForm
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $formId = Deserializer::int64($stream);
+        $formId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $invoice = Invoice::deserialize($stream);
 
         return new self(

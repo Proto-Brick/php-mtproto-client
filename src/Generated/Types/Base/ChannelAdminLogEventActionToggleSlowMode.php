@@ -32,8 +32,10 @@ final class ChannelAdminLogEventActionToggleSlowMode extends AbstractChannelAdmi
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $prevValue = Deserializer::int32($stream);
-        $newValue = Deserializer::int32($stream);
+        $prevValue = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $newValue = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $prevValue,

@@ -38,7 +38,8 @@ final class TopPeer extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $peer = AbstractPeer::deserialize($stream);
-        $rating = Deserializer::double($stream);
+        $rating = unpack('d', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $peer,

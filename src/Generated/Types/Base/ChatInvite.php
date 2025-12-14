@@ -125,7 +125,8 @@ final class ChatInvite extends AbstractChatInvite
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $channel = (($flags & (1 << 0)) !== 0) ? true : null;
         $broadcast = (($flags & (1 << 1)) !== 0) ? true : null;
         $public = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -138,9 +139,11 @@ final class ChatInvite extends AbstractChatInvite
         $title = Deserializer::bytes($stream);
         $about = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
         $photo = AbstractPhoto::deserialize($stream);
-        $participantsCount = Deserializer::int32($stream);
+        $participantsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $participants = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']) : null;
-        $color = Deserializer::int32($stream);
+        $color = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $subscriptionPricing = (($flags & (1 << 10)) !== 0) ? StarsSubscriptionPricing::deserialize($stream) : null;
         $subscriptionFormId = (($flags & (1 << 12)) !== 0) ? Deserializer::int64($stream) : null;
         $botVerification = (($flags & (1 << 13)) !== 0) ? BotVerification::deserialize($stream) : null;

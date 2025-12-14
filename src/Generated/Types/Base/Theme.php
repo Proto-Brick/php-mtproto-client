@@ -92,12 +92,15 @@ final class Theme extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $creator = (($flags & (1 << 0)) !== 0) ? true : null;
         $default_ = (($flags & (1 << 1)) !== 0) ? true : null;
         $forChat = (($flags & (1 << 5)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $slug = Deserializer::bytes($stream);
         $title = Deserializer::bytes($stream);
         $document = (($flags & (1 << 2)) !== 0) ? AbstractDocument::deserialize($stream) : null;

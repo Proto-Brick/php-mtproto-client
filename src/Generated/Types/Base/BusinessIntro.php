@@ -47,7 +47,8 @@ final class BusinessIntro extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
         $sticker = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($stream) : null;

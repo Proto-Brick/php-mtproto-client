@@ -32,7 +32,8 @@ final class UpdateUserStatus extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $userId = Deserializer::int64($stream);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $status = AbstractUserStatus::deserialize($stream);
 
         return new self(

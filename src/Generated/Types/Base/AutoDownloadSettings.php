@@ -76,18 +76,25 @@ final class AutoDownloadSettings extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $disabled = (($flags & (1 << 0)) !== 0) ? true : null;
         $videoPreloadLarge = (($flags & (1 << 1)) !== 0) ? true : null;
         $audioPreloadNext = (($flags & (1 << 2)) !== 0) ? true : null;
         $phonecallsLessData = (($flags & (1 << 3)) !== 0) ? true : null;
         $storiesPreload = (($flags & (1 << 4)) !== 0) ? true : null;
-        $photoSizeMax = Deserializer::int32($stream);
-        $videoSizeMax = Deserializer::int64($stream);
-        $fileSizeMax = Deserializer::int64($stream);
-        $videoUploadMaxbitrate = Deserializer::int32($stream);
-        $smallQueueActiveOperationsMax = Deserializer::int32($stream);
-        $largeQueueActiveOperationsMax = Deserializer::int32($stream);
+        $photoSizeMax = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $videoSizeMax = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $fileSizeMax = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $videoUploadMaxbitrate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $smallQueueActiveOperationsMax = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $largeQueueActiveOperationsMax = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $photoSizeMax,

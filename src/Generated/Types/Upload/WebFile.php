@@ -47,10 +47,12 @@ final class WebFile extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $size = Deserializer::int32($stream);
+        $size = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $mimeType = Deserializer::bytes($stream);
         $fileType = FileType::deserialize($stream);
-        $mtime = Deserializer::int32($stream);
+        $mtime = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $bytes = Deserializer::bytes($stream);
 
         return new self(

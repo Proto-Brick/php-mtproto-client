@@ -60,11 +60,13 @@ final class SentCodeTypeEmailCode extends AbstractSentCodeType
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $appleSigninAllowed = (($flags & (1 << 0)) !== 0) ? true : null;
         $googleSigninAllowed = (($flags & (1 << 1)) !== 0) ? true : null;
         $emailPattern = Deserializer::bytes($stream);
-        $length = Deserializer::int32($stream);
+        $length = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $resetAvailablePeriod = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
         $resetPendingDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
 

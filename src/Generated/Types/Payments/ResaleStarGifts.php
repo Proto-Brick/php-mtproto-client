@@ -82,8 +82,10 @@ final class ResaleStarGifts extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $count = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $gifts = Deserializer::vectorOfObjects($stream, [AbstractStarGift::class, 'deserialize']);
         $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $attributes = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractStarGiftAttribute::class, 'deserialize']) : null;

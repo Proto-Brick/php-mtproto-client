@@ -45,11 +45,13 @@ final class UpdateBotNewBusinessMessage extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $connectionId = Deserializer::bytes($stream);
         $message = AbstractMessage::deserialize($stream);
         $replyToMessage = (($flags & (1 << 0)) !== 0) ? AbstractMessage::deserialize($stream) : null;
-        $qts = Deserializer::int32($stream);
+        $qts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $connectionId,

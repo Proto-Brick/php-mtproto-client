@@ -50,8 +50,10 @@ final class PageBlockPhoto extends AbstractPageBlock
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $photoId = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $photoId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $caption = PageCaption::deserialize($stream);
         $url = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $webpageId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;

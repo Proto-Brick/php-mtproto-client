@@ -32,7 +32,8 @@ final class PageBlockAudio extends AbstractPageBlock
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $audioId = Deserializer::int64($stream);
+        $audioId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $caption = PageCaption::deserialize($stream);
 
         return new self(

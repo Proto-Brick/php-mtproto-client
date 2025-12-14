@@ -42,7 +42,8 @@ final class UpdateDeleteScheduledMessages extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $peer = AbstractPeer::deserialize($stream);
         $messages = Deserializer::vectorOfInts($stream);
         $sentMessages = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfInts($stream) : null;

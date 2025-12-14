@@ -38,10 +38,14 @@ final class UpdateBotStopped extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $userId = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $stopped = (Deserializer::int32($stream) === 0x997275b5);
-        $qts = Deserializer::int32($stream);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $stopped = (unpack('V', substr($stream, 0, 4))[1] === 0x997275b5);
+        $stream = substr($stream, 4);
+        $qts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $userId,

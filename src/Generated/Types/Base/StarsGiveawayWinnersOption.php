@@ -44,10 +44,13 @@ final class StarsGiveawayWinnersOption extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $default_ = (($flags & (1 << 0)) !== 0) ? true : null;
-        $users = Deserializer::int32($stream);
-        $perUserStars = Deserializer::int64($stream);
+        $users = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $perUserStars = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $users,

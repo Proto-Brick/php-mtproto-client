@@ -29,7 +29,8 @@ final class MessageActionChatJoinedByLink extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $inviterId = Deserializer::int64($stream);
+        $inviterId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $inviterId

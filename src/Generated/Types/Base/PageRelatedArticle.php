@@ -79,9 +79,11 @@ final class PageRelatedArticle extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $url = Deserializer::bytes($stream);
-        $webpageId = Deserializer::int64($stream);
+        $webpageId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $photoId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;

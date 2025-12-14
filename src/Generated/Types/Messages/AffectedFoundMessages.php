@@ -43,9 +43,12 @@ final class AffectedFoundMessages extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $pts = Deserializer::int32($stream);
-        $ptsCount = Deserializer::int32($stream);
-        $offset = Deserializer::int32($stream);
+        $pts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $offset = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $messages = Deserializer::vectorOfInts($stream);
 
         return new self(

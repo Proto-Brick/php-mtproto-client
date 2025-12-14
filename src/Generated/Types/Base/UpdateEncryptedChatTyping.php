@@ -29,7 +29,8 @@ final class UpdateEncryptedChatTyping extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $chatId = Deserializer::int32($stream);
+        $chatId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $chatId

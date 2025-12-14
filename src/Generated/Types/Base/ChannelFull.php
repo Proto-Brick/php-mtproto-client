@@ -442,7 +442,8 @@ final class ChannelFull extends AbstractChatFull
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $canViewParticipants = (($flags & (1 << 3)) !== 0) ? true : null;
         $canSetUsername = (($flags & (1 << 6)) !== 0) ? true : null;
         $canSetStickers = (($flags & (1 << 7)) !== 0) ? true : null;
@@ -451,7 +452,8 @@ final class ChannelFull extends AbstractChatFull
         $hasScheduled = (($flags & (1 << 19)) !== 0) ? true : null;
         $canViewStats = (($flags & (1 << 20)) !== 0) ? true : null;
         $blocked = (($flags & (1 << 22)) !== 0) ? true : null;
-        $flags2 = Deserializer::int32($stream);
+        $flags2 = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $canDeleteChannel = (($flags2 & (1 << 0)) !== 0) ? true : null;
         $antispam = (($flags2 & (1 << 1)) !== 0) ? true : null;
         $participantsHidden = (($flags2 & (1 << 2)) !== 0) ? true : null;
@@ -465,16 +467,20 @@ final class ChannelFull extends AbstractChatFull
         $paidReactionsAvailable = (($flags2 & (1 << 16)) !== 0) ? true : null;
         $stargiftsAvailable = (($flags2 & (1 << 19)) !== 0) ? true : null;
         $paidMessagesAvailable = (($flags2 & (1 << 20)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $about = Deserializer::bytes($stream);
         $participantsCount = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $adminsCount = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $kickedCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $bannedCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $onlineCount = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($stream) : null;
-        $readInboxMaxId = Deserializer::int32($stream);
-        $readOutboxMaxId = Deserializer::int32($stream);
-        $unreadCount = Deserializer::int32($stream);
+        $readInboxMaxId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $readOutboxMaxId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $unreadCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $chatPhoto = AbstractPhoto::deserialize($stream);
         $notifySettings = PeerNotifySettings::deserialize($stream);
         $exportedInvite = (($flags & (1 << 23)) !== 0) ? AbstractExportedChatInvite::deserialize($stream) : null;
@@ -490,7 +496,8 @@ final class ChannelFull extends AbstractChatFull
         $slowmodeSeconds = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($stream) : null;
         $slowmodeNextSendDate = (($flags & (1 << 18)) !== 0) ? Deserializer::int32($stream) : null;
         $statsDc = (($flags & (1 << 12)) !== 0) ? Deserializer::int32($stream) : null;
-        $pts = Deserializer::int32($stream);
+        $pts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $call = (($flags & (1 << 21)) !== 0) ? AbstractInputGroupCall::deserialize($stream) : null;
         $ttlPeriod = (($flags & (1 << 24)) !== 0) ? Deserializer::int32($stream) : null;
         $pendingSuggestions = (($flags & (1 << 25)) !== 0) ? Deserializer::vectorOfStrings($stream) : null;

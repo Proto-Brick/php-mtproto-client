@@ -39,10 +39,13 @@ final class UpdateChannelPinnedTopic extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $pinned = (($flags & (1 << 0)) !== 0) ? true : null;
-        $channelId = Deserializer::int64($stream);
-        $topicId = Deserializer::int32($stream);
+        $channelId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $topicId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $channelId,

@@ -36,8 +36,10 @@ final class UpdateDeleteMessages extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $messages = Deserializer::vectorOfInts($stream);
-        $pts = Deserializer::int32($stream);
-        $ptsCount = Deserializer::int32($stream);
+        $pts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $messages,

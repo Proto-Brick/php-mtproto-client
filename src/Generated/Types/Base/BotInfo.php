@@ -110,7 +110,8 @@ final class BotInfo extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $hasPreviewMedias = (($flags & (1 << 6)) !== 0) ? true : null;
         $userId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
         $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;

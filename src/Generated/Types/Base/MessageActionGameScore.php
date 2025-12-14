@@ -32,8 +32,10 @@ final class MessageActionGameScore extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $gameId = Deserializer::int64($stream);
-        $score = Deserializer::int32($stream);
+        $gameId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $score = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $gameId,

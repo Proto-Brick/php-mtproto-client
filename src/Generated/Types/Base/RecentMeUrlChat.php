@@ -33,7 +33,8 @@ final class RecentMeUrlChat extends AbstractRecentMeUrl
     {
         Deserializer::int32($stream); // Constructor ID
         $url = Deserializer::bytes($stream);
-        $chatId = Deserializer::int64($stream);
+        $chatId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $url,

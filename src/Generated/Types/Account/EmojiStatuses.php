@@ -33,7 +33,8 @@ final class EmojiStatuses extends AbstractEmojiStatuses
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
+        $hash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $statuses = Deserializer::vectorOfObjects($stream, [AbstractEmojiStatus::class, 'deserialize']);
 
         return new self(

@@ -34,7 +34,8 @@ final class TimezonesList extends AbstractTimezonesList
     {
         Deserializer::int32($stream); // Constructor ID
         $timezones = Deserializer::vectorOfObjects($stream, [Timezone::class, 'deserialize']);
-        $hash = Deserializer::int32($stream);
+        $hash = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $timezones,

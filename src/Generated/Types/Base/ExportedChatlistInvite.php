@@ -42,7 +42,8 @@ final class ExportedChatlistInvite extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $title = Deserializer::bytes($stream);
         $url = Deserializer::bytes($stream);
         $peers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);

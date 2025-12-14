@@ -57,7 +57,8 @@ final class MessageViews extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $views = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $forwards = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $replies = (($flags & (1 << 2)) !== 0) ? MessageReplies::deserialize($stream) : null;

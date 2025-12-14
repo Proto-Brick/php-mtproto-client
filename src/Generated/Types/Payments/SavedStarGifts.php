@@ -64,8 +64,10 @@ final class SavedStarGifts extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $count = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $count = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $chatNotificationsEnabled = (($flags & (1 << 1)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
         $gifts = Deserializer::vectorOfObjects($stream, [SavedStarGift::class, 'deserialize']);
         $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;

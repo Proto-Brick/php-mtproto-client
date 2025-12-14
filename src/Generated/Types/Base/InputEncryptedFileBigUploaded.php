@@ -35,9 +35,12 @@ final class InputEncryptedFileBigUploaded extends AbstractInputEncryptedFile
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int64($stream);
-        $parts = Deserializer::int32($stream);
-        $keyFingerprint = Deserializer::int32($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $parts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $keyFingerprint = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $id,

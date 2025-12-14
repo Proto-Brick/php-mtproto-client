@@ -74,7 +74,8 @@ final class LangPackStringPluralized extends AbstractLangPackString
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $key = Deserializer::bytes($stream);
         $zeroValue = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $oneValue = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;

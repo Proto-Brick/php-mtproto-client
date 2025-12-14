@@ -35,9 +35,12 @@ final class GroupCallDiscarded extends AbstractGroupCall
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $duration = Deserializer::int32($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $duration = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $id,

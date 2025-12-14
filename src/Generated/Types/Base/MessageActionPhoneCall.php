@@ -52,9 +52,11 @@ final class MessageActionPhoneCall extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $video = (($flags & (1 << 2)) !== 0) ? true : null;
-        $callId = Deserializer::int64($stream);
+        $callId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $reason = (($flags & (1 << 0)) !== 0) ? AbstractPhoneCallDiscardReason::deserialize($stream) : null;
         $duration = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
 

@@ -45,10 +45,13 @@ final class UpdateReadMessagesContents extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $messages = Deserializer::vectorOfInts($stream);
-        $pts = Deserializer::int32($stream);
-        $ptsCount = Deserializer::int32($stream);
+        $pts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $date = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(

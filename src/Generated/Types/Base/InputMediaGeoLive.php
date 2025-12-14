@@ -60,7 +60,8 @@ final class InputMediaGeoLive extends AbstractInputMedia
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $stopped = (($flags & (1 << 0)) !== 0) ? true : null;
         $geoPoint = AbstractInputGeoPoint::deserialize($stream);
         $heading = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;

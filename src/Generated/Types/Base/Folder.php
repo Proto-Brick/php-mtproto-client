@@ -62,11 +62,13 @@ final class Folder extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $autofillNewBroadcasts = (($flags & (1 << 0)) !== 0) ? true : null;
         $autofillPublicGroups = (($flags & (1 << 1)) !== 0) ? true : null;
         $autofillNewCorrespondents = (($flags & (1 << 2)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
+        $id = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $title = Deserializer::bytes($stream);
         $photo = (($flags & (1 << 3)) !== 0) ? AbstractChatPhoto::deserialize($stream) : null;
 

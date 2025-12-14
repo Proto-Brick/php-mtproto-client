@@ -153,19 +153,23 @@ final class StarGift extends AbstractStarGift
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $limited = (($flags & (1 << 0)) !== 0) ? true : null;
         $soldOut = (($flags & (1 << 1)) !== 0) ? true : null;
         $birthday = (($flags & (1 << 2)) !== 0) ? true : null;
         $requirePremium = (($flags & (1 << 7)) !== 0) ? true : null;
         $limitedPerUser = (($flags & (1 << 8)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $sticker = AbstractDocument::deserialize($stream);
-        $stars = Deserializer::int64($stream);
+        $stars = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $availabilityRemains = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $availabilityTotal = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $availabilityResale = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
-        $convertStars = Deserializer::int64($stream);
+        $convertStars = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $firstSaleDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $lastSaleDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $upgradeStars = (($flags & (1 << 3)) !== 0) ? Deserializer::int64($stream) : null;

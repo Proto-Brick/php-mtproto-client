@@ -57,15 +57,19 @@ final class BotApp extends AbstractBotApp
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $shortName = Deserializer::bytes($stream);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
         $photo = AbstractPhoto::deserialize($stream);
         $document = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($stream) : null;
-        $hash = Deserializer::int64($stream);
+        $hash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $id,

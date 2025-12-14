@@ -41,8 +41,10 @@ final class NearestDc extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $country = Deserializer::bytes($stream);
-        $thisDc = Deserializer::int32($stream);
-        $nearestDc = Deserializer::int32($stream);
+        $thisDc = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $nearestDc = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $country,

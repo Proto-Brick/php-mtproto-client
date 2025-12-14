@@ -97,14 +97,16 @@ final class StarsSubscription extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $canceled = (($flags & (1 << 0)) !== 0) ? true : null;
         $canRefulfill = (($flags & (1 << 1)) !== 0) ? true : null;
         $missingBalance = (($flags & (1 << 2)) !== 0) ? true : null;
         $botCanceled = (($flags & (1 << 7)) !== 0) ? true : null;
         $id = Deserializer::bytes($stream);
         $peer = AbstractPeer::deserialize($stream);
-        $untilDate = Deserializer::int32($stream);
+        $untilDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $pricing = StarsSubscriptionPricing::deserialize($stream);
         $chatInviteHash = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
         $title = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;

@@ -32,7 +32,8 @@ final class UpdateBotMenuButton extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $botId = Deserializer::int64($stream);
+        $botId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $button = AbstractBotMenuButton::deserialize($stream);
 
         return new self(

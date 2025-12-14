@@ -45,11 +45,14 @@ final class UpdateBotChatInviteRequester extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
-        $date = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $about = Deserializer::bytes($stream);
         $invite = AbstractExportedChatInvite::deserialize($stream);
-        $qts = Deserializer::int32($stream);
+        $qts = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $peer,

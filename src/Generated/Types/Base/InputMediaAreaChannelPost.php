@@ -37,7 +37,8 @@ final class InputMediaAreaChannelPost extends AbstractMediaArea
         Deserializer::int32($stream); // Constructor ID
         $coordinates = MediaAreaCoordinates::deserialize($stream);
         $channel = AbstractInputChannel::deserialize($stream);
-        $msgId = Deserializer::int32($stream);
+        $msgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $coordinates,

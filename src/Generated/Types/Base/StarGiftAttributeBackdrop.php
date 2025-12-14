@@ -48,12 +48,18 @@ final class StarGiftAttributeBackdrop extends AbstractStarGiftAttribute
     {
         Deserializer::int32($stream); // Constructor ID
         $name = Deserializer::bytes($stream);
-        $backdropId = Deserializer::int32($stream);
-        $centerColor = Deserializer::int32($stream);
-        $edgeColor = Deserializer::int32($stream);
-        $patternColor = Deserializer::int32($stream);
-        $textColor = Deserializer::int32($stream);
-        $rarityPermille = Deserializer::int32($stream);
+        $backdropId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $centerColor = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $edgeColor = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $patternColor = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $textColor = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $rarityPermille = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $name,

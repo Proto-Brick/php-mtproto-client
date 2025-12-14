@@ -116,13 +116,16 @@ final class ChatInviteExported extends AbstractExportedChatInvite
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $revoked = (($flags & (1 << 0)) !== 0) ? true : null;
         $permanent = (($flags & (1 << 5)) !== 0) ? true : null;
         $requestNeeded = (($flags & (1 << 6)) !== 0) ? true : null;
         $link = Deserializer::bytes($stream);
-        $adminId = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
+        $adminId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $startDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
         $expireDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $usageLimit = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;

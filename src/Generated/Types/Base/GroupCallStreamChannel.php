@@ -40,9 +40,12 @@ final class GroupCallStreamChannel extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $channel = Deserializer::int32($stream);
-        $scale = Deserializer::int32($stream);
-        $lastTimestampMs = Deserializer::int64($stream);
+        $channel = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $scale = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $lastTimestampMs = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $channel,

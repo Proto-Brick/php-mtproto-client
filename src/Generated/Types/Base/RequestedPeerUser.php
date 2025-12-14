@@ -63,8 +63,10 @@ final class RequestedPeerUser extends AbstractRequestedPeer
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $firstName = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $lastName = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $username = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;

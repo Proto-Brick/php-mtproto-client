@@ -53,10 +53,13 @@ final class InputGroupCallStream extends AbstractInputFileLocation
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $call = AbstractInputGroupCall::deserialize($stream);
-        $timeMs = Deserializer::int64($stream);
-        $scale = Deserializer::int32($stream);
+        $timeMs = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $scale = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $videoChannel = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $videoQuality = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
 

@@ -36,8 +36,10 @@ final class MediaAreaChannelPost extends AbstractMediaArea
     {
         Deserializer::int32($stream); // Constructor ID
         $coordinates = MediaAreaCoordinates::deserialize($stream);
-        $channelId = Deserializer::int64($stream);
-        $msgId = Deserializer::int32($stream);
+        $channelId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $msgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $coordinates,

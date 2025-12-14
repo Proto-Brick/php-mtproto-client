@@ -317,7 +317,8 @@ final class Message extends AbstractMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $out = (($flags & (1 << 1)) !== 0) ? true : null;
         $mentioned = (($flags & (1 << 4)) !== 0) ? true : null;
         $mediaUnread = (($flags & (1 << 5)) !== 0) ? true : null;
@@ -329,12 +330,14 @@ final class Message extends AbstractMessage
         $pinned = (($flags & (1 << 24)) !== 0) ? true : null;
         $noforwards = (($flags & (1 << 26)) !== 0) ? true : null;
         $invertMedia = (($flags & (1 << 27)) !== 0) ? true : null;
-        $flags2 = Deserializer::int32($stream);
+        $flags2 = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $offline = (($flags2 & (1 << 1)) !== 0) ? true : null;
         $videoProcessingPending = (($flags2 & (1 << 4)) !== 0) ? true : null;
         $paidSuggestedPostStars = (($flags2 & (1 << 8)) !== 0) ? true : null;
         $paidSuggestedPostTon = (($flags2 & (1 << 9)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
+        $id = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $fromId = (($flags & (1 << 8)) !== 0) ? AbstractPeer::deserialize($stream) : null;
         $fromBoostsApplied = (($flags & (1 << 29)) !== 0) ? Deserializer::int32($stream) : null;
         $peerId = AbstractPeer::deserialize($stream);
@@ -343,7 +346,8 @@ final class Message extends AbstractMessage
         $viaBotId = (($flags & (1 << 11)) !== 0) ? Deserializer::int64($stream) : null;
         $viaBusinessBotId = (($flags2 & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
         $replyTo = (($flags & (1 << 3)) !== 0) ? AbstractMessageReplyHeader::deserialize($stream) : null;
-        $date = Deserializer::int32($stream);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $message = Deserializer::bytes($stream);
         $media = (($flags & (1 << 9)) !== 0) ? AbstractMessageMedia::deserialize($stream) : null;
         $replyMarkup = (($flags & (1 << 6)) !== 0) ? AbstractReplyMarkup::deserialize($stream) : null;

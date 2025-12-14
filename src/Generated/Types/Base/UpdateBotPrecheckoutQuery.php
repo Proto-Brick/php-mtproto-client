@@ -59,14 +59,18 @@ final class UpdateBotPrecheckoutQuery extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $queryId = Deserializer::int64($stream);
-        $userId = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $queryId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $payload = Deserializer::bytes($stream);
         $info = (($flags & (1 << 0)) !== 0) ? PaymentRequestedInfo::deserialize($stream) : null;
         $shippingOptionId = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $currency = Deserializer::bytes($stream);
-        $totalAmount = Deserializer::int64($stream);
+        $totalAmount = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
 
         return new self(
             $queryId,

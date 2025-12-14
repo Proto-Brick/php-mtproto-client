@@ -81,20 +81,28 @@ final class PhoneCall extends AbstractPhoneCall
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $p2pAllowed = (($flags & (1 << 5)) !== 0) ? true : null;
         $video = (($flags & (1 << 6)) !== 0) ? true : null;
         $conferenceSupported = (($flags & (1 << 8)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $adminId = Deserializer::int64($stream);
-        $participantId = Deserializer::int64($stream);
+        $id = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $accessHash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $date = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $adminId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $participantId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $gAOrB = Deserializer::bytes($stream);
-        $keyFingerprint = Deserializer::int64($stream);
+        $keyFingerprint = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $protocol = PhoneCallProtocol::deserialize($stream);
         $connections = Deserializer::vectorOfObjects($stream, [AbstractPhoneConnection::class, 'deserialize']);
-        $startDate = Deserializer::int32($stream);
+        $startDate = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $customParameters = (($flags & (1 << 7)) !== 0) ? Deserializer::deserializeDataJSON($stream) : null;
 
         return new self(

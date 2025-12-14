@@ -29,7 +29,8 @@ final class SentCodeTypeCall extends AbstractSentCodeType
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $length = Deserializer::int32($stream);
+        $length = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $length

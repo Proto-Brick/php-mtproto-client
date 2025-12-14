@@ -37,7 +37,8 @@ final class CdnPublicKey extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $dcId = Deserializer::int32($stream);
+        $dcId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $publicKey = Deserializer::bytes($stream);
 
         return new self(

@@ -38,7 +38,8 @@ final class ExportedContactToken extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $url = Deserializer::bytes($stream);
-        $expires = Deserializer::int32($stream);
+        $expires = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $url,

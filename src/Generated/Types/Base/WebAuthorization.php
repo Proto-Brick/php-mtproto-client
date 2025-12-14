@@ -58,13 +58,17 @@ final class WebAuthorization extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $hash = Deserializer::int64($stream);
-        $botId = Deserializer::int64($stream);
+        $hash = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $botId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $domain = Deserializer::bytes($stream);
         $browser = Deserializer::bytes($stream);
         $platform = Deserializer::bytes($stream);
-        $dateCreated = Deserializer::int32($stream);
-        $dateActive = Deserializer::int32($stream);
+        $dateCreated = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $dateActive = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $ip = Deserializer::bytes($stream);
         $region = Deserializer::bytes($stream);
 

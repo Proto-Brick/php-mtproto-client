@@ -29,7 +29,8 @@ final class SendMessageUploadPhotoAction extends AbstractSendMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $progress = Deserializer::int32($stream);
+        $progress = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $progress

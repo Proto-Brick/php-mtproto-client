@@ -33,7 +33,8 @@ final class MessageReplyStoryHeader extends AbstractMessageReplyHeader
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
-        $storyId = Deserializer::int32($stream);
+        $storyId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
 
         return new self(
             $peer,

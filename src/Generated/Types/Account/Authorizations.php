@@ -38,7 +38,8 @@ final class Authorizations extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $authorizationTtlDays = Deserializer::int32($stream);
+        $authorizationTtlDays = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $authorizations = Deserializer::vectorOfObjects($stream, [Authorization::class, 'deserialize']);
 
         return new self(

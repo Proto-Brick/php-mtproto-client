@@ -52,11 +52,13 @@ final class InputInvoiceStarGift extends AbstractInputInvoice
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $hideName = (($flags & (1 << 0)) !== 0) ? true : null;
         $includeUpgrade = (($flags & (1 << 2)) !== 0) ? true : null;
         $peer = AbstractInputPeer::deserialize($stream);
-        $giftId = Deserializer::int64($stream);
+        $giftId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;
 
         return new self(

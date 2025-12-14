@@ -51,7 +51,8 @@ final class AutoSaveSettings extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $photos = (($flags & (1 << 0)) !== 0) ? true : null;
         $videos = (($flags & (1 << 1)) !== 0) ? true : null;
         $videoMaxSize = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;

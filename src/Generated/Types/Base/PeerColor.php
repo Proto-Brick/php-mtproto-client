@@ -49,7 +49,8 @@ final class PeerColor extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
         $color = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $backgroundEmojiId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($stream) : null;
 

@@ -59,12 +59,17 @@ final class UpdateBotCallbackQuery extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $queryId = Deserializer::int64($stream);
-        $userId = Deserializer::int64($stream);
+        $flags = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $queryId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
+        $userId = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $peer = AbstractPeer::deserialize($stream);
-        $msgId = Deserializer::int32($stream);
-        $chatInstance = Deserializer::int64($stream);
+        $msgId = unpack('V', substr($stream, 0, 4))[1];
+        $stream = substr($stream, 4);
+        $chatInstance = unpack('q', substr($stream, 0, 8))[1];
+        $stream = substr($stream, 8);
         $data = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $gameShortName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
 
