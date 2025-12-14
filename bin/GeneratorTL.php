@@ -76,7 +76,7 @@ class GeneratorTL
         $this->generateAbstractClasses();
         $this->generateConcreteClasses('constructors', 'Types');
         $this->generateConcreteClasses('methods', 'Methods');
-        $this->generatePeerPropertyMap();
+        $this->generatePeerCollector();
         echo "Generation complete! Files are in '" . realpath(self::OUTPUT_DIR) . "' directory.\n";
     }
 
@@ -126,7 +126,8 @@ class GeneratorTL
             str_contains($p, 'forbidden') || // Недоступные (обычно без хеша)
             str_contains($p, 'full') ||      // Расширенная инфа (обычно идет отдельно)
             str_contains($p, 'status') ||
-            str_contains($p, 'photo')
+            str_contains($p, 'photo') ||
+            str_contains($p, 'encrypted')
         ) {
             return false;
         }
@@ -228,16 +229,12 @@ class GeneratorTL
         return false;
     }
 
-    private function generatePeerPropertyMap(): void
+    private function generatePeerCollector(): void
     {
-        echo "Generating Action-Based PeerPropertyMap...\n";
-        $this->typeContainsPeerEntityCache = []; // Сброс кэша
+        echo "Generating Optimized PeerCollector Class (Switch version)...\n";
+        $this->typeContainsPeerEntityCache = [];
 
-        $map = [];
-
-        // Константы для читаемости в генераторе (в файл запишем числа)
-        // 1 = SCAN (Иди вглубь)
-        // 2 = SAVE (Сохраняй и выходи)
+        $switchBody = "";
 
         foreach ($this->schema['constructors'] as $constructor) {
             $predicate = $constructor['predicate'];
@@ -250,58 +247,92 @@ class GeneratorTL
             }
             $fullNamespace = self::BASE_NAMESPACE . '\\Types' . ($namespace ? '\\' . $namespace : '');
             $fqcn = $fullNamespace . '\\' . $className;
-            $cleanFqcn = ltrim($fqcn, '\\');
 
-            $propertiesMap = [];
+            // Собираем код для свойств
+            $classCode = "";
 
             foreach ($constructor['params'] as $param) {
-                $type = $param['type'];
-                if ($type === '#') continue;
-                if (str_contains($type, '?')) {
-                    $type = explode('?', $type)[1];
+                $rawType = $param['type'];
+                if ($rawType === '#') continue;
+
+                $cleanType = $rawType;
+                if (str_contains($rawType, '?')) {
+                    $parts = explode('?', $rawType);
+                    $cleanType = end($parts);
                 }
 
-                // ЛОГИКА ПРИНЯТИЯ РЕШЕНИЙ
+                $propName = $this->sanitizeParamName($param['name']);
 
-                // 1. Это сама сущность (User, Chat...)? -> SAVE (2)
-                if ($this->isTypeAnEntity($type)) {
-                    $propertiesMap[$this->sanitizeParamName($param['name'])] = 2;
+                // Проверка на вектор
+                $isVector = str_starts_with($cleanType, 'Vector<');
+                if ($isVector) {
+                    $cleanType = substr($cleanType, 7, -1);
                 }
-                // 2. Это контейнер, внутри которого могут быть сущности? -> SCAN (1)
-                elseif ($this->canTypeContainPeerEntity($type)) {
-                    $propertiesMap[$this->sanitizeParamName($param['name'])] = 1;
+
+                // ЛОГИКА
+                $action = 0;
+                if ($this->isTypeAnEntity($cleanType)) {
+                    $action = 2; // SAVE
+                } elseif ($this->canTypeContainPeerEntity($cleanType)) {
+                    $action = 1; // SCAN
                 }
-                // 3. Иначе игнорируем поле
+
+                if ($action === 0) continue;
+
+                $access = "\$object->$propName";
+                $block = "";
+
+                if ($action === 2) { // SAVE
+                    if ($isVector) {
+                        $block = "foreach ($access as \$item) { if (\$item instanceof \\ProtoBrick\\MTProtoClient\\TL\\Contracts\\PeerEntity) { \$manager->savePeerEntity(\$item); } }";
+                    } else {
+                        $block = "if ($access instanceof \\ProtoBrick\\MTProtoClient\\TL\\Contracts\\PeerEntity) { \$manager->savePeerEntity($access); }";
+                    }
+                } elseif ($action === 1) { // SCAN
+                    if ($isVector) {
+                        $block = "foreach ($access as \$item) { \$this->collect(\$item, \$manager); }";
+                    } else {
+                        $block = "\$this->collect($access, \$manager);";
+                    }
+                }
+
+                // Добавляем отступ для красоты
+                $classCode .= "                if ($access !== null) { $block }\n";
             }
 
-            if (!empty($propertiesMap)) {
-                $map[$cleanFqcn] = $propertiesMap;
+            // Если есть код, добавляем case
+            if ($classCode !== "") {
+                // Используем return вместо break, так как нам больше ничего делать не надо
+                $switchBody .= "            case \\$fqcn::class:\n$classCode                return;\n\n";
             }
         }
 
-        // --- Генерация файла ---
-        $lines = [];
-        $lines[] = '<?php';
-        $lines[] = '';
-        $lines[] = 'return [';
+        // Генерируем файл с switch
+        $content = <<<PHP
+<?php
 
-        foreach ($map as $className => $props) {
-            $safeClass = str_replace("'", "\\'", $className);
+declare(strict_types=1);
 
-            // Формируем строку: 'prop' => 1, 'prop2' => 2
-            $propsParts = [];
-            foreach ($props as $prop => $action) {
-                $propsParts[] = "'$prop' => $action";
-            }
-            $propsStr = '[' . implode(', ', $propsParts) . ']';
+namespace ProtoBrick\MTProtoClient\Generated;
 
-            $lines[] = "    '$safeClass' => $propsStr,";
+use ProtoBrick\MTProtoClient\Peer\PeerManager;
+
+/**
+ * Auto-generated PeerCollector.
+ * Uses optimized switch for maximum performance (Level 3 optimization).
+ */
+final class PeerCollector
+{
+    public function collect(object \$object, PeerManager \$manager): void
+    {
+        switch (\$object::class) {
+$switchBody
         }
+    }
+}
+PHP;
 
-        $lines[] = '];';
-
-        $content = implode("\n", $lines) . "\n";
-        $outputPath = self::OUTPUT_DIR . '/PeerPropertyMap.php';
+        $outputPath = self::OUTPUT_DIR . '/PeerCollector.php';
         file_put_contents($outputPath, $content);
     }
 
@@ -531,9 +562,8 @@ class GeneratorTL
         $parentType = $item['type'];
         $constructorId = 'null';
 
-        // --- ШАГ 1: Получаем "сырой" ID в виде числа (int) ---
+        // --- ШАГ 1: Получаем "сырой" ID ---
         $rawIdInt = null;
-
         if (isset(self::TYPE_ID_EXCEPTIONS[$predicate])) {
             $rawIdInt = self::TYPE_ID_EXCEPTIONS[$predicate];
         } elseif (isset($item['id'])) {
@@ -566,24 +596,6 @@ class GeneratorTL
             }
         }
 
-        // --- Interfaces Logic (НОВОЕ) ---
-        $implements = [];
-        $implementsStr = '';
-
-        if (!$isMethod) {
-            // Проверяем, нужно ли добавлять PeerEntity
-            if ($this->shouldImplementPeerEntity($predicate, $item['params'])) {
-                // Регистрируем use для интерфейса (он теперь лежит в Contracts)
-                $this->registerUse(PeerEntity::class, $className, $parentFqcn);
-                $implements[] = 'PeerEntity';
-            }
-        }
-
-        if (!empty($implements)) {
-            $implementsStr = ' implements ' . implode(', ', $implements);
-        }
-        // --------------------------------
-
         $this->registerUse(Serializer::class, $className, $parentFqcn);
         if (!$isMethod) {
             $this->registerUse(Deserializer::class, $className, $parentFqcn);
@@ -592,7 +604,42 @@ class GeneratorTL
             }
         }
 
-        // --- Constructor, Properties and other Use statements ---
+        // --- Interfaces Logic & PeerEntity Method ---
+        $implements = [];
+        $implementsStr = '';
+        $extraMethods = '';
+
+        if (!$isMethod) {
+            // Проверяем, нужно ли добавлять PeerEntity
+            if ($this->shouldImplementPeerEntity($predicate, $item['params'])) {
+                $this->registerUse(\ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity::class, $className, $parentFqcn);
+                $implements[] = 'PeerEntity';
+
+                // Определяем тип для хардкода
+                $p = strtolower($predicate);
+                $peerType = 'user'; // default
+                if (str_contains($p, 'channel')) {
+                    $peerType = 'channel';
+                } elseif (str_contains($p, 'chat')) {
+                    $peerType = 'chat';
+                }
+
+                // Генерируем метод
+                $extraMethods .= <<<PHP
+
+    public function getPeerType(): string
+    {
+        return '$peerType';
+    }
+PHP;
+            }
+        }
+
+        if (!empty($implements)) {
+            $implementsStr = ' implements ' . implode(', ', $implements);
+        }
+
+        // --- Constructor & Properties ---
         $constructorData = $this->buildConstructorParams($item['params'], $className, $parentFqcn);
         $constructorParamsStr = $constructorData['paramsString'];
         $paramDocs = $constructorData['paramDocs'];
@@ -624,7 +671,7 @@ class GeneratorTL
         public const CONSTRUCTOR_ID = {$constructorId};
         
         public string \$predicate = '{$predicate}';
-        {$methodSpecifics}{$constructorDocBlock}
+        {$methodSpecifics}{$extraMethods}{$constructorDocBlock}
         public function __construct({$constructorParamsStr}) {}
         {$serializerContent}
     }

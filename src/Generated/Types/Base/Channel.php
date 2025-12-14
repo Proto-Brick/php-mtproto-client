@@ -14,6 +14,10 @@ final class Channel extends AbstractChat implements PeerEntity
     
     public string $predicate = 'channel';
     
+    public function getPeerType(): string
+    {
+        return 'channel';
+    }
     /**
      * @param int $id
      * @param string $title

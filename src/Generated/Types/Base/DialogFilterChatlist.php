@@ -14,6 +14,10 @@ final class DialogFilterChatlist extends AbstractDialogFilter implements PeerEnt
     
     public string $predicate = 'dialogFilterChatlist';
     
+    public function getPeerType(): string
+    {
+        return 'chat';
+    }
     /**
      * @param int $id
      * @param TextWithEntities $title

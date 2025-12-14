@@ -14,6 +14,10 @@ final class User extends AbstractUser implements PeerEntity
     
     public string $predicate = 'user';
     
+    public function getPeerType(): string
+    {
+        return 'user';
+    }
     /**
      * @param int $id
      * @param true|null $self

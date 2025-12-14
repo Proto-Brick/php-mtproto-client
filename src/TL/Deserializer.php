@@ -30,17 +30,18 @@ class Deserializer
 
     public static function int32(string &$stream): int
     {
-        $value_bin = substr($stream, 0, 4);
+        // Распаковка как 32-bit беззнаковый little-endian integer
+        $val = unpack('V', substr($stream, 0, 4))[1];
         $stream = substr($stream, 4);
-        return unpack('V', $value_bin)[1]; // Распаковка как 32-bit беззнаковый little-endian integer.
+        return $val;
     }
 
     public static function int64(string &$stream): int
     {
-        $value_bin = substr($stream, 0, 8);
+        // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
+        $val = unpack('q', substr($stream, 0, 8))[1];
         $stream = substr($stream, 8);
-        return unpack('q', $value_bin)[1]; // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
-        //return unpack('q', $value_bin)[1]; // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
+        return $val;
     }
 
     public static function int128(string &$stream): string
@@ -86,11 +87,7 @@ class Deserializer
         }
 
         $data = substr($stream, 0, $len);
-        $stream = substr($stream, $len);
-
-        if ($padding > 0) {
-            $stream = substr($stream, $padding);
-        }
+        $stream = substr($stream, $len + $padding);
 
         return $data;
     }
@@ -141,11 +138,23 @@ class Deserializer
             throw new \RuntimeException('Invalid vector constructor for Vector<int>');
         }
         $count = self::int32($payload);
-        $result = [];
-        for ($i = 0; $i < $count; $i++) {
-            $result[] = self::int32($payload);
+
+        if ($count === 0) {
+            return [];
         }
-        return $result;
+
+        $bytesNeeded = $count * 4;
+
+        if (strlen($payload) < $bytesNeeded) {
+            throw new \RuntimeException("Not enough bytes for vector of ints");
+        }
+
+        $data = substr($payload, 0, $bytesNeeded);
+        $payload = substr($payload, $bytesNeeded);
+
+        // V* - распаковываем все как unsigned long (32 bit little endian)
+        // array_values нужен, так как unpack возвращает индексы с 1, а нам нужно с 0
+        return array_values(unpack('V*', $data));
     }
 
     public static function vectorOfLongs(string &$payload): array
@@ -154,11 +163,22 @@ class Deserializer
             throw new \RuntimeException('Invalid vector constructor for Vector<long>');
         }
         $count = self::int32($payload);
-        $result = [];
-        for ($i = 0; $i < $count; $i++) {
-            $result[] = self::int64($payload);
+
+        if ($count === 0) {
+            return [];
         }
-        return $result;
+
+        $bytesNeeded = $count * 8;
+
+        if (strlen($payload) < $bytesNeeded) {
+            throw new \RuntimeException("Not enough bytes for vector of longs");
+        }
+
+        $data = substr($payload, 0, $bytesNeeded);
+        $payload = substr($payload, $bytesNeeded);
+
+        // q* - распаковываем все как signed long long (64 bit little endian)
+        return array_values(unpack('q*', $data));
     }
 
     public static function vectorOfStrings(string &$payload): array

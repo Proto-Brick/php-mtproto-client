@@ -1,14 +1,13 @@
 <?php declare(strict_types=1);
 namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
-use ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity;
 use ProtoBrick\MTProtoClient\TL\Deserializer;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/encryptedChat
  */
-final class EncryptedChat extends AbstractEncryptedChat implements PeerEntity
+final class EncryptedChat extends AbstractEncryptedChat
 {
     public const CONSTRUCTOR_ID = 0x61f0d4c7;
     

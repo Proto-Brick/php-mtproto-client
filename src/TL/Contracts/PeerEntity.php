@@ -10,5 +10,9 @@ namespace ProtoBrick\MTProtoClient\TL\Contracts;
  */
 interface PeerEntity
 {
-    // Гарантирует, что у объекта есть ID и hash
+    /**
+     * Возвращает тип сущности: 'user', 'chat' или 'channel'.
+     * Используется для быстрого сохранения в PeerStorage без рефлексии.
+     */
+    public function getPeerType(): string;
 }

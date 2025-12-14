@@ -603,24 +603,20 @@ class Client
         });
     }
 
-    // Файл: /php-mtproto-client/src/Client.php
-
-    // ... (внутри класса Client)
-
     private function deserializeResponsePayload(RpcRequest $request, string &$payload): mixed
     {
         $responseClassOrType = $request->getResponseClass();
 
-        // --- ШАГ 1: Проверяем, ожидаем ли мы вектор ---
         if (str_starts_with($responseClassOrType, 'vector<')) {
-            // Ожидаем вектор. Извлекаем FQCN внутреннего типа.
-            $innerTypeFqn = substr($responseClassOrType, 7, -1);
+            $innerType = substr($responseClassOrType, 7, -1);
 
-            // Делегируем всю логику по работе с вектором нашему helper'у.
-            return $this->deserializeVectorOfObjects($innerTypeFqn, $payload);
+            return match ($innerType) {
+                'int' => Deserializer::vectorOfInts($payload),
+                'long' => Deserializer::vectorOfLongs($payload),
+                'string', 'bytes' => Deserializer::vectorOfStrings($payload),
+                default => $this->deserializeVectorOfObjects($innerType, $payload),
+            };
         }
-
-        // --- ШАГ 2: Ожидаем одиночный объект или примитив ---
 
         // Это может быть FQCN сгенерированного класса
         if (class_exists($responseClassOrType)) {
@@ -633,7 +629,7 @@ class Client
             'int' => Deserializer::int32($payload),
             'long' => Deserializer::int64($payload),
             'string' => Deserializer::bytes($payload),
-            default => throw new \Exception("Unsupported response type: '{$responseClassOrType}'"),
+            default => throw new \RuntimeException("Unsupported response type: '{$responseClassOrType}'"),
         };
     }
 

@@ -14,6 +14,10 @@ final class UpdateShortChatMessage extends AbstractUpdates implements PeerEntity
     
     public string $predicate = 'updateShortChatMessage';
     
+    public function getPeerType(): string
+    {
+        return 'chat';
+    }
     /**
      * @param int $id
      * @param int $fromId

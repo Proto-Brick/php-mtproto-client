@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ProtoBrick\MTProtoClient\Peer;
 
 use ProtoBrick\MTProtoClient\Client;
+use ProtoBrick\MTProtoClient\Generated\PeerCollector;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerChannel;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerChat;
@@ -17,23 +18,13 @@ class PeerManager
 {
     private ?Client $client = null;
 
-    /**
-     * @var array<string, array<string, int>> Карта свойств: [ClassName => [propName => ActionID]]
-     */
-    private static array $propertyMap = [];
-
-    private const ACTION_SCAN = 1;
-    private const ACTION_SAVE = 2;
+    private PeerCollector $collector;
 
     public function __construct(
         private readonly PeerStorage $storage
     ) {
-        if (empty(self::$propertyMap)) {
-            $mapPath = __DIR__ . '/../Generated/PeerPropertyMap.php';
-            if (file_exists($mapPath)) {
-                self::$propertyMap = require $mapPath;
-            }
-        }
+        // Инициализируем сгенерированный коллектор
+        $this->collector = new PeerCollector();
     }
 
     public function setClient(Client $client): void
@@ -73,7 +64,7 @@ class PeerManager
                     $this->client->contacts->resolveUsername($username);
                     $info = $this->storage->getByUsername($username);
                 } catch (\Throwable $e) {
-                    // Игнорируем ошибки резолвинга, чтобы выбросить общее исключение ниже
+                    // Игнорируем ошибки резолвинга
                 }
             }
         }
@@ -90,7 +81,7 @@ class PeerManager
                 $message .= "2. You haven't met this user/chat yet. Telegram requires an 'access_hash' to interact with IDs.\n";
                 $message .= "Solutions:\n";
                 $message .= " - Use a @username (string) instead. The library can resolve usernames automatically via API.\n";
-                $message .= " - Fetch updates or dialogs first (e.g. call \$client->messages->getDialogs(...)) to populate the cache.\n";
+                $message .= " - Fetch updates or dialogs first (e.g. call \$client->messages->getDialogs()) to populate the cache.\n";
                 $message .= " - If you know the access_hash, pass 'new InputPeerUser(id, access_hash)' manually.\n";
             } elseif (is_string($peer)) {
                 $message .= "\nReason: Username not found in cache and API resolution (contacts.resolveUsername) failed or returned empty result.\n";
@@ -110,16 +101,17 @@ class PeerManager
     }
 
     /**
-     * "Пылесос": ищет сущности в ответе API согласно карте PeerPropertyMap.
+     * "Пылесос" (Ultimate Edition): Делегирует работу сгенерированному коду.
      */
     public function collect(mixed $object): void
     {
-        // 1. Проверка корневого объекта (на случай, если collect вызван вручную для User)
+        // 1. Проверка корневого объекта (для одиночных вызовов или "листьев" дерева)
         if ($object instanceof PeerEntity) {
             $this->savePeerEntity($object);
-            return; // Сущности в Telegram - это "листья", внутри них нет других сущностей
+            return;
         }
 
+        // 2. Обработка списков (Vector<T>)
         if (is_array($object)) {
             foreach ($object as $item) {
                 $this->collect($item);
@@ -131,74 +123,30 @@ class PeerManager
             return;
         }
 
-        $class = get_class($object);
-
-        // Если для класса нет карты, значит в нем нет ничего интересного (спасибо генератору)
-        if (!isset(self::$propertyMap[$class])) {
-            return;
-        }
-
-        // 2. Работа по карте
-        foreach (self::$propertyMap[$class] as $prop => $action) {
-            // Быстрый доступ к свойству (они public readonly)
-            if (!isset($object->$prop)) {
-                continue;
-            }
-            $value = $object->$prop;
-
-            // Внимание: $value может быть массивом (если это Vector<Type>)
-            // или null (если поле опциональное)
-            if ($value === null) {
-                continue;
-            }
-
-            if ($action === self::ACTION_SAVE) {
-                // Это либо Entity, либо массив Entity.
-                if (is_array($value)) {
-                    foreach ($value as $item) {
-                        if ($item instanceof PeerEntity) {
-                            $this->savePeerEntity($item);
-                        }
-                    }
-                } elseif ($value instanceof PeerEntity) {
-                    $this->savePeerEntity($value);
-                }
-            } elseif ($action === self::ACTION_SCAN) {
-                // Это контейнер (Dialogs, Updates...). Идем вглубь.
-                if (is_array($value)) {
-                    foreach ($value as $item) {
-                        $this->collect($item);
-                    }
-                } else {
-                    $this->collect($value);
-                }
-            }
-        }
+        // 3. Прямой вызов сгенерированного кода
+        // PeerCollector содержит switch ($object::class), который работает за O(1).
+        // Он сам знает, какие свойства сканировать (рекурсия через $this->collect),
+        // а какие сохранять (через $this->savePeerEntity).
+        $this->collector->collect($object, $this);
     }
 
     /**
-     * Извлекает данные из PeerEntity и сохраняет в хранилище.
+     * PUBLIC метод (вызывается из PeerCollector).
+     * Сохраняет сущность в хранилище.
      */
-    private function savePeerEntity(PeerEntity $object): void
+    public function savePeerEntity(PeerEntity $object): void
     {
-        // Проверка на наличие ID (хотя интерфейс и генератор это гарантируют)
+        // Проверка на наличие ID
         if (!isset($object->id)) {
             return;
         }
 
-        $id = (int)$object->id;
-        // У обычных чатов (Chat) нет access_hash, ставим 0
-        $accessHash = isset($object->accessHash) ? (int)$object->accessHash : 0;
+        $id = (int) $object->id;
+        $accessHash = isset($object->accessHash) ? (int) $object->accessHash : 0;
 
-        $class = get_class($object);
-        $type = 'user'; // default
-
-        // Определение типа по имени класса (быстро и надежно для сгенерированных классов)
-        if (str_contains($class, 'Channel')) {
-            $type = 'channel';
-        } elseif (str_contains($class, 'Chat')) {
-            $type = 'chat';
-        }
+        // Быстрое получение типа через интерфейс (Level 1 Optimization)
+        // Метод getPeerType() сгенерирован в DTO-классах и возвращает константу.
+        $type = $object->getPeerType();
 
         $this->storage->save(
             new PeerInfo(
