@@ -1,13 +1,14 @@
 <?php declare(strict_types=1);
 namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
+use ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity;
 use ProtoBrick\MTProtoClient\TL\Deserializer;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 
 /**
  * @see https://core.telegram.org/type/user
  */
-final class User extends AbstractUser
+final class User extends AbstractUser implements PeerEntity
 {
     public const CONSTRUCTOR_ID = 0x20b1422;
     

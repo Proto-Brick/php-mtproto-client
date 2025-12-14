@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity;
 use ProtoBrick\MTProtoClient\TL\Deserializer;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 use ProtoBrick\MTProtoClient\TL\RpcRequest;
@@ -48,6 +49,13 @@ class GeneratorTL
 
     private array $concreteTypeToConstructorMap = [];
 
+    /**
+     * Кэш для memoization: [TypeName => bool]
+     * true - тип содержит PeerEntity (прямо или косвенно)
+     * false - тип "пустой" в плане пиров
+     */
+    private array $typeContainsPeerEntityCache = [];
+
     public function __construct()
     {
         if (!file_exists(self::API_SCHEMA_PATH)) {
@@ -72,93 +80,227 @@ class GeneratorTL
         echo "Generation complete! Files are in '" . realpath(self::OUTPUT_DIR) . "' directory.\n";
     }
 
+    /**
+     * Проверяет, является ли тип (или Vector<Type>) прямой сущностью (User, Chat, Channel).
+     * Если true — значит поле этого типа нужно сразу СОХРАНЯТЬ (SAVE).
+     */
+    private function isTypeAnEntity(string $typeName): bool
+    {
+        // Раскрываем вектор
+        if (str_starts_with($typeName, 'Vector<')) {
+            $typeName = substr($typeName, 7, -1);
+        }
+
+        // Если примитив - точно нет
+        if ($this->isBuiltInType($typeName)) {
+            return false;
+        }
+
+        // Находим конструкторы типа
+        $constructors = $this->typeToConstructorsMap[$typeName] ?? [];
+
+        // Если хоть один конструктор этого типа помечен как PeerEntity — считаем весь тип сущностью.
+        // (Например, User может быть userEmpty, но мы всё равно обработаем его как сущность).
+        foreach ($constructors as $constructor) {
+            if ($this->shouldImplementPeerEntity($constructor['predicate'], $constructor['params'])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Определяет, является ли конструктор сущностью (User, Chat, Channel),
+     * которую стоит сохранять в кэш пиров.
+     */
+    private function shouldImplementPeerEntity(string $predicate, array $params): bool
+    {
+        $p = strtolower($predicate);
+
+        // 1. Отсеиваем явный мусор, ссылки и служебные типы
+        if (str_starts_with($p, 'input') || // Входящие данные
+            str_starts_with($p, 'peer') ||  // Ссылки (просто ID)
+            str_contains($p, 'slice') ||    // Списки
+            str_contains($p, 'empty') ||    // Пустые заглушки
+            str_contains($p, 'forbidden') || // Недоступные (обычно без хеша)
+            str_contains($p, 'full') ||      // Расширенная инфа (обычно идет отдельно)
+            str_contains($p, 'status') ||
+            str_contains($p, 'photo')
+        ) {
+            return false;
+        }
+
+        // 2. Проверяем наличие поля id
+        $hasId = false;
+        $hasAccessHash = false;
+
+        foreach ($params as $param) {
+            if ($param['name'] === 'id') $hasId = true;
+            if ($param['name'] === 'access_hash') $hasAccessHash = true;
+        }
+
+        if (!$hasId) {
+            return false;
+        }
+
+        // 3. Основная логика: User, Chat, Channel
+        $isUser = str_contains($p, 'user');
+        $isChannel = str_contains($p, 'channel');
+        $isChat = str_contains($p, 'chat');
+
+        // User и Channel (Megagroup) обязаны иметь access_hash для взаимодействия
+        if ($isUser || $isChannel) {
+            return $hasAccessHash;
+        }
+
+        // Обычные чаты (Basic Group) не имеют access_hash, но являются сущностями
+        if ($isChat) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Рекурсивно проверяет, может ли данный TL-тип содержать PeerEntity.
+     */
+    /**
+     * Рекурсивно проверяет, может ли данный TL-тип содержать PeerEntity.
+     */
+    private function canTypeContainPeerEntity(string $typeName, array $visited = []): bool
+    {
+        // 1. Обработка векторов Vector<Type>
+        if (str_starts_with($typeName, 'Vector<')) {
+            $innerType = substr($typeName, 7, -1);
+            return $this->canTypeContainPeerEntity($innerType, $visited);
+        }
+
+        // 2. Примитивы точно нет
+        if ($this->isBuiltInType($typeName)) {
+            return false;
+        }
+
+        // 3. Проверка кэша
+        if (isset($this->typeContainsPeerEntityCache[$typeName])) {
+            return $this->typeContainsPeerEntityCache[$typeName];
+        }
+
+        // 4. Защита от циклической рекурсии
+        if (in_array($typeName, $visited, true)) {
+            return false;
+        }
+        $visited[] = $typeName;
+
+        // 5. Находим конструкторы для этого типа
+        $constructors = $this->typeToConstructorsMap[$typeName] ?? [];
+
+        if (empty($constructors) && isset($this->concreteTypeToConstructorMap[$typeName])) {
+            // Логика для concrete типов (если нужно, обычно typeToConstructorsMap хватает)
+        }
+
+        foreach ($constructors as $constructor) {
+            $predicate = $constructor['predicate'];
+
+            // А. Является ли сам конструктор PeerEntity?
+            if ($this->shouldImplementPeerEntity($predicate, $constructor['params'])) {
+                $this->typeContainsPeerEntityCache[$typeName] = true;
+                return true;
+            }
+
+            // Б. Содержит ли он поля, которые могут быть PeerEntity?
+            foreach ($constructor['params'] as $param) {
+                $paramType = $param['type'];
+
+                if (str_contains($paramType, '?')) {
+                    $parts = explode('?', $paramType);
+                    $paramType = end($parts);
+                }
+
+                if ($this->canTypeContainPeerEntity($paramType, $visited)) {
+                    $this->typeContainsPeerEntityCache[$typeName] = true;
+                    return true;
+                }
+            }
+        }
+
+        $this->typeContainsPeerEntityCache[$typeName] = false;
+        return false;
+    }
+
     private function generatePeerPropertyMap(): void
     {
-        echo "Generating PeerPropertyMap...\n";
+        echo "Generating Action-Based PeerPropertyMap...\n";
+        $this->typeContainsPeerEntityCache = []; // Сброс кэша
 
         $map = [];
+
+        // Константы для читаемости в генераторе (в файл запишем числа)
+        // 1 = SCAN (Иди вглубь)
+        // 2 = SAVE (Сохраняй и выходи)
 
         foreach ($this->schema['constructors'] as $constructor) {
             $predicate = $constructor['predicate'];
 
+            // Определяем FQCN
             if (isset($this->concreteTypeToConstructorMap[$constructor['type']]) && $this->concreteTypeToConstructorMap[$constructor['type']] === $predicate) {
-                // Случай, когда тип == конструктор (единственная реализация)
                 [$namespace, $className] = $this->getNamespaceAndClassName($constructor['type']);
             } else {
                 [$namespace, $className] = $this->getNamespaceAndClassName($predicate);
             }
-
             $fullNamespace = self::BASE_NAMESPACE . '\\Types' . ($namespace ? '\\' . $namespace : '');
             $fqcn = $fullNamespace . '\\' . $className;
+            $cleanFqcn = ltrim($fqcn, '\\');
 
-            $propertiesToScan = [];
+            $propertiesMap = [];
 
             foreach ($constructor['params'] as $param) {
                 $type = $param['type'];
-
-                // Пропускаем флаги (#)
                 if ($type === '#') continue;
-
-                // Очищаем тип от '?' (flags.0?User)
                 if (str_contains($type, '?')) {
-                    $parts = explode('?', $type);
-                    $type = end($parts);
+                    $type = explode('?', $type)[1];
                 }
 
-                // Логика определения: нужно ли сканировать это поле?
-                // Нам нужно сканировать поле, если это НЕ примитив.
-                // Примитивы в схеме TL: int, long, int128, int256, double, string, bytes, Bool, true
+                // ЛОГИКА ПРИНЯТИЯ РЕШЕНИЙ
 
-                $isPrimitive = in_array(strtolower($type), [
-                    'int', 'long', 'int128', 'int256', 'double', 'string', 'bytes', 'bool', 'true', 'null'
-                ], true);
-
-                // Если это Vector<Primitive>, тоже пропускаем
-                if (!$isPrimitive && str_starts_with($type, 'Vector<')) {
-                    $inner = substr($type, 7, -1); // "Vector<int>" -> "int"
-                    if (in_array(strtolower($inner), ['int', 'long', 'string', 'bytes', 'double', 'bool'], true)) {
-                        $isPrimitive = true;
-                    }
+                // 1. Это сама сущность (User, Chat...)? -> SAVE (2)
+                if ($this->isTypeAnEntity($type)) {
+                    $propertiesMap[$this->sanitizeParamName($param['name'])] = 2;
                 }
-
-                // Если это НЕ примитив, значит там может лежать объект (User, Chat, Message и т.д.),
-                // который нужно проверить рекурсивно.
-                if (!$isPrimitive) {
-                    $propertiesToScan[] = $this->sanitizeParamName($param['name']);
+                // 2. Это контейнер, внутри которого могут быть сущности? -> SCAN (1)
+                elseif ($this->canTypeContainPeerEntity($type)) {
+                    $propertiesMap[$this->sanitizeParamName($param['name'])] = 1;
                 }
+                // 3. Иначе игнорируем поле
             }
 
-            // Если у класса есть сложные свойства, добавляем в карту.
-            // Ключ карты — полное имя класса (без начального слэша, как возвращает get_class)
-            if (!empty($propertiesToScan)) {
-                // Убираем ведущий слеш для соответствия get_class()
-                $cleanFqcn = ltrim($fqcn, '\\');
-                $map[$cleanFqcn] = $propertiesToScan;
+            if (!empty($propertiesMap)) {
+                $map[$cleanFqcn] = $propertiesMap;
             }
         }
 
-        // --- Генерация файла с использованием короткого синтаксиса массива [] ---
+        // --- Генерация файла ---
         $lines = [];
         $lines[] = '<?php';
         $lines[] = '';
         $lines[] = 'return [';
 
-        foreach ($map as $className => $properties) {
-            // Экранируем кавычки в имени класса (на всякий случай)
+        foreach ($map as $className => $props) {
             $safeClass = str_replace("'", "\\'", $className);
 
-            // Формируем список свойств в формате ['prop1', 'prop2']
-            $safeProps = array_map(fn($p) => "'" . str_replace("'", "\\'", $p) . "'", $properties);
-            $propsList = '[' . implode(', ', $safeProps) . ']';
+            // Формируем строку: 'prop' => 1, 'prop2' => 2
+            $propsParts = [];
+            foreach ($props as $prop => $action) {
+                $propsParts[] = "'$prop' => $action";
+            }
+            $propsStr = '[' . implode(', ', $propsParts) . ']';
 
-            // Добавляем строку в массив
-            $lines[] = "    '$safeClass' => $propsList,";
+            $lines[] = "    '$safeClass' => $propsStr,";
         }
 
         $lines[] = '];';
 
         $content = implode("\n", $lines) . "\n";
-
         $outputPath = self::OUTPUT_DIR . '/PeerPropertyMap.php';
         file_put_contents($outputPath, $content);
     }
@@ -389,7 +531,7 @@ class GeneratorTL
         $parentType = $item['type'];
         $constructorId = 'null';
 
-// --- ШАГ 1: Получаем "сырой" ID в виде числа (int) ---
+        // --- ШАГ 1: Получаем "сырой" ID в виде числа (int) ---
         $rawIdInt = null;
 
         if (isset(self::TYPE_ID_EXCEPTIONS[$predicate])) {
@@ -411,27 +553,41 @@ class GeneratorTL
 
         if ($isMethod) {
             $baseClassFqn = self::RPC_REQUEST_FQN;
-            $parentFqcn = $baseClassFqn; // Устанавливаем для корректной работы registerUse
+            $parentFqcn = $baseClassFqn;
             $extends = $this->registerUse($baseClassFqn, $className, null);
         } else {
             $isConcreteOfAbstract = isset($this->abstractTypes[$parentType]);
             if ($isConcreteOfAbstract) {
-                // Если класс наследуется от нашего абстрактного класса,
-                // то TlObject уже будет доступен через него.
                 $parentFqcn = $this->resolveCustomType($parentType);
                 $extends = $this->registerUse($parentFqcn, $className, null);
             } else {
-                // Только если это "корневой" DTO, он наследуется напрямую от TlObject.
                 $baseClassFqn = self::TL_OBJECT_FQN;
                 $extends = $this->registerUse($baseClassFqn, $className, null);
             }
         }
 
+        // --- Interfaces Logic (НОВОЕ) ---
+        $implements = [];
+        $implementsStr = '';
+
+        if (!$isMethod) {
+            // Проверяем, нужно ли добавлять PeerEntity
+            if ($this->shouldImplementPeerEntity($predicate, $item['params'])) {
+                // Регистрируем use для интерфейса (он теперь лежит в Contracts)
+                $this->registerUse(PeerEntity::class, $className, $parentFqcn);
+                $implements[] = 'PeerEntity';
+            }
+        }
+
+        if (!empty($implements)) {
+            $implementsStr = ' implements ' . implode(', ', $implements);
+        }
+        // --------------------------------
+
         $this->registerUse(Serializer::class, $className, $parentFqcn);
         if (!$isMethod) {
             $this->registerUse(Deserializer::class, $className, $parentFqcn);
             if (!$isConcreteOfAbstract) {
-                // Только "корневые" DTO выбрасывают это исключение при проверке constructorId
                 $this->registerUse(\RuntimeException::class, $className, $parentFqcn);
             }
         }
@@ -454,19 +610,16 @@ class GeneratorTL
         $seeUrl = "https://core.telegram.org/" . ($isMethod ? "method" : "type") . "/{$predicate}";
         $classDocBlock = "/**\n * @see {$seeUrl}\n */";
 
-        // --- НАЧАЛО НОВОЙ ЛОГИКИ ---
-        // Собираем PHPDoc для конструктора, если есть что собирать
         $constructorDocBlock = '';
         if (!empty($paramDocs)) {
             $constructorDocBlock = "\n    /**\n" . implode("\n", $paramDocs) . "\n     */";
         }
-        // --- КОНЕЦ НОВОЙ ЛОГИКИ ---
 
         return <<<PHP
     <?php declare(strict_types=1);
     namespace {$fullNamespace};
     {$useBlock}{$classDocBlock}
-    final class {$className} extends {$extends}
+    final class {$className} extends {$extends}{$implementsStr}
     {
         public const CONSTRUCTOR_ID = {$constructorId};
         

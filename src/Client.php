@@ -426,15 +426,19 @@ class Client
                 try {
                     $resultPayload = $this->processRpcResultBody($messageBody);
 
-                    $time_stamp = microtime(true);
+                    $t1 = hrtime(true);
                     $responseObject = $this->deserializeResponsePayload($request, $resultPayload);
-                    print "[Десериализация] " . $request->getPredicate() .' - ' . round((microtime(true) - $time_stamp)*1000, 2) . "ms\n";
+                    $dt1 = (hrtime(true) - $t1) / 1e+6;
+                    echo "[Десериализация] {$request->getPredicate()} - " . number_format($dt1, 2) . "ms\n";
 
                     if (!$this->session->isInitialized) {
                         $this->session->isInitialized = true;
                         echo "[INFO] Session initialized.\n";
                     }
+                    $t2 = hrtime(true);
                     $this->peerManager->collect($responseObject);
+                    $dt2 = (hrtime(true) - $t2) / 1e+6;
+                    echo "[PeerManager] Сбор пиров - " . number_format($dt2, 2) . "ms\n";
                     $this->session->save($this->authKey);
                     $deferred->complete($responseObject);
                 } catch (\Throwable $e) {
