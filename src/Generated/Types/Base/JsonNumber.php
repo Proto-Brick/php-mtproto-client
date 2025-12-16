@@ -29,8 +29,7 @@ final class JsonNumber extends AbstractJSONValue
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $value = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $value = Deserializer::double($stream);
 
         return new self(
             $value

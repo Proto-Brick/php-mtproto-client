@@ -71,15 +71,11 @@ final class SearchResultsCalendar extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $inexact = (($flags & (1 << 0)) !== 0) ? true : null;
-        $count = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $minDate = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $minMsgId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $count = Deserializer::int32($stream);
+        $minDate = Deserializer::int32($stream);
+        $minMsgId = Deserializer::int32($stream);
         $offsetIdOffset = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $periods = Deserializer::vectorOfObjects($stream, [SearchResultsCalendarPeriod::class, 'deserialize']);
         $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);

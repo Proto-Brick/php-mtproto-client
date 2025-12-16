@@ -97,18 +97,15 @@ final class Boost extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $gift = (($flags & (1 << 1)) !== 0) ? true : null;
         $giveaway = (($flags & (1 << 2)) !== 0) ? true : null;
         $unclaimed = (($flags & (1 << 3)) !== 0) ? true : null;
         $id = Deserializer::bytes($stream);
         $userId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
         $giveawayMsgId = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $expires = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
+        $expires = Deserializer::int32($stream);
         $usedGiftSlug = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
         $multiplier = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
         $stars = (($flags & (1 << 6)) !== 0) ? Deserializer::int64($stream) : null;

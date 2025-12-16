@@ -35,12 +35,9 @@ final class TextImage extends AbstractRichText
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $documentId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $w = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $h = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $documentId = Deserializer::int64($stream);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
 
         return new self(
             $documentId,

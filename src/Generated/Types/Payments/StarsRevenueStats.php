@@ -52,13 +52,11 @@ final class StarsRevenueStats extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $topHoursGraph = (($flags & (1 << 0)) !== 0) ? AbstractStatsGraph::deserialize($stream) : null;
         $revenueGraph = AbstractStatsGraph::deserialize($stream);
         $status = StarsRevenueStatus::deserialize($stream);
-        $usdRate = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $usdRate = Deserializer::double($stream);
 
         return new self(
             $revenueGraph,

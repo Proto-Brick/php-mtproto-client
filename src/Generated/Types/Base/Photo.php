@@ -59,20 +59,15 @@ final class Photo extends AbstractPhoto
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $hasStickers = (($flags & (1 << 0)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $accessHash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
         $fileReference = Deserializer::bytes($stream);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
         $sizes = Deserializer::vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']);
         $videoSizes = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractVideoSize::class, 'deserialize']) : null;
-        $dcId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $dcId = Deserializer::int32($stream);
 
         return new self(
             $id,

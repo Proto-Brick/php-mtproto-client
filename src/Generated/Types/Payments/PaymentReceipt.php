@@ -95,14 +95,10 @@ final class PaymentReceipt extends AbstractPaymentReceipt
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $botId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $providerId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $flags = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
+        $botId = Deserializer::int64($stream);
+        $providerId = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
         $photo = (($flags & (1 << 2)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
@@ -111,8 +107,7 @@ final class PaymentReceipt extends AbstractPaymentReceipt
         $shipping = (($flags & (1 << 1)) !== 0) ? ShippingOption::deserialize($stream) : null;
         $tipAmount = (($flags & (1 << 3)) !== 0) ? Deserializer::int64($stream) : null;
         $currency = Deserializer::bytes($stream);
-        $totalAmount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $totalAmount = Deserializer::int64($stream);
         $credentialsTitle = Deserializer::bytes($stream);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 

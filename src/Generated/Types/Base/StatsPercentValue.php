@@ -37,10 +37,8 @@ final class StatsPercentValue extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $part = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $total = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $part = Deserializer::double($stream);
+        $total = Deserializer::double($stream);
 
         return new self(
             $part,

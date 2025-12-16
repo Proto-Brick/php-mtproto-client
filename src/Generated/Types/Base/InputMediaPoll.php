@@ -55,8 +55,7 @@ final class InputMediaPoll extends AbstractInputMedia
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $poll = Poll::deserialize($stream);
         $correctAnswers = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfStrings($stream) : null;
         $solution = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;

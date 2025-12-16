@@ -38,10 +38,8 @@ final class InputFile extends AbstractInputFile
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $parts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int64($stream);
+        $parts = Deserializer::int32($stream);
         $name = Deserializer::bytes($stream);
         $md5Checksum = Deserializer::bytes($stream);
 

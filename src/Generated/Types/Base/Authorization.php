@@ -99,27 +99,22 @@ final class Authorization extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $current = (($flags & (1 << 0)) !== 0) ? true : null;
         $officialApp = (($flags & (1 << 1)) !== 0) ? true : null;
         $passwordPending = (($flags & (1 << 2)) !== 0) ? true : null;
         $encryptedRequestsDisabled = (($flags & (1 << 3)) !== 0) ? true : null;
         $callRequestsDisabled = (($flags & (1 << 4)) !== 0) ? true : null;
         $unconfirmed = (($flags & (1 << 5)) !== 0) ? true : null;
-        $hash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $hash = Deserializer::int64($stream);
         $deviceModel = Deserializer::bytes($stream);
         $platform = Deserializer::bytes($stream);
         $systemVersion = Deserializer::bytes($stream);
-        $apiId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $apiId = Deserializer::int32($stream);
         $appName = Deserializer::bytes($stream);
         $appVersion = Deserializer::bytes($stream);
-        $dateCreated = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $dateActive = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $dateCreated = Deserializer::int32($stream);
+        $dateActive = Deserializer::int32($stream);
         $ip = Deserializer::bytes($stream);
         $country = Deserializer::bytes($stream);
         $region = Deserializer::bytes($stream);

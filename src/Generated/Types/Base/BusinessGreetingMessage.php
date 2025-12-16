@@ -40,11 +40,9 @@ final class BusinessGreetingMessage extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $shortcutId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $shortcutId = Deserializer::int32($stream);
         $recipients = BusinessRecipients::deserialize($stream);
-        $noActivityDays = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $noActivityDays = Deserializer::int32($stream);
 
         return new self(
             $shortcutId,

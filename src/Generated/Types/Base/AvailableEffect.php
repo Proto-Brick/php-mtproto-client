@@ -63,15 +63,12 @@ final class AvailableEffect extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $premiumRequired = (($flags & (1 << 2)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
         $emoticon = Deserializer::bytes($stream);
         $staticIconId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $effectStickerId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $effectStickerId = Deserializer::int64($stream);
         $effectAnimationId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($stream) : null;
 
         return new self(

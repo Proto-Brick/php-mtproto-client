@@ -37,8 +37,7 @@ final class MessagePeerVote extends AbstractMessagePeerVote
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
         $option = Deserializer::bytes($stream);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
 
         return new self(
             $peer,

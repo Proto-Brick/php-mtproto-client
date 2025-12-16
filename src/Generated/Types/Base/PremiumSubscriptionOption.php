@@ -71,16 +71,13 @@ final class PremiumSubscriptionOption extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $current = (($flags & (1 << 1)) !== 0) ? true : null;
         $canPurchaseUpgrade = (($flags & (1 << 2)) !== 0) ? true : null;
         $transaction = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $months = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $months = Deserializer::int32($stream);
         $currency = Deserializer::bytes($stream);
-        $amount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $amount = Deserializer::int64($stream);
         $botUrl = Deserializer::bytes($stream);
         $storeProduct = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
 

@@ -39,12 +39,9 @@ final class UpdateReadHistoryOutbox extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
-        $maxId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $pts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $maxId = Deserializer::int32($stream);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
 
         return new self(
             $peer,

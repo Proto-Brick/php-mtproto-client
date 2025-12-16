@@ -38,8 +38,7 @@ final class SentEmailCode extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $emailPattern = Deserializer::bytes($stream);
-        $length = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $length = Deserializer::int32($stream);
 
         return new self(
             $emailPattern,

@@ -114,25 +114,18 @@ final class UpdateShortChatMessage extends AbstractUpdates implements PeerEntity
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $out = (($flags & (1 << 1)) !== 0) ? true : null;
         $mentioned = (($flags & (1 << 4)) !== 0) ? true : null;
         $mediaUnread = (($flags & (1 << 5)) !== 0) ? true : null;
         $silent = (($flags & (1 << 13)) !== 0) ? true : null;
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $fromId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $chatId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int32($stream);
+        $fromId = Deserializer::int64($stream);
+        $chatId = Deserializer::int64($stream);
         $message = Deserializer::bytes($stream);
-        $pts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
         $fwdFrom = (($flags & (1 << 2)) !== 0) ? MessageFwdHeader::deserialize($stream) : null;
         $viaBotId = (($flags & (1 << 11)) !== 0) ? Deserializer::int64($stream) : null;
         $replyTo = (($flags & (1 << 3)) !== 0) ? AbstractMessageReplyHeader::deserialize($stream) : null;

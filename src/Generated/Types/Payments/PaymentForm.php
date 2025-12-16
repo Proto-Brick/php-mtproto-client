@@ -116,20 +116,16 @@ final class PaymentForm extends AbstractPaymentForm
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $canSaveCredentials = (($flags & (1 << 2)) !== 0) ? true : null;
         $passwordMissing = (($flags & (1 << 3)) !== 0) ? true : null;
-        $formId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $botId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $formId = Deserializer::int64($stream);
+        $botId = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
         $photo = (($flags & (1 << 5)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
         $invoice = Invoice::deserialize($stream);
-        $providerId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $providerId = Deserializer::int64($stream);
         $url = Deserializer::bytes($stream);
         $nativeProvider = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
         $nativeParams = (($flags & (1 << 4)) !== 0) ? Deserializer::deserializeDataJSON($stream) : null;

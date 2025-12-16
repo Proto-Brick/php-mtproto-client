@@ -55,10 +55,8 @@ final class RequestedPeerChannel extends AbstractRequestedPeer
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $channelId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $flags = Deserializer::int32($stream);
+        $channelId = Deserializer::int64($stream);
         $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $username = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $photo = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($stream) : null;

@@ -45,8 +45,7 @@ final class PopularAppBots extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 

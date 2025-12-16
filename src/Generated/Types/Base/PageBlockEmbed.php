@@ -81,8 +81,7 @@ final class PageBlockEmbed extends AbstractPageBlock
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $fullWidth = (($flags & (1 << 0)) !== 0) ? true : null;
         $allowScrolling = (($flags & (1 << 3)) !== 0) ? true : null;
         $url = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;

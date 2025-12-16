@@ -55,8 +55,7 @@ final class InputStickerSetItem extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $document = AbstractInputDocument::deserialize($stream);
         $emoji = Deserializer::bytes($stream);
         $maskCoords = (($flags & (1 << 0)) !== 0) ? MaskCoords::deserialize($stream) : null;

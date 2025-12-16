@@ -73,11 +73,9 @@ final class StoryViews extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $hasViewers = (($flags & (1 << 1)) !== 0) ? true : null;
-        $viewsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $viewsCount = Deserializer::int32($stream);
         $forwardsCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $reactions = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [ReactionCount::class, 'deserialize']) : null;
         $reactionsCount = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;

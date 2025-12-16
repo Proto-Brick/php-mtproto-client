@@ -39,11 +39,9 @@ final class UpdateMonoForumNoPaidException extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $exception = (($flags & (1 << 0)) !== 0) ? true : null;
-        $channelId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $channelId = Deserializer::int64($stream);
         $savedPeerId = AbstractPeer::deserialize($stream);
 
         return new self(

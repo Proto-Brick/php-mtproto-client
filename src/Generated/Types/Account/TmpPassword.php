@@ -38,8 +38,7 @@ final class TmpPassword extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $tmpPassword = Deserializer::bytes($stream);
-        $validUntil = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $validUntil = Deserializer::int32($stream);
 
         return new self(
             $tmpPassword,

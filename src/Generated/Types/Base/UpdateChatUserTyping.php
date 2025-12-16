@@ -35,8 +35,7 @@ final class UpdateChatUserTyping extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $chatId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $chatId = Deserializer::int64($stream);
         $fromId = AbstractPeer::deserialize($stream);
         $action = AbstractSendMessageAction::deserialize($stream);
 

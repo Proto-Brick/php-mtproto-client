@@ -29,8 +29,7 @@ final class JsonBool extends AbstractJSONValue
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $value = (unpack('V', substr($stream, 0, 4))[1] === 0x997275b5);
-        $stream = substr($stream, 4);
+        $value = (Deserializer::int32($stream) === 0x997275b5);
 
         return new self(
             $value

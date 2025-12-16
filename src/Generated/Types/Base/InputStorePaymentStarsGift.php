@@ -39,11 +39,9 @@ final class InputStorePaymentStarsGift extends AbstractInputStorePaymentPurpose
     {
         Deserializer::int32($stream); // Constructor ID
         $userId = AbstractInputUser::deserialize($stream);
-        $stars = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $stars = Deserializer::int64($stream);
         $currency = Deserializer::bytes($stream);
-        $amount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $amount = Deserializer::int64($stream);
 
         return new self(
             $userId,

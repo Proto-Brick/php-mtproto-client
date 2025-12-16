@@ -62,13 +62,11 @@ final class MessageActionConferenceCall extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $missed = (($flags & (1 << 0)) !== 0) ? true : null;
         $active = (($flags & (1 << 1)) !== 0) ? true : null;
         $video = (($flags & (1 << 4)) !== 0) ? true : null;
-        $callId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $callId = Deserializer::int64($stream);
         $duration = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $otherParticipants = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']) : null;
 

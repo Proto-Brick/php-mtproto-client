@@ -37,8 +37,7 @@ final class AvailableEffects extends AbstractAvailableEffects
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $hash = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $hash = Deserializer::int32($stream);
         $effects = Deserializer::vectorOfObjects($stream, [AvailableEffect::class, 'deserialize']);
         $documents = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
 

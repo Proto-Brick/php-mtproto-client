@@ -32,8 +32,7 @@ final class EmojiList extends AbstractEmojiList
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $hash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $hash = Deserializer::int64($stream);
         $documentId = Deserializer::vectorOfLongs($stream);
 
         return new self(

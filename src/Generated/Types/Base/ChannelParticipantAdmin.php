@@ -66,17 +66,13 @@ final class ChannelParticipantAdmin extends AbstractChannelParticipant
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $canEdit = (($flags & (1 << 0)) !== 0) ? true : null;
         $self = (($flags & (1 << 1)) !== 0) ? true : null;
-        $userId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $userId = Deserializer::int64($stream);
         $inviterId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($stream) : null;
-        $promotedBy = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $promotedBy = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
         $adminRights = ChatAdminRights::deserialize($stream);
         $rank = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
 

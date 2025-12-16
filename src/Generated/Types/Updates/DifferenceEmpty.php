@@ -32,10 +32,8 @@ final class DifferenceEmpty extends AbstractDifference
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $seq = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
+        $seq = Deserializer::int32($stream);
 
         return new self(
             $date,

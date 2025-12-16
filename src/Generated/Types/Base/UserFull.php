@@ -372,8 +372,7 @@ final class UserFull extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $blocked = (($flags & (1 << 0)) !== 0) ? true : null;
         $phoneCallsAvailable = (($flags & (1 << 4)) !== 0) ? true : null;
         $phoneCallsPrivate = (($flags & (1 << 5)) !== 0) ? true : null;
@@ -387,14 +386,12 @@ final class UserFull extends TlObject
         $wallpaperOverridden = (($flags & (1 << 28)) !== 0) ? true : null;
         $contactRequirePremium = (($flags & (1 << 29)) !== 0) ? true : null;
         $readDatesPrivate = (($flags & (1 << 30)) !== 0) ? true : null;
-        $flags2 = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags2 = Deserializer::int32($stream);
         $sponsoredEnabled = (($flags2 & (1 << 7)) !== 0) ? true : null;
         $canViewRevenue = (($flags2 & (1 << 9)) !== 0) ? true : null;
         $botCanManageEmojiStatus = (($flags2 & (1 << 10)) !== 0) ? true : null;
         $displayGiftsButton = (($flags2 & (1 << 16)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
         $about = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $settings = PeerSettings::deserialize($stream);
         $personalPhoto = (($flags & (1 << 21)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
@@ -403,8 +400,7 @@ final class UserFull extends TlObject
         $notifySettings = PeerNotifySettings::deserialize($stream);
         $botInfo = (($flags & (1 << 3)) !== 0) ? BotInfo::deserialize($stream) : null;
         $pinnedMsgId = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
-        $commonChatsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $commonChatsCount = Deserializer::int32($stream);
         $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
         $ttlPeriod = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($stream) : null;
         $themeEmoticon = (($flags & (1 << 15)) !== 0) ? Deserializer::bytes($stream) : null;

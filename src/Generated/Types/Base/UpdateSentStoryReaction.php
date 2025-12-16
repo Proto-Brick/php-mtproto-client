@@ -36,8 +36,7 @@ final class UpdateSentStoryReaction extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
-        $storyId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $storyId = Deserializer::int32($stream);
         $reaction = AbstractReaction::deserialize($stream);
 
         return new self(

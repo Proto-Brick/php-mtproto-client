@@ -56,18 +56,12 @@ final class MediaAreaCoordinates extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $x = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $y = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $w = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $h = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $rotation = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $flags = Deserializer::int32($stream);
+        $x = Deserializer::double($stream);
+        $y = Deserializer::double($stream);
+        $w = Deserializer::double($stream);
+        $h = Deserializer::double($stream);
+        $rotation = Deserializer::double($stream);
         $radius = (($flags & (1 << 0)) !== 0) ? Deserializer::double($stream) : null;
 
         return new self(

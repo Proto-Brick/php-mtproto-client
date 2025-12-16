@@ -35,11 +35,9 @@ final class UpdateBotWebhookJSONQuery extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $queryId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $queryId = Deserializer::int64($stream);
         $data = Deserializer::deserializeDataJSON($stream);
-        $timeout = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $timeout = Deserializer::int32($stream);
 
         return new self(
             $queryId,

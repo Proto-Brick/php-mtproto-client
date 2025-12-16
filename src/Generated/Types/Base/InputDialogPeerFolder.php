@@ -29,8 +29,7 @@ final class InputDialogPeerFolder extends AbstractInputDialogPeer
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $folderId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $folderId = Deserializer::int32($stream);
 
         return new self(
             $folderId

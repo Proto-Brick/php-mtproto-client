@@ -99,8 +99,7 @@ final class WallPaperSettings extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $blur = (($flags & (1 << 1)) !== 0) ? true : null;
         $motion = (($flags & (1 << 2)) !== 0) ? true : null;
         $backgroundColor = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;

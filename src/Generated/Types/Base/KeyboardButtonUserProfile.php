@@ -33,8 +33,7 @@ final class KeyboardButtonUserProfile extends AbstractKeyboardButton
     {
         Deserializer::int32($stream); // Constructor ID
         $text = Deserializer::bytes($stream);
-        $userId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $userId = Deserializer::int64($stream);
 
         return new self(
             $text,

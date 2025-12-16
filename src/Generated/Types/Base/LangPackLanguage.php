@@ -77,8 +77,7 @@ final class LangPackLanguage extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $official = (($flags & (1 << 0)) !== 0) ? true : null;
         $rtl = (($flags & (1 << 2)) !== 0) ? true : null;
         $beta = (($flags & (1 << 3)) !== 0) ? true : null;
@@ -87,10 +86,8 @@ final class LangPackLanguage extends TlObject
         $langCode = Deserializer::bytes($stream);
         $baseLangCode = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $pluralCode = Deserializer::bytes($stream);
-        $stringsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $translatedCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $stringsCount = Deserializer::int32($stream);
+        $translatedCount = Deserializer::int32($stream);
         $translationsUrl = Deserializer::bytes($stream);
 
         return new self(

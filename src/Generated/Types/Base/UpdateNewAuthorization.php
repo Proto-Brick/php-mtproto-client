@@ -60,11 +60,9 @@ final class UpdateNewAuthorization extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $unconfirmed = (($flags & (1 << 0)) !== 0) ? true : null;
-        $hash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $hash = Deserializer::int64($stream);
         $date = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $device = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $location = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;

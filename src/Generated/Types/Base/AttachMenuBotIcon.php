@@ -47,8 +47,7 @@ final class AttachMenuBotIcon extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $name = Deserializer::bytes($stream);
         $icon = AbstractDocument::deserialize($stream);
         $colors = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [AttachMenuBotIconColor::class, 'deserialize']) : null;

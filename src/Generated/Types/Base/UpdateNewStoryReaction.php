@@ -35,8 +35,7 @@ final class UpdateNewStoryReaction extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $storyId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $storyId = Deserializer::int32($stream);
         $peer = AbstractPeer::deserialize($stream);
         $reaction = AbstractReaction::deserialize($stream);
 

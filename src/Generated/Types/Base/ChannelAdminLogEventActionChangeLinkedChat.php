@@ -32,10 +32,8 @@ final class ChannelAdminLogEventActionChangeLinkedChat extends AbstractChannelAd
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $prevValue = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $newValue = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $prevValue = Deserializer::int64($stream);
+        $newValue = Deserializer::int64($stream);
 
         return new self(
             $prevValue,

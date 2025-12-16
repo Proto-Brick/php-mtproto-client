@@ -67,15 +67,13 @@ final class BotCallbackAnswer extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $alert = (($flags & (1 << 1)) !== 0) ? true : null;
         $hasUrl = (($flags & (1 << 3)) !== 0) ? true : null;
         $nativeUi = (($flags & (1 << 4)) !== 0) ? true : null;
         $message = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $url = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $cacheTime = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $cacheTime = Deserializer::int32($stream);
 
         return new self(
             $cacheTime,

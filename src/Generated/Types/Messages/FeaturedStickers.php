@@ -46,13 +46,10 @@ final class FeaturedStickers extends AbstractFeaturedStickers
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $premium = (($flags & (1 << 0)) !== 0) ? true : null;
-        $hash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $count = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $hash = Deserializer::int64($stream);
+        $count = Deserializer::int32($stream);
         $sets = Deserializer::vectorOfObjects($stream, [AbstractStickerSetCovered::class, 'deserialize']);
         $unread = Deserializer::vectorOfLongs($stream);
 

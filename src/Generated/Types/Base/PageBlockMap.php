@@ -42,12 +42,9 @@ final class PageBlockMap extends AbstractPageBlock
     {
         Deserializer::int32($stream); // Constructor ID
         $geo = AbstractGeoPoint::deserialize($stream);
-        $zoom = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $w = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $h = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $zoom = Deserializer::int32($stream);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
         $caption = PageCaption::deserialize($stream);
 
         return new self(

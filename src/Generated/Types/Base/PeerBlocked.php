@@ -38,8 +38,7 @@ final class PeerBlocked extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $peerId = AbstractPeer::deserialize($stream);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
 
         return new self(
             $peerId,

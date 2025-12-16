@@ -41,8 +41,7 @@ final class TopPeerCategoryPeers extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $category = TopPeerCategory::deserialize($stream);
-        $count = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $count = Deserializer::int32($stream);
         $peers = Deserializer::vectorOfObjects($stream, [TopPeer::class, 'deserialize']);
 
         return new self(

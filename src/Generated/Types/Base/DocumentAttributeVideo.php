@@ -76,17 +76,13 @@ final class DocumentAttributeVideo extends AbstractDocumentAttribute
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $roundMessage = (($flags & (1 << 0)) !== 0) ? true : null;
         $supportsStreaming = (($flags & (1 << 1)) !== 0) ? true : null;
         $nosound = (($flags & (1 << 3)) !== 0) ? true : null;
-        $duration = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $w = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $h = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $duration = Deserializer::double($stream);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
         $preloadPrefixSize = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
         $videoStartTs = (($flags & (1 << 4)) !== 0) ? Deserializer::double($stream) : null;
         $videoCodec = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;

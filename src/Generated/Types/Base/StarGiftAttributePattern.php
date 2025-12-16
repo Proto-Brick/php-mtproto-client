@@ -37,8 +37,7 @@ final class StarGiftAttributePattern extends AbstractStarGiftAttribute
         Deserializer::int32($stream); // Constructor ID
         $name = Deserializer::bytes($stream);
         $document = AbstractDocument::deserialize($stream);
-        $rarityPermille = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $rarityPermille = Deserializer::int32($stream);
 
         return new self(
             $name,

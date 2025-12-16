@@ -45,13 +45,11 @@ final class KeyboardButtonUrlAuth extends AbstractKeyboardButton
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $text = Deserializer::bytes($stream);
         $fwdText = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $url = Deserializer::bytes($stream);
-        $buttonId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $buttonId = Deserializer::int32($stream);
 
         return new self(
             $text,

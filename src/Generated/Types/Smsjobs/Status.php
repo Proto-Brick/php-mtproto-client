@@ -64,19 +64,13 @@ final class Status extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $allowInternational = (($flags & (1 << 0)) !== 0) ? true : null;
-        $recentSent = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $recentSince = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $recentRemains = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $totalSent = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $totalSince = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $recentSent = Deserializer::int32($stream);
+        $recentSince = Deserializer::int32($stream);
+        $recentRemains = Deserializer::int32($stream);
+        $totalSent = Deserializer::int32($stream);
+        $totalSince = Deserializer::int32($stream);
         $lastGiftSlug = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $termsUrl = Deserializer::bytes($stream);
 

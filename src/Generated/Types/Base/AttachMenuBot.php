@@ -80,16 +80,14 @@ final class AttachMenuBot extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $inactive = (($flags & (1 << 0)) !== 0) ? true : null;
         $hasSettings = (($flags & (1 << 1)) !== 0) ? true : null;
         $requestWriteAccess = (($flags & (1 << 2)) !== 0) ? true : null;
         $showInAttachMenu = (($flags & (1 << 3)) !== 0) ? true : null;
         $showInSideMenu = (($flags & (1 << 4)) !== 0) ? true : null;
         $sideMenuDisclaimerNeeded = (($flags & (1 << 5)) !== 0) ? true : null;
-        $botId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $botId = Deserializer::int64($stream);
         $shortName = Deserializer::bytes($stream);
         $peerTypes = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [AttachMenuPeerType::class, 'deserialize']) : null;
         $icons = Deserializer::vectorOfObjects($stream, [AttachMenuBotIcon::class, 'deserialize']);

@@ -104,8 +104,7 @@ final class DialogFilter extends AbstractDialogFilter
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $contacts = (($flags & (1 << 0)) !== 0) ? true : null;
         $nonContacts = (($flags & (1 << 1)) !== 0) ? true : null;
         $groups = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -115,8 +114,7 @@ final class DialogFilter extends AbstractDialogFilter
         $excludeRead = (($flags & (1 << 12)) !== 0) ? true : null;
         $excludeArchived = (($flags & (1 << 13)) !== 0) ? true : null;
         $titleNoanimate = (($flags & (1 << 28)) !== 0) ? true : null;
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int32($stream);
         $title = TextWithEntities::deserialize($stream);
         $emoticon = (($flags & (1 << 25)) !== 0) ? Deserializer::bytes($stream) : null;
         $color = (($flags & (1 << 27)) !== 0) ? Deserializer::int32($stream) : null;

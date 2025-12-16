@@ -33,8 +33,7 @@ final class InputInvoiceBusinessBotTransferStars extends AbstractInputInvoice
     {
         Deserializer::int32($stream); // Constructor ID
         $bot = AbstractInputUser::deserialize($stream);
-        $stars = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $stars = Deserializer::int64($stream);
 
         return new self(
             $bot,

@@ -47,14 +47,11 @@ final class ChatPhoto extends AbstractChatPhoto
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $hasVideo = (($flags & (1 << 0)) !== 0) ? true : null;
-        $photoId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $photoId = Deserializer::int64($stream);
         $strippedThumb = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $dcId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $dcId = Deserializer::int32($stream);
 
         return new self(
             $photoId,

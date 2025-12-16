@@ -44,10 +44,8 @@ final class LangPackDifference extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $langCode = Deserializer::bytes($stream);
-        $fromVersion = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $version = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $fromVersion = Deserializer::int32($stream);
+        $version = Deserializer::int32($stream);
         $strings = Deserializer::vectorOfObjects($stream, [AbstractLangPackString::class, 'deserialize']);
 
         return new self(

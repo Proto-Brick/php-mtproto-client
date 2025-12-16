@@ -47,12 +47,9 @@ final class Birthday extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $day = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $month = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
+        $day = Deserializer::int32($stream);
+        $month = Deserializer::int32($stream);
         $year = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(

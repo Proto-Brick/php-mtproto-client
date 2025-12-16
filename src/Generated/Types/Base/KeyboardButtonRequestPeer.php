@@ -39,11 +39,9 @@ final class KeyboardButtonRequestPeer extends AbstractKeyboardButton
     {
         Deserializer::int32($stream); // Constructor ID
         $text = Deserializer::bytes($stream);
-        $buttonId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $buttonId = Deserializer::int32($stream);
         $peerType = AbstractRequestPeerType::deserialize($stream);
-        $maxQuantity = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $maxQuantity = Deserializer::int32($stream);
 
         return new self(
             $text,

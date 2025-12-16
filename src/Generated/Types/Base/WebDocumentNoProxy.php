@@ -39,8 +39,7 @@ final class WebDocumentNoProxy extends AbstractWebDocument
     {
         Deserializer::int32($stream); // Constructor ID
         $url = Deserializer::bytes($stream);
-        $size = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $size = Deserializer::int32($stream);
         $mimeType = Deserializer::bytes($stream);
         $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
 

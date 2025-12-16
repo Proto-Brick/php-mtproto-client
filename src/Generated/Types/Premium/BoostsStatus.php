@@ -92,15 +92,11 @@ final class BoostsStatus extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $myBoost = (($flags & (1 << 2)) !== 0) ? true : null;
-        $level = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $currentLevelBoosts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $boosts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $level = Deserializer::int32($stream);
+        $currentLevelBoosts = Deserializer::int32($stream);
+        $boosts = Deserializer::int32($stream);
         $giftBoosts = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
         $nextLevelBoosts = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $premiumAudience = (($flags & (1 << 1)) !== 0) ? StatsPercentValue::deserialize($stream) : null;

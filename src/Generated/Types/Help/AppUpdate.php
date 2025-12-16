@@ -71,11 +71,9 @@ final class AppUpdate extends AbstractAppUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $canNotSkip = (($flags & (1 << 0)) !== 0) ? true : null;
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int32($stream);
         $version = Deserializer::bytes($stream);
         $text = Deserializer::bytes($stream);
         $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);

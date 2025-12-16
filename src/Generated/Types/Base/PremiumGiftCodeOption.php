@@ -61,17 +61,13 @@ final class PremiumGiftCodeOption extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $users = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $months = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
+        $users = Deserializer::int32($stream);
+        $months = Deserializer::int32($stream);
         $storeProduct = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $storeQuantity = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $currency = Deserializer::bytes($stream);
-        $amount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $amount = Deserializer::int64($stream);
 
         return new self(
             $users,

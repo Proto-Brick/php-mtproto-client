@@ -48,15 +48,12 @@ final class UpdateBotMessageReaction extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
-        $msgId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $msgId = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
         $actor = AbstractPeer::deserialize($stream);
         $oldReactions = Deserializer::vectorOfObjects($stream, [AbstractReaction::class, 'deserialize']);
         $newReactions = Deserializer::vectorOfObjects($stream, [AbstractReaction::class, 'deserialize']);
-        $qts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $qts = Deserializer::int32($stream);
 
         return new self(
             $peer,

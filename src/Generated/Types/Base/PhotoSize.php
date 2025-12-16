@@ -39,12 +39,9 @@ final class PhotoSize extends AbstractPhotoSize
     {
         Deserializer::int32($stream); // Constructor ID
         $type = Deserializer::bytes($stream);
-        $w = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $h = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $size = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $w = Deserializer::int32($stream);
+        $h = Deserializer::int32($stream);
+        $size = Deserializer::int32($stream);
 
         return new self(
             $type,

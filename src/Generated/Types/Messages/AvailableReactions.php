@@ -33,8 +33,7 @@ final class AvailableReactions extends AbstractAvailableReactions
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $hash = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $hash = Deserializer::int32($stream);
         $reactions = Deserializer::vectorOfObjects($stream, [AvailableReaction::class, 'deserialize']);
 
         return new self(

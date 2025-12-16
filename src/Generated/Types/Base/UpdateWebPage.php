@@ -36,10 +36,8 @@ final class UpdateWebPage extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $webpage = AbstractWebPage::deserialize($stream);
-        $pts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
 
         return new self(
             $webpage,

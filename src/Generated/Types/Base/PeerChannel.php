@@ -29,8 +29,7 @@ final class PeerChannel extends AbstractPeer
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $channelId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $channelId = Deserializer::int64($stream);
 
         return new self(
             $channelId

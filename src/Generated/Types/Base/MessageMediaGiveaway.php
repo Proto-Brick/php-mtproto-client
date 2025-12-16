@@ -79,19 +79,16 @@ final class MessageMediaGiveaway extends AbstractMessageMedia
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $onlyNewSubscribers = (($flags & (1 << 0)) !== 0) ? true : null;
         $winnersAreVisible = (($flags & (1 << 2)) !== 0) ? true : null;
         $channels = Deserializer::vectorOfLongs($stream);
         $countriesIso2 = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfStrings($stream) : null;
         $prizeDescription = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $quantity = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $quantity = Deserializer::int32($stream);
         $months = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
         $stars = (($flags & (1 << 5)) !== 0) ? Deserializer::int64($stream) : null;
-        $untilDate = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $untilDate = Deserializer::int32($stream);
 
         return new self(
             $channels,

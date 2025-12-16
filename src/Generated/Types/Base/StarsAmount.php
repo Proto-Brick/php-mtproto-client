@@ -32,10 +32,8 @@ final class StarsAmount extends AbstractStarsAmount
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $amount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $nanos = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $amount = Deserializer::int64($stream);
+        $nanos = Deserializer::int32($stream);
 
         return new self(
             $amount,

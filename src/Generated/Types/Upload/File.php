@@ -37,8 +37,7 @@ final class File extends AbstractFile
     {
         Deserializer::int32($stream); // Constructor ID
         $type = FileType::deserialize($stream);
-        $mtime = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $mtime = Deserializer::int32($stream);
         $bytes = Deserializer::bytes($stream);
 
         return new self(

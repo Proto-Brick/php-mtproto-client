@@ -38,8 +38,7 @@ final class InputClientProxy extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $address = Deserializer::bytes($stream);
-        $port = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $port = Deserializer::int32($stream);
 
         return new self(
             $address,

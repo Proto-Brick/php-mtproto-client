@@ -48,15 +48,12 @@ final class PhoneConnection extends AbstractPhoneConnection
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $tcp = (($flags & (1 << 0)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
         $ip = Deserializer::bytes($stream);
         $ipv6 = Deserializer::bytes($stream);
-        $port = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $port = Deserializer::int32($stream);
         $peerTag = Deserializer::bytes($stream);
 
         return new self(

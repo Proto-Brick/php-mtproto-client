@@ -42,8 +42,7 @@ final class FileCdnRedirect extends AbstractFile
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $dcId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $dcId = Deserializer::int32($stream);
         $fileToken = Deserializer::bytes($stream);
         $encryptionKey = Deserializer::bytes($stream);
         $encryptionIv = Deserializer::bytes($stream);

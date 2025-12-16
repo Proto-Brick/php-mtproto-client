@@ -55,14 +55,11 @@ final class ChannelForbidden extends AbstractChat
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $broadcast = (($flags & (1 << 5)) !== 0) ? true : null;
         $megagroup = (($flags & (1 << 8)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $accessHash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $untilDate = (($flags & (1 << 16)) !== 0) ? Deserializer::int32($stream) : null;
 

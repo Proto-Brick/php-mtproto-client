@@ -32,10 +32,8 @@ final class MessageActionPaidMessagesRefunded extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $count = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $stars = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $count = Deserializer::int32($stream);
+        $stars = Deserializer::int64($stream);
 
         return new self(
             $count,

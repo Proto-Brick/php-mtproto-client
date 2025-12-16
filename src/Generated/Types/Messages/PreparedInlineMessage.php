@@ -49,12 +49,10 @@ final class PreparedInlineMessage extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $queryId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $queryId = Deserializer::int64($stream);
         $result = AbstractBotInlineResult::deserialize($stream);
         $peerTypes = Deserializer::vectorOfObjects($stream, [InlineQueryPeerType::class, 'deserialize']);
-        $cacheTime = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $cacheTime = Deserializer::int32($stream);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 
         return new self(

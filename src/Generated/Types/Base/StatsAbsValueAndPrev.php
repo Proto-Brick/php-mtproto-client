@@ -37,10 +37,8 @@ final class StatsAbsValueAndPrev extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $current = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $previous = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $current = Deserializer::double($stream);
+        $previous = Deserializer::double($stream);
 
         return new self(
             $current,

@@ -162,16 +162,13 @@ final class WebPage extends AbstractWebPage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $hasLargeMedia = (($flags & (1 << 13)) !== 0) ? true : null;
         $videoCoverPhoto = (($flags & (1 << 14)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
         $url = Deserializer::bytes($stream);
         $displayUrl = Deserializer::bytes($stream);
-        $hash = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $hash = Deserializer::int32($stream);
         $type = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $siteName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $title = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;

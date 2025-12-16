@@ -69,8 +69,7 @@ final class BotInlineMediaResult extends AbstractBotInlineResult
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $id = Deserializer::bytes($stream);
         $type = Deserializer::bytes($stream);
         $photo = (($flags & (1 << 0)) !== 0) ? AbstractPhoto::deserialize($stream) : null;

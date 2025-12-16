@@ -35,11 +35,9 @@ final class UpdateBotPurchasedPaidMedia extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $userId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $userId = Deserializer::int64($stream);
         $payload = Deserializer::bytes($stream);
-        $qts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $qts = Deserializer::int32($stream);
 
         return new self(
             $userId,

@@ -49,14 +49,11 @@ final class CollectibleInfo extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $purchaseDate = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $purchaseDate = Deserializer::int32($stream);
         $currency = Deserializer::bytes($stream);
-        $amount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $amount = Deserializer::int64($stream);
         $cryptoCurrency = Deserializer::bytes($stream);
-        $cryptoAmount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $cryptoAmount = Deserializer::int64($stream);
         $url = Deserializer::bytes($stream);
 
         return new self(

@@ -33,8 +33,7 @@ final class InputSavedStarGiftChat extends AbstractInputSavedStarGift
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractInputPeer::deserialize($stream);
-        $savedId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $savedId = Deserializer::int64($stream);
 
         return new self(
             $peer,

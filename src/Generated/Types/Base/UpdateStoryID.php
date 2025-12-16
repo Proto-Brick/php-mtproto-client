@@ -32,10 +32,8 @@ final class UpdateStoryID extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $randomId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int32($stream);
+        $randomId = Deserializer::int64($stream);
 
         return new self(
             $id,

@@ -37,8 +37,7 @@ final class ContactBirthday extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $contactId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $contactId = Deserializer::int64($stream);
         $birthday = Birthday::deserialize($stream);
 
         return new self(

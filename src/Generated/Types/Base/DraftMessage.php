@@ -84,16 +84,14 @@ final class DraftMessage extends AbstractDraftMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $noWebpage = (($flags & (1 << 1)) !== 0) ? true : null;
         $invertMedia = (($flags & (1 << 6)) !== 0) ? true : null;
         $replyTo = (($flags & (1 << 4)) !== 0) ? AbstractInputReplyTo::deserialize($stream) : null;
         $message = Deserializer::bytes($stream);
         $entities = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
         $media = (($flags & (1 << 5)) !== 0) ? AbstractInputMedia::deserialize($stream) : null;
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
         $effect = (($flags & (1 << 7)) !== 0) ? Deserializer::int64($stream) : null;
         $suggestedPost = (($flags & (1 << 8)) !== 0) ? SuggestedPost::deserialize($stream) : null;
 

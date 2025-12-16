@@ -42,10 +42,8 @@ final class WebDocument extends AbstractWebDocument
     {
         Deserializer::int32($stream); // Constructor ID
         $url = Deserializer::bytes($stream);
-        $accessHash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $size = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $accessHash = Deserializer::int64($stream);
+        $size = Deserializer::int32($stream);
         $mimeType = Deserializer::bytes($stream);
         $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
 

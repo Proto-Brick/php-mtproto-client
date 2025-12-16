@@ -33,8 +33,7 @@ final class MessageActionGroupCallScheduled extends AbstractMessageAction
     {
         Deserializer::int32($stream); // Constructor ID
         $call = AbstractInputGroupCall::deserialize($stream);
-        $scheduleDate = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $scheduleDate = Deserializer::int32($stream);
 
         return new self(
             $call,

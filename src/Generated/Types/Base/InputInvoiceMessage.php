@@ -33,8 +33,7 @@ final class InputInvoiceMessage extends AbstractInputInvoice
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractInputPeer::deserialize($stream);
-        $msgId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $msgId = Deserializer::int32($stream);
 
         return new self(
             $peer,

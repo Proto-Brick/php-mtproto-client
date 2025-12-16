@@ -29,8 +29,7 @@ final class InputMessageID extends AbstractInputMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int32($stream);
 
         return new self(
             $id

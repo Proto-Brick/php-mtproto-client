@@ -33,8 +33,7 @@ final class ChatInvitePeek extends AbstractChatInvite
     {
         Deserializer::int32($stream); // Constructor ID
         $chat = AbstractChat::deserialize($stream);
-        $expires = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $expires = Deserializer::int32($stream);
 
         return new self(
             $chat,

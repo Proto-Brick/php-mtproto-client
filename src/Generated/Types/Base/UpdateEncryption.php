@@ -33,8 +33,7 @@ final class UpdateEncryption extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $chat = AbstractEncryptedChat::deserialize($stream);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
 
         return new self(
             $chat,

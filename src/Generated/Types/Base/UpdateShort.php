@@ -33,8 +33,7 @@ final class UpdateShort extends AbstractUpdates
     {
         Deserializer::int32($stream); // Constructor ID
         $update = AbstractUpdate::deserialize($stream);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
 
         return new self(
             $update,

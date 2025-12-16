@@ -45,15 +45,12 @@ final class UpdatePinnedMessages extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $pinned = (($flags & (1 << 0)) !== 0) ? true : null;
         $peer = AbstractPeer::deserialize($stream);
         $messages = Deserializer::vectorOfInts($stream);
-        $pts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
 
         return new self(
             $peer,

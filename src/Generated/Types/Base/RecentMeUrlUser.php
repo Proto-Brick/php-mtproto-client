@@ -33,8 +33,7 @@ final class RecentMeUrlUser extends AbstractRecentMeUrl
     {
         Deserializer::int32($stream); // Constructor ID
         $url = Deserializer::bytes($stream);
-        $userId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $userId = Deserializer::int64($stream);
 
         return new self(
             $url,

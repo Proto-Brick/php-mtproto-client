@@ -55,11 +55,9 @@ final class AllStories extends AbstractAllStories
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $hasMore = (($flags & (1 << 0)) !== 0) ? true : null;
-        $count = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $count = Deserializer::int32($stream);
         $state = Deserializer::bytes($stream);
         $peerStories = Deserializer::vectorOfObjects($stream, [PeerStories::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);

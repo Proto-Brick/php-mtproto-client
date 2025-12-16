@@ -105,33 +105,23 @@ final class ForumTopic extends AbstractForumTopic
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $my = (($flags & (1 << 1)) !== 0) ? true : null;
         $closed = (($flags & (1 << 2)) !== 0) ? true : null;
         $pinned = (($flags & (1 << 3)) !== 0) ? true : null;
         $short = (($flags & (1 << 5)) !== 0) ? true : null;
         $hidden = (($flags & (1 << 6)) !== 0) ? true : null;
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
         $title = Deserializer::bytes($stream);
-        $iconColor = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $iconColor = Deserializer::int32($stream);
         $iconEmojiId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $topMessage = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $readInboxMaxId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $readOutboxMaxId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $unreadCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $unreadMentionsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $unreadReactionsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $topMessage = Deserializer::int32($stream);
+        $readInboxMaxId = Deserializer::int32($stream);
+        $readOutboxMaxId = Deserializer::int32($stream);
+        $unreadCount = Deserializer::int32($stream);
+        $unreadMentionsCount = Deserializer::int32($stream);
+        $unreadReactionsCount = Deserializer::int32($stream);
         $fromId = AbstractPeer::deserialize($stream);
         $notifySettings = PeerNotifySettings::deserialize($stream);
         $draft = (($flags & (1 << 4)) !== 0) ? AbstractDraftMessage::deserialize($stream) : null;

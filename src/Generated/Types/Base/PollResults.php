@@ -78,8 +78,7 @@ final class PollResults extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $min = (($flags & (1 << 0)) !== 0) ? true : null;
         $results = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [PollAnswerVoters::class, 'deserialize']) : null;
         $totalVoters = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;

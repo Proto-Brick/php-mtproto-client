@@ -40,12 +40,9 @@ final class TodoCompletion extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $completedBy = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int32($stream);
+        $completedBy = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
 
         return new self(
             $id,

@@ -33,8 +33,7 @@ final class SentEncryptedFile extends AbstractSentEncryptedMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
         $file = AbstractEncryptedFile::deserialize($stream);
 
         return new self(

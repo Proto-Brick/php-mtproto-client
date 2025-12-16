@@ -57,8 +57,7 @@ final class BotInlineMessageText extends AbstractBotInlineMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $noWebpage = (($flags & (1 << 0)) !== 0) ? true : null;
         $invertMedia = (($flags & (1 << 3)) !== 0) ? true : null;
         $message = Deserializer::bytes($stream);

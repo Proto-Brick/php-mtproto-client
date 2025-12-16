@@ -40,12 +40,9 @@ final class ChatAdminWithInvites extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $adminId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $invitesCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $revokedInvitesCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $adminId = Deserializer::int64($stream);
+        $invitesCount = Deserializer::int32($stream);
+        $revokedInvitesCount = Deserializer::int32($stream);
 
         return new self(
             $adminId,

@@ -315,8 +315,7 @@ final class User extends AbstractUser implements PeerEntity
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $self = (($flags & (1 << 10)) !== 0) ? true : null;
         $contact = (($flags & (1 << 11)) !== 0) ? true : null;
         $mutualContact = (($flags & (1 << 12)) !== 0) ? true : null;
@@ -335,8 +334,7 @@ final class User extends AbstractUser implements PeerEntity
         $botAttachMenu = (($flags & (1 << 27)) !== 0) ? true : null;
         $premium = (($flags & (1 << 28)) !== 0) ? true : null;
         $attachMenuEnabled = (($flags & (1 << 29)) !== 0) ? true : null;
-        $flags2 = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags2 = Deserializer::int32($stream);
         $botCanEdit = (($flags2 & (1 << 1)) !== 0) ? true : null;
         $closeFriend = (($flags2 & (1 << 2)) !== 0) ? true : null;
         $storiesHidden = (($flags2 & (1 << 3)) !== 0) ? true : null;
@@ -344,8 +342,7 @@ final class User extends AbstractUser implements PeerEntity
         $contactRequirePremium = (($flags2 & (1 << 10)) !== 0) ? true : null;
         $botBusiness = (($flags2 & (1 << 11)) !== 0) ? true : null;
         $botHasMainApp = (($flags2 & (1 << 13)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
         $accessHash = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
         $firstName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $lastName = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;

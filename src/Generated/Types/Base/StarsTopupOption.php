@@ -55,15 +55,12 @@ final class StarsTopupOption extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $extended = (($flags & (1 << 1)) !== 0) ? true : null;
-        $stars = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $stars = Deserializer::int64($stream);
         $storeProduct = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $currency = Deserializer::bytes($stream);
-        $amount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $amount = Deserializer::int64($stream);
 
         return new self(
             $stars,

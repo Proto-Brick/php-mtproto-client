@@ -65,14 +65,11 @@ final class ChatInviteImporter extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $requested = (($flags & (1 << 0)) !== 0) ? true : null;
         $viaChatlist = (($flags & (1 << 3)) !== 0) ? true : null;
-        $userId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $userId = Deserializer::int64($stream);
+        $date = Deserializer::int32($stream);
         $about = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
         $approvedBy = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($stream) : null;
 

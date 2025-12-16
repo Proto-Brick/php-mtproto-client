@@ -32,10 +32,8 @@ final class UpdateReadChannelOutbox extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $channelId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $maxId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $channelId = Deserializer::int64($stream);
+        $maxId = Deserializer::int32($stream);
 
         return new self(
             $channelId,

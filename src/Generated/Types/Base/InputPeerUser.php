@@ -32,10 +32,8 @@ final class InputPeerUser extends AbstractInputPeer
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $userId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $accessHash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $userId = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
 
         return new self(
             $userId,

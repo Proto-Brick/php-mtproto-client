@@ -41,12 +41,9 @@ final class EncryptedMessage extends AbstractEncryptedMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $randomId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $chatId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $randomId = Deserializer::int64($stream);
+        $chatId = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
         $bytes = Deserializer::bytes($stream);
         $file = AbstractEncryptedFile::deserialize($stream);
 

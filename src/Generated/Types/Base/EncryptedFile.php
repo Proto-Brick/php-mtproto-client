@@ -41,16 +41,11 @@ final class EncryptedFile extends AbstractEncryptedFile
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $accessHash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $size = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $dcId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $keyFingerprint = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int64($stream);
+        $accessHash = Deserializer::int64($stream);
+        $size = Deserializer::int64($stream);
+        $dcId = Deserializer::int32($stream);
+        $keyFingerprint = Deserializer::int32($stream);
 
         return new self(
             $id,

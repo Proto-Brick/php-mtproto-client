@@ -41,8 +41,7 @@ final class BlockedSlice extends AbstractBlocked
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $count = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $count = Deserializer::int32($stream);
         $blocked = Deserializer::vectorOfObjects($stream, [PeerBlocked::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);

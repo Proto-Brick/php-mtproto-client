@@ -40,8 +40,7 @@ final class RecentStickers extends AbstractRecentStickers
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $hash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $hash = Deserializer::int64($stream);
         $packs = Deserializer::vectorOfObjects($stream, [StickerPack::class, 'deserialize']);
         $stickers = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
         $dates = Deserializer::vectorOfInts($stream);

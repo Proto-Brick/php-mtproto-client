@@ -159,13 +159,11 @@ final class ChatFull extends AbstractChatFull
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $canSetUsername = (($flags & (1 << 7)) !== 0) ? true : null;
         $hasScheduled = (($flags & (1 << 8)) !== 0) ? true : null;
         $translationsDisabled = (($flags & (1 << 19)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
         $about = Deserializer::bytes($stream);
         $participants = AbstractChatParticipants::deserialize($stream);
         $chatPhoto = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($stream) : null;

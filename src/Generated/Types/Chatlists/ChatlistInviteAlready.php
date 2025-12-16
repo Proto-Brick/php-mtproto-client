@@ -44,8 +44,7 @@ final class ChatlistInviteAlready extends AbstractChatlistInvite
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $filterId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $filterId = Deserializer::int32($stream);
         $missingPeers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
         $alreadyPeers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);

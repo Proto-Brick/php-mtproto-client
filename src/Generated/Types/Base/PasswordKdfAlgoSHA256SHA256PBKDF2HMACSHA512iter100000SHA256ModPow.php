@@ -40,8 +40,7 @@ final class PasswordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow ex
         Deserializer::int32($stream); // Constructor ID
         $salt1 = Deserializer::bytes($stream);
         $salt2 = Deserializer::bytes($stream);
-        $g = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $g = Deserializer::int32($stream);
         $p = Deserializer::bytes($stream);
 
         return new self(

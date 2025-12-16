@@ -37,8 +37,7 @@ final class TextUrl extends AbstractRichText
         Deserializer::int32($stream); // Constructor ID
         $text = AbstractRichText::deserialize($stream);
         $url = Deserializer::bytes($stream);
-        $webpageId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $webpageId = Deserializer::int64($stream);
 
         return new self(
             $text,

@@ -38,11 +38,9 @@ final class DhConfig extends AbstractDhConfig
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $g = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $g = Deserializer::int32($stream);
         $p = Deserializer::bytes($stream);
-        $version = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $version = Deserializer::int32($stream);
         $random = Deserializer::bytes($stream);
 
         return new self(

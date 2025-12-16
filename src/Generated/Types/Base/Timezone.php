@@ -42,8 +42,7 @@ final class Timezone extends TlObject
         }
         $id = Deserializer::bytes($stream);
         $name = Deserializer::bytes($stream);
-        $utcOffset = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $utcOffset = Deserializer::int32($stream);
 
         return new self(
             $id,

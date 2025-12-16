@@ -32,8 +32,7 @@ final class UpdateDeleteQuickReplyMessages extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $shortcutId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $shortcutId = Deserializer::int32($stream);
         $messages = Deserializer::vectorOfInts($stream);
 
         return new self(

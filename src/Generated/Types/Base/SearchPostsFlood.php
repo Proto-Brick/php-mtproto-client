@@ -55,16 +55,12 @@ final class SearchPostsFlood extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $queryIsFree = (($flags & (1 << 0)) !== 0) ? true : null;
-        $totalDaily = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $remains = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $totalDaily = Deserializer::int32($stream);
+        $remains = Deserializer::int32($stream);
         $waitTill = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $starsAmount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $starsAmount = Deserializer::int64($stream);
 
         return new self(
             $totalDaily,

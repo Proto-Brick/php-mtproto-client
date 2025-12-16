@@ -57,8 +57,7 @@ final class AuthorizationForm extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $requiredTypes = Deserializer::vectorOfObjects($stream, [AbstractSecureRequiredType::class, 'deserialize']);
         $values = Deserializer::vectorOfObjects($stream, [SecureValue::class, 'deserialize']);
         $errors = Deserializer::vectorOfObjects($stream, [AbstractSecureValueError::class, 'deserialize']);

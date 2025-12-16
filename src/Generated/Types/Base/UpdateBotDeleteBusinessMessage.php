@@ -41,8 +41,7 @@ final class UpdateBotDeleteBusinessMessage extends AbstractUpdate
         $connectionId = Deserializer::bytes($stream);
         $peer = AbstractPeer::deserialize($stream);
         $messages = Deserializer::vectorOfInts($stream);
-        $qts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $qts = Deserializer::int32($stream);
 
         return new self(
             $connectionId,

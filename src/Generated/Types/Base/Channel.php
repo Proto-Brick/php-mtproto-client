@@ -323,8 +323,7 @@ final class Channel extends AbstractChat implements PeerEntity
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $creator = (($flags & (1 << 0)) !== 0) ? true : null;
         $left = (($flags & (1 << 2)) !== 0) ? true : null;
         $broadcast = (($flags & (1 << 5)) !== 0) ? true : null;
@@ -345,8 +344,7 @@ final class Channel extends AbstractChat implements PeerEntity
         $joinToSend = (($flags & (1 << 28)) !== 0) ? true : null;
         $joinRequest = (($flags & (1 << 29)) !== 0) ? true : null;
         $forum = (($flags & (1 << 30)) !== 0) ? true : null;
-        $flags2 = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags2 = Deserializer::int32($stream);
         $storiesHidden = (($flags2 & (1 << 1)) !== 0) ? true : null;
         $storiesHiddenMin = (($flags2 & (1 << 2)) !== 0) ? true : null;
         $storiesUnavailable = (($flags2 & (1 << 3)) !== 0) ? true : null;
@@ -355,14 +353,12 @@ final class Channel extends AbstractChat implements PeerEntity
         $broadcastMessagesAllowed = (($flags2 & (1 << 16)) !== 0) ? true : null;
         $monoforum = (($flags2 & (1 << 17)) !== 0) ? true : null;
         $forumTabs = (($flags2 & (1 << 19)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
         $accessHash = (($flags & (1 << 13)) !== 0) ? Deserializer::int64($stream) : null;
         $title = Deserializer::bytes($stream);
         $username = (($flags & (1 << 6)) !== 0) ? Deserializer::bytes($stream) : null;
         $photo = AbstractChatPhoto::deserialize($stream);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
         $restrictionReason = (($flags & (1 << 9)) !== 0) ? Deserializer::vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
         $adminRights = (($flags & (1 << 14)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
         $bannedRights = (($flags & (1 << 15)) !== 0) ? ChatBannedRights::deserialize($stream) : null;

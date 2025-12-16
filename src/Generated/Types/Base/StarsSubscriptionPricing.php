@@ -37,10 +37,8 @@ final class StarsSubscriptionPricing extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $period = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $amount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $period = Deserializer::int32($stream);
+        $amount = Deserializer::int64($stream);
 
         return new self(
             $period,

@@ -38,13 +38,10 @@ final class UpdateChannelWebPage extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $channelId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $channelId = Deserializer::int64($stream);
         $webpage = AbstractWebPage::deserialize($stream);
-        $pts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
 
         return new self(
             $channelId,

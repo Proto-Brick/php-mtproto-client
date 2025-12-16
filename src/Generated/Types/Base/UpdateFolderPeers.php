@@ -36,10 +36,8 @@ final class UpdateFolderPeers extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $folderPeers = Deserializer::vectorOfObjects($stream, [FolderPeer::class, 'deserialize']);
-        $pts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $ptsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $pts = Deserializer::int32($stream);
+        $ptsCount = Deserializer::int32($stream);
 
         return new self(
             $folderPeers,

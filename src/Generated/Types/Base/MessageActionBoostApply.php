@@ -29,8 +29,7 @@ final class MessageActionBoostApply extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $boosts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $boosts = Deserializer::int32($stream);
 
         return new self(
             $boosts

@@ -38,14 +38,10 @@ final class PostInteractionCountersStory extends AbstractPostInteractionCounters
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $storyId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $views = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $forwards = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $reactions = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $storyId = Deserializer::int32($stream);
+        $views = Deserializer::int32($stream);
+        $forwards = Deserializer::int32($stream);
+        $reactions = Deserializer::int32($stream);
 
         return new self(
             $storyId,

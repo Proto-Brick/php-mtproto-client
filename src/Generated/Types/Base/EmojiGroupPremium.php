@@ -33,8 +33,7 @@ final class EmojiGroupPremium extends AbstractEmojiGroup
     {
         Deserializer::int32($stream); // Constructor ID
         $title = Deserializer::bytes($stream);
-        $iconEmojiId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $iconEmojiId = Deserializer::int64($stream);
 
         return new self(
             $title,

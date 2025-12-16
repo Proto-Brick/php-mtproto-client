@@ -60,8 +60,7 @@ final class InputChatUploadedPhoto extends AbstractInputChatPhoto
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $file = (($flags & (1 << 0)) !== 0) ? AbstractInputFile::deserialize($stream) : null;
         $video = (($flags & (1 << 1)) !== 0) ? AbstractInputFile::deserialize($stream) : null;
         $videoStartTs = (($flags & (1 << 2)) !== 0) ? Deserializer::double($stream) : null;

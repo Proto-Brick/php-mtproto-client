@@ -75,8 +75,7 @@ final class PasswordInputSettings extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $newAlgo = (($flags & (1 << 0)) !== 0) ? AbstractPasswordKdfAlgo::deserialize($stream) : null;
         $newPasswordHash = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $hint = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;

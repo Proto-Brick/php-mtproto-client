@@ -42,8 +42,7 @@ final class ChatInviteImporters extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $count = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $count = Deserializer::int32($stream);
         $importers = Deserializer::vectorOfObjects($stream, [ChatInviteImporter::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 

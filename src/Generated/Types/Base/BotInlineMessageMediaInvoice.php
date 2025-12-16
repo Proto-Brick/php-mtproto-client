@@ -66,16 +66,14 @@ final class BotInlineMessageMediaInvoice extends AbstractBotInlineMessage
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $shippingAddressRequested = (($flags & (1 << 1)) !== 0) ? true : null;
         $test = (($flags & (1 << 3)) !== 0) ? true : null;
         $title = Deserializer::bytes($stream);
         $description = Deserializer::bytes($stream);
         $photo = (($flags & (1 << 0)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
         $currency = Deserializer::bytes($stream);
-        $totalAmount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $totalAmount = Deserializer::int64($stream);
         $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($stream) : null;
 
         return new self(

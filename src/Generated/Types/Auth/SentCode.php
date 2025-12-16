@@ -50,8 +50,7 @@ final class SentCode extends AbstractSentCode
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $type = AbstractSentCodeType::deserialize($stream);
         $phoneCodeHash = Deserializer::bytes($stream);
         $nextType = (($flags & (1 << 1)) !== 0) ? CodeType::deserialize($stream) : null;

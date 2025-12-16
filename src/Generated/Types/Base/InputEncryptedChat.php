@@ -37,10 +37,8 @@ final class InputEncryptedChat extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $chatId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $accessHash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $chatId = Deserializer::int32($stream);
+        $accessHash = Deserializer::int64($stream);
 
         return new self(
             $chatId,

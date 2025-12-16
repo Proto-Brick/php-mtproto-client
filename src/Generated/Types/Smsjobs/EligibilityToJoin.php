@@ -38,8 +38,7 @@ final class EligibilityToJoin extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $termsUrl = Deserializer::bytes($stream);
-        $monthlySentSms = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $monthlySentSms = Deserializer::int32($stream);
 
         return new self(
             $termsUrl,

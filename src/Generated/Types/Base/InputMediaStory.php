@@ -33,8 +33,7 @@ final class InputMediaStory extends AbstractInputMedia
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractInputPeer::deserialize($stream);
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int32($stream);
 
         return new self(
             $peer,

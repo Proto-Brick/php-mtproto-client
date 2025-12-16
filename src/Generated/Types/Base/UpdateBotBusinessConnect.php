@@ -33,8 +33,7 @@ final class UpdateBotBusinessConnect extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $connection = BotBusinessConnection::deserialize($stream);
-        $qts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $qts = Deserializer::int32($stream);
 
         return new self(
             $connection,

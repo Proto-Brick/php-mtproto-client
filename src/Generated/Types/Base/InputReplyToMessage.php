@@ -87,10 +87,8 @@ final class InputReplyToMessage extends AbstractInputReplyTo
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $replyToMsgId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
+        $replyToMsgId = Deserializer::int32($stream);
         $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $replyToPeerId = (($flags & (1 << 1)) !== 0) ? AbstractInputPeer::deserialize($stream) : null;
         $quoteText = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;

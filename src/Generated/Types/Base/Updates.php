@@ -44,10 +44,8 @@ final class Updates extends AbstractUpdates
         $updates = Deserializer::vectorOfObjects($stream, [AbstractUpdate::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $seq = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
+        $seq = Deserializer::int32($stream);
 
         return new self(
             $updates,

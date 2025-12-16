@@ -36,8 +36,7 @@ final class UpdateBotCommands extends AbstractUpdate
     {
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
-        $botId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $botId = Deserializer::int64($stream);
         $commands = Deserializer::vectorOfObjects($stream, [BotCommand::class, 'deserialize']);
 
         return new self(

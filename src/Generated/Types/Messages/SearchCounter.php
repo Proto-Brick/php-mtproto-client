@@ -45,12 +45,10 @@ final class SearchCounter extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $inexact = (($flags & (1 << 1)) !== 0) ? true : null;
         $filter = AbstractMessagesFilter::deserialize($stream);
-        $count = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $count = Deserializer::int32($stream);
 
         return new self(
             $filter,

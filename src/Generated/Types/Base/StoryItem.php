@@ -157,8 +157,7 @@ final class StoryItem extends AbstractStoryItem
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $pinned = (($flags & (1 << 5)) !== 0) ? true : null;
         $public = (($flags & (1 << 7)) !== 0) ? true : null;
         $closeFriends = (($flags & (1 << 8)) !== 0) ? true : null;
@@ -168,14 +167,11 @@ final class StoryItem extends AbstractStoryItem
         $contacts = (($flags & (1 << 12)) !== 0) ? true : null;
         $selectedContacts = (($flags & (1 << 13)) !== 0) ? true : null;
         $out = (($flags & (1 << 16)) !== 0) ? true : null;
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int32($stream);
+        $date = Deserializer::int32($stream);
         $fromId = (($flags & (1 << 18)) !== 0) ? AbstractPeer::deserialize($stream) : null;
         $fwdFrom = (($flags & (1 << 17)) !== 0) ? StoryFwdHeader::deserialize($stream) : null;
-        $expireDate = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $expireDate = Deserializer::int32($stream);
         $caption = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
         $media = AbstractMessageMedia::deserialize($stream);

@@ -43,11 +43,9 @@ final class InputAppEvent extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $time = unpack('d', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $time = Deserializer::double($stream);
         $type = Deserializer::bytes($stream);
-        $peer = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $peer = Deserializer::int64($stream);
         $data = Deserializer::deserializeJsonValue($stream);
 
         return new self(

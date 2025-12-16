@@ -48,13 +48,10 @@ final class PageBlockEmbedPost extends AbstractPageBlock
     {
         Deserializer::int32($stream); // Constructor ID
         $url = Deserializer::bytes($stream);
-        $webpageId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $authorPhotoId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $webpageId = Deserializer::int64($stream);
+        $authorPhotoId = Deserializer::int64($stream);
         $author = Deserializer::bytes($stream);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
         $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
         $caption = PageCaption::deserialize($stream);
 

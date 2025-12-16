@@ -46,8 +46,7 @@ final class SavedContact extends TlObject
         $phone = Deserializer::bytes($stream);
         $firstName = Deserializer::bytes($stream);
         $lastName = Deserializer::bytes($stream);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
 
         return new self(
             $phone,

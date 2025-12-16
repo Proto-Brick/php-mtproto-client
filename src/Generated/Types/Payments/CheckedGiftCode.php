@@ -85,16 +85,13 @@ final class CheckedGiftCode extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $viaGiveaway = (($flags & (1 << 2)) !== 0) ? true : null;
         $fromId = (($flags & (1 << 4)) !== 0) ? AbstractPeer::deserialize($stream) : null;
         $giveawayMsgId = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
         $toId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $months = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
+        $months = Deserializer::int32($stream);
         $usedDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);

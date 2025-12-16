@@ -46,8 +46,7 @@ final class SecureRequiredType extends AbstractSecureRequiredType
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $nativeNames = (($flags & (1 << 0)) !== 0) ? true : null;
         $selfieRequired = (($flags & (1 << 1)) !== 0) ? true : null;
         $translationRequired = (($flags & (1 << 2)) !== 0) ? true : null;

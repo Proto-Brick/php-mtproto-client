@@ -107,24 +107,19 @@ final class StarGiftUnique extends AbstractStarGift
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $requirePremium = (($flags & (1 << 6)) !== 0) ? true : null;
         $resaleTonOnly = (($flags & (1 << 7)) !== 0) ? true : null;
-        $id = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $id = Deserializer::int64($stream);
         $title = Deserializer::bytes($stream);
         $slug = Deserializer::bytes($stream);
-        $num = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $num = Deserializer::int32($stream);
         $ownerId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
         $ownerName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
         $ownerAddress = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
         $attributes = Deserializer::vectorOfObjects($stream, [AbstractStarGiftAttribute::class, 'deserialize']);
-        $availabilityIssued = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $availabilityTotal = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $availabilityIssued = Deserializer::int32($stream);
+        $availabilityTotal = Deserializer::int32($stream);
         $giftAddress = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
         $resellAmount = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractStarsAmount::class, 'deserialize']) : null;
         $releasedBy = (($flags & (1 << 5)) !== 0) ? AbstractPeer::deserialize($stream) : null;

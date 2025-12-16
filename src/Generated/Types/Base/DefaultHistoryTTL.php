@@ -34,8 +34,7 @@ final class DefaultHistoryTTL extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $period = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $period = Deserializer::int32($stream);
 
         return new self(
             $period

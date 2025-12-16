@@ -29,8 +29,7 @@ final class DifferenceTooLong extends AbstractDifference
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $pts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $pts = Deserializer::int32($stream);
 
         return new self(
             $pts

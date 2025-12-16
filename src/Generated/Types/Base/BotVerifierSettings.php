@@ -52,11 +52,9 @@ final class BotVerifierSettings extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $canModifyCustomDescription = (($flags & (1 << 1)) !== 0) ? true : null;
-        $icon = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $icon = Deserializer::int64($stream);
         $company = Deserializer::bytes($stream);
         $customDescription = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
 

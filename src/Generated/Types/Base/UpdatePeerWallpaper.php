@@ -44,8 +44,7 @@ final class UpdatePeerWallpaper extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $wallpaperOverridden = (($flags & (1 << 1)) !== 0) ? true : null;
         $peer = AbstractPeer::deserialize($stream);
         $wallpaper = (($flags & (1 << 0)) !== 0) ? AbstractWallPaper::deserialize($stream) : null;

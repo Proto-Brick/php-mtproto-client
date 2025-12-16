@@ -35,8 +35,7 @@ final class AllStoriesNotModified extends AbstractAllStories
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $state = Deserializer::bytes($stream);
         $stealthMode = StoriesStealthMode::deserialize($stream);
 

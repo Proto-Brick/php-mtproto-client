@@ -55,10 +55,8 @@ final class StoryAlbum extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $albumId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
+        $albumId = Deserializer::int32($stream);
         $title = Deserializer::bytes($stream);
         $iconPhoto = (($flags & (1 << 0)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
         $iconVideo = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($stream) : null;

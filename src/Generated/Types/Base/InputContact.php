@@ -43,8 +43,7 @@ final class InputContact extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $clientId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $clientId = Deserializer::int64($stream);
         $phone = Deserializer::bytes($stream);
         $firstName = Deserializer::bytes($stream);
         $lastName = Deserializer::bytes($stream);

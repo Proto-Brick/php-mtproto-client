@@ -51,8 +51,7 @@ final class HistoryImportParsed extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $pm = (($flags & (1 << 0)) !== 0) ? true : null;
         $group = (($flags & (1 << 1)) !== 0) ? true : null;
         $title = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;

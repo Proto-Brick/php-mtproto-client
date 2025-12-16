@@ -39,13 +39,10 @@ final class MessageActionGiveawayResults extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $stars = (($flags & (1 << 0)) !== 0) ? true : null;
-        $winnersCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $unclaimedCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $winnersCount = Deserializer::int32($stream);
+        $unclaimedCount = Deserializer::int32($stream);
 
         return new self(
             $winnersCount,

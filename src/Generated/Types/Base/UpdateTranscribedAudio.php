@@ -45,14 +45,11 @@ final class UpdateTranscribedAudio extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $pending = (($flags & (1 << 0)) !== 0) ? true : null;
         $peer = AbstractPeer::deserialize($stream);
-        $msgId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $transcriptionId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $msgId = Deserializer::int32($stream);
+        $transcriptionId = Deserializer::int64($stream);
         $text = Deserializer::bytes($stream);
 
         return new self(

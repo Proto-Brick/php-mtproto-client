@@ -38,12 +38,10 @@ final class UpdateMessagePollVote extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $pollId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $pollId = Deserializer::int64($stream);
         $peer = AbstractPeer::deserialize($stream);
         $options = Deserializer::vectorOfStrings($stream);
-        $qts = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $qts = Deserializer::int32($stream);
 
         return new self(
             $pollId,

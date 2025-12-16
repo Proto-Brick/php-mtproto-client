@@ -35,8 +35,7 @@ final class AttachMenuBots extends AbstractAttachMenuBots
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $hash = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $hash = Deserializer::int64($stream);
         $bots = Deserializer::vectorOfObjects($stream, [AttachMenuBot::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
 

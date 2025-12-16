@@ -38,8 +38,7 @@ final class BotPreparedInlineMessage extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $id = Deserializer::bytes($stream);
-        $expireDate = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $expireDate = Deserializer::int32($stream);
 
         return new self(
             $id,

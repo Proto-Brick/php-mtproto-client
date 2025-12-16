@@ -32,8 +32,7 @@ final class LoginTokenMigrateTo extends AbstractLoginToken
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $dcId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $dcId = Deserializer::int32($stream);
         $token = Deserializer::bytes($stream);
 
         return new self(

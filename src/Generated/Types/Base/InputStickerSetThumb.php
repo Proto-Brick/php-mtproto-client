@@ -33,8 +33,7 @@ final class InputStickerSetThumb extends AbstractInputFileLocation
     {
         Deserializer::int32($stream); // Constructor ID
         $stickerset = AbstractInputStickerSet::deserialize($stream);
-        $thumbVersion = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $thumbVersion = Deserializer::int32($stream);
 
         return new self(
             $stickerset,

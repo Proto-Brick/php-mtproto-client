@@ -38,12 +38,9 @@ final class InputFileLocation extends AbstractInputFileLocation
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $volumeId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $localId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $secret = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $volumeId = Deserializer::int64($stream);
+        $localId = Deserializer::int32($stream);
+        $secret = Deserializer::int64($stream);
         $fileReference = Deserializer::bytes($stream);
 
         return new self(

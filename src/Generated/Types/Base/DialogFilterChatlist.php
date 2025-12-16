@@ -71,12 +71,10 @@ final class DialogFilterChatlist extends AbstractDialogFilter implements PeerEnt
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $hasMyInvites = (($flags & (1 << 26)) !== 0) ? true : null;
         $titleNoanimate = (($flags & (1 << 28)) !== 0) ? true : null;
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int32($stream);
         $title = TextWithEntities::deserialize($stream);
         $emoticon = (($flags & (1 << 25)) !== 0) ? Deserializer::bytes($stream) : null;
         $color = (($flags & (1 << 27)) !== 0) ? Deserializer::int32($stream) : null;

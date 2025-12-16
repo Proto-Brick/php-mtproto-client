@@ -61,13 +61,10 @@ final class MessageActionGiftPremium extends AbstractMessageAction
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $currency = Deserializer::bytes($stream);
-        $amount = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $months = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $amount = Deserializer::int64($stream);
+        $months = Deserializer::int32($stream);
         $cryptoCurrency = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
         $cryptoAmount = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
         $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;

@@ -33,8 +33,7 @@ final class SentCodeTypeMissedCall extends AbstractSentCodeType
     {
         Deserializer::int32($stream); // Constructor ID
         $prefix = Deserializer::bytes($stream);
-        $length = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $length = Deserializer::int32($stream);
 
         return new self(
             $prefix,

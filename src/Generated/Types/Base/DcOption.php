@@ -80,19 +80,16 @@ final class DcOption extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $ipv6 = (($flags & (1 << 0)) !== 0) ? true : null;
         $mediaOnly = (($flags & (1 << 1)) !== 0) ? true : null;
         $tcpoOnly = (($flags & (1 << 2)) !== 0) ? true : null;
         $cdn = (($flags & (1 << 3)) !== 0) ? true : null;
         $static = (($flags & (1 << 4)) !== 0) ? true : null;
         $thisPortOnly = (($flags & (1 << 5)) !== 0) ? true : null;
-        $id = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $id = Deserializer::int32($stream);
         $ipAddress = Deserializer::bytes($stream);
-        $port = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $port = Deserializer::int32($stream);
         $secret = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($stream) : null;
 
         return new self(

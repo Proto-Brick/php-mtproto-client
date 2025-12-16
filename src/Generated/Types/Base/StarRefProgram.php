@@ -63,12 +63,9 @@ final class StarRefProgram extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $botId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $commissionPermille = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
+        $botId = Deserializer::int64($stream);
+        $commissionPermille = Deserializer::int32($stream);
         $durationMonths = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
         $endDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
         $dailyRevenuePerUser = (($flags & (1 << 2)) !== 0) ? AbstractStarsAmount::deserialize($stream) : null;

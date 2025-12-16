@@ -58,15 +58,11 @@ final class MyBoost extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $slot = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
+        $slot = Deserializer::int32($stream);
         $peer = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $expires = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
+        $expires = Deserializer::int32($stream);
         $cooldownUntilDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(

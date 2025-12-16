@@ -39,10 +39,8 @@ final class UpdateChannelTooLong extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $channelId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $flags = Deserializer::int32($stream);
+        $channelId = Deserializer::int64($stream);
         $pts = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
 
         return new self(

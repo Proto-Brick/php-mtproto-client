@@ -64,21 +64,15 @@ final class MonoForumDialog extends AbstractSavedDialog
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $unreadMark = (($flags & (1 << 3)) !== 0) ? true : null;
         $nopaidMessagesException = (($flags & (1 << 4)) !== 0) ? true : null;
         $peer = AbstractPeer::deserialize($stream);
-        $topMessage = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $readInboxMaxId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $readOutboxMaxId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $unreadCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $unreadReactionsCount = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $topMessage = Deserializer::int32($stream);
+        $readInboxMaxId = Deserializer::int32($stream);
+        $readOutboxMaxId = Deserializer::int32($stream);
+        $unreadCount = Deserializer::int32($stream);
+        $unreadReactionsCount = Deserializer::int32($stream);
         $draft = (($flags & (1 << 1)) !== 0) ? AbstractDraftMessage::deserialize($stream) : null;
 
         return new self(

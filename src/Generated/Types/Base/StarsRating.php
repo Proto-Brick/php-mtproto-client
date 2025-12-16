@@ -50,14 +50,10 @@ final class StarsRating extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $level = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        $currentLevelStars = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $stars = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $flags = Deserializer::int32($stream);
+        $level = Deserializer::int32($stream);
+        $currentLevelStars = Deserializer::int64($stream);
+        $stars = Deserializer::int64($stream);
         $nextLevelStars = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
 
         return new self(

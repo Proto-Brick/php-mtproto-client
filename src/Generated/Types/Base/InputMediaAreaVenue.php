@@ -36,8 +36,7 @@ final class InputMediaAreaVenue extends AbstractMediaArea
     {
         Deserializer::int32($stream); // Constructor ID
         $coordinates = MediaAreaCoordinates::deserialize($stream);
-        $queryId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
+        $queryId = Deserializer::int64($stream);
         $resultId = Deserializer::bytes($stream);
 
         return new self(

@@ -42,8 +42,7 @@ final class UserInfo extends AbstractUserInfo
         $message = Deserializer::bytes($stream);
         $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
         $author = Deserializer::bytes($stream);
-        $date = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $date = Deserializer::int32($stream);
 
         return new self(
             $message,

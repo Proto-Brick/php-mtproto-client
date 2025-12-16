@@ -37,8 +37,7 @@ final class UpdateChatDefaultBannedRights extends AbstractUpdate
         Deserializer::int32($stream); // Constructor ID
         $peer = AbstractPeer::deserialize($stream);
         $defaultBannedRights = ChatBannedRights::deserialize($stream);
-        $version = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $version = Deserializer::int32($stream);
 
         return new self(
             $peer,

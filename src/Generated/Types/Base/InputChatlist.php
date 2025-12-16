@@ -34,8 +34,7 @@ final class InputChatlist extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $filterId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $filterId = Deserializer::int32($stream);
 
         return new self(
             $filterId

@@ -122,8 +122,7 @@ final class SponsoredMessage extends TlObject
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $flags = Deserializer::int32($stream);
         $recommended = (($flags & (1 << 5)) !== 0) ? true : null;
         $canReport = (($flags & (1 << 12)) !== 0) ? true : null;
         $randomId = Deserializer::bytes($stream);

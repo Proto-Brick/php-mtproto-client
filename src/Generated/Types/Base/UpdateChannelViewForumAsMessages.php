@@ -32,10 +32,8 @@ final class UpdateChannelViewForumAsMessages extends AbstractUpdate
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $channelId = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        $enabled = (unpack('V', substr($stream, 0, 4))[1] === 0x997275b5);
-        $stream = substr($stream, 4);
+        $channelId = Deserializer::int64($stream);
+        $enabled = (Deserializer::int32($stream) === 0x997275b5);
 
         return new self(
             $channelId,

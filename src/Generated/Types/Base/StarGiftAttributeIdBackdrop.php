@@ -29,8 +29,7 @@ final class StarGiftAttributeIdBackdrop extends AbstractStarGiftAttributeId
     public static function deserialize(string &$stream): static
     {
         Deserializer::int32($stream); // Constructor ID
-        $backdropId = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
+        $backdropId = Deserializer::int32($stream);
 
         return new self(
             $backdropId
