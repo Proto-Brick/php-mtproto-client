@@ -409,6 +409,10 @@ class Client
         $constructorId = Deserializer::peekConstructor($messageBody);
 
         switch ($constructorId) {
+            case Constructors::GZIP_PACKED: // <--- ДОБАВИТЬ ЭТОТ БЛОК
+                $unpackedData = Deserializer::deserializeGzipPacked($messageBody);
+                $this->handleSingleMessage($unpackedData);
+                return;
             case Constructors::RPC_RESULT:
                 Deserializer::int32($messageBody);
                 $req_msg_id = Deserializer::int64($messageBody);
@@ -457,6 +461,7 @@ class Client
                 // Важно! Такой подход съест все тело сообщения, что может быть неверно,
                 // если оно имеет сложную структуру. Проще всего обрабатывать каждый по отдельности.
                 // Пока оставим только updatesTooLong.
+                //$this->peerManager->collect($update);
                 Deserializer::consumeConstructor($messageBody);
                 return;
 

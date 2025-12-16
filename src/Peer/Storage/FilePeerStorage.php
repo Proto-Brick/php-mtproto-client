@@ -12,19 +12,14 @@ class FilePeerStorage implements PeerStorage
     /** @var array<int, PeerInfo> */
     private array $cacheById = [];
 
-    /** @var array<string, int> */
+    /** @var array<string, int> Ключи в нижнем регистре */
     private array $usernameMap = [];
 
-    /** @var array<string, int> */
+    /** @var array<string, int> Очищенные телефоны */
     private array $phoneMap = [];
 
-    /** @var bool Флаг: были ли изменения с момента последней записи */
     private bool $isDirty = false;
-
-    /** @var string ID активного таймера Revolt */
     private string $saveTimerId = '';
-
-    /** @var float Задержка записи на диск в секундах */
     private const SAVE_DELAY = 2.0;
 
     public function __construct(private readonly string $storageFile)
@@ -32,9 +27,6 @@ class FilePeerStorage implements PeerStorage
         $this->load();
     }
 
-    /**
-     * Гарантирует сохранение данных при уничтожении объекта (завершении скрипта).
-     */
     public function __destruct()
     {
         $this->flush();
@@ -47,7 +39,9 @@ class FilePeerStorage implements PeerStorage
         }
 
         $content = file_get_contents($this->storageFile);
-        if (!$content) return;
+        if (!$content) {
+            return;
+        }
 
         $data = json_decode($content, true) ?: [];
 
@@ -57,7 +51,8 @@ class FilePeerStorage implements PeerStorage
                 (int)$row['access_hash'],
                 $row['type'],
                 $row['username'] ?? null,
-                $row['phone'] ?? null
+                $row['phone'] ?? null,
+                $row['is_min'] ?? false
             );
             $this->updateMemoryCache($peer);
         }
@@ -67,48 +62,100 @@ class FilePeerStorage implements PeerStorage
     {
         $existing = $this->cacheById[$info->id] ?? null;
 
-        // --- ЛОГИКА СЛИЯНИЯ (SMART MERGE) ---
+        // SMART MERGE
         if ($existing) {
-            $newAccessHash = $info->accessHash;
-            $newUsername = $info->username;
-            $newPhone = $info->phone;
+            $finalAccessHash = $info->accessHash;
 
-            // 1. Не затираем валидный хеш нулем
-            if ($newAccessHash === 0 && $existing->accessHash !== 0) {
-                $newAccessHash = $existing->accessHash;
+            // Если новый хеш пустой (0), оставляем старый
+            if ($finalAccessHash === 0 && $existing->accessHash !== 0) {
+                $finalAccessHash = $existing->accessHash;
             }
 
-            // 2. Не теряем юзернейм
-            if ($newUsername === null && $existing->username !== null) {
-                $newUsername = $existing->username;
+            // Если пришел min-объект, но у нас уже есть полноценный с валидным хешем,
+            // мы доверяем старому хешу, даже если в min-объекте пришел какой-то хеш (обычно там урезанный)
+            if ($info->isMin && !$existing->isMin && $existing->accessHash !== 0) {
+                $finalAccessHash = $existing->accessHash;
             }
 
-            // 3. Не теряем телефон
-            if ($newPhone === null && $existing->phone !== null) {
-                $newPhone = $existing->phone;
+            // Если в новом объекте (особенно min) нет username/phone, оставляем старые
+            // Если объект НЕ min и username пришел null, значит юзер его удалил.
+            // Но в min-объектах поля часто отсутствуют просто так.
+
+            $finalUsername = $info->username;
+            if ($info->isMin && $finalUsername === null) {
+                $finalUsername = $existing->username;
             }
+
+            $finalPhone = $info->phone;
+            if ($info->isMin && $finalPhone === null) {
+                $finalPhone = $existing->phone;
+            }
+
+            // isMin ставим false, если хотя бы одна из версий была полноценной
+            $finalIsMin = $info->isMin && $existing->isMin;
 
             $info = new PeerInfo(
                 $info->id,
-                $newAccessHash,
+                $finalAccessHash,
                 $info->type,
-                $newUsername,
-                $newPhone
+                $finalUsername,
+                $finalPhone,
+                $finalIsMin
             );
         }
-        // ------------------------------------
+
+        // COLLISION HANDLING
+
+        // Username Claim (Кто-то занял юзернейм)
+        if ($info->username) {
+            $normalizedUsername = strtolower($info->username);
+            $oldOwnerId = $this->usernameMap[$normalizedUsername] ?? null;
+
+            // Если этот юзернейм принадлежал кому-то другому
+            if ($oldOwnerId !== null && $oldOwnerId !== $info->id) {
+                $this->removeUsernameFromPeer($oldOwnerId);
+            }
+        }
+
+        // Username Change (Этот пир сменил юзернейм)
+        // Только для полных объектов, т.к. в min юзернейма может просто не быть
+        if ($existing && !$info->isMin) {
+            // Если был старый юзернейм, и он отличается от нового (или стал null)
+            if ($existing->username && $existing->username !== $info->username) {
+                unset($this->usernameMap[strtolower($existing->username)]);
+            }
+        }
 
         $this->updateMemoryCache($info);
 
-        // ВМЕСТО МГНОВЕННОЙ ЗАПИСИ:
         $this->isDirty = true;
         $this->scheduleSave();
     }
 
     /**
-     * Планирует запись на диск через SAVE_DELAY секунд.
-     * Если таймер уже запущен, новый не создается.
+     * Удаляет username у пира по ID (используется при коллизиях).
      */
+    private function removeUsernameFromPeer(int $peerId): void
+    {
+        $peer = $this->cacheById[$peerId] ?? null;
+        if (!$peer || !$peer->username) {
+            return;
+        }
+
+        unset($this->usernameMap[strtolower($peer->username)]);
+
+        $updatedPeer = new PeerInfo(
+            id: $peer->id,
+            accessHash: $peer->accessHash,
+            type: $peer->type,
+            username: null,
+            phone: $peer->phone,
+            isMin: $peer->isMin
+        );
+        $this->cacheById[$peerId] = $updatedPeer;
+        $this->isDirty = true;
+    }
+
     private function scheduleSave(): void
     {
         if ($this->saveTimerId !== '') {
@@ -116,26 +163,20 @@ class FilePeerStorage implements PeerStorage
         }
 
         $this->saveTimerId = EventLoop::delay(self::SAVE_DELAY, function () {
-            $this->saveTimerId = ''; // Сбрасываем ID, так как таймер сработал
+            $this->saveTimerId = '';
             if ($this->isDirty) {
                 $this->saveToDisk();
                 $this->isDirty = false;
-                echo "[Storage] Peers saved to disk (Throttled).\n"; // Раскомментировать для отладки
             }
         });
     }
 
-    /**
-     * Принудительно записывает изменения на диск, если они есть.
-     * Отменяет отложенный таймер.
-     */
     public function flush(): void
     {
         if ($this->saveTimerId !== '') {
             EventLoop::cancel($this->saveTimerId);
             $this->saveTimerId = '';
         }
-
         if ($this->isDirty) {
             $this->saveToDisk();
             $this->isDirty = false;
@@ -159,16 +200,24 @@ class FilePeerStorage implements PeerStorage
     {
         $data = [];
         foreach ($this->cacheById as $peer) {
-            $data[] = [
+            $row = [
                 'id' => $peer->id,
                 'access_hash' => $peer->accessHash,
                 'type' => $peer->type,
-                'username' => $peer->username,
-                'phone' => $peer->phone,
             ];
+            if ($peer->username) {
+                $row['username'] = $peer->username;
+            }
+            if ($peer->phone) {
+                $row['phone'] = $peer->phone;
+            }
+            if ($peer->isMin) {
+                $row['is_min'] = true;
+            }
+
+            $data[] = $row;
         }
 
-        // Атомарная запись для предотвращения повреждения файла при сбоях
         $tempFile = $this->storageFile . '.tmp';
         file_put_contents($tempFile, json_encode($data, JSON_UNESCAPED_UNICODE));
 

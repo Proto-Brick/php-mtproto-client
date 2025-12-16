@@ -15,5 +15,6 @@ final readonly class PeerInfo
         public string $type,    // 'user', 'chat', 'channel'
         public ?string $username = null,
         public ?string $phone = null,
+        public bool $isMin = false,
     ) {}
 }

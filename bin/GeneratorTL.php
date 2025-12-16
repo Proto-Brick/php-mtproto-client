@@ -80,45 +80,7 @@ class GeneratorTL
         echo "Generation complete! Files are in '" . realpath(self::OUTPUT_DIR) . "' directory.\n";
     }
 
-    /**
-     * Возвращает оптимизированный PHP-код для чтения примитивов без вызова методов Deserializer.
-     * Возвращает null, если инлайнинг для этого типа не поддерживается или слишком сложен.
-     */
-    private function getInlineDeserializationBlock(string $varName, string $tlType): ?string
-    {
-        // Для строк (string/bytes) инлайнинг сложный (логика длины), оставляем метод.
-        // Для векторов тоже оставляем метод.
-        // Инлайним только фиксированные числовые типы.
 
-        return match (strtolower($tlType)) {
-            'int', 'int32' =>
-                "        {$varName} = unpack('V', substr(\$stream, 0, 4))[1];\n" .
-                "        \$stream = substr(\$stream, 4);",
-
-            'long', 'int64' =>
-                "        {$varName} = unpack('q', substr(\$stream, 0, 8))[1];\n" .
-                "        \$stream = substr(\$stream, 8);",
-
-            'int128' =>
-                "        {$varName} = strrev(substr(\$stream, 0, 16));\n" .
-                "        \$stream = substr(\$stream, 16);",
-
-            'int256' =>
-                "        {$varName} = strrev(substr(\$stream, 0, 32));\n" .
-                "        \$stream = substr(\$stream, 32);",
-
-            'double' =>
-                "        {$varName} = unpack('d', substr(\$stream, 0, 8))[1];\n" .
-                "        \$stream = substr(\$stream, 8);",
-
-            // Логика Bool: читаем 4 байта, если это ID boolTrue - возвращаем true.
-            'bool' =>
-                "        {$varName} = (unpack('V', substr(\$stream, 0, 4))[1] === 0x997275b5);\n" .
-                "        \$stream = substr(\$stream, 4);",
-
-            default => null,
-        };
-    }
 
     /**
      * Проверяет, является ли тип (или Vector<Type>) прямой сущностью (User, Chat, Channel).

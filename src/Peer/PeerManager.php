@@ -144,9 +144,12 @@ class PeerManager
         $id = (int) $object->id;
         $accessHash = isset($object->accessHash) ? (int) $object->accessHash : 0;
 
-        // Быстрое получение типа через интерфейс (Level 1 Optimization)
-        // Метод getPeerType() сгенерирован в DTO-классах и возвращает константу.
         $type = $object->getPeerType();
+
+        $isMin = false;
+        if (property_exists($object, 'min') && $object->min === true) {
+            $isMin = true;
+        }
 
         $this->storage->save(
             new PeerInfo(
@@ -154,7 +157,8 @@ class PeerManager
                 accessHash: $accessHash,
                 type: $type,
                 username: $object->username ?? null,
-                phone: $object->phone ?? null
+                phone: $object->phone ?? null,
+                isMin: $isMin
             )
         );
     }

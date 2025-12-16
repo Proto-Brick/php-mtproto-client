@@ -27,6 +27,7 @@
   ],
   "require": {
     "php-64bit": ">=8.2",
+    "ext-json": "*",
     "ext-zlib": "*",
     "phpseclib/phpseclib": "^3.0",
     "amphp/sync": "^2.3",
@@ -36,7 +37,8 @@
   "suggest": {
     "ext-gmp": "Install the gmp extension to speed up authorization",
     "ext-bcmath": "Install the bcmath extension to speed up authorization",
-    "ext-openssl": "Speeds up crypto operations (AES/RSA) significantly"
+    "ext-openssl": "Speeds up crypto operations (AES/RSA) significantly",
+    "ext-mbstring": "Recommended for correct handling of UTF-8 strings in Telegram messages"
   },
   "autoload": {
     "psr-4": {
