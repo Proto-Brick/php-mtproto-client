@@ -10,11 +10,11 @@ namespace ProtoBrick\MTProtoClient\TL\Contracts;
 interface Deserializable
 {
     /**
-     * Deserializes an object from a binary stream.
-     * The stream is passed by reference and should be advanced by the method.
+     * Deserializes an object from a binary stream using an offset.
      *
-     * @param string $stream
+     * @param string $__payload The full binary data.
+     * @param int    $__offset  Current read position (passed by reference).
      * @return static
      */
-    public static function deserialize(string &$stream): static;
+    public static function deserialize(string $__payload, int &$__offset): static;
 }

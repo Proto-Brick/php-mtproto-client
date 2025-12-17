@@ -104,7 +104,7 @@ class AuthKeyCreator
         $this->transport->send($request)->await();
 
         $prefixBytes = $this->transport->receive(4)->await();
-        $lengthOrError = Deserializer::int32($prefixBytes);
+        $lengthOrError = unpack('V', $prefixBytes)[1];
 
         if ($lengthOrError <= 0) {
             throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
@@ -126,7 +126,8 @@ class AuthKeyCreator
         $tlObjectPayload = substr($responsePayload, 20);
 
         // 9. Десериализуем TL-объект `resPQ` в PHP-массив.
-        $deserialized = Deserializer::deserializeResPQ($tlObjectPayload);
+        $offset = 0;
+        $deserialized = Deserializer::deserializeResPQ($tlObjectPayload, $offset);
 
         // 10. Финальная проверка безопасности: nonce в ответе должен совпадать с тем, что мы отправили.
         // Это защищает от атак повторного воспроизведения (replay attacks).
@@ -194,7 +195,7 @@ class AuthKeyCreator
         $this->transport->send($request)->await();
 
         $prefixBytes = $this->transport->receive(4)->await();
-        $lengthOrError = Deserializer::int32($prefixBytes);
+        $lengthOrError = unpack('V', $prefixBytes)[1];
 
         if ($lengthOrError <= 0) {
             throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
@@ -206,7 +207,8 @@ class AuthKeyCreator
         // Снова пропускаем заголовок
         $responsePayload = substr($responsePayload, 20);
 
-        $serverDhData = Deserializer::deserializeServerDhParamsOk($responsePayload);
+        $offset = 0;
+        $serverDhData = Deserializer::deserializeServerDhParamsOk($responsePayload, $offset);
 
         if ($serverDhData['nonce'] !== $resPQData['nonce']) {
             throw new \RuntimeException("Invalid nonce in Server_DH_Params response.");
@@ -280,7 +282,6 @@ class AuthKeyCreator
         $this->session->save($authKey);
         echo "Initial server_salt calculated and set.\n";
 
-        // Этап 4.5: Все проверки пройдены, возвращаем ключ
         return $authKey;
     }
 
@@ -318,9 +319,9 @@ class AuthKeyCreator
 
         // Десериализуем, чтобы узнать фактическую длину данных без паддинга
         $streamForParsing = $innerDataWithPadding;
-        $dhInnerData = Deserializer::deserializeServerDhInnerData($streamForParsing);
-        $actualDataLength = \strlen($innerDataWithPadding) - \strlen($streamForParsing);
-        $actualData = substr($innerDataWithPadding, 0, $actualDataLength);
+        $offset = 0;
+        $dhInnerData = Deserializer::deserializeServerDhInnerData($streamForParsing, $offset);
+        $actualData = substr($innerDataWithPadding, 0, $offset);
 
         if (hash('sha1', $actualData, true) !== $answerHash) {
             throw new \RuntimeException("SHA1 hash mismatch in server_DH_inner_data.");
@@ -409,7 +410,7 @@ class AuthKeyCreator
         $this->transport->send($request)->await();
 
         $prefixBytes = $this->transport->receive(4)->await();
-        $lengthOrError = Deserializer::int32($prefixBytes);
+        $lengthOrError = unpack('V', $prefixBytes)[1];
 
         if ($lengthOrError <= 0) {
             throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
@@ -430,11 +431,11 @@ class AuthKeyCreator
         $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
         $responsePayload = substr($responsePayload, 20); // Пропускаем заголовок
 
-        $finalConstructor = Deserializer::int32($responsePayload);
-
-        $nonceFromServer = Deserializer::raw128($responsePayload);
-        $serverNonceFromServer = Deserializer::raw128($responsePayload);
-        $newNonceHashFromServer = Deserializer::raw128($responsePayload);
+        $offset = 0;
+        $finalConstructor = Deserializer::int32($responsePayload, $offset);
+        $nonceFromServer = Deserializer::raw128($responsePayload, $offset);
+        $serverNonceFromServer = Deserializer::raw128($responsePayload, $offset);
+        $newNonceHashFromServer = Deserializer::raw128($responsePayload, $offset);
 
         if ($nonceFromServer !== $resPQData['nonce']) {
             throw new \RuntimeException("Final nonce mismatch.");

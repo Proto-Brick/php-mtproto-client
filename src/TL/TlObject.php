@@ -40,8 +40,9 @@ abstract class TlObject implements TlObjectInterface, Serializable, Deserializab
     abstract public function serialize(): string;
 
     /**
-     * @param string $stream
+     * @param string $payload
+     * @param int $offset
      * @return static
      */
-    abstract public static function deserialize(string &$stream): static;
+    abstract public static function deserialize(string $__payload, int &$__offset): static;
 }

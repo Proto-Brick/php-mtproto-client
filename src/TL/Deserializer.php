@@ -8,86 +8,116 @@ use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
 
 class Deserializer
 {
-    public static function peekInt32(string $stream): int
+    public static function peekInt32(string $payload, int $offset): int
     {
-        if (\strlen($stream) < 4) {
-            throw new \RuntimeException("Not enough data to peek int32");
-        }
-        return unpack('V', substr($stream, 0, 4))[1];
-    }
-
-    public static function deserializeBool(string &$payload): bool
-    {
-        $constructorId = self::consumeConstructor($payload);
-        if ($constructorId === 0x997275b5) { // boolTrue
-            return true;
-        }
-        if ($constructorId === 0xbc799737) { // boolFalse
-            return false;
-        }
-        throw new \RuntimeException("Expected bool, but got constructor " . dechex($constructorId));
-    }
-
-    public static function int32(string &$stream): int
-    {
-        // Распаковка как 32-bit беззнаковый little-endian integer
-        $val = unpack('V', substr($stream, 0, 4))[1];
-        $stream = substr($stream, 4);
-        return $val;
-    }
-
-    public static function int64(string &$stream): int
-    {
-        // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
-        $val = unpack('q', substr($stream, 0, 8))[1];
-        $stream = substr($stream, 8);
-        return $val;
-    }
-
-    public static function int128(string &$stream): string
-    {
-        $value_bin = substr($stream, 0, 16);
-        $stream = substr($stream, 16);
-        return strrev($value_bin); // Преобразует Little-Endian (из сети) в Big-Endian (для PHP)
-    }
-
-    public static function double(string &$stream): float
-    {
-        $value_bin = substr($stream, 0, 8);
-        $stream = substr($stream, 8);
-        return unpack('d', $value_bin)[1];
+//        if (!isset($payload[$offset + 3])) {
+//            throw new \RuntimeException("Not enough data to peek int32 at offset $offset");
+//        }
+        return unpack('V', $payload, $offset)[1];
     }
 
     /**
-     * НОВЫЙ МЕТОД: Читает 16 "сырых" байт и возвращает их как есть.
+     * Читает (потребляет) ID конструктора из потока.
      */
-    public static function raw128(string &$payload): string
+    public static function consumeConstructor(string $payload, int &$offset): int
     {
-        $value = substr($payload, 0, 16);
-        $payload = substr($payload, 16);
-        return $value; // Без strrev!
+        $val = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+        return $val;
     }
 
-    public static function bytes(string &$stream): string
+    public static function int32(string $payload, int &$offset): int
     {
-        $firstByte = \ord($stream[0]);
-        $stream = substr($stream, 1);
+//        if (!isset($payload[$offset + 3])) {
+//            throw new \RuntimeException("Not enough data for int32 at offset $offset");
+//        }
+        $val = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+        return $val;
+    }
+
+    public static function int64(string $payload, int &$offset): int
+    {
+//        if (!isset($payload[$offset + 7])) {
+//            throw new \RuntimeException("Not enough data for int64 at offset $offset");
+//        }
+        $val = unpack('q', $payload, $offset)[1];
+        $offset += 8;
+        return $val;
+    }
+
+    public static function int128(string $payload, int &$offset): string
+    {
+        $val = substr($payload, $offset, 16);
+//        if (strlen($val) !== 16) {
+//            throw new \RuntimeException("Not enough data for int128");
+//        }
+        $offset += 16;
+        return strrev($val); // Big-Endian conversion
+    }
+
+    public static function raw128(string $payload, int &$offset): string
+    {
+        $val = substr($payload, $offset, 16);
+//        if (strlen($val) !== 16) {
+//            throw new \RuntimeException("Not enough data for raw128");
+//        }
+        $offset += 16;
+        return $val;
+    }
+
+    public static function double(string $payload, int &$offset): float
+    {
+//        if (!isset($payload[$offset + 7])) {
+//            throw new \RuntimeException("Not enough data for double");
+//        }
+        $val = unpack('d', $payload, $offset)[1];
+        $offset += 8;
+        return $val;
+    }
+
+    public static function bool(string $payload, int &$offset): bool
+    {
+        $constructorId = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+
+        return match ($constructorId) {
+            0x997275b5 => true,  // boolTrue
+            0xbc799737 => false, // boolFalse
+            default => throw new \RuntimeException("Expected bool, got " . dechex($constructorId)),
+        };
+    }
+
+    public static function bytes(string $payload, int &$offset): string
+    {
+//        if (!isset($payload[$offset])) {
+//            throw new \RuntimeException("Unexpected end of stream reading bytes at $offset");
+//        }
+
+        $firstByte = ord($payload[$offset]);
 
         if ($firstByte <= 253) {
             $len = $firstByte;
-            $padding = (4 - (($len + 1) % 4)) % 4;
+            $offset++;
+            $padding = (4 - ($len + 1)) & 3;
         } else {
-            if ($firstByte === 254) {
-                $len = unpack('V', substr($stream, 0, 3) . "\x00")[1];
-                $stream = substr($stream, 3);
-                $padding = (4 - $len % 4) % 4;
-            } else {
-                throw new \RuntimeException("Invalid length prefix for TL-string: " . dechex($firstByte));
+            if ($firstByte !== 254) {
+                throw new \RuntimeException("Invalid length prefix at $offset: " . dechex($firstByte));
             }
+            // Читаем 3 байта длины (little endian)
+            $fullInt = unpack('V', $payload, $offset)[1];
+            $len = $fullInt >> 8;
+
+            $offset += 4;
+            $padding = (4 - $len) & 3;
         }
 
-        $data = substr($stream, 0, $len);
-        $stream = substr($stream, $len + $padding);
+        if (strlen($payload) < $offset + $len) {
+            throw new \RuntimeException("Not enough data for bytes content");
+        }
+
+        $data = substr($payload, $offset, $len);
+        $offset += $len + $padding;
 
         return $data;
     }
@@ -95,102 +125,106 @@ class Deserializer
     /**
      * Заглядывает в поток и читает ID конструктора, не изменяя поток.
      */
-    public static function peekConstructor(string $stream): int
+    public static function peekConstructor(string $payload, int $offset): int
     {
-        return self::peekInt32($stream);
-    }
-
-    /**
-     * Читает (потребляет) ID конструктора из потока.
-     */
-    public static function consumeConstructor(string &$stream): int
-    {
-        return self::int32($stream);
+        return unpack('V', $payload, $offset)[1];
     }
 
     /**
      * Десериализует вектор TL-объектов.
      * @param string $payload - Бинарная строка (передается по ссылке)
+     * @param int $offset
      * @param callable $itemDeserializer - Функция для десериализации одного элемента,
      *                                     например, [AbstractMessage::class, 'deserialize']
      * @return array
      */
-    public static function vectorOfObjects(string &$payload, callable $itemDeserializer): array
+    public static function vectorOfObjects(string $payload, int &$offset, callable $itemDeserializer): array
     {
-        if (self::int32($payload) !== 0x1cb5c415) {
-            throw new \RuntimeException('Invalid vector constructor ID');
-        }
+        $id = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+//        if ($id !== Constructors::VECTOR) {
+//            throw new \RuntimeException('Invalid vector constructor ID: ' . dechex($id));
+//        }
 
-        $count = self::int32($payload);
+        $count = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+
         $result = [];
 
         for ($i = 0; $i < $count; $i++) {
-//            var_dump(substr(bin2hex($payload), 0, 10));
-            $result[] = $itemDeserializer($payload);
+            $result[] = $itemDeserializer($payload, $offset);
         }
 
         return $result;
     }
 
-    public static function vectorOfInts(string &$payload): array
+    public static function vectorOfInts(string $payload, int &$offset): array
     {
-        if (self::int32($payload) !== 0x1cb5c415) {
-            throw new \RuntimeException('Invalid vector constructor for Vector<int>');
-        }
-        $count = self::int32($payload);
+        $id = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+
+//        if ($id !== 0x1cb5c415) {
+//            throw new \RuntimeException('Invalid vector constructor for Vector<int>');
+//        }
+
+        $count = unpack('V', $payload, $offset)[1];
+        $offset += 4;
 
         if ($count === 0) {
             return [];
         }
 
         $bytesNeeded = $count * 4;
+//        if (strlen($payload) < $offset + $bytesNeeded) {
+//            throw new \RuntimeException("Not enough bytes for vector of ints");
+//        }
 
-        if (strlen($payload) < $bytesNeeded) {
-            throw new \RuntimeException("Not enough bytes for vector of ints");
-        }
+        $data = substr($payload, $offset, $bytesNeeded);
+        $offset += $bytesNeeded;
 
-        $data = substr($payload, 0, $bytesNeeded);
-        $payload = substr($payload, $bytesNeeded);
-
-        // V* - распаковываем все как unsigned long (32 bit little endian)
-        // array_values нужен, так как unpack возвращает индексы с 1, а нам нужно с 0
         return array_values(unpack('V*', $data));
     }
 
-    public static function vectorOfLongs(string &$payload): array
+    public static function vectorOfLongs(string $payload, int &$offset): array
     {
-        if (self::int32($payload) !== 0x1cb5c415) {
-            throw new \RuntimeException('Invalid vector constructor for Vector<long>');
-        }
-        $count = self::int32($payload);
+        $id = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+//        if ($id !== 0x1cb5c415) {
+//            throw new \RuntimeException('Invalid vector constructor for Vector<long>');
+//        }
+
+        $count = unpack('V', $payload, $offset)[1];
+        $offset += 4;
 
         if ($count === 0) {
             return [];
         }
 
         $bytesNeeded = $count * 8;
+//        if (strlen($payload) < $offset + $bytesNeeded) {
+//            throw new \RuntimeException("Not enough bytes for vector of longs");
+//        }
 
-        if (strlen($payload) < $bytesNeeded) {
-            throw new \RuntimeException("Not enough bytes for vector of longs");
-        }
+        $data = substr($payload, $offset, $bytesNeeded);
+        $offset += $bytesNeeded;
 
-        $data = substr($payload, 0, $bytesNeeded);
-        $payload = substr($payload, $bytesNeeded);
-
-        // q* - распаковываем все как signed long long (64 bit little endian)
         return array_values(unpack('q*', $data));
     }
 
-    public static function vectorOfStrings(string &$payload): array
+    public static function vectorOfStrings(string $payload, int &$offset): array
     {
-        if (self::int32($payload) !== 0x1cb5c415) {
+        $id = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+        if ($id !== 0x1cb5c415) {
             throw new \RuntimeException('Invalid vector constructor for Vector<string>');
         }
-        $count = self::int32($payload);
+        $count = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+
         $result = [];
         for ($i = 0; $i < $count; $i++) {
-            $result[] = self::bytes($payload);
-        } // string и bytes десериализуются одинаково
+            $result[] = self::bytes($payload, $offset);
+        }
         return $result;
     }
 
@@ -198,179 +232,155 @@ class Deserializer
      * Десериализует сложный TL-тип JSONValue рекурсивно.
      * Умеет обрабатывать все современные JSON-конструкторы.
      */
-    public static function deserializeJsonValue(string &$stream): mixed
+    public static function deserializeJsonValue(string $payload, int &$offset): mixed
     {
-        // Заглядываем в поток, чтобы узнать, какой тип JSON-элемента нас ждет
-        $constructorId = self::peekInt32($stream);
+        $constructorId = unpack('V', $payload, $offset)[1];
 
         switch ($constructorId) {
-            case 0x3f6d7b68: // jsonNull#3f6d7b68 = JSONValue;
-                self::int32($stream); // "Съедаем" ID
+            case 0x3f6d7b68: // jsonNull
+                $offset += 4;
                 return null;
 
-            case 0xc7345e6a: // jsonBool#c7345e6a value:Bool = JSONValue;
-                self::int32($stream); // "Съедаем" ID
-                // Читаем значение типа Bool (которое тоже является TL-объектом)
-                $boolConstructor = self::int32($stream);
+            case 0xc7345e6a: // jsonBool
+                $offset += 4;
+                $boolConstructor = unpack('V', $payload, $offset)[1];
+                $offset += 4;
                 if ($boolConstructor === 0x997275b5) {
                     return true;
-                } // boolTrue
+                }
                 if ($boolConstructor === 0xbc799737) {
                     return false;
-                } // boolFalse
-                throw new \RuntimeException("Invalid constructor for Bool inside jsonBool");
-
-            case 0x2be0dfa4: // jsonNumber#2be0dfa4 value:double = JSONValue;
-                self::int32($stream); // "Съедаем" ID
-                return self::double($stream);
-
-                // --- ДОБАВЛЕНО: Обработка нового конструктора для строк ---
-            case 0xb71e767a: // jsonString#b71e767a value:string = JSONValue;
-                self::int32($stream); // "Съедаем" ID
-                return self::bytes($stream);
-
-            case 0xf7444763: // jsonArray#f7444763 value:vector<JSONValue> = JSONValue;
-                self::int32($stream); // "Съедаем" ID
-
-                // Это вектор<JSONValue>
-                if (self::int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
-                    throw new \RuntimeException('Invalid vector constructor in jsonArray');
                 }
-                $count = self::int32($stream);
+                throw new \RuntimeException("Invalid bool in json");
+
+            case 0x2be0dfa4: // jsonNumber
+                $offset += 4;
+                return self::double($payload, $offset);
+
+            case 0xb71e767a: // jsonString
+                $offset += 4;
+                return self::bytes($payload, $offset);
+
+            case 0xf7444763: // jsonArray
+                $offset += 4;
+                $vecId = unpack('V', $payload, $offset)[1];
+                $offset += 4;
+                if ($vecId !== 481674261) {
+                    throw new \RuntimeException('Invalid vector ID');
+                }
+
+                $count = unpack('V', $payload, $offset)[1];
+                $offset += 4;
                 $result = [];
                 for ($i = 0; $i < $count; $i++) {
-                    // Рекурсивно вызываем себя для каждого элемента массива
-                    $result[] = self::deserializeJsonValue($stream);
+                    $result[] = self::deserializeJsonValue($payload, $offset);
                 }
                 return $result;
 
-            case 0x99c1d49d: // jsonObject#99c1d49d value:vector<JSONObjectValue> = JSONValue;
-                self::int32($stream); // "Съедаем" ID
-
-                // Это вектор<JSONObjectValue>
-                if (self::int32($stream) !== 0x1cb5c415) { // Проверяем ID вектора
-                    throw new \RuntimeException('Invalid vector constructor in jsonObject');
+            case 0x99c1d49d: // jsonObject
+                $offset += 4;
+                $vecId = unpack('V', $payload, $offset)[1];
+                $offset += 4;
+                if ($vecId !== 481674261) {
+                    throw new \RuntimeException('Invalid vector ID');
                 }
-                $count = self::int32($stream);
+
+                $count = unpack('V', $payload, $offset)[1];
+                $offset += 4;
                 $result = [];
                 for ($i = 0; $i < $count; $i++) {
-                    // Десериализуем пару ключ-значение (JSONObjectValue)
-                    // jsonObjectValue#c0de1bd9 key:string value:JSONValue = JSONObjectValue;
-                    if (self::int32($stream) !== 0xc0de1bd9) {
-                        throw new \RuntimeException('Invalid constructor for JSONObjectValue');
+                    $objValId = unpack('V', $payload, $offset)[1];
+                    $offset += 4;
+                    if ($objValId !== 0xc0de1bd9) {
+                        throw new \RuntimeException('Invalid jsonObjectValue');
                     }
-                    $key = self::bytes($stream);
-                    // Рекурсивно вызываем себя для значения
-                    $value = self::deserializeJsonValue($stream);
+
+                    $key = self::bytes($payload, $offset);
+                    $value = self::deserializeJsonValue($payload, $offset);
                     $result[$key] = $value;
                 }
                 return $result;
 
-            case 0x7d748d04: // dataJSON#7d748d04 data:string = DataJSON; (псевдоним для JSONValue)
-                self::int32($stream); // "Съедаем" ID
-                $data = self::bytes($stream);
-                return json_decode($data, true) ?: []; // Парсим строку как JSON
+            case 0x7d748d04: // dataJSON
+                $offset += 4;
+                $data = self::bytes($payload, $offset);
+                return json_decode($data, true) ?: [];
 
             default:
                 throw new \RuntimeException('Unknown JSONValue constructor: ' . dechex($constructorId));
         }
     }
 
-    public static function deserializeDataJSON(string &$stream): array
+    public static function deserializeDataJSON(string $payload, int &$offset): array
     {
-        return json_decode(self::bytes($stream), true) ?: [];
+        return json_decode(self::bytes($payload, $offset), true) ?: [];
     }
 
-    public static function deserializeResPQ(string &$stream): array
+    public static function deserializeResPQ(string $payload, int &$offset): array
     {
-        $constructor = self::int32($stream);
+        $constructor = self::int32($payload, $offset);
         if ($constructor !== 0x05162463) {
-            throw new \RuntimeException("Expected resPQ constructor, but got " . dechex($constructor));
+            throw new \RuntimeException("Expected resPQ constructor");
         }
 
-        $nonce = self::raw128($stream);
-        $server_nonce = self::raw128($stream);
-        $pq = self::bytes($stream);
-
-        $vector_constructor = self::int32($stream);
-        if ($vector_constructor !== 0x1cb5c415) {
-            throw new \RuntimeException(
-                "Expected vector constructor, but got " . dechex($vector_constructor) . ". Stream state: " . bin2hex(
-                    $stream,
-                ),
-            );
-        }
-
-        $count = self::int32($stream);
-        $fingerprints = [];
-        for ($i = 0; $i < $count; $i++) {
-            $fingerprints[] = self::int64($stream);
-        }
+        $nonce = self::raw128($payload, $offset);
+        $server_nonce = self::raw128($payload, $offset);
+        $pq = self::bytes($payload, $offset);
 
         return [
             'nonce' => $nonce,
             'server_nonce' => $server_nonce,
             'pq' => $pq,
-            'fingerprints' => $fingerprints,
+            'fingerprints' => self::vectorOfLongs($payload, $offset),
         ];
     }
 
     /**
      * Десериализует ответ server_DH_params_ok.
-     * @param string $stream
+     * @param string $payload
+     * @param int $offset
      * @return array
      */
-    public static function deserializeServerDhParamsOk(string &$stream): array
+    public static function deserializeServerDhParamsOk(string $payload, int &$offset): array
     {
-        $constructor = self::int32($stream);
-        // Конструктор для server_DH_params_ok = 0xd0e8075c
+        $constructor = self::int32($payload, $offset);
         if ($constructor !== 0xd0e8075c) {
             throw new \RuntimeException("Expected server_DH_params_ok constructor, but got " . dechex($constructor));
         }
 
-        // Читаем поля в том порядке, в котором они идут в схеме
-        $nonce = self::raw128($stream);
-        $server_nonce = self::raw128($stream);
-        $encrypted_answer = self::bytes($stream);
-
         return [
-            'nonce' => $nonce,
-            'server_nonce' => $server_nonce,
-            'encrypted_answer' => $encrypted_answer,
+            'nonce' => self::raw128($payload, $offset),
+            'server_nonce' => self::raw128($payload, $offset),
+            'encrypted_answer' => self::bytes($payload, $offset),
         ];
     }
 
-    public static function deserializeServerDhInnerData(string &$stream): array
+    public static function deserializeServerDhInnerData(string $payload, int &$offset): array
     {
-        $constructor = self::int32($stream);
+        $constructor = self::int32($payload, $offset);
         if ($constructor !== 0xb5890dba) {
-            throw new \RuntimeException("Invalid constructor in DH answer: " . dechex($constructor));
+            throw new \RuntimeException("Invalid constructor in DH answer");
         }
-        $nonce = self::raw128($stream);
-        $server_nonce = self::raw128($stream);
-        $g = self::int32($stream);
-        $dh_prime = self::bytes($stream);
-        $g_a = self::bytes($stream);
-        $server_time = self::int32($stream);
 
         return [
-            'nonce' => $nonce,
-            'server_nonce' => $server_nonce,
-            'g' => $g,
-            'dh_prime' => $dh_prime,
-            'g_a' => $g_a,
-            'server_time' => $server_time,
+            'nonce' => self::raw128($payload, $offset),
+            'server_nonce' => self::raw128($payload, $offset),
+            'g' => self::int32($payload, $offset),
+            'dh_prime' => self::bytes($payload, $offset),
+            'g_a' => self::bytes($payload, $offset),
+            'server_time' => self::int32($payload, $offset),
         ];
     }
 
-    public static function deserializeGzipPacked(string &$stream): string
+
+    public static function deserializeGzipPacked(string $payload, int &$offset): string
     {
-        $constructor = self::int32($stream);
-        if ($constructor !== 0x3072cfa1) { // gzip_packed
+        $constructor = self::int32($payload, $offset);
+        if ($constructor !== 0x3072cfa1) {
             throw new \RuntimeException("Expected gzip_packed constructor, but got " . dechex($constructor));
         }
 
-        $packed_data = self::bytes($stream);
+        $packed_data = self::bytes($payload, $offset);
         $unpacked_data = gzdecode($packed_data);
 
         if ($unpacked_data === false) {
@@ -387,59 +397,45 @@ class Deserializer
      * dcOption#18b7a10d flags:# id:int ip_address:string port:int secret:flags.10?bytes = DcOption;
      * (В новой схеме могут быть доп. флаги, но базовые поля те же)
      *
-     * @param string $stream
+     * @param string $payload
+     * @param int $offset
      * @return array
      */
-    public static function deserializeDcOption(string &$stream): array
+    public static function deserializeDcOption(string $payload, int &$offset): array
     {
-        // В новой JSON-схеме ID конструктора 414687501, что равно 0x18b7a10d
-        $constructor = self::int32($stream);
+        $constructor = self::int32($payload, $offset);
         if ($constructor !== 0x18b7a10d) {
-            throw new \RuntimeException("Expected dcOption constructor (0x18b7a10d), but got " . dechex($constructor));
+            throw new \RuntimeException("Expected dcOption constructor, but got " . dechex($constructor));
         }
 
-        $flags = self::int32($stream);
-        $id = self::int32($stream);
-        $ip_address = self::bytes($stream);
-        $port = self::int32($stream);
-
-        $secret = null;
-        // Поле 'secret' присутствует, если установлен 10-й бит (2^10 = 1024)
-        if ($flags & (1 << 10)) {
-            $secret = self::bytes($stream);
-        }
+        $flags = self::int32($payload, $offset);
 
         return [
-            '_' => 'dcOption', // Добавляем имя типа для удобства
-            'id' => $id,
-            'ip_address' => $ip_address,
-            'port' => $port,
-            'secret' => $secret,
-            'flags' => $flags, // Сохраняем флаги для отладки
+            '_' => 'dcOption',
+            'id' => self::int32($payload, $offset),
+            'ip_address' => self::bytes($payload, $offset),
+            'port' => self::int32($payload, $offset),
+            'secret' => ($flags & (1 << 10)) ? self::bytes($payload, $offset) : null,
+            'flags' => $flags,
         ];
     }
 
     /**
      * Десериализует bad_server_salt.
      */
-    public static function deserializeBadServerSalt(string &$stream): array
+    public static function deserializeBadServerSalt(string $payload, int &$offset): array
     {
-        $constructor = self::int32($stream);
+        $constructor = self::int32($payload, $offset);
         if ($constructor !== 0xedab447b) {
-            throw new \RuntimeException("Expected bad_server_salt constructor, but got " . dechex($constructor));
+            throw new \RuntimeException("Expected bad_server_salt");
         }
-
-        $bad_msg_id = self::int64($stream);
-        $bad_msg_seqno = self::int32($stream);
-        $error_code = self::int32($stream);
-        $new_server_salt = self::int64($stream);
 
         return [
             '_' => 'bad_server_salt',
-            'bad_msg_id' => $bad_msg_id,
-            'bad_msg_seqno' => $bad_msg_seqno,
-            'error_code' => $error_code,
-            'new_server_salt' => $new_server_salt,
+            'bad_msg_id' => self::int64($payload, $offset),
+            'bad_msg_seqno' => self::int32($payload, $offset),
+            'error_code' => self::int32($payload, $offset),
+            'new_server_salt' => self::int64($payload, $offset),
         ];
     }
 
@@ -448,117 +444,96 @@ class Deserializer
      * Точно соответствует схеме:
      * config#cc1a241e flags:# ... = Config;
      *
-     * @param string $stream
+     * @param string $payload
+     * @param int $offset
      * @return array
      */
-    public static function deserializeConfig(string &$stream): array
+    public static function deserializeConfig(string $payload, int &$offset): array
     {
-        // ID конструктора -870702050 (signed int32) соответствует 0xcc1a241e (unsigned)
-        $constructor = self::int32($stream);
+        $constructor = self::int32($payload, $offset);
         if ($constructor !== 0xcc1a241e) {
-            throw new \RuntimeException("Expected config constructor (0xcc1a241e), but got " . dechex($constructor));
+            throw new \RuntimeException("Expected config constructor");
         }
 
-        $config = ['_' => 'config']; // Начинаем собирать результат
+        $flags = self::int32($payload, $offset);
 
-        $flags = self::int32($stream);
-        $config['flags'] = $flags;
+        $config = [
+            '_' => 'config',
+            'flags' => $flags,
+            'date' => self::int32($payload, $offset),
+            'expires' => self::int32($payload, $offset),
+            'test_mode' => self::bool($payload, $offset), // Используем bool() т.к. там может быть boolTrue/False
+            'this_dc' => self::int32($payload, $offset),
+        ];
 
-        // --- Безусловные поля (всегда присутствуют) ---
-        $config['date'] = self::int32($stream);
-        $config['expires'] = self::int32($stream);
+        // Вектор DcOption
+        // Инлайним логику вектора для скорости
+        $vecId = unpack('V', $payload, $offset)[1];
+        $offset += 4;
+        $count = unpack('V', $payload, $offset)[1];
+        $offset += 4;
 
-        $test_mode_constructor = self::int32($stream);
-        $config['test_mode'] = ($test_mode_constructor === 0x997275b5); // boolTrue
-
-        $config['this_dc'] = self::int32($stream);
-
-        // --- Вектор DcOption ---
-        $vector_constructor = self::int32($stream);
-        if ($vector_constructor !== 0x1cb5c415) {
-            throw new \RuntimeException("Expected vector constructor for dc_options, but got " . dechex($vector_constructor));
-        }
-        $dc_options_count = self::int32($stream);
         $dc_options = [];
-        for ($i = 0; $i < $dc_options_count; $i++) {
-            $dc_options[] = self::deserializeDcOption($stream);
+        for ($i = 0; $i < $count; $i++) {
+            $dc_options[] = self::deserializeDcOption($payload, $offset);
         }
         $config['dc_options'] = $dc_options;
 
-        // --- Остальные безусловные поля (согласно схеме) ---
-        $config['dc_txt_domain_name'] = self::bytes($stream);
-        $config['chat_size_max'] = self::int32($stream);
-        $config['megagroup_size_max'] = self::int32($stream);
-        $config['forwarded_count_max'] = self::int32($stream);
-        $config['online_update_period_ms'] = self::int32($stream);
-        $config['offline_blur_timeout_ms'] = self::int32($stream);
-        $config['offline_idle_timeout_ms'] = self::int32($stream);
-        $config['online_cloud_timeout_ms'] = self::int32($stream);
-        $config['notify_cloud_delay_ms'] = self::int32($stream);
-        $config['notify_default_delay_ms'] = self::int32($stream);
-        $config['push_chat_period_ms'] = self::int32($stream);
-        $config['push_chat_limit'] = self::int32($stream);
-        $config['edit_time_limit'] = self::int32($stream);
-        $config['revoke_time_limit'] = self::int32($stream);
-        $config['revoke_pm_time_limit'] = self::int32($stream);
-        $config['rating_e_decay'] = self::int32($stream);
-        $config['stickers_recent_limit'] = self::int32($stream);
-        $config['channels_read_media_period'] = self::int32($stream);
+        $config['dc_txt_domain_name'] = self::bytes($payload, $offset);
+        $config['chat_size_max'] = self::int32($payload, $offset);
+        $config['megagroup_size_max'] = self::int32($payload, $offset);
+        $config['forwarded_count_max'] = self::int32($payload, $offset);
+        $config['online_update_period_ms'] = self::int32($payload, $offset);
+        $config['offline_blur_timeout_ms'] = self::int32($payload, $offset);
+        $config['offline_idle_timeout_ms'] = self::int32($payload, $offset);
+        $config['online_cloud_timeout_ms'] = self::int32($payload, $offset);
+        $config['notify_cloud_delay_ms'] = self::int32($payload, $offset);
+        $config['notify_default_delay_ms'] = self::int32($payload, $offset);
+        $config['push_chat_period_ms'] = self::int32($payload, $offset);
+        $config['push_chat_limit'] = self::int32($payload, $offset);
+        $config['edit_time_limit'] = self::int32($payload, $offset);
+        $config['revoke_time_limit'] = self::int32($payload, $offset);
+        $config['revoke_pm_time_limit'] = self::int32($payload, $offset);
+        $config['rating_e_decay'] = self::int32($payload, $offset);
+        $config['stickers_recent_limit'] = self::int32($payload, $offset);
+        $config['channels_read_media_period'] = self::int32($payload, $offset);
 
-        // --- Поля, зависящие от флагов ---
-        // (name: "tmp_sessions", type: "flags.0?int")
         if ($flags & (1 << 0)) {
-            $config['tmp_sessions'] = self::int32($stream);
+            $config['tmp_sessions'] = self::int32($payload, $offset);
         }
 
-        // (name: "call_receive_timeout_ms", type: "int") - это поле стало безусловным в новых схемах
-        $config['call_receive_timeout_ms'] = self::int32($stream);
-        $config['call_ring_timeout_ms'] = self::int32($stream);
-        $config['call_connect_timeout_ms'] = self::int32($stream);
-        $config['call_packet_timeout_ms'] = self::int32($stream);
+        $config['call_receive_timeout_ms'] = self::int32($payload, $offset);
+        $config['call_ring_timeout_ms'] = self::int32($payload, $offset);
+        $config['call_connect_timeout_ms'] = self::int32($payload, $offset);
+        $config['call_packet_timeout_ms'] = self::int32($payload, $offset);
 
-        $config['me_url_prefix'] = self::bytes($stream);
+        $config['me_url_prefix'] = self::bytes($payload, $offset);
 
-        // (name: "autoupdate_url_prefix", type: "flags.7?string")
         if ($flags & (1 << 7)) {
-            $config['autoupdate_url_prefix'] = self::bytes($stream);
+            $config['autoupdate_url_prefix'] = self::bytes($payload, $offset);
         }
-        // (name: "gif_search_username", type: "flags.9?string")
         if ($flags & (1 << 9)) {
-            $config['gif_search_username'] = self::bytes($stream);
+            $config['gif_search_username'] = self::bytes($payload, $offset);
         }
-        // (name: "venue_search_username", type: "flags.10?string")
         if ($flags & (1 << 10)) {
-            $config['venue_search_username'] = self::bytes($stream);
+            $config['venue_search_username'] = self::bytes($payload, $offset);
         }
-        // (name: "img_search_username", type: "flags.11?string")
         if ($flags & (1 << 11)) {
-            $config['img_search_username'] = self::bytes($stream);
+            $config['img_search_username'] = self::bytes($payload, $offset);
         }
-        // (name: "static_maps_provider", type: "flags.12?string")
         if ($flags & (1 << 12)) {
-            $config['static_maps_provider'] = self::bytes($stream);
+            $config['static_maps_provider'] = self::bytes($payload, $offset);
         }
 
-        $config['caption_length_max'] = self::int32($stream);
-        $config['message_length_max'] = self::int32($stream);
-        $config['webfile_dc_id'] = self::int32($stream);
+        $config['caption_length_max'] = self::int32($payload, $offset);
+        $config['message_length_max'] = self::int32($payload, $offset);
+        $config['webfile_dc_id'] = self::int32($payload, $offset);
 
-        // (name: "suggested_lang_code", type: "flags.2?string")
         if ($flags & (1 << 2)) {
-            $config['suggested_lang_code'] = self::bytes($stream);
+            $config['suggested_lang_code'] = self::bytes($payload, $offset);
+            $config['lang_pack_version'] = self::int32($payload, $offset);
+            $config['base_lang_pack_version'] = self::int32($payload, $offset);
         }
-        // (name: "lang_pack_version", type: "flags.2?int")
-        if ($flags & (1 << 2)) {
-            $config['lang_pack_version'] = self::int32($stream);
-        }
-        // (name: "base_lang_pack_version", type: "flags.2?int")
-        if ($flags & (1 << 2)) {
-            $config['base_lang_pack_version'] = self::int32($stream);
-        }
-
-        // (name: "reactions_default", type: "flags.15?Reaction") - более сложный тип, пока пропустим
-        // (name: "autologin_token", type: "flags.16?string") - тоже пропустим
 
         return $config;
     }
@@ -567,59 +542,51 @@ class Deserializer
      * Десериализует msg_container.
      * @return array Массив вложенных сообщений, каждое со своим телом (body).
      */
-    public static function deserializeMessageContainer(string &$stream): array
+    public static function deserializeMessageContainer(string $payload, int &$offset): array
     {
-        $constructor = self::int32($stream);
+        $constructor = self::int32($payload, $offset);
         if ($constructor !== Constructors::MSG_CONTAINER) {
-            throw new \RuntimeException("Expected msg_container constructor, but got " . dechex($constructor));
+            throw new \RuntimeException("Expected msg_container");
         }
 
-        $count = self::int32($stream); // Количество сообщений в контейнере
+        $count = self::int32($payload, $offset);
         $messages = [];
 
         for ($i = 0; $i < $count; $i++) {
-            // Парсим каждое вложенное сообщение
-            $msg_id = self::int64($stream); // В MTProto long - 64-бита, читаем как бинарную строку
-            $seqno = self::int32($stream);
-            $length = self::int32($stream);
+            $msg_id = self::int64($payload, $offset);
+            $seqno = self::int32($payload, $offset);
+            $length = self::int32($payload, $offset);
 
-            if (\strlen($stream) < $length) {
-                throw new \RuntimeException("Not enough data in stream to read message of length {$length}.");
+            if (strlen($payload) < $offset + $length) {
+                throw new \RuntimeException("Container message truncated");
             }
 
-            $body = substr($stream, 0, $length);
-            $stream = substr($stream, $length);
+            $body = substr($payload, $offset, $length);
+            $offset += $length;
 
             $messages[] = [
                 'msg_id' => $msg_id,
                 'seqno' => $seqno,
                 'length' => $length,
-                'body' => $body, // Тело сообщения - это "сырые" бинарные данные
+                'body' => $body,
             ];
         }
 
         return $messages;
     }
 
-    /**
-     * Десериализует new_session_created.
-     */
-    public static function deserializeNewSessionCreated(string &$stream): array
+    public static function deserializeNewSessionCreated(string $payload, int &$offset): array
     {
-        $constructor = self::int32($stream);
+        $constructor = self::int32($payload, $offset);
         if ($constructor !== 0x9ec20908) {
             throw new \RuntimeException("Expected new_session_created constructor, but got " . dechex($constructor));
         }
 
-        $first_msg_id = self::int64($stream);
-        $unique_id = self::int64($stream);
-        $server_salt = self::int64($stream);
-
         return [
             '_' => 'new_session_created',
-            'first_msg_id' => $first_msg_id,
-            'unique_id' => $unique_id,
-            'server_salt' => $server_salt,
+            'first_msg_id' => self::int64($payload, $offset),
+            'unique_id' => self::int64($payload, $offset),
+            'server_salt' => self::int64($payload, $offset),
         ];
     }
 }

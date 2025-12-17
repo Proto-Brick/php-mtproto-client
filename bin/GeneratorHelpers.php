@@ -347,7 +347,7 @@ trait GeneratorHelpers
             'DataJSON' => [
                 'php_type' => 'array',
                 'serialize_tpl' => 'Serializer::serializeDataJSON(%s)',
-                'deserialize_tpl' => 'Deserializer::deserializeDataJSON($stream)',
+                'deserialize_tpl' => 'Deserializer::deserializeDataJSON($__payload, $__offset)',
             ],
 
             // Обработчик для JSONValue: это сложный TL-объект, представляющий JSON.
@@ -355,7 +355,7 @@ trait GeneratorHelpers
             'JSONValue' => [
                 'php_type' => 'array', // warning: по спецификации, тут должен json объект, но на практике пока в схеме только array
                 'serialize_tpl' => 'Serializer::serializeJsonValue(%s)',
-                'deserialize_tpl' => 'Deserializer::deserializeJsonValue($stream)',
+                'deserialize_tpl' => 'Deserializer::deserializeJsonValue($__payload, $__offset)',
             ],
             default => null,
         };
@@ -436,7 +436,7 @@ trait GeneratorHelpers
             $serializeBody .= "        \$buffer .= Serializer::int32(\${$flagsName});\n";
 
             // Десериализация: чтение этого поля флагов
-            $deserializeBody .= "        \${$flagsName} = Deserializer::int32(\$stream);\n";
+            $deserializeBody .= "        \${$flagsName} = Deserializer::int32(\$__payload, \$__offset);\n";
         }
         if (!empty($flagDefinitions)) {
             $serializeBody .= "\n";
@@ -577,9 +577,9 @@ trait GeneratorHelpers
         if (!$isMethod) {
             $deserializeBody = '';
             if ($isConcreteOfAbstract) {
-                $deserializeBody = "        Deserializer::int32(\$stream); // Constructor ID\n";
+                $deserializeBody = "        Deserializer::int32(\$__payload, \$__offset); // Constructor ID\n";
             } else {
-                $deserializeBody = "        \$constructorId = Deserializer::int32(\$stream);\n" .
+                $deserializeBody = "        \$constructorId = Deserializer::int32(\$__payload, \$__offset);\n" .
                     "        if (\$constructorId !== self::CONSTRUCTOR_ID) {\n" .
                     "            throw new RuntimeException('Invalid constructor ID for ' . self::class);\n" .
                     "        }\n";
@@ -592,7 +592,7 @@ trait GeneratorHelpers
                 $localVars[$propName] = '$' . $propName;
 
                 if ($param['type'] === '#') {
-                    $deserializeBody .= "        \${$propName} = Deserializer::int32(\$stream);\n";
+                    $deserializeBody .= "        \${$propName} = Deserializer::int32(\$__payload, \$__offset);\n";
                     continue;
                 }
 
@@ -624,7 +624,7 @@ trait GeneratorHelpers
 
             $deserializeMethod = <<<PHP
     
-        public static function deserialize(string &\$stream): static
+        public static function deserialize(string \$__payload, &\$__offset): static
         {
     {$deserializeBody}
         }
@@ -742,37 +742,37 @@ trait GeneratorHelpers
         switch ($tlTypeLower) {
             case 'int':
             case 'int32':
-                return "Deserializer::int32(\$stream)";
+                return "Deserializer::int32(\$__payload, \$__offset)";
             case 'long':
             case 'int64':
-                return "Deserializer::int64(\$stream)";
-            case 'int128': return "Deserializer::int128(\$stream)";
-            case 'int256': return "Deserializer::int256(\$stream)";
-            case 'double': return "Deserializer::double(\$stream)";
+                return "Deserializer::int64(\$__payload, \$__offset)";
+            case 'int128': return "Deserializer::int128(\$__payload, \$__offset)";
+            case 'int256': return "Deserializer::int256(\$__payload, \$__offset)";
+            case 'double': return "Deserializer::double(\$__payload, \$__offset)";
             case 'string':
             case 'bytes':
-                return "Deserializer::bytes(\$stream)";
+                return "Deserializer::bytes(\$__payload, \$__offset)";
             case 'bool':
-                return "(Deserializer::int32(\$stream) === 0x997275b5)";
+                return "(Deserializer::int32(\$__payload, \$__offset) === 0x997275b5)";
             default:
                 if (str_starts_with($tlType, 'Vector<')) {
                     $innerType = substr($tlType, 7, -1);
 
                     if ($innerType === 'int') {
-                        return "Deserializer::vectorOfInts(\$stream)";
+                        return "Deserializer::vectorOfInts(\$__payload, \$__offset)";
                     }
                     if ($innerType === 'long') {
-                        return "Deserializer::vectorOfLongs(\$stream)";
+                        return "Deserializer::vectorOfLongs(\$__payload, \$__offset)";
                     }
                     if ($innerType === 'string' || $innerType === 'bytes') {
-                        return "Deserializer::vectorOfStrings(\$stream)";
+                        return "Deserializer::vectorOfStrings(\$__payload, \$__offset)";
                     }
 
                     // Рекурсивный вызов для векторов объектов. Это правильно.
                     $deserializationCode = $this->getDeserializationCodeForType($innerType, $currentClassName, $parentFqcn);
                     // Извлекаем имя класса (которое уже может быть алиасом)
                     $callableClass = explode('::', $deserializationCode)[0];
-                    return "Deserializer::vectorOfObjects(\$stream, [{$callableClass}::class, 'deserialize'])";
+                    return "Deserializer::vectorOfObjects(\$__payload, \$__offset, [{$callableClass}::class, 'deserialize'])";
                 }
 
                 // --- ИСПРАВЛЕННАЯ ЛОГИКА ДЛЯ ОДИНОЧНЫХ ОБЪЕКТОВ ---
@@ -785,7 +785,7 @@ trait GeneratorHelpers
                 $callableClass = $this->registerUse($fqcn, $currentClassName, $parentFqcn);
 
                 // 3. Возвращаем строку для десериализации.
-                return "{$callableClass}::deserialize(\$stream)";
+                return "{$callableClass}::deserialize(\$__payload, \$__offset)";
         }
     }
 
@@ -829,7 +829,7 @@ trait GeneratorHelpers
                 $dependencies[$childFqcn] = true;
             }
 
-            $matchArms[] = "            {$hexValue} => {$class}::deserialize(\$stream),";
+            $matchArms[] = "            {$hexValue} => {$class}::deserialize(\$__payload, \$__offset),";
         }
 
         // Убираем \ перед Exception в default-ветке
@@ -841,10 +841,10 @@ trait GeneratorHelpers
         $useBlock = $this->buildUseBlock($dependencies, $fullNamespace, null);
 
         $body = <<<PHP
-    public static function deserialize(string &\$stream): static
+    public static function deserialize(string \$__payload, int &\$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        \$constructorId = Deserializer::peekInt32(\$stream);
+        \$constructorId = Deserializer::peekInt32(\$__payload, \$__offset);
         
         return match (\$constructorId) {
 {$cases}
