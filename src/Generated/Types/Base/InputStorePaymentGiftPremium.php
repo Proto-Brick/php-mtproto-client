@@ -32,12 +32,12 @@ final class InputStorePaymentGiftPremium extends AbstractInputStorePaymentPurpos
         $buffer .= Serializer::int64($this->amount);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $userId = AbstractInputUser::deserialize($stream);
-        $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $userId = AbstractInputUser::deserialize($__payload, $__offset);
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $amount = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $userId,

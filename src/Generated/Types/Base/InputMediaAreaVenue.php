@@ -32,12 +32,12 @@ final class InputMediaAreaVenue extends AbstractMediaArea
         $buffer .= Serializer::bytes($this->resultId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $coordinates = MediaAreaCoordinates::deserialize($stream);
-        $queryId = Deserializer::int64($stream);
-        $resultId = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $coordinates = MediaAreaCoordinates::deserialize($__payload, $__offset);
+        $queryId = Deserializer::int64($__payload, $__offset);
+        $resultId = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $coordinates,

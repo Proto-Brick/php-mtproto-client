@@ -104,23 +104,23 @@ final class BotInfo extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $hasPreviewMedias = (($flags & (1 << 6)) !== 0) ? true : null;
-        $userId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $descriptionPhoto = (($flags & (1 << 4)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
-        $descriptionDocument = (($flags & (1 << 5)) !== 0) ? AbstractDocument::deserialize($stream) : null;
-        $commands = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfObjects($stream, [BotCommand::class, 'deserialize']) : null;
-        $menuButton = (($flags & (1 << 3)) !== 0) ? AbstractBotMenuButton::deserialize($stream) : null;
-        $privacyPolicyUrl = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
-        $appSettings = (($flags & (1 << 8)) !== 0) ? BotAppSettings::deserialize($stream) : null;
-        $verifierSettings = (($flags & (1 << 9)) !== 0) ? BotVerifierSettings::deserialize($stream) : null;
+        $userId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $descriptionPhoto = (($flags & (1 << 4)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
+        $descriptionDocument = (($flags & (1 << 5)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
+        $commands = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [BotCommand::class, 'deserialize']) : null;
+        $menuButton = (($flags & (1 << 3)) !== 0) ? AbstractBotMenuButton::deserialize($__payload, $__offset) : null;
+        $privacyPolicyUrl = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $appSettings = (($flags & (1 << 8)) !== 0) ? BotAppSettings::deserialize($__payload, $__offset) : null;
+        $verifierSettings = (($flags & (1 << 9)) !== 0) ? BotVerifierSettings::deserialize($__payload, $__offset) : null;
 
         return new self(
             $hasPreviewMedias,

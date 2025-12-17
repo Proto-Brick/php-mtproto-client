@@ -45,15 +45,15 @@ final class BotInlineMessageMediaContact extends AbstractBotInlineMessage
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $phoneNumber = Deserializer::bytes($stream);
-        $firstName = Deserializer::bytes($stream);
-        $lastName = Deserializer::bytes($stream);
-        $vcard = Deserializer::bytes($stream);
-        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $phoneNumber = Deserializer::bytes($__payload, $__offset);
+        $firstName = Deserializer::bytes($__payload, $__offset);
+        $lastName = Deserializer::bytes($__payload, $__offset);
+        $vcard = Deserializer::bytes($__payload, $__offset);
+        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($__payload, $__offset) : null;
 
         return new self(
             $phoneNumber,

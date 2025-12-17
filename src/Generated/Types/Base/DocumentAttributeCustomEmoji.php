@@ -41,14 +41,14 @@ final class DocumentAttributeCustomEmoji extends AbstractDocumentAttribute
         $buffer .= $this->stickerset->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $free = (($flags & (1 << 0)) !== 0) ? true : null;
         $textColor = (($flags & (1 << 1)) !== 0) ? true : null;
-        $alt = Deserializer::bytes($stream);
-        $stickerset = AbstractInputStickerSet::deserialize($stream);
+        $alt = Deserializer::bytes($__payload, $__offset);
+        $stickerset = AbstractInputStickerSet::deserialize($__payload, $__offset);
 
         return new self(
             $alt,

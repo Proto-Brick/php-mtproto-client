@@ -29,11 +29,11 @@ final class ChannelAdminLogEventActionChangePhoto extends AbstractChannelAdminLo
         $buffer .= $this->newPhoto->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $prevPhoto = AbstractPhoto::deserialize($stream);
-        $newPhoto = AbstractPhoto::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $prevPhoto = AbstractPhoto::deserialize($__payload, $__offset);
+        $newPhoto = AbstractPhoto::deserialize($__payload, $__offset);
 
         return new self(
             $prevPhoto,

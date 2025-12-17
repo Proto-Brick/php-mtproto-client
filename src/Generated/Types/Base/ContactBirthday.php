@@ -31,14 +31,14 @@ final class ContactBirthday extends TlObject
         $buffer .= $this->birthday->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $contactId = Deserializer::int64($stream);
-        $birthday = Birthday::deserialize($stream);
+        $contactId = Deserializer::int64($__payload, $__offset);
+        $birthday = Birthday::deserialize($__payload, $__offset);
 
         return new self(
             $contactId,

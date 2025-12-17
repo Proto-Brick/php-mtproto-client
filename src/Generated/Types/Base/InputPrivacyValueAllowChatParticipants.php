@@ -26,10 +26,10 @@ final class InputPrivacyValueAllowChatParticipants extends AbstractInputPrivacyR
         $buffer .= Serializer::vectorOfLongs($this->chats);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $chats = Deserializer::vectorOfLongs($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $chats = Deserializer::vectorOfLongs($__payload, $__offset);
 
         return new self(
             $chats

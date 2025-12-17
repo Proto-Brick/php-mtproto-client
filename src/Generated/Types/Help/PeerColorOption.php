@@ -67,19 +67,19 @@ final class PeerColorOption extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $hidden = (($flags & (1 << 0)) !== 0) ? true : null;
-        $colorId = Deserializer::int32($stream);
-        $colors = (($flags & (1 << 1)) !== 0) ? AbstractPeerColorSet::deserialize($stream) : null;
-        $darkColors = (($flags & (1 << 2)) !== 0) ? AbstractPeerColorSet::deserialize($stream) : null;
-        $channelMinLevel = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $groupMinLevel = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $colorId = Deserializer::int32($__payload, $__offset);
+        $colors = (($flags & (1 << 1)) !== 0) ? AbstractPeerColorSet::deserialize($__payload, $__offset) : null;
+        $darkColors = (($flags & (1 << 2)) !== 0) ? AbstractPeerColorSet::deserialize($__payload, $__offset) : null;
+        $channelMinLevel = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $groupMinLevel = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $colorId,

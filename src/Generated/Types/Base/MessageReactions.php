@@ -61,19 +61,19 @@ final class MessageReactions extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $min = (($flags & (1 << 0)) !== 0) ? true : null;
         $canSeeList = (($flags & (1 << 2)) !== 0) ? true : null;
         $reactionsAsTags = (($flags & (1 << 3)) !== 0) ? true : null;
-        $results = Deserializer::vectorOfObjects($stream, [ReactionCount::class, 'deserialize']);
-        $recentReactions = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [MessagePeerReaction::class, 'deserialize']) : null;
-        $topReactors = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [MessageReactor::class, 'deserialize']) : null;
+        $results = Deserializer::vectorOfObjects($__payload, $__offset, [ReactionCount::class, 'deserialize']);
+        $recentReactions = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [MessagePeerReaction::class, 'deserialize']) : null;
+        $topReactors = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [MessageReactor::class, 'deserialize']) : null;
 
         return new self(
             $results,

@@ -65,19 +65,19 @@ final class WallPaper extends AbstractWallPaper
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int64($stream);
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $id = Deserializer::int64($__payload, $__offset);
+        $flags = Deserializer::int32($__payload, $__offset);
         $creator = (($flags & (1 << 0)) !== 0) ? true : null;
         $default_ = (($flags & (1 << 1)) !== 0) ? true : null;
         $pattern = (($flags & (1 << 3)) !== 0) ? true : null;
         $dark = (($flags & (1 << 4)) !== 0) ? true : null;
-        $accessHash = Deserializer::int64($stream);
-        $slug = Deserializer::bytes($stream);
-        $document = AbstractDocument::deserialize($stream);
-        $settings = (($flags & (1 << 2)) !== 0) ? WallPaperSettings::deserialize($stream) : null;
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $slug = Deserializer::bytes($__payload, $__offset);
+        $document = AbstractDocument::deserialize($__payload, $__offset);
+        $settings = (($flags & (1 << 2)) !== 0) ? WallPaperSettings::deserialize($__payload, $__offset) : null;
 
         return new self(
             $id,

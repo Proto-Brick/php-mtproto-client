@@ -41,12 +41,12 @@ final class ChannelAdminLogEventActionPinTopic extends AbstractChannelAdminLogEv
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $prevTopic = (($flags & (1 << 0)) !== 0) ? AbstractForumTopic::deserialize($stream) : null;
-        $newTopic = (($flags & (1 << 1)) !== 0) ? AbstractForumTopic::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $prevTopic = (($flags & (1 << 0)) !== 0) ? AbstractForumTopic::deserialize($__payload, $__offset) : null;
+        $newTopic = (($flags & (1 << 1)) !== 0) ? AbstractForumTopic::deserialize($__payload, $__offset) : null;
 
         return new self(
             $prevTopic,

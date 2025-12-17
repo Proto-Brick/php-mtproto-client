@@ -30,11 +30,11 @@ final class Reactions extends AbstractReactions
         $buffer .= Serializer::vectorOfObjects($this->reactions);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
-        $reactions = Deserializer::vectorOfObjects($stream, [AbstractReaction::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int64($__payload, $__offset);
+        $reactions = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractReaction::class, 'deserialize']);
 
         return new self(
             $hash,

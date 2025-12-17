@@ -39,13 +39,13 @@ final class ChannelParticipantCreator extends AbstractChannelParticipant
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
-        $adminRights = ChatAdminRights::deserialize($stream);
-        $rank = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $adminRights = ChatAdminRights::deserialize($__payload, $__offset);
+        $rank = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $userId,

@@ -56,16 +56,16 @@ final class ReplyKeyboardMarkup extends AbstractReplyMarkup
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $resize = (($flags & (1 << 0)) !== 0) ? true : null;
         $singleUse = (($flags & (1 << 1)) !== 0) ? true : null;
         $selective = (($flags & (1 << 2)) !== 0) ? true : null;
         $persistent = (($flags & (1 << 4)) !== 0) ? true : null;
-        $rows = Deserializer::vectorOfObjects($stream, [KeyboardButtonRow::class, 'deserialize']);
-        $placeholder = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
+        $rows = Deserializer::vectorOfObjects($__payload, $__offset, [KeyboardButtonRow::class, 'deserialize']);
+        $placeholder = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $rows,

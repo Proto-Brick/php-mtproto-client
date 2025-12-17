@@ -29,11 +29,11 @@ final class PageBlockAuthorDate extends AbstractPageBlock
         $buffer .= Serializer::int32($this->publishedDate);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $author = AbstractRichText::deserialize($stream);
-        $publishedDate = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $author = AbstractRichText::deserialize($__payload, $__offset);
+        $publishedDate = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $author,

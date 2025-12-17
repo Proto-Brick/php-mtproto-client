@@ -62,16 +62,16 @@ final class GiveawayInfo extends AbstractGiveawayInfo
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $participating = (($flags & (1 << 0)) !== 0) ? true : null;
         $preparingResults = (($flags & (1 << 3)) !== 0) ? true : null;
-        $startDate = Deserializer::int32($stream);
-        $joinedTooEarlyDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $adminDisallowedChatId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;
-        $disallowedCountry = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
+        $startDate = Deserializer::int32($__payload, $__offset);
+        $joinedTooEarlyDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $adminDisallowedChatId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $disallowedCountry = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $startDate,

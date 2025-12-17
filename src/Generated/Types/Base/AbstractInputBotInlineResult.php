@@ -11,16 +11,16 @@ use RuntimeException;
  */
 abstract class AbstractInputBotInlineResult extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x88bf9319 => InputBotInlineResult::deserialize($stream),
-            0xa8d864a7 => InputBotInlineResultPhoto::deserialize($stream),
-            0xfff8fdc4 => InputBotInlineResultDocument::deserialize($stream),
-            0x4fa417f2 => InputBotInlineResultGame::deserialize($stream),
+            0x88bf9319 => InputBotInlineResult::deserialize($__payload, $__offset),
+            0xa8d864a7 => InputBotInlineResultPhoto::deserialize($__payload, $__offset),
+            0xfff8fdc4 => InputBotInlineResultDocument::deserialize($__payload, $__offset),
+            0x4fa417f2 => InputBotInlineResultGame::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type InputBotInlineResult. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

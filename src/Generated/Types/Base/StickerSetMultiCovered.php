@@ -29,11 +29,11 @@ final class StickerSetMultiCovered extends AbstractStickerSetCovered
         $buffer .= Serializer::vectorOfObjects($this->covers);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $set = StickerSet::deserialize($stream);
-        $covers = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $set = StickerSet::deserialize($__payload, $__offset);
+        $covers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
 
         return new self(
             $set,

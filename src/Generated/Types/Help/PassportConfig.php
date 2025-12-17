@@ -29,11 +29,11 @@ final class PassportConfig extends AbstractPassportConfig
         $buffer .= Serializer::serializeDataJSON($this->countriesLangs);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int32($stream);
-        $countriesLangs = Deserializer::deserializeDataJSON($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int32($__payload, $__offset);
+        $countriesLangs = Deserializer::deserializeDataJSON($__payload, $__offset);
 
         return new self(
             $hash,

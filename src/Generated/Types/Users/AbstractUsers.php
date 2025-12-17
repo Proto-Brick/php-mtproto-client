@@ -11,14 +11,14 @@ use RuntimeException;
  */
 abstract class AbstractUsers extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x62d706b8 => Users::deserialize($stream),
-            0x315a4974 => UsersSlice::deserialize($stream),
+            0x62d706b8 => Users::deserialize($__payload, $__offset),
+            0x315a4974 => UsersSlice::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type users.Users. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

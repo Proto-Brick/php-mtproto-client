@@ -31,14 +31,14 @@ final class TopPeer extends TlObject
         $buffer .= pack('d', $this->rating);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $peer = AbstractPeer::deserialize($stream);
-        $rating = Deserializer::double($stream);
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $rating = Deserializer::double($__payload, $__offset);
 
         return new self(
             $peer,

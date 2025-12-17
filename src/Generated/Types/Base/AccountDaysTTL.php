@@ -28,13 +28,13 @@ final class AccountDaysTTL extends TlObject
         $buffer .= Serializer::int32($this->days);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $days = Deserializer::int32($stream);
+        $days = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $days

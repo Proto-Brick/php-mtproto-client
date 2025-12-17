@@ -32,12 +32,12 @@ final class TextUrl extends AbstractRichText
         $buffer .= Serializer::int64($this->webpageId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $text = AbstractRichText::deserialize($stream);
-        $url = Deserializer::bytes($stream);
-        $webpageId = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $text = AbstractRichText::deserialize($__payload, $__offset);
+        $url = Deserializer::bytes($__payload, $__offset);
+        $webpageId = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $text,

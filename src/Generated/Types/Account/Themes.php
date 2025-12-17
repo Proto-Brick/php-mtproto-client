@@ -30,11 +30,11 @@ final class Themes extends AbstractThemes
         $buffer .= Serializer::vectorOfObjects($this->themes);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
-        $themes = Deserializer::vectorOfObjects($stream, [Theme::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int64($__payload, $__offset);
+        $themes = Deserializer::vectorOfObjects($__payload, $__offset, [Theme::class, 'deserialize']);
 
         return new self(
             $hash,

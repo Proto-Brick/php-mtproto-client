@@ -29,11 +29,11 @@ final class RecentMeUrlStickerSet extends AbstractRecentMeUrl
         $buffer .= $this->set->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $url = Deserializer::bytes($stream);
-        $set = AbstractStickerSetCovered::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $url = Deserializer::bytes($__payload, $__offset);
+        $set = AbstractStickerSetCovered::deserialize($__payload, $__offset);
 
         return new self(
             $url,

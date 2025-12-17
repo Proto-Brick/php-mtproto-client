@@ -57,14 +57,14 @@ final class InputChatUploadedPhoto extends AbstractInputChatPhoto
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $file = (($flags & (1 << 0)) !== 0) ? AbstractInputFile::deserialize($stream) : null;
-        $video = (($flags & (1 << 1)) !== 0) ? AbstractInputFile::deserialize($stream) : null;
-        $videoStartTs = (($flags & (1 << 2)) !== 0) ? Deserializer::double($stream) : null;
-        $videoEmojiMarkup = (($flags & (1 << 3)) !== 0) ? AbstractVideoSize::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $file = (($flags & (1 << 0)) !== 0) ? AbstractInputFile::deserialize($__payload, $__offset) : null;
+        $video = (($flags & (1 << 1)) !== 0) ? AbstractInputFile::deserialize($__payload, $__offset) : null;
+        $videoStartTs = (($flags & (1 << 2)) !== 0) ? Deserializer::double($__payload, $__offset) : null;
+        $videoEmojiMarkup = (($flags & (1 << 3)) !== 0) ? AbstractVideoSize::deserialize($__payload, $__offset) : null;
 
         return new self(
             $file,

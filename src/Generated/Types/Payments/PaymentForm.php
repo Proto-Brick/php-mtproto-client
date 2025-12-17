@@ -113,26 +113,26 @@ final class PaymentForm extends AbstractPaymentForm
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $canSaveCredentials = (($flags & (1 << 2)) !== 0) ? true : null;
         $passwordMissing = (($flags & (1 << 3)) !== 0) ? true : null;
-        $formId = Deserializer::int64($stream);
-        $botId = Deserializer::int64($stream);
-        $title = Deserializer::bytes($stream);
-        $description = Deserializer::bytes($stream);
-        $photo = (($flags & (1 << 5)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
-        $invoice = Invoice::deserialize($stream);
-        $providerId = Deserializer::int64($stream);
-        $url = Deserializer::bytes($stream);
-        $nativeProvider = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
-        $nativeParams = (($flags & (1 << 4)) !== 0) ? Deserializer::deserializeDataJSON($stream) : null;
-        $additionalMethods = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfObjects($stream, [PaymentFormMethod::class, 'deserialize']) : null;
-        $savedInfo = (($flags & (1 << 0)) !== 0) ? PaymentRequestedInfo::deserialize($stream) : null;
-        $savedCredentials = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [PaymentSavedCredentials::class, 'deserialize']) : null;
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $formId = Deserializer::int64($__payload, $__offset);
+        $botId = Deserializer::int64($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $description = Deserializer::bytes($__payload, $__offset);
+        $photo = (($flags & (1 << 5)) !== 0) ? AbstractWebDocument::deserialize($__payload, $__offset) : null;
+        $invoice = Invoice::deserialize($__payload, $__offset);
+        $providerId = Deserializer::int64($__payload, $__offset);
+        $url = Deserializer::bytes($__payload, $__offset);
+        $nativeProvider = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $nativeParams = (($flags & (1 << 4)) !== 0) ? Deserializer::deserializeDataJSON($__payload, $__offset) : null;
+        $additionalMethods = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [PaymentFormMethod::class, 'deserialize']) : null;
+        $savedInfo = (($flags & (1 << 0)) !== 0) ? PaymentRequestedInfo::deserialize($__payload, $__offset) : null;
+        $savedCredentials = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [PaymentSavedCredentials::class, 'deserialize']) : null;
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $formId,

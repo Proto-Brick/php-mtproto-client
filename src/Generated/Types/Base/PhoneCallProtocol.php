@@ -46,18 +46,18 @@ final class PhoneCallProtocol extends TlObject
         $buffer .= Serializer::vectorOfStrings($this->libraryVersions);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $udpP2p = (($flags & (1 << 0)) !== 0) ? true : null;
         $udpReflector = (($flags & (1 << 1)) !== 0) ? true : null;
-        $minLayer = Deserializer::int32($stream);
-        $maxLayer = Deserializer::int32($stream);
-        $libraryVersions = Deserializer::vectorOfStrings($stream);
+        $minLayer = Deserializer::int32($__payload, $__offset);
+        $maxLayer = Deserializer::int32($__payload, $__offset);
+        $libraryVersions = Deserializer::vectorOfStrings($__payload, $__offset);
 
         return new self(
             $minLayer,

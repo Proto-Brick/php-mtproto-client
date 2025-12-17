@@ -29,11 +29,11 @@ final class InputInvoiceBusinessBotTransferStars extends AbstractInputInvoice
         $buffer .= Serializer::int64($this->stars);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $bot = AbstractInputUser::deserialize($stream);
-        $stars = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $bot = AbstractInputUser::deserialize($__payload, $__offset);
+        $stars = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $bot,

@@ -11,15 +11,15 @@ use RuntimeException;
  */
 abstract class AbstractStoryReaction extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x6090d6d5 => StoryReaction::deserialize($stream),
-            0xbbab2643 => StoryReactionPublicForward::deserialize($stream),
-            0xcfcd0f13 => StoryReactionPublicRepost::deserialize($stream),
+            0x6090d6d5 => StoryReaction::deserialize($__payload, $__offset),
+            0xbbab2643 => StoryReactionPublicForward::deserialize($__payload, $__offset),
+            0xcfcd0f13 => StoryReactionPublicRepost::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type StoryReaction. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

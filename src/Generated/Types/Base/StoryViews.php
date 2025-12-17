@@ -67,19 +67,19 @@ final class StoryViews extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $hasViewers = (($flags & (1 << 1)) !== 0) ? true : null;
-        $viewsCount = Deserializer::int32($stream);
-        $forwardsCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $reactions = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [ReactionCount::class, 'deserialize']) : null;
-        $reactionsCount = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $recentViewers = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfLongs($stream) : null;
+        $viewsCount = Deserializer::int32($__payload, $__offset);
+        $forwardsCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $reactions = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [ReactionCount::class, 'deserialize']) : null;
+        $reactionsCount = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $recentViewers = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfLongs($__payload, $__offset) : null;
 
         return new self(
             $viewsCount,

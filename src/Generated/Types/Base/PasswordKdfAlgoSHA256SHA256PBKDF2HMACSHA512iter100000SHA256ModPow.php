@@ -35,13 +35,13 @@ final class PasswordKdfAlgoSHA256SHA256PBKDF2HMACSHA512iter100000SHA256ModPow ex
         $buffer .= Serializer::bytes($this->p);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $salt1 = Deserializer::bytes($stream);
-        $salt2 = Deserializer::bytes($stream);
-        $g = Deserializer::int32($stream);
-        $p = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $salt1 = Deserializer::bytes($__payload, $__offset);
+        $salt2 = Deserializer::bytes($__payload, $__offset);
+        $g = Deserializer::int32($__payload, $__offset);
+        $p = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $salt1,

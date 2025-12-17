@@ -112,23 +112,23 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $upgrade = (($flags & (1 << 0)) !== 0) ? true : null;
         $transferred = (($flags & (1 << 1)) !== 0) ? true : null;
         $saved = (($flags & (1 << 2)) !== 0) ? true : null;
         $refunded = (($flags & (1 << 5)) !== 0) ? true : null;
-        $gift = AbstractStarGift::deserialize($stream);
-        $canExportAt = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $transferStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
-        $fromId = (($flags & (1 << 6)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $peer = (($flags & (1 << 7)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $savedId = (($flags & (1 << 7)) !== 0) ? Deserializer::int64($stream) : null;
-        $resaleAmount = (($flags & (1 << 8)) !== 0) ? AbstractStarsAmount::deserialize($stream) : null;
-        $canTransferAt = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($stream) : null;
-        $canResellAt = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
+        $gift = AbstractStarGift::deserialize($__payload, $__offset);
+        $canExportAt = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $transferStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $fromId = (($flags & (1 << 6)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $peer = (($flags & (1 << 7)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $savedId = (($flags & (1 << 7)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $resaleAmount = (($flags & (1 << 8)) !== 0) ? AbstractStarsAmount::deserialize($__payload, $__offset) : null;
+        $canTransferAt = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $canResellAt = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $gift,

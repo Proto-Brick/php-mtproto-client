@@ -72,21 +72,21 @@ final class BotResults extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $gallery = (($flags & (1 << 0)) !== 0) ? true : null;
-        $queryId = Deserializer::int64($stream);
-        $nextOffset = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $switchPm = (($flags & (1 << 2)) !== 0) ? InlineBotSwitchPM::deserialize($stream) : null;
-        $switchWebview = (($flags & (1 << 3)) !== 0) ? InlineBotWebView::deserialize($stream) : null;
-        $results = Deserializer::vectorOfObjects($stream, [AbstractBotInlineResult::class, 'deserialize']);
-        $cacheTime = Deserializer::int32($stream);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $queryId = Deserializer::int64($__payload, $__offset);
+        $nextOffset = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $switchPm = (($flags & (1 << 2)) !== 0) ? InlineBotSwitchPM::deserialize($__payload, $__offset) : null;
+        $switchWebview = (($flags & (1 << 3)) !== 0) ? InlineBotWebView::deserialize($__payload, $__offset) : null;
+        $results = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractBotInlineResult::class, 'deserialize']);
+        $cacheTime = Deserializer::int32($__payload, $__offset);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $queryId,

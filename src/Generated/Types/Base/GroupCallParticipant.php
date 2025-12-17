@@ -134,13 +134,13 @@ final class GroupCallParticipant extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $muted = (($flags & (1 << 0)) !== 0) ? true : null;
         $left = (($flags & (1 << 1)) !== 0) ? true : null;
         $canSelfUnmute = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -151,15 +151,15 @@ final class GroupCallParticipant extends TlObject
         $volumeByAdmin = (($flags & (1 << 10)) !== 0) ? true : null;
         $self = (($flags & (1 << 12)) !== 0) ? true : null;
         $videoJoined = (($flags & (1 << 15)) !== 0) ? true : null;
-        $peer = AbstractPeer::deserialize($stream);
-        $date = Deserializer::int32($stream);
-        $activeDate = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $source = Deserializer::int32($stream);
-        $volume = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($stream) : null;
-        $about = (($flags & (1 << 11)) !== 0) ? Deserializer::bytes($stream) : null;
-        $raiseHandRating = (($flags & (1 << 13)) !== 0) ? Deserializer::int64($stream) : null;
-        $video = (($flags & (1 << 6)) !== 0) ? GroupCallParticipantVideo::deserialize($stream) : null;
-        $presentation = (($flags & (1 << 14)) !== 0) ? GroupCallParticipantVideo::deserialize($stream) : null;
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $activeDate = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $source = Deserializer::int32($__payload, $__offset);
+        $volume = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $about = (($flags & (1 << 11)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $raiseHandRating = (($flags & (1 << 13)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $video = (($flags & (1 << 6)) !== 0) ? GroupCallParticipantVideo::deserialize($__payload, $__offset) : null;
+        $presentation = (($flags & (1 << 14)) !== 0) ? GroupCallParticipantVideo::deserialize($__payload, $__offset) : null;
 
         return new self(
             $peer,

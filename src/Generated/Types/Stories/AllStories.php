@@ -52,17 +52,17 @@ final class AllStories extends AbstractAllStories
         $buffer .= $this->stealthMode->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $hasMore = (($flags & (1 << 0)) !== 0) ? true : null;
-        $count = Deserializer::int32($stream);
-        $state = Deserializer::bytes($stream);
-        $peerStories = Deserializer::vectorOfObjects($stream, [PeerStories::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $stealthMode = StoriesStealthMode::deserialize($stream);
+        $count = Deserializer::int32($__payload, $__offset);
+        $state = Deserializer::bytes($__payload, $__offset);
+        $peerStories = Deserializer::vectorOfObjects($__payload, $__offset, [PeerStories::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
+        $stealthMode = StoriesStealthMode::deserialize($__payload, $__offset);
 
         return new self(
             $count,

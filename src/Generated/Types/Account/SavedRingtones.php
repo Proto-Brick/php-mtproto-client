@@ -30,11 +30,11 @@ final class SavedRingtones extends AbstractSavedRingtones
         $buffer .= Serializer::vectorOfObjects($this->ringtones);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
-        $ringtones = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int64($__payload, $__offset);
+        $ringtones = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
 
         return new self(
             $hash,

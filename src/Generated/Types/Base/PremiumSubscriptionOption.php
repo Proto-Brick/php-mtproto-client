@@ -65,21 +65,21 @@ final class PremiumSubscriptionOption extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $current = (($flags & (1 << 1)) !== 0) ? true : null;
         $canPurchaseUpgrade = (($flags & (1 << 2)) !== 0) ? true : null;
-        $transaction = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $months = Deserializer::int32($stream);
-        $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
-        $botUrl = Deserializer::bytes($stream);
-        $storeProduct = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $transaction = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $months = Deserializer::int32($__payload, $__offset);
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $amount = Deserializer::int64($__payload, $__offset);
+        $botUrl = Deserializer::bytes($__payload, $__offset);
+        $storeProduct = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $months,

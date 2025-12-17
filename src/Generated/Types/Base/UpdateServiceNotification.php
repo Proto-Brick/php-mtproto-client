@@ -55,17 +55,17 @@ final class UpdateServiceNotification extends AbstractUpdate
         $buffer .= Serializer::vectorOfObjects($this->entities);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $popup = (($flags & (1 << 0)) !== 0) ? true : null;
         $invertMedia = (($flags & (1 << 2)) !== 0) ? true : null;
-        $inboxDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $type = Deserializer::bytes($stream);
-        $message = Deserializer::bytes($stream);
-        $media = AbstractMessageMedia::deserialize($stream);
-        $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
+        $inboxDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $type = Deserializer::bytes($__payload, $__offset);
+        $message = Deserializer::bytes($__payload, $__offset);
+        $media = AbstractMessageMedia::deserialize($__payload, $__offset);
+        $entities = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']);
 
         return new self(
             $type,

@@ -37,15 +37,15 @@ final class PeerStories extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $stories = BasePeerStories::deserialize($stream);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $stories = BasePeerStories::deserialize($__payload, $__offset);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $stories,

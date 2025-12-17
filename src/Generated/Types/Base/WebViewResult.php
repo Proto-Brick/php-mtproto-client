@@ -48,17 +48,17 @@ final class WebViewResult extends TlObject
         $buffer .= Serializer::bytes($this->url);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $fullsize = (($flags & (1 << 1)) !== 0) ? true : null;
         $fullscreen = (($flags & (1 << 2)) !== 0) ? true : null;
-        $queryId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $url = Deserializer::bytes($stream);
+        $queryId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $url = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $url,

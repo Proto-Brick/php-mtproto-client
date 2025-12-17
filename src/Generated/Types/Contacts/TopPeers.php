@@ -35,12 +35,12 @@ final class TopPeers extends AbstractTopPeers
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $categories = Deserializer::vectorOfObjects($stream, [TopPeerCategoryPeers::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $categories = Deserializer::vectorOfObjects($__payload, $__offset, [TopPeerCategoryPeers::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $categories,

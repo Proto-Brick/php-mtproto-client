@@ -26,10 +26,10 @@ final class UpdateSmsJob extends AbstractUpdate
         $buffer .= Serializer::bytes($this->jobId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $jobId = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $jobId = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $jobId

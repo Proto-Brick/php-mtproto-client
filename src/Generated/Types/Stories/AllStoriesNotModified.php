@@ -32,12 +32,12 @@ final class AllStoriesNotModified extends AbstractAllStories
         $buffer .= $this->stealthMode->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $state = Deserializer::bytes($stream);
-        $stealthMode = StoriesStealthMode::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $state = Deserializer::bytes($__payload, $__offset);
+        $stealthMode = StoriesStealthMode::deserialize($__payload, $__offset);
 
         return new self(
             $state,

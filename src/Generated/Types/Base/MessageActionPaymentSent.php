@@ -57,16 +57,16 @@ final class MessageActionPaymentSent extends AbstractMessageAction
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $recurringInit = (($flags & (1 << 2)) !== 0) ? true : null;
         $recurringUsed = (($flags & (1 << 3)) !== 0) ? true : null;
-        $currency = Deserializer::bytes($stream);
-        $totalAmount = Deserializer::int64($stream);
-        $invoiceSlug = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $subscriptionUntilDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $totalAmount = Deserializer::int64($__payload, $__offset);
+        $invoiceSlug = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $subscriptionUntilDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $currency,

@@ -28,13 +28,13 @@ final class EmojiLanguage extends TlObject
         $buffer .= Serializer::bytes($this->langCode);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $langCode = Deserializer::bytes($stream);
+        $langCode = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $langCode

@@ -44,13 +44,13 @@ final class RequestedPeerChat extends AbstractRequestedPeer
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $chatId = Deserializer::int64($stream);
-        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $photo = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $chatId = Deserializer::int64($__payload, $__offset);
+        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $photo = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
 
         return new self(
             $chatId,

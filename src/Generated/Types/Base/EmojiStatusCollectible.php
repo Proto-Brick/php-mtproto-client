@@ -60,20 +60,20 @@ final class EmojiStatusCollectible extends AbstractEmojiStatus
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $collectibleId = Deserializer::int64($stream);
-        $documentId = Deserializer::int64($stream);
-        $title = Deserializer::bytes($stream);
-        $slug = Deserializer::bytes($stream);
-        $patternDocumentId = Deserializer::int64($stream);
-        $centerColor = Deserializer::int32($stream);
-        $edgeColor = Deserializer::int32($stream);
-        $patternColor = Deserializer::int32($stream);
-        $textColor = Deserializer::int32($stream);
-        $until = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $collectibleId = Deserializer::int64($__payload, $__offset);
+        $documentId = Deserializer::int64($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $slug = Deserializer::bytes($__payload, $__offset);
+        $patternDocumentId = Deserializer::int64($__payload, $__offset);
+        $centerColor = Deserializer::int32($__payload, $__offset);
+        $edgeColor = Deserializer::int32($__payload, $__offset);
+        $patternColor = Deserializer::int32($__payload, $__offset);
+        $textColor = Deserializer::int32($__payload, $__offset);
+        $until = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $collectibleId,

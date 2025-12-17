@@ -162,13 +162,13 @@ final class PeerSettings extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $reportSpam = (($flags & (1 << 0)) !== 0) ? true : null;
         $addContact = (($flags & (1 << 1)) !== 0) ? true : null;
         $blockContact = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -180,16 +180,16 @@ final class PeerSettings extends TlObject
         $requestChatBroadcast = (($flags & (1 << 10)) !== 0) ? true : null;
         $businessBotPaused = (($flags & (1 << 11)) !== 0) ? true : null;
         $businessBotCanReply = (($flags & (1 << 12)) !== 0) ? true : null;
-        $geoDistance = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
-        $requestChatTitle = (($flags & (1 << 9)) !== 0) ? Deserializer::bytes($stream) : null;
-        $requestChatDate = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($stream) : null;
-        $businessBotId = (($flags & (1 << 13)) !== 0) ? Deserializer::int64($stream) : null;
-        $businessBotManageUrl = (($flags & (1 << 13)) !== 0) ? Deserializer::bytes($stream) : null;
-        $chargePaidMessageStars = (($flags & (1 << 14)) !== 0) ? Deserializer::int64($stream) : null;
-        $registrationMonth = (($flags & (1 << 15)) !== 0) ? Deserializer::bytes($stream) : null;
-        $phoneCountry = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
-        $nameChangeDate = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($stream) : null;
-        $photoChangeDate = (($flags & (1 << 18)) !== 0) ? Deserializer::int32($stream) : null;
+        $geoDistance = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $requestChatTitle = (($flags & (1 << 9)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $requestChatDate = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $businessBotId = (($flags & (1 << 13)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $businessBotManageUrl = (($flags & (1 << 13)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $chargePaidMessageStars = (($flags & (1 << 14)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $registrationMonth = (($flags & (1 << 15)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $phoneCountry = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $nameChangeDate = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $photoChangeDate = (($flags & (1 << 18)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $reportSpam,

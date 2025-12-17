@@ -11,17 +11,17 @@ use RuntimeException;
  */
 abstract class AbstractInputNotifyPeer extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0xb8bc5b0c => InputNotifyPeer::deserialize($stream),
-            0x193b4417 => InputNotifyUsers::deserialize($stream),
-            0x4a95e84e => InputNotifyChats::deserialize($stream),
-            0xb1db7c7e => InputNotifyBroadcasts::deserialize($stream),
-            0x5c467992 => InputNotifyForumTopic::deserialize($stream),
+            0xb8bc5b0c => InputNotifyPeer::deserialize($__payload, $__offset),
+            0x193b4417 => InputNotifyUsers::deserialize($__payload, $__offset),
+            0x4a95e84e => InputNotifyChats::deserialize($__payload, $__offset),
+            0xb1db7c7e => InputNotifyBroadcasts::deserialize($__payload, $__offset),
+            0x5c467992 => InputNotifyForumTopic::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type InputNotifyPeer. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

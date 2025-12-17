@@ -41,14 +41,14 @@ final class PageBlockTable extends AbstractPageBlock
         $buffer .= Serializer::vectorOfObjects($this->rows);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $bordered = (($flags & (1 << 0)) !== 0) ? true : null;
         $striped = (($flags & (1 << 1)) !== 0) ? true : null;
-        $title = AbstractRichText::deserialize($stream);
-        $rows = Deserializer::vectorOfObjects($stream, [PageTableRow::class, 'deserialize']);
+        $title = AbstractRichText::deserialize($__payload, $__offset);
+        $rows = Deserializer::vectorOfObjects($__payload, $__offset, [PageTableRow::class, 'deserialize']);
 
         return new self(
             $title,

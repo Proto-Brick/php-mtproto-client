@@ -31,14 +31,14 @@ final class InputFolderPeer extends TlObject
         $buffer .= Serializer::int32($this->folderId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $peer = AbstractInputPeer::deserialize($stream);
-        $folderId = Deserializer::int32($stream);
+        $peer = AbstractInputPeer::deserialize($__payload, $__offset);
+        $folderId = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $peer,

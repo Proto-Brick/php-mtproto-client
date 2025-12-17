@@ -52,18 +52,18 @@ final class MyBoost extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $slot = Deserializer::int32($stream);
-        $peer = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $date = Deserializer::int32($stream);
-        $expires = Deserializer::int32($stream);
-        $cooldownUntilDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $slot = Deserializer::int32($__payload, $__offset);
+        $peer = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $date = Deserializer::int32($__payload, $__offset);
+        $expires = Deserializer::int32($__payload, $__offset);
+        $cooldownUntilDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $slot,

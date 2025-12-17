@@ -26,10 +26,10 @@ final class MessageMediaGeo extends AbstractMessageMedia
         $buffer .= $this->geo->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $geo = AbstractGeoPoint::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $geo = AbstractGeoPoint::deserialize($__payload, $__offset);
 
         return new self(
             $geo

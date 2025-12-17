@@ -34,15 +34,15 @@ final class BusinessGreetingMessage extends TlObject
         $buffer .= Serializer::int32($this->noActivityDays);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $shortcutId = Deserializer::int32($stream);
-        $recipients = BusinessRecipients::deserialize($stream);
-        $noActivityDays = Deserializer::int32($stream);
+        $shortcutId = Deserializer::int32($__payload, $__offset);
+        $recipients = BusinessRecipients::deserialize($__payload, $__offset);
+        $noActivityDays = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $shortcutId,

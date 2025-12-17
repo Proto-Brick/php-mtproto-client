@@ -37,16 +37,16 @@ final class ChannelAdminLogEvent extends TlObject
         $buffer .= $this->action->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $id = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
-        $action = AbstractChannelAdminLogEventAction::deserialize($stream);
+        $id = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $action = AbstractChannelAdminLogEventAction::deserialize($__payload, $__offset);
 
         return new self(
             $id,

@@ -33,12 +33,12 @@ final class UpdateGroupCallConnection extends AbstractUpdate
         $buffer .= Serializer::serializeDataJSON($this->params);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $presentation = (($flags & (1 << 0)) !== 0) ? true : null;
-        $params = Deserializer::deserializeDataJSON($stream);
+        $params = Deserializer::deserializeDataJSON($__payload, $__offset);
 
         return new self(
             $params,

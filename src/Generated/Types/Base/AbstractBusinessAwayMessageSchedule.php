@@ -11,15 +11,15 @@ use RuntimeException;
  */
 abstract class AbstractBusinessAwayMessageSchedule extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0xc9b9e2b9 => BusinessAwayMessageScheduleAlways::deserialize($stream),
-            0xc3f2f501 => BusinessAwayMessageScheduleOutsideWorkHours::deserialize($stream),
-            0xcc4d9ecc => BusinessAwayMessageScheduleCustom::deserialize($stream),
+            0xc9b9e2b9 => BusinessAwayMessageScheduleAlways::deserialize($__payload, $__offset),
+            0xc3f2f501 => BusinessAwayMessageScheduleOutsideWorkHours::deserialize($__payload, $__offset),
+            0xcc4d9ecc => BusinessAwayMessageScheduleCustom::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type BusinessAwayMessageSchedule. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

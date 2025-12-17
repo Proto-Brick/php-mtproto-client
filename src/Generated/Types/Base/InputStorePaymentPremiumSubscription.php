@@ -35,10 +35,10 @@ final class InputStorePaymentPremiumSubscription extends AbstractInputStorePayme
         $buffer .= Serializer::int32($flags);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $restore = (($flags & (1 << 0)) !== 0) ? true : null;
         $upgrade = (($flags & (1 << 1)) !== 0) ? true : null;
 

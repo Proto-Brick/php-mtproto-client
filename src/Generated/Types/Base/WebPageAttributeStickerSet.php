@@ -38,13 +38,13 @@ final class WebPageAttributeStickerSet extends AbstractWebPageAttribute
         $buffer .= Serializer::vectorOfObjects($this->stickers);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $emojis = (($flags & (1 << 0)) !== 0) ? true : null;
         $textColor = (($flags & (1 << 1)) !== 0) ? true : null;
-        $stickers = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
+        $stickers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
 
         return new self(
             $stickers,

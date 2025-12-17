@@ -109,26 +109,26 @@ final class Password extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $hasRecovery = (($flags & (1 << 0)) !== 0) ? true : null;
         $hasSecureValues = (($flags & (1 << 1)) !== 0) ? true : null;
         $hasPassword = (($flags & (1 << 2)) !== 0) ? true : null;
-        $currentAlgo = (($flags & (1 << 2)) !== 0) ? AbstractPasswordKdfAlgo::deserialize($stream) : null;
-        $srpB = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $srpId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;
-        $hint = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $emailUnconfirmedPattern = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
-        $newAlgo = AbstractPasswordKdfAlgo::deserialize($stream);
-        $newSecureAlgo = AbstractSecurePasswordKdfAlgo::deserialize($stream);
-        $secureRandom = Deserializer::bytes($stream);
-        $pendingResetDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $loginEmailPattern = (($flags & (1 << 6)) !== 0) ? Deserializer::bytes($stream) : null;
+        $currentAlgo = (($flags & (1 << 2)) !== 0) ? AbstractPasswordKdfAlgo::deserialize($__payload, $__offset) : null;
+        $srpB = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $srpId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $hint = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $emailUnconfirmedPattern = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $newAlgo = AbstractPasswordKdfAlgo::deserialize($__payload, $__offset);
+        $newSecureAlgo = AbstractSecurePasswordKdfAlgo::deserialize($__payload, $__offset);
+        $secureRandom = Deserializer::bytes($__payload, $__offset);
+        $pendingResetDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $loginEmailPattern = (($flags & (1 << 6)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $newAlgo,

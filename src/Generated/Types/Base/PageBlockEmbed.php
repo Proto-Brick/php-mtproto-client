@@ -78,18 +78,18 @@ final class PageBlockEmbed extends AbstractPageBlock
         $buffer .= $this->caption->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $fullWidth = (($flags & (1 << 0)) !== 0) ? true : null;
         $allowScrolling = (($flags & (1 << 3)) !== 0) ? true : null;
-        $url = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $html = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $posterPhotoId = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
-        $w = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $h = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $caption = PageCaption::deserialize($stream);
+        $url = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $html = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $posterPhotoId = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $w = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $h = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $caption = PageCaption::deserialize($__payload, $__offset);
 
         return new self(
             $caption,

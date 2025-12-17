@@ -26,10 +26,10 @@ final class WebPageAttributeStarGiftCollection extends AbstractWebPageAttribute
         $buffer .= Serializer::vectorOfObjects($this->icons);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $icons = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $icons = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
 
         return new self(
             $icons

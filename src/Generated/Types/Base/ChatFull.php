@@ -156,30 +156,30 @@ final class ChatFull extends AbstractChatFull
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $canSetUsername = (($flags & (1 << 7)) !== 0) ? true : null;
         $hasScheduled = (($flags & (1 << 8)) !== 0) ? true : null;
         $translationsDisabled = (($flags & (1 << 19)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $about = Deserializer::bytes($stream);
-        $participants = AbstractChatParticipants::deserialize($stream);
-        $chatPhoto = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
-        $notifySettings = PeerNotifySettings::deserialize($stream);
-        $exportedInvite = (($flags & (1 << 13)) !== 0) ? AbstractExportedChatInvite::deserialize($stream) : null;
-        $botInfo = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [BotInfo::class, 'deserialize']) : null;
-        $pinnedMsgId = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
-        $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
-        $call = (($flags & (1 << 12)) !== 0) ? AbstractInputGroupCall::deserialize($stream) : null;
-        $ttlPeriod = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($stream) : null;
-        $groupcallDefaultJoinAs = (($flags & (1 << 15)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $themeEmoticon = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
-        $requestsPending = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($stream) : null;
-        $recentRequesters = (($flags & (1 << 17)) !== 0) ? Deserializer::vectorOfLongs($stream) : null;
-        $availableReactions = (($flags & (1 << 18)) !== 0) ? AbstractChatReactions::deserialize($stream) : null;
-        $reactionsLimit = (($flags & (1 << 20)) !== 0) ? Deserializer::int32($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $about = Deserializer::bytes($__payload, $__offset);
+        $participants = AbstractChatParticipants::deserialize($__payload, $__offset);
+        $chatPhoto = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
+        $notifySettings = PeerNotifySettings::deserialize($__payload, $__offset);
+        $exportedInvite = (($flags & (1 << 13)) !== 0) ? AbstractExportedChatInvite::deserialize($__payload, $__offset) : null;
+        $botInfo = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [BotInfo::class, 'deserialize']) : null;
+        $pinnedMsgId = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $call = (($flags & (1 << 12)) !== 0) ? AbstractInputGroupCall::deserialize($__payload, $__offset) : null;
+        $ttlPeriod = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $groupcallDefaultJoinAs = (($flags & (1 << 15)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $themeEmoticon = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $requestsPending = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $recentRequesters = (($flags & (1 << 17)) !== 0) ? Deserializer::vectorOfLongs($__payload, $__offset) : null;
+        $availableReactions = (($flags & (1 << 18)) !== 0) ? AbstractChatReactions::deserialize($__payload, $__offset) : null;
+        $reactionsLimit = (($flags & (1 << 20)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $id,

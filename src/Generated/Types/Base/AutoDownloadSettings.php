@@ -70,24 +70,24 @@ final class AutoDownloadSettings extends TlObject
         $buffer .= Serializer::int32($this->largeQueueActiveOperationsMax);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $disabled = (($flags & (1 << 0)) !== 0) ? true : null;
         $videoPreloadLarge = (($flags & (1 << 1)) !== 0) ? true : null;
         $audioPreloadNext = (($flags & (1 << 2)) !== 0) ? true : null;
         $phonecallsLessData = (($flags & (1 << 3)) !== 0) ? true : null;
         $storiesPreload = (($flags & (1 << 4)) !== 0) ? true : null;
-        $photoSizeMax = Deserializer::int32($stream);
-        $videoSizeMax = Deserializer::int64($stream);
-        $fileSizeMax = Deserializer::int64($stream);
-        $videoUploadMaxbitrate = Deserializer::int32($stream);
-        $smallQueueActiveOperationsMax = Deserializer::int32($stream);
-        $largeQueueActiveOperationsMax = Deserializer::int32($stream);
+        $photoSizeMax = Deserializer::int32($__payload, $__offset);
+        $videoSizeMax = Deserializer::int64($__payload, $__offset);
+        $fileSizeMax = Deserializer::int64($__payload, $__offset);
+        $videoUploadMaxbitrate = Deserializer::int32($__payload, $__offset);
+        $smallQueueActiveOperationsMax = Deserializer::int32($__payload, $__offset);
+        $largeQueueActiveOperationsMax = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $photoSizeMax,

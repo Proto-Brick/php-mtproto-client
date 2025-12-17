@@ -35,13 +35,13 @@ final class PostInteractionCountersStory extends AbstractPostInteractionCounters
         $buffer .= Serializer::int32($this->reactions);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $storyId = Deserializer::int32($stream);
-        $views = Deserializer::int32($stream);
-        $forwards = Deserializer::int32($stream);
-        $reactions = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $storyId = Deserializer::int32($__payload, $__offset);
+        $views = Deserializer::int32($__payload, $__offset);
+        $forwards = Deserializer::int32($__payload, $__offset);
+        $reactions = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $storyId,

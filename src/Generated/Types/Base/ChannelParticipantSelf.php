@@ -47,15 +47,15 @@ final class ChannelParticipantSelf extends AbstractChannelParticipant
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $viaRequest = (($flags & (1 << 0)) !== 0) ? true : null;
-        $userId = Deserializer::int64($stream);
-        $inviterId = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $subscriptionUntilDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $userId = Deserializer::int64($__payload, $__offset);
+        $inviterId = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $subscriptionUntilDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $userId,

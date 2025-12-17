@@ -68,16 +68,16 @@ final class SentCodeTypeFirebaseSms extends AbstractSentCodeType
         $buffer .= Serializer::int32($this->length);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $nonce = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $playIntegrityProjectId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;
-        $playIntegrityNonce = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $receipt = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $pushTimeout = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $length = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $nonce = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $playIntegrityProjectId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $playIntegrityNonce = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $receipt = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $pushTimeout = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $length = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $length,

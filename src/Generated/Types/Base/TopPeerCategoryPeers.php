@@ -34,15 +34,15 @@ final class TopPeerCategoryPeers extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->peers);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $category = TopPeerCategory::deserialize($stream);
-        $count = Deserializer::int32($stream);
-        $peers = Deserializer::vectorOfObjects($stream, [TopPeer::class, 'deserialize']);
+        $category = TopPeerCategory::deserialize($__payload, $__offset);
+        $count = Deserializer::int32($__payload, $__offset);
+        $peers = Deserializer::vectorOfObjects($__payload, $__offset, [TopPeer::class, 'deserialize']);
 
         return new self(
             $category,

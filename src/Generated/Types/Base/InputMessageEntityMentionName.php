@@ -32,12 +32,12 @@ final class InputMessageEntityMentionName extends AbstractMessageEntity
         $buffer .= $this->userId->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $offset = Deserializer::int32($stream);
-        $length = Deserializer::int32($stream);
-        $userId = AbstractInputUser::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $offset = Deserializer::int32($__payload, $__offset);
+        $length = Deserializer::int32($__payload, $__offset);
+        $userId = AbstractInputUser::deserialize($__payload, $__offset);
 
         return new self(
             $offset,

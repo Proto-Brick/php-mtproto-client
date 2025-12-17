@@ -33,12 +33,12 @@ final class UpdateSavedDialogPinned extends AbstractUpdate
         $buffer .= $this->peer->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $pinned = (($flags & (1 << 0)) !== 0) ? true : null;
-        $peer = AbstractDialogPeer::deserialize($stream);
+        $peer = AbstractDialogPeer::deserialize($__payload, $__offset);
 
         return new self(
             $peer,

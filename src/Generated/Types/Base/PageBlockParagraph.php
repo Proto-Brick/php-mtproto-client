@@ -26,10 +26,10 @@ final class PageBlockParagraph extends AbstractPageBlock
         $buffer .= $this->text->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $text = AbstractRichText::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $text = AbstractRichText::deserialize($__payload, $__offset);
 
         return new self(
             $text

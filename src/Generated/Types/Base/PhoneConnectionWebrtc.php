@@ -53,18 +53,18 @@ final class PhoneConnectionWebrtc extends AbstractPhoneConnection
         $buffer .= Serializer::bytes($this->password);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $turn = (($flags & (1 << 0)) !== 0) ? true : null;
         $stun = (($flags & (1 << 1)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $ip = Deserializer::bytes($stream);
-        $ipv6 = Deserializer::bytes($stream);
-        $port = Deserializer::int32($stream);
-        $username = Deserializer::bytes($stream);
-        $password = Deserializer::bytes($stream);
+        $id = Deserializer::int64($__payload, $__offset);
+        $ip = Deserializer::bytes($__payload, $__offset);
+        $ipv6 = Deserializer::bytes($__payload, $__offset);
+        $port = Deserializer::int32($__payload, $__offset);
+        $username = Deserializer::bytes($__payload, $__offset);
+        $password = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $id,

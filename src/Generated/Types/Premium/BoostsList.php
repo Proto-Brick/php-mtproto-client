@@ -46,17 +46,17 @@ final class BoostsList extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $count = Deserializer::int32($stream);
-        $boosts = Deserializer::vectorOfObjects($stream, [Boost::class, 'deserialize']);
-        $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $flags = Deserializer::int32($__payload, $__offset);
+        $count = Deserializer::int32($__payload, $__offset);
+        $boosts = Deserializer::vectorOfObjects($__payload, $__offset, [Boost::class, 'deserialize']);
+        $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $count,

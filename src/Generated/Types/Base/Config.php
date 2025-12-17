@@ -233,60 +233,60 @@ final class Config extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $defaultP2pContacts = (($flags & (1 << 3)) !== 0) ? true : null;
         $preloadFeaturedStickers = (($flags & (1 << 4)) !== 0) ? true : null;
         $revokePmInbox = (($flags & (1 << 6)) !== 0) ? true : null;
         $blockedMode = (($flags & (1 << 8)) !== 0) ? true : null;
         $forceTryIpv6 = (($flags & (1 << 14)) !== 0) ? true : null;
-        $date = Deserializer::int32($stream);
-        $expires = Deserializer::int32($stream);
-        $testMode = (Deserializer::int32($stream) === 0x997275b5);
-        $thisDc = Deserializer::int32($stream);
-        $dcOptions = Deserializer::vectorOfObjects($stream, [DcOption::class, 'deserialize']);
-        $dcTxtDomainName = Deserializer::bytes($stream);
-        $chatSizeMax = Deserializer::int32($stream);
-        $megagroupSizeMax = Deserializer::int32($stream);
-        $forwardedCountMax = Deserializer::int32($stream);
-        $onlineUpdatePeriodMs = Deserializer::int32($stream);
-        $offlineBlurTimeoutMs = Deserializer::int32($stream);
-        $offlineIdleTimeoutMs = Deserializer::int32($stream);
-        $onlineCloudTimeoutMs = Deserializer::int32($stream);
-        $notifyCloudDelayMs = Deserializer::int32($stream);
-        $notifyDefaultDelayMs = Deserializer::int32($stream);
-        $pushChatPeriodMs = Deserializer::int32($stream);
-        $pushChatLimit = Deserializer::int32($stream);
-        $editTimeLimit = Deserializer::int32($stream);
-        $revokeTimeLimit = Deserializer::int32($stream);
-        $revokePmTimeLimit = Deserializer::int32($stream);
-        $ratingEDecay = Deserializer::int32($stream);
-        $stickersRecentLimit = Deserializer::int32($stream);
-        $channelsReadMediaPeriod = Deserializer::int32($stream);
-        $tmpSessions = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $callReceiveTimeoutMs = Deserializer::int32($stream);
-        $callRingTimeoutMs = Deserializer::int32($stream);
-        $callConnectTimeoutMs = Deserializer::int32($stream);
-        $callPacketTimeoutMs = Deserializer::int32($stream);
-        $meUrlPrefix = Deserializer::bytes($stream);
-        $autoupdateUrlPrefix = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
-        $gifSearchUsername = (($flags & (1 << 9)) !== 0) ? Deserializer::bytes($stream) : null;
-        $venueSearchUsername = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($stream) : null;
-        $imgSearchUsername = (($flags & (1 << 11)) !== 0) ? Deserializer::bytes($stream) : null;
-        $staticMapsProvider = (($flags & (1 << 12)) !== 0) ? Deserializer::bytes($stream) : null;
-        $captionLengthMax = Deserializer::int32($stream);
-        $messageLengthMax = Deserializer::int32($stream);
-        $webfileDcId = Deserializer::int32($stream);
-        $suggestedLangCode = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $langPackVersion = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $baseLangPackVersion = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $reactionsDefault = (($flags & (1 << 15)) !== 0) ? AbstractReaction::deserialize($stream) : null;
-        $autologinToken = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
+        $date = Deserializer::int32($__payload, $__offset);
+        $expires = Deserializer::int32($__payload, $__offset);
+        $testMode = (Deserializer::int32($__payload, $__offset) === 0x997275b5);
+        $thisDc = Deserializer::int32($__payload, $__offset);
+        $dcOptions = Deserializer::vectorOfObjects($__payload, $__offset, [DcOption::class, 'deserialize']);
+        $dcTxtDomainName = Deserializer::bytes($__payload, $__offset);
+        $chatSizeMax = Deserializer::int32($__payload, $__offset);
+        $megagroupSizeMax = Deserializer::int32($__payload, $__offset);
+        $forwardedCountMax = Deserializer::int32($__payload, $__offset);
+        $onlineUpdatePeriodMs = Deserializer::int32($__payload, $__offset);
+        $offlineBlurTimeoutMs = Deserializer::int32($__payload, $__offset);
+        $offlineIdleTimeoutMs = Deserializer::int32($__payload, $__offset);
+        $onlineCloudTimeoutMs = Deserializer::int32($__payload, $__offset);
+        $notifyCloudDelayMs = Deserializer::int32($__payload, $__offset);
+        $notifyDefaultDelayMs = Deserializer::int32($__payload, $__offset);
+        $pushChatPeriodMs = Deserializer::int32($__payload, $__offset);
+        $pushChatLimit = Deserializer::int32($__payload, $__offset);
+        $editTimeLimit = Deserializer::int32($__payload, $__offset);
+        $revokeTimeLimit = Deserializer::int32($__payload, $__offset);
+        $revokePmTimeLimit = Deserializer::int32($__payload, $__offset);
+        $ratingEDecay = Deserializer::int32($__payload, $__offset);
+        $stickersRecentLimit = Deserializer::int32($__payload, $__offset);
+        $channelsReadMediaPeriod = Deserializer::int32($__payload, $__offset);
+        $tmpSessions = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $callReceiveTimeoutMs = Deserializer::int32($__payload, $__offset);
+        $callRingTimeoutMs = Deserializer::int32($__payload, $__offset);
+        $callConnectTimeoutMs = Deserializer::int32($__payload, $__offset);
+        $callPacketTimeoutMs = Deserializer::int32($__payload, $__offset);
+        $meUrlPrefix = Deserializer::bytes($__payload, $__offset);
+        $autoupdateUrlPrefix = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $gifSearchUsername = (($flags & (1 << 9)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $venueSearchUsername = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $imgSearchUsername = (($flags & (1 << 11)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $staticMapsProvider = (($flags & (1 << 12)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $captionLengthMax = Deserializer::int32($__payload, $__offset);
+        $messageLengthMax = Deserializer::int32($__payload, $__offset);
+        $webfileDcId = Deserializer::int32($__payload, $__offset);
+        $suggestedLangCode = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $langPackVersion = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $baseLangPackVersion = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $reactionsDefault = (($flags & (1 << 15)) !== 0) ? AbstractReaction::deserialize($__payload, $__offset) : null;
+        $autologinToken = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $date,

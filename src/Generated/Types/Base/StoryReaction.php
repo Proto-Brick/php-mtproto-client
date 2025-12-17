@@ -32,12 +32,12 @@ final class StoryReaction extends AbstractStoryReaction
         $buffer .= $this->reaction->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $peerId = AbstractPeer::deserialize($stream);
-        $date = Deserializer::int32($stream);
-        $reaction = AbstractReaction::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $peerId = AbstractPeer::deserialize($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $reaction = AbstractReaction::deserialize($__payload, $__offset);
 
         return new self(
             $peerId,

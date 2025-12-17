@@ -44,16 +44,16 @@ final class EncryptedChat extends AbstractEncryptedChat
         $buffer .= Serializer::int64($this->keyFingerprint);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int32($stream);
-        $accessHash = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $adminId = Deserializer::int64($stream);
-        $participantId = Deserializer::int64($stream);
-        $gAOrB = Deserializer::bytes($stream);
-        $keyFingerprint = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $id = Deserializer::int32($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $adminId = Deserializer::int64($__payload, $__offset);
+        $participantId = Deserializer::int64($__payload, $__offset);
+        $gAOrB = Deserializer::bytes($__payload, $__offset);
+        $keyFingerprint = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $id,

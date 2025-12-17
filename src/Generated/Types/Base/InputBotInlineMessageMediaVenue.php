@@ -51,17 +51,17 @@ final class InputBotInlineMessageMediaVenue extends AbstractInputBotInlineMessag
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $geoPoint = AbstractInputGeoPoint::deserialize($stream);
-        $title = Deserializer::bytes($stream);
-        $address = Deserializer::bytes($stream);
-        $provider = Deserializer::bytes($stream);
-        $venueId = Deserializer::bytes($stream);
-        $venueType = Deserializer::bytes($stream);
-        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $geoPoint = AbstractInputGeoPoint::deserialize($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $address = Deserializer::bytes($__payload, $__offset);
+        $provider = Deserializer::bytes($__payload, $__offset);
+        $venueId = Deserializer::bytes($__payload, $__offset);
+        $venueType = Deserializer::bytes($__payload, $__offset);
+        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($__payload, $__offset) : null;
 
         return new self(
             $geoPoint,

@@ -32,12 +32,12 @@ final class AttachMenuBots extends AbstractAttachMenuBots
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
-        $bots = Deserializer::vectorOfObjects($stream, [AttachMenuBot::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int64($__payload, $__offset);
+        $bots = Deserializer::vectorOfObjects($__payload, $__offset, [AttachMenuBot::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $hash,

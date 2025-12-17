@@ -26,10 +26,10 @@ final class JsonNumber extends AbstractJSONValue
         $buffer .= pack('d', $this->value);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $value = Deserializer::double($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $value = Deserializer::double($__payload, $__offset);
 
         return new self(
             $value

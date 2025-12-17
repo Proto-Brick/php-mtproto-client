@@ -41,15 +41,15 @@ final class MessageMediaVenue extends AbstractMessageMedia
         $buffer .= Serializer::bytes($this->venueType);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $geo = AbstractGeoPoint::deserialize($stream);
-        $title = Deserializer::bytes($stream);
-        $address = Deserializer::bytes($stream);
-        $provider = Deserializer::bytes($stream);
-        $venueId = Deserializer::bytes($stream);
-        $venueType = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $geo = AbstractGeoPoint::deserialize($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $address = Deserializer::bytes($__payload, $__offset);
+        $provider = Deserializer::bytes($__payload, $__offset);
+        $venueId = Deserializer::bytes($__payload, $__offset);
+        $venueType = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $geo,

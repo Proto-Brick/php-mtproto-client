@@ -26,10 +26,10 @@ final class LangPackStringDeleted extends AbstractLangPackString
         $buffer .= Serializer::bytes($this->key);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $key = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $key = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $key

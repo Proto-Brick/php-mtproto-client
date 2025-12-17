@@ -49,17 +49,17 @@ final class StoryAlbum extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $albumId = Deserializer::int32($stream);
-        $title = Deserializer::bytes($stream);
-        $iconPhoto = (($flags & (1 << 0)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
-        $iconVideo = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $albumId = Deserializer::int32($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $iconPhoto = (($flags & (1 << 0)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
+        $iconVideo = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
 
         return new self(
             $albumId,

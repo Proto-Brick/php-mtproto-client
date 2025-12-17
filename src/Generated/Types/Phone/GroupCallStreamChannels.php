@@ -29,13 +29,13 @@ final class GroupCallStreamChannels extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->channels);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $channels = Deserializer::vectorOfObjects($stream, [GroupCallStreamChannel::class, 'deserialize']);
+        $channels = Deserializer::vectorOfObjects($__payload, $__offset, [GroupCallStreamChannel::class, 'deserialize']);
 
         return new self(
             $channels

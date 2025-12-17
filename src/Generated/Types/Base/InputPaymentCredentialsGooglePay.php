@@ -26,10 +26,10 @@ final class InputPaymentCredentialsGooglePay extends AbstractInputPaymentCredent
         $buffer .= Serializer::serializeDataJSON($this->paymentToken);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $paymentToken = Deserializer::deserializeDataJSON($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $paymentToken = Deserializer::deserializeDataJSON($__payload, $__offset);
 
         return new self(
             $paymentToken

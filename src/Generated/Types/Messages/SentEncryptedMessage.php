@@ -26,10 +26,10 @@ final class SentEncryptedMessage extends AbstractSentEncryptedMessage
         $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $date = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $date = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $date

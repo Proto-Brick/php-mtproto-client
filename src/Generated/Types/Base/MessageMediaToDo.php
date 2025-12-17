@@ -36,12 +36,12 @@ final class MessageMediaToDo extends AbstractMessageMedia
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $todo = TodoList::deserialize($stream);
-        $completions = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [TodoCompletion::class, 'deserialize']) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $todo = TodoList::deserialize($__payload, $__offset);
+        $completions = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [TodoCompletion::class, 'deserialize']) : null;
 
         return new self(
             $todo,

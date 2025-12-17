@@ -83,20 +83,20 @@ final class InputPeerNotifySettings extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $showPreviews = (($flags & (1 << 0)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $silent = (($flags & (1 << 1)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $muteUntil = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $sound = (($flags & (1 << 3)) !== 0) ? AbstractNotificationSound::deserialize($stream) : null;
-        $storiesMuted = (($flags & (1 << 6)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $storiesHideSender = (($flags & (1 << 7)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $storiesSound = (($flags & (1 << 8)) !== 0) ? AbstractNotificationSound::deserialize($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $showPreviews = (($flags & (1 << 0)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
+        $silent = (($flags & (1 << 1)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
+        $muteUntil = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $sound = (($flags & (1 << 3)) !== 0) ? AbstractNotificationSound::deserialize($__payload, $__offset) : null;
+        $storiesMuted = (($flags & (1 << 6)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
+        $storiesHideSender = (($flags & (1 << 7)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
+        $storiesSound = (($flags & (1 << 8)) !== 0) ? AbstractNotificationSound::deserialize($__payload, $__offset) : null;
 
         return new self(
             $showPreviews,

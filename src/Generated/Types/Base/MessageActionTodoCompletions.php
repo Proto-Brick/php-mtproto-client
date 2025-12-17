@@ -29,11 +29,11 @@ final class MessageActionTodoCompletions extends AbstractMessageAction
         $buffer .= Serializer::vectorOfInts($this->incompleted);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $completed = Deserializer::vectorOfInts($stream);
-        $incompleted = Deserializer::vectorOfInts($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $completed = Deserializer::vectorOfInts($__payload, $__offset);
+        $incompleted = Deserializer::vectorOfInts($__payload, $__offset);
 
         return new self(
             $completed,

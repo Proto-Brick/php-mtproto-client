@@ -43,18 +43,18 @@ final class CollectibleInfo extends TlObject
         $buffer .= Serializer::bytes($this->url);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $purchaseDate = Deserializer::int32($stream);
-        $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
-        $cryptoCurrency = Deserializer::bytes($stream);
-        $cryptoAmount = Deserializer::int64($stream);
-        $url = Deserializer::bytes($stream);
+        $purchaseDate = Deserializer::int32($__payload, $__offset);
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $amount = Deserializer::int64($__payload, $__offset);
+        $cryptoCurrency = Deserializer::bytes($__payload, $__offset);
+        $cryptoAmount = Deserializer::int64($__payload, $__offset);
+        $url = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $purchaseDate,

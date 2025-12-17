@@ -29,11 +29,11 @@ final class TextEmail extends AbstractRichText
         $buffer .= Serializer::bytes($this->email);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $text = AbstractRichText::deserialize($stream);
-        $email = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $text = AbstractRichText::deserialize($__payload, $__offset);
+        $email = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $text,

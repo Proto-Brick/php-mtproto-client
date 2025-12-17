@@ -50,19 +50,19 @@ final class MediaAreaCoordinates extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $x = Deserializer::double($stream);
-        $y = Deserializer::double($stream);
-        $w = Deserializer::double($stream);
-        $h = Deserializer::double($stream);
-        $rotation = Deserializer::double($stream);
-        $radius = (($flags & (1 << 0)) !== 0) ? Deserializer::double($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $x = Deserializer::double($__payload, $__offset);
+        $y = Deserializer::double($__payload, $__offset);
+        $w = Deserializer::double($__payload, $__offset);
+        $h = Deserializer::double($__payload, $__offset);
+        $rotation = Deserializer::double($__payload, $__offset);
+        $radius = (($flags & (1 << 0)) !== 0) ? Deserializer::double($__payload, $__offset) : null;
 
         return new self(
             $x,

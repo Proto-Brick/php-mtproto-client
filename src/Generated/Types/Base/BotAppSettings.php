@@ -67,18 +67,18 @@ final class BotAppSettings extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $placeholderPath = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $backgroundColor = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $backgroundDarkColor = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $headerColor = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $headerDarkColor = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $placeholderPath = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $backgroundColor = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $backgroundDarkColor = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $headerColor = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $headerDarkColor = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $placeholderPath,

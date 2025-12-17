@@ -34,15 +34,15 @@ final class HighScore extends TlObject
         $buffer .= Serializer::int32($this->score);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $pos = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
-        $score = Deserializer::int32($stream);
+        $pos = Deserializer::int32($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $score = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $pos,

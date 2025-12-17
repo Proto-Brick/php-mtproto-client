@@ -32,14 +32,14 @@ final class Support extends TlObject
         $buffer .= $this->user->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $phoneNumber = Deserializer::bytes($stream);
-        $user = AbstractUser::deserialize($stream);
+        $phoneNumber = Deserializer::bytes($__payload, $__offset);
+        $user = AbstractUser::deserialize($__payload, $__offset);
 
         return new self(
             $phoneNumber,

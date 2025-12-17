@@ -42,14 +42,14 @@ final class UpdateBotEditBusinessMessage extends AbstractUpdate
         $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $connectionId = Deserializer::bytes($stream);
-        $message = AbstractMessage::deserialize($stream);
-        $replyToMessage = (($flags & (1 << 0)) !== 0) ? AbstractMessage::deserialize($stream) : null;
-        $qts = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $connectionId = Deserializer::bytes($__payload, $__offset);
+        $message = AbstractMessage::deserialize($__payload, $__offset);
+        $replyToMessage = (($flags & (1 << 0)) !== 0) ? AbstractMessage::deserialize($__payload, $__offset) : null;
+        $qts = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $connectionId,

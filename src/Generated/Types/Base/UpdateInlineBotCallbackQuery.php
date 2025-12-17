@@ -53,16 +53,16 @@ final class UpdateInlineBotCallbackQuery extends AbstractUpdate
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $queryId = Deserializer::int64($stream);
-        $userId = Deserializer::int64($stream);
-        $msgId = AbstractInputBotInlineMessageID::deserialize($stream);
-        $chatInstance = Deserializer::int64($stream);
-        $data = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $gameShortName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $queryId = Deserializer::int64($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $msgId = AbstractInputBotInlineMessageID::deserialize($__payload, $__offset);
+        $chatInstance = Deserializer::int64($__payload, $__offset);
+        $data = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $gameShortName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $queryId,

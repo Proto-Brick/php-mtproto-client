@@ -35,13 +35,13 @@ final class UpdateBotStopped extends AbstractUpdate
         $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $userId = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $stopped = (Deserializer::int32($stream) === 0x997275b5);
-        $qts = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $userId = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $stopped = (Deserializer::int32($__payload, $__offset) === 0x997275b5);
+        $qts = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $userId,

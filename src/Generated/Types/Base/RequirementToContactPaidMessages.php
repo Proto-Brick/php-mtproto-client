@@ -26,10 +26,10 @@ final class RequirementToContactPaidMessages extends AbstractRequirementToContac
         $buffer .= Serializer::int64($this->starsAmount);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $starsAmount = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $starsAmount = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $starsAmount

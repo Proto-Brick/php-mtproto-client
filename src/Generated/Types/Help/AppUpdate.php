@@ -68,18 +68,18 @@ final class AppUpdate extends AbstractAppUpdate
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $canNotSkip = (($flags & (1 << 0)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
-        $version = Deserializer::bytes($stream);
-        $text = Deserializer::bytes($stream);
-        $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
-        $document = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($stream) : null;
-        $url = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $sticker = (($flags & (1 << 3)) !== 0) ? AbstractDocument::deserialize($stream) : null;
+        $id = Deserializer::int32($__payload, $__offset);
+        $version = Deserializer::bytes($__payload, $__offset);
+        $text = Deserializer::bytes($__payload, $__offset);
+        $entities = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']);
+        $document = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
+        $url = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $sticker = (($flags & (1 << 3)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
 
         return new self(
             $id,

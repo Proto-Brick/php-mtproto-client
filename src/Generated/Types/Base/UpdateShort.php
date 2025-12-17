@@ -29,11 +29,11 @@ final class UpdateShort extends AbstractUpdates
         $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $update = AbstractUpdate::deserialize($stream);
-        $date = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $update = AbstractUpdate::deserialize($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $update,

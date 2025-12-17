@@ -51,14 +51,14 @@ final class MessageActionBotAllowed extends AbstractMessageAction
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $attachMenu = (($flags & (1 << 1)) !== 0) ? true : null;
         $fromRequest = (($flags & (1 << 3)) !== 0) ? true : null;
-        $domain = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $app = (($flags & (1 << 2)) !== 0) ? AbstractBotApp::deserialize($stream) : null;
+        $domain = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $app = (($flags & (1 << 2)) !== 0) ? AbstractBotApp::deserialize($__payload, $__offset) : null;
 
         return new self(
             $attachMenu,

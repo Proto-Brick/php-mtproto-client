@@ -26,10 +26,10 @@ final class InputPrivacyValueDisallowUsers extends AbstractInputPrivacyRule
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $users = Deserializer::vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputUser::class, 'deserialize']);
 
         return new self(
             $users

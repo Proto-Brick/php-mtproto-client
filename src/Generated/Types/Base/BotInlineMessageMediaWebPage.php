@@ -72,19 +72,19 @@ final class BotInlineMessageMediaWebPage extends AbstractBotInlineMessage
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $invertMedia = (($flags & (1 << 3)) !== 0) ? true : null;
         $forceLargeMedia = (($flags & (1 << 4)) !== 0) ? true : null;
         $forceSmallMedia = (($flags & (1 << 5)) !== 0) ? true : null;
         $manual = (($flags & (1 << 7)) !== 0) ? true : null;
         $safe = (($flags & (1 << 8)) !== 0) ? true : null;
-        $message = Deserializer::bytes($stream);
-        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $url = Deserializer::bytes($stream);
-        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($stream) : null;
+        $message = Deserializer::bytes($__payload, $__offset);
+        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $url = Deserializer::bytes($__payload, $__offset);
+        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($__payload, $__offset) : null;
 
         return new self(
             $message,

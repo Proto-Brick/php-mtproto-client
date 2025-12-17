@@ -11,14 +11,14 @@ use RuntimeException;
  */
 abstract class AbstractChatPhoto extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x37c1011c => ChatPhotoEmpty::deserialize($stream),
-            0x1c6e1c11 => ChatPhoto::deserialize($stream),
+            0x37c1011c => ChatPhotoEmpty::deserialize($__payload, $__offset),
+            0x1c6e1c11 => ChatPhoto::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type ChatPhoto. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

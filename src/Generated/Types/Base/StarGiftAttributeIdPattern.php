@@ -26,10 +26,10 @@ final class StarGiftAttributeIdPattern extends AbstractStarGiftAttributeId
         $buffer .= Serializer::int64($this->documentId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $documentId = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $documentId = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $documentId

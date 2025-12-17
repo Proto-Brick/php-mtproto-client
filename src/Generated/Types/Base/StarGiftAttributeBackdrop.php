@@ -44,16 +44,16 @@ final class StarGiftAttributeBackdrop extends AbstractStarGiftAttribute
         $buffer .= Serializer::int32($this->rarityPermille);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $name = Deserializer::bytes($stream);
-        $backdropId = Deserializer::int32($stream);
-        $centerColor = Deserializer::int32($stream);
-        $edgeColor = Deserializer::int32($stream);
-        $patternColor = Deserializer::int32($stream);
-        $textColor = Deserializer::int32($stream);
-        $rarityPermille = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $name = Deserializer::bytes($__payload, $__offset);
+        $backdropId = Deserializer::int32($__payload, $__offset);
+        $centerColor = Deserializer::int32($__payload, $__offset);
+        $edgeColor = Deserializer::int32($__payload, $__offset);
+        $patternColor = Deserializer::int32($__payload, $__offset);
+        $textColor = Deserializer::int32($__payload, $__offset);
+        $rarityPermille = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $name,

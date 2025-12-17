@@ -29,11 +29,11 @@ final class MessageActionGroupCallScheduled extends AbstractMessageAction
         $buffer .= Serializer::int32($this->scheduleDate);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $call = AbstractInputGroupCall::deserialize($stream);
-        $scheduleDate = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $call = AbstractInputGroupCall::deserialize($__payload, $__offset);
+        $scheduleDate = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $call,

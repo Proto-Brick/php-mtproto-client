@@ -49,17 +49,17 @@ final class InputStickerSetItem extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $document = AbstractInputDocument::deserialize($stream);
-        $emoji = Deserializer::bytes($stream);
-        $maskCoords = (($flags & (1 << 0)) !== 0) ? MaskCoords::deserialize($stream) : null;
-        $keywords = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $document = AbstractInputDocument::deserialize($__payload, $__offset);
+        $emoji = Deserializer::bytes($__payload, $__offset);
+        $maskCoords = (($flags & (1 << 0)) !== 0) ? MaskCoords::deserialize($__payload, $__offset) : null;
+        $keywords = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $document,

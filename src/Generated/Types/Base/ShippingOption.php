@@ -34,15 +34,15 @@ final class ShippingOption extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->prices);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $id = Deserializer::bytes($stream);
-        $title = Deserializer::bytes($stream);
-        $prices = Deserializer::vectorOfObjects($stream, [LabeledPrice::class, 'deserialize']);
+        $id = Deserializer::bytes($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $prices = Deserializer::vectorOfObjects($__payload, $__offset, [LabeledPrice::class, 'deserialize']);
 
         return new self(
             $id,

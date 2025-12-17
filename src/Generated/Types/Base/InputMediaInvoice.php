@@ -72,19 +72,19 @@ final class InputMediaInvoice extends AbstractInputMedia
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $title = Deserializer::bytes($stream);
-        $description = Deserializer::bytes($stream);
-        $photo = (($flags & (1 << 0)) !== 0) ? InputWebDocument::deserialize($stream) : null;
-        $invoice = Invoice::deserialize($stream);
-        $payload = Deserializer::bytes($stream);
-        $provider = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $providerData = Deserializer::deserializeDataJSON($stream);
-        $startParam = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $extendedMedia = (($flags & (1 << 2)) !== 0) ? AbstractInputMedia::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $description = Deserializer::bytes($__payload, $__offset);
+        $photo = (($flags & (1 << 0)) !== 0) ? InputWebDocument::deserialize($__payload, $__offset) : null;
+        $invoice = Invoice::deserialize($__payload, $__offset);
+        $payload = Deserializer::bytes($__payload, $__offset);
+        $provider = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $providerData = Deserializer::deserializeDataJSON($__payload, $__offset);
+        $startParam = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $extendedMedia = (($flags & (1 << 2)) !== 0) ? AbstractInputMedia::deserialize($__payload, $__offset) : null;
 
         return new self(
             $title,

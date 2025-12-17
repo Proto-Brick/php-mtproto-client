@@ -26,10 +26,10 @@ final class SecurePasswordKdfAlgoSHA512 extends AbstractSecurePasswordKdfAlgo
         $buffer .= Serializer::bytes($this->salt);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $salt = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $salt = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $salt

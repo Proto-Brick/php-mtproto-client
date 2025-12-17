@@ -81,22 +81,22 @@ final class CodeSettings extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $allowFlashcall = (($flags & (1 << 0)) !== 0) ? true : null;
         $currentNumber = (($flags & (1 << 1)) !== 0) ? true : null;
         $allowAppHash = (($flags & (1 << 4)) !== 0) ? true : null;
         $allowMissedCall = (($flags & (1 << 5)) !== 0) ? true : null;
         $allowFirebase = (($flags & (1 << 7)) !== 0) ? true : null;
         $unknownNumber = (($flags & (1 << 9)) !== 0) ? true : null;
-        $logoutTokens = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfStrings($stream) : null;
-        $token = (($flags & (1 << 8)) !== 0) ? Deserializer::bytes($stream) : null;
-        $appSandbox = (($flags & (1 << 8)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
+        $logoutTokens = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfStrings($__payload, $__offset) : null;
+        $token = (($flags & (1 << 8)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $appSandbox = (($flags & (1 << 8)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
 
         return new self(
             $allowFlashcall,

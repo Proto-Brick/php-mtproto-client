@@ -29,11 +29,11 @@ final class TermsOfServiceUpdate extends AbstractTermsOfServiceUpdate
         $buffer .= $this->termsOfService->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $expires = Deserializer::int32($stream);
-        $termsOfService = TermsOfService::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $expires = Deserializer::int32($__payload, $__offset);
+        $termsOfService = TermsOfService::deserialize($__payload, $__offset);
 
         return new self(
             $expires,

@@ -43,18 +43,18 @@ final class PostAddress extends TlObject
         $buffer .= Serializer::bytes($this->postCode);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $streetLine1 = Deserializer::bytes($stream);
-        $streetLine2 = Deserializer::bytes($stream);
-        $city = Deserializer::bytes($stream);
-        $state = Deserializer::bytes($stream);
-        $countryIso2 = Deserializer::bytes($stream);
-        $postCode = Deserializer::bytes($stream);
+        $streetLine1 = Deserializer::bytes($__payload, $__offset);
+        $streetLine2 = Deserializer::bytes($__payload, $__offset);
+        $city = Deserializer::bytes($__payload, $__offset);
+        $state = Deserializer::bytes($__payload, $__offset);
+        $countryIso2 = Deserializer::bytes($__payload, $__offset);
+        $postCode = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $streetLine1,

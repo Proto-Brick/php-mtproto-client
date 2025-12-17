@@ -26,10 +26,10 @@ final class MessageExtendedMedia extends AbstractMessageExtendedMedia
         $buffer .= $this->media->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $media = AbstractMessageMedia::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $media = AbstractMessageMedia::deserialize($__payload, $__offset);
 
         return new self(
             $media

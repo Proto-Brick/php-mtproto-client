@@ -29,11 +29,11 @@ final class UpdateMessageID extends AbstractUpdate
         $buffer .= Serializer::int64($this->randomId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int32($stream);
-        $randomId = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $id = Deserializer::int32($__payload, $__offset);
+        $randomId = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $id,

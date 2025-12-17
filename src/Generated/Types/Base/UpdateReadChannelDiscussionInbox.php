@@ -50,15 +50,15 @@ final class UpdateReadChannelDiscussionInbox extends AbstractUpdate
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $channelId = Deserializer::int64($stream);
-        $topMsgId = Deserializer::int32($stream);
-        $readMaxId = Deserializer::int32($stream);
-        $broadcastId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $broadcastPost = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $channelId = Deserializer::int64($__payload, $__offset);
+        $topMsgId = Deserializer::int32($__payload, $__offset);
+        $readMaxId = Deserializer::int32($__payload, $__offset);
+        $broadcastId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $broadcastPost = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $channelId,

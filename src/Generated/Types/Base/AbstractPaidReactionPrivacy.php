@@ -11,15 +11,15 @@ use RuntimeException;
  */
 abstract class AbstractPaidReactionPrivacy extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x206ad49e => PaidReactionPrivacyDefault::deserialize($stream),
-            0x1f0c1ad9 => PaidReactionPrivacyAnonymous::deserialize($stream),
-            0xdc6cfcf0 => PaidReactionPrivacyPeer::deserialize($stream),
+            0x206ad49e => PaidReactionPrivacyDefault::deserialize($__payload, $__offset),
+            0x1f0c1ad9 => PaidReactionPrivacyAnonymous::deserialize($__payload, $__offset),
+            0xdc6cfcf0 => PaidReactionPrivacyPeer::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type PaidReactionPrivacy. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

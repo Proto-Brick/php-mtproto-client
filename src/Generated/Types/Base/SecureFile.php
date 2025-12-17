@@ -44,16 +44,16 @@ final class SecureFile extends AbstractSecureFile
         $buffer .= Serializer::bytes($this->secret);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $size = Deserializer::int64($stream);
-        $dcId = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $fileHash = Deserializer::bytes($stream);
-        $secret = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $size = Deserializer::int64($__payload, $__offset);
+        $dcId = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $fileHash = Deserializer::bytes($__payload, $__offset);
+        $secret = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $id,

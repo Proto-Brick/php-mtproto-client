@@ -40,16 +40,16 @@ final class ImportedContacts extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $imported = Deserializer::vectorOfObjects($stream, [ImportedContact::class, 'deserialize']);
-        $popularInvites = Deserializer::vectorOfObjects($stream, [PopularContact::class, 'deserialize']);
-        $retryContacts = Deserializer::vectorOfLongs($stream);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $imported = Deserializer::vectorOfObjects($__payload, $__offset, [ImportedContact::class, 'deserialize']);
+        $popularInvites = Deserializer::vectorOfObjects($__payload, $__offset, [PopularContact::class, 'deserialize']);
+        $retryContacts = Deserializer::vectorOfLongs($__payload, $__offset);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $imported,

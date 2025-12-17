@@ -47,18 +47,18 @@ final class StarGiftCollection extends TlObject
         $buffer .= Serializer::int64($this->hash);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $collectionId = Deserializer::int32($stream);
-        $title = Deserializer::bytes($stream);
-        $icon = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($stream) : null;
-        $giftsCount = Deserializer::int32($stream);
-        $hash = Deserializer::int64($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
+        $collectionId = Deserializer::int32($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $icon = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
+        $giftsCount = Deserializer::int32($__payload, $__offset);
+        $hash = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $collectionId,

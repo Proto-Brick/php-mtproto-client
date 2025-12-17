@@ -41,14 +41,14 @@ final class ChatlistInviteAlready extends AbstractChatlistInvite
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $filterId = Deserializer::int32($stream);
-        $missingPeers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
-        $alreadyPeers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $filterId = Deserializer::int32($__payload, $__offset);
+        $missingPeers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPeer::class, 'deserialize']);
+        $alreadyPeers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPeer::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $filterId,

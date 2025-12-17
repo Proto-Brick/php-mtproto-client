@@ -19,9 +19,9 @@ final class ReactionsNotModified extends AbstractReactions
     {
         return Serializer::int32(self::CONSTRUCTOR_ID);
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
+        Deserializer::int32($__payload, $__offset); // Constructor ID
 
         return new self();
     }

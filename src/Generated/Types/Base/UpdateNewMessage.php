@@ -32,12 +32,12 @@ final class UpdateNewMessage extends AbstractUpdate
         $buffer .= Serializer::int32($this->ptsCount);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $message = AbstractMessage::deserialize($stream);
-        $pts = Deserializer::int32($stream);
-        $ptsCount = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $message = AbstractMessage::deserialize($__payload, $__offset);
+        $pts = Deserializer::int32($__payload, $__offset);
+        $ptsCount = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $message,

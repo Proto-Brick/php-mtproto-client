@@ -110,13 +110,13 @@ final class Invoice extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $test = (($flags & (1 << 0)) !== 0) ? true : null;
         $nameRequested = (($flags & (1 << 1)) !== 0) ? true : null;
         $phoneRequested = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -126,12 +126,12 @@ final class Invoice extends TlObject
         $phoneToProvider = (($flags & (1 << 6)) !== 0) ? true : null;
         $emailToProvider = (($flags & (1 << 7)) !== 0) ? true : null;
         $recurring = (($flags & (1 << 9)) !== 0) ? true : null;
-        $currency = Deserializer::bytes($stream);
-        $prices = Deserializer::vectorOfObjects($stream, [LabeledPrice::class, 'deserialize']);
-        $maxTipAmount = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($stream) : null;
-        $suggestedTipAmounts = (($flags & (1 << 8)) !== 0) ? Deserializer::vectorOfLongs($stream) : null;
-        $termsUrl = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($stream) : null;
-        $subscriptionPeriod = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $prices = Deserializer::vectorOfObjects($__payload, $__offset, [LabeledPrice::class, 'deserialize']);
+        $maxTipAmount = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $suggestedTipAmounts = (($flags & (1 << 8)) !== 0) ? Deserializer::vectorOfLongs($__payload, $__offset) : null;
+        $termsUrl = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $subscriptionPeriod = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $currency,

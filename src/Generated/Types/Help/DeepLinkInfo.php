@@ -42,13 +42,13 @@ final class DeepLinkInfo extends AbstractDeepLinkInfo
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $updateApp = (($flags & (1 << 0)) !== 0) ? true : null;
-        $message = Deserializer::bytes($stream);
-        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $message = Deserializer::bytes($__payload, $__offset);
+        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
 
         return new self(
             $message,

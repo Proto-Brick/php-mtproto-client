@@ -29,11 +29,11 @@ final class UpdateUserEmojiStatus extends AbstractUpdate
         $buffer .= $this->emojiStatus->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $userId = Deserializer::int64($stream);
-        $emojiStatus = AbstractEmojiStatus::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $userId = Deserializer::int64($__payload, $__offset);
+        $emojiStatus = AbstractEmojiStatus::deserialize($__payload, $__offset);
 
         return new self(
             $userId,

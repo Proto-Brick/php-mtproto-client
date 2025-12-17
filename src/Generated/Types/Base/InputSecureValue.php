@@ -86,21 +86,21 @@ final class InputSecureValue extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $type = SecureValueType::deserialize($stream);
-        $data = (($flags & (1 << 0)) !== 0) ? SecureData::deserialize($stream) : null;
-        $frontSide = (($flags & (1 << 1)) !== 0) ? AbstractInputSecureFile::deserialize($stream) : null;
-        $reverseSide = (($flags & (1 << 2)) !== 0) ? AbstractInputSecureFile::deserialize($stream) : null;
-        $selfie = (($flags & (1 << 3)) !== 0) ? AbstractInputSecureFile::deserialize($stream) : null;
-        $translation = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputSecureFile::class, 'deserialize']) : null;
-        $files = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputSecureFile::class, 'deserialize']) : null;
-        $plainData = (($flags & (1 << 5)) !== 0) ? AbstractSecurePlainData::deserialize($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $type = SecureValueType::deserialize($__payload, $__offset);
+        $data = (($flags & (1 << 0)) !== 0) ? SecureData::deserialize($__payload, $__offset) : null;
+        $frontSide = (($flags & (1 << 1)) !== 0) ? AbstractInputSecureFile::deserialize($__payload, $__offset) : null;
+        $reverseSide = (($flags & (1 << 2)) !== 0) ? AbstractInputSecureFile::deserialize($__payload, $__offset) : null;
+        $selfie = (($flags & (1 << 3)) !== 0) ? AbstractInputSecureFile::deserialize($__payload, $__offset) : null;
+        $translation = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputSecureFile::class, 'deserialize']) : null;
+        $files = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputSecureFile::class, 'deserialize']) : null;
+        $plainData = (($flags & (1 << 5)) !== 0) ? AbstractSecurePlainData::deserialize($__payload, $__offset) : null;
 
         return new self(
             $type,

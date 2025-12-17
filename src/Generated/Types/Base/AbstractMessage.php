@@ -11,15 +11,15 @@ use RuntimeException;
  */
 abstract class AbstractMessage extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x90a6ca84 => MessageEmpty::deserialize($stream),
-            0x9815cec8 => Message::deserialize($stream),
-            0x7a800e0a => MessageService::deserialize($stream),
+            0x90a6ca84 => MessageEmpty::deserialize($__payload, $__offset),
+            0x9815cec8 => Message::deserialize($__payload, $__offset),
+            0x7a800e0a => MessageService::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type Message. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

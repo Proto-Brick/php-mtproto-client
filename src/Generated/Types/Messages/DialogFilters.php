@@ -36,15 +36,15 @@ final class DialogFilters extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->filters);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $tagsEnabled = (($flags & (1 << 0)) !== 0) ? true : null;
-        $filters = Deserializer::vectorOfObjects($stream, [AbstractDialogFilter::class, 'deserialize']);
+        $filters = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDialogFilter::class, 'deserialize']);
 
         return new self(
             $filters,

@@ -30,11 +30,11 @@ final class UsersSlice extends AbstractUsers
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $count = Deserializer::int32($stream);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $count = Deserializer::int32($__payload, $__offset);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $count,

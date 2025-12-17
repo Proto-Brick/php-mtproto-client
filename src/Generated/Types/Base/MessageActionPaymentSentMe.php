@@ -71,19 +71,19 @@ final class MessageActionPaymentSentMe extends AbstractMessageAction
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $recurringInit = (($flags & (1 << 2)) !== 0) ? true : null;
         $recurringUsed = (($flags & (1 << 3)) !== 0) ? true : null;
-        $currency = Deserializer::bytes($stream);
-        $totalAmount = Deserializer::int64($stream);
-        $payload = Deserializer::bytes($stream);
-        $info = (($flags & (1 << 0)) !== 0) ? PaymentRequestedInfo::deserialize($stream) : null;
-        $shippingOptionId = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $charge = PaymentCharge::deserialize($stream);
-        $subscriptionUntilDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $totalAmount = Deserializer::int64($__payload, $__offset);
+        $payload = Deserializer::bytes($__payload, $__offset);
+        $info = (($flags & (1 << 0)) !== 0) ? PaymentRequestedInfo::deserialize($__payload, $__offset) : null;
+        $shippingOptionId = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $charge = PaymentCharge::deserialize($__payload, $__offset);
+        $subscriptionUntilDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $currency,

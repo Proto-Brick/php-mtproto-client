@@ -43,13 +43,13 @@ final class ReplyKeyboardForceReply extends AbstractReplyMarkup
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $singleUse = (($flags & (1 << 1)) !== 0) ? true : null;
         $selective = (($flags & (1 << 2)) !== 0) ? true : null;
-        $placeholder = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
+        $placeholder = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $singleUse,

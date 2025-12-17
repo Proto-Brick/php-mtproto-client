@@ -35,13 +35,13 @@ final class InputDocumentFileLocation extends AbstractInputFileLocation
         $buffer .= Serializer::bytes($this->thumbSize);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $fileReference = Deserializer::bytes($stream);
-        $thumbSize = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $fileReference = Deserializer::bytes($__payload, $__offset);
+        $thumbSize = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $id,

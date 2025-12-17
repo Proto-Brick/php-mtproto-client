@@ -42,14 +42,14 @@ final class UpdateChannelUserTyping extends AbstractUpdate
         $buffer .= $this->action->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $channelId = Deserializer::int64($stream);
-        $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $fromId = AbstractPeer::deserialize($stream);
-        $action = AbstractSendMessageAction::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $channelId = Deserializer::int64($__payload, $__offset);
+        $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $fromId = AbstractPeer::deserialize($__payload, $__offset);
+        $action = AbstractSendMessageAction::deserialize($__payload, $__offset);
 
         return new self(
             $channelId,

@@ -31,14 +31,14 @@ final class StatsPercentValue extends TlObject
         $buffer .= pack('d', $this->total);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $part = Deserializer::double($stream);
-        $total = Deserializer::double($stream);
+        $part = Deserializer::double($__payload, $__offset);
+        $total = Deserializer::double($__payload, $__offset);
 
         return new self(
             $part,

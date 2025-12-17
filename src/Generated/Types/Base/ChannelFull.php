@@ -439,10 +439,10 @@ final class ChannelFull extends AbstractChatFull
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $canViewParticipants = (($flags & (1 << 3)) !== 0) ? true : null;
         $canSetUsername = (($flags & (1 << 6)) !== 0) ? true : null;
         $canSetStickers = (($flags & (1 << 7)) !== 0) ? true : null;
@@ -451,7 +451,7 @@ final class ChannelFull extends AbstractChatFull
         $hasScheduled = (($flags & (1 << 19)) !== 0) ? true : null;
         $canViewStats = (($flags & (1 << 20)) !== 0) ? true : null;
         $blocked = (($flags & (1 << 22)) !== 0) ? true : null;
-        $flags2 = Deserializer::int32($stream);
+        $flags2 = Deserializer::int32($__payload, $__offset);
         $canDeleteChannel = (($flags2 & (1 << 0)) !== 0) ? true : null;
         $antispam = (($flags2 & (1 << 1)) !== 0) ? true : null;
         $participantsHidden = (($flags2 & (1 << 2)) !== 0) ? true : null;
@@ -465,50 +465,50 @@ final class ChannelFull extends AbstractChatFull
         $paidReactionsAvailable = (($flags2 & (1 << 16)) !== 0) ? true : null;
         $stargiftsAvailable = (($flags2 & (1 << 19)) !== 0) ? true : null;
         $paidMessagesAvailable = (($flags2 & (1 << 20)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $about = Deserializer::bytes($stream);
-        $participantsCount = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $adminsCount = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $kickedCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $bannedCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $onlineCount = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($stream) : null;
-        $readInboxMaxId = Deserializer::int32($stream);
-        $readOutboxMaxId = Deserializer::int32($stream);
-        $unreadCount = Deserializer::int32($stream);
-        $chatPhoto = AbstractPhoto::deserialize($stream);
-        $notifySettings = PeerNotifySettings::deserialize($stream);
-        $exportedInvite = (($flags & (1 << 23)) !== 0) ? AbstractExportedChatInvite::deserialize($stream) : null;
-        $botInfo = Deserializer::vectorOfObjects($stream, [BotInfo::class, 'deserialize']);
-        $migratedFromChatId = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
-        $migratedFromMaxId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $pinnedMsgId = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $stickerset = (($flags & (1 << 8)) !== 0) ? StickerSet::deserialize($stream) : null;
-        $availableMinId = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($stream) : null;
-        $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
-        $linkedChatId = (($flags & (1 << 14)) !== 0) ? Deserializer::int64($stream) : null;
-        $location = (($flags & (1 << 15)) !== 0) ? AbstractChannelLocation::deserialize($stream) : null;
-        $slowmodeSeconds = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($stream) : null;
-        $slowmodeNextSendDate = (($flags & (1 << 18)) !== 0) ? Deserializer::int32($stream) : null;
-        $statsDc = (($flags & (1 << 12)) !== 0) ? Deserializer::int32($stream) : null;
-        $pts = Deserializer::int32($stream);
-        $call = (($flags & (1 << 21)) !== 0) ? AbstractInputGroupCall::deserialize($stream) : null;
-        $ttlPeriod = (($flags & (1 << 24)) !== 0) ? Deserializer::int32($stream) : null;
-        $pendingSuggestions = (($flags & (1 << 25)) !== 0) ? Deserializer::vectorOfStrings($stream) : null;
-        $groupcallDefaultJoinAs = (($flags & (1 << 26)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $themeEmoticon = (($flags & (1 << 27)) !== 0) ? Deserializer::bytes($stream) : null;
-        $requestsPending = (($flags & (1 << 28)) !== 0) ? Deserializer::int32($stream) : null;
-        $recentRequesters = (($flags & (1 << 28)) !== 0) ? Deserializer::vectorOfLongs($stream) : null;
-        $defaultSendAs = (($flags & (1 << 29)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $availableReactions = (($flags & (1 << 30)) !== 0) ? AbstractChatReactions::deserialize($stream) : null;
-        $reactionsLimit = (($flags2 & (1 << 13)) !== 0) ? Deserializer::int32($stream) : null;
-        $stories = (($flags2 & (1 << 4)) !== 0) ? PeerStories::deserialize($stream) : null;
-        $wallpaper = (($flags2 & (1 << 7)) !== 0) ? AbstractWallPaper::deserialize($stream) : null;
-        $boostsApplied = (($flags2 & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
-        $boostsUnrestrict = (($flags2 & (1 << 9)) !== 0) ? Deserializer::int32($stream) : null;
-        $emojiset = (($flags2 & (1 << 10)) !== 0) ? StickerSet::deserialize($stream) : null;
-        $botVerification = (($flags2 & (1 << 17)) !== 0) ? BotVerification::deserialize($stream) : null;
-        $stargiftsCount = (($flags2 & (1 << 18)) !== 0) ? Deserializer::int32($stream) : null;
-        $sendPaidMessagesStars = (($flags2 & (1 << 21)) !== 0) ? Deserializer::int64($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $about = Deserializer::bytes($__payload, $__offset);
+        $participantsCount = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $adminsCount = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $kickedCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $bannedCount = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $onlineCount = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $readInboxMaxId = Deserializer::int32($__payload, $__offset);
+        $readOutboxMaxId = Deserializer::int32($__payload, $__offset);
+        $unreadCount = Deserializer::int32($__payload, $__offset);
+        $chatPhoto = AbstractPhoto::deserialize($__payload, $__offset);
+        $notifySettings = PeerNotifySettings::deserialize($__payload, $__offset);
+        $exportedInvite = (($flags & (1 << 23)) !== 0) ? AbstractExportedChatInvite::deserialize($__payload, $__offset) : null;
+        $botInfo = Deserializer::vectorOfObjects($__payload, $__offset, [BotInfo::class, 'deserialize']);
+        $migratedFromChatId = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $migratedFromMaxId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $pinnedMsgId = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $stickerset = (($flags & (1 << 8)) !== 0) ? StickerSet::deserialize($__payload, $__offset) : null;
+        $availableMinId = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $linkedChatId = (($flags & (1 << 14)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $location = (($flags & (1 << 15)) !== 0) ? AbstractChannelLocation::deserialize($__payload, $__offset) : null;
+        $slowmodeSeconds = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $slowmodeNextSendDate = (($flags & (1 << 18)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $statsDc = (($flags & (1 << 12)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $pts = Deserializer::int32($__payload, $__offset);
+        $call = (($flags & (1 << 21)) !== 0) ? AbstractInputGroupCall::deserialize($__payload, $__offset) : null;
+        $ttlPeriod = (($flags & (1 << 24)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $pendingSuggestions = (($flags & (1 << 25)) !== 0) ? Deserializer::vectorOfStrings($__payload, $__offset) : null;
+        $groupcallDefaultJoinAs = (($flags & (1 << 26)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $themeEmoticon = (($flags & (1 << 27)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $requestsPending = (($flags & (1 << 28)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $recentRequesters = (($flags & (1 << 28)) !== 0) ? Deserializer::vectorOfLongs($__payload, $__offset) : null;
+        $defaultSendAs = (($flags & (1 << 29)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $availableReactions = (($flags & (1 << 30)) !== 0) ? AbstractChatReactions::deserialize($__payload, $__offset) : null;
+        $reactionsLimit = (($flags2 & (1 << 13)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $stories = (($flags2 & (1 << 4)) !== 0) ? PeerStories::deserialize($__payload, $__offset) : null;
+        $wallpaper = (($flags2 & (1 << 7)) !== 0) ? AbstractWallPaper::deserialize($__payload, $__offset) : null;
+        $boostsApplied = (($flags2 & (1 << 8)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $boostsUnrestrict = (($flags2 & (1 << 9)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $emojiset = (($flags2 & (1 << 10)) !== 0) ? StickerSet::deserialize($__payload, $__offset) : null;
+        $botVerification = (($flags2 & (1 << 17)) !== 0) ? BotVerification::deserialize($__payload, $__offset) : null;
+        $stargiftsCount = (($flags2 & (1 << 18)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $sendPaidMessagesStars = (($flags2 & (1 << 21)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
 
         return new self(
             $id,

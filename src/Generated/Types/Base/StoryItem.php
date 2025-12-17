@@ -154,10 +154,10 @@ final class StoryItem extends AbstractStoryItem
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $pinned = (($flags & (1 << 5)) !== 0) ? true : null;
         $public = (($flags & (1 << 7)) !== 0) ? true : null;
         $closeFriends = (($flags & (1 << 8)) !== 0) ? true : null;
@@ -167,19 +167,19 @@ final class StoryItem extends AbstractStoryItem
         $contacts = (($flags & (1 << 12)) !== 0) ? true : null;
         $selectedContacts = (($flags & (1 << 13)) !== 0) ? true : null;
         $out = (($flags & (1 << 16)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $fromId = (($flags & (1 << 18)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $fwdFrom = (($flags & (1 << 17)) !== 0) ? StoryFwdHeader::deserialize($stream) : null;
-        $expireDate = Deserializer::int32($stream);
-        $caption = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $media = AbstractMessageMedia::deserialize($stream);
-        $mediaAreas = (($flags & (1 << 14)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMediaArea::class, 'deserialize']) : null;
-        $privacy = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractPrivacyRule::class, 'deserialize']) : null;
-        $views = (($flags & (1 << 3)) !== 0) ? StoryViews::deserialize($stream) : null;
-        $sentReaction = (($flags & (1 << 15)) !== 0) ? AbstractReaction::deserialize($stream) : null;
-        $albums = (($flags & (1 << 19)) !== 0) ? Deserializer::vectorOfInts($stream) : null;
+        $id = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $fromId = (($flags & (1 << 18)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $fwdFrom = (($flags & (1 << 17)) !== 0) ? StoryFwdHeader::deserialize($__payload, $__offset) : null;
+        $expireDate = Deserializer::int32($__payload, $__offset);
+        $caption = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $media = AbstractMessageMedia::deserialize($__payload, $__offset);
+        $mediaAreas = (($flags & (1 << 14)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMediaArea::class, 'deserialize']) : null;
+        $privacy = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPrivacyRule::class, 'deserialize']) : null;
+        $views = (($flags & (1 << 3)) !== 0) ? StoryViews::deserialize($__payload, $__offset) : null;
+        $sentReaction = (($flags & (1 << 15)) !== 0) ? AbstractReaction::deserialize($__payload, $__offset) : null;
+        $albums = (($flags & (1 << 19)) !== 0) ? Deserializer::vectorOfInts($__payload, $__offset) : null;
 
         return new self(
             $id,

@@ -26,10 +26,10 @@ final class ReplyInlineMarkup extends AbstractReplyMarkup
         $buffer .= Serializer::vectorOfObjects($this->rows);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $rows = Deserializer::vectorOfObjects($stream, [KeyboardButtonRow::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $rows = Deserializer::vectorOfObjects($__payload, $__offset, [KeyboardButtonRow::class, 'deserialize']);
 
         return new self(
             $rows

@@ -37,16 +37,16 @@ final class SearchResultsCalendarPeriod extends TlObject
         $buffer .= Serializer::int32($this->count);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $date = Deserializer::int32($stream);
-        $minMsgId = Deserializer::int32($stream);
-        $maxMsgId = Deserializer::int32($stream);
-        $count = Deserializer::int32($stream);
+        $date = Deserializer::int32($__payload, $__offset);
+        $minMsgId = Deserializer::int32($__payload, $__offset);
+        $maxMsgId = Deserializer::int32($__payload, $__offset);
+        $count = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $date,

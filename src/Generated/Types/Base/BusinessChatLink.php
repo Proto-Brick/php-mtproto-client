@@ -52,18 +52,18 @@ final class BusinessChatLink extends TlObject
         $buffer .= Serializer::int32($this->views);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $link = Deserializer::bytes($stream);
-        $message = Deserializer::bytes($stream);
-        $entities = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $title = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $views = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
+        $link = Deserializer::bytes($__payload, $__offset);
+        $message = Deserializer::bytes($__payload, $__offset);
+        $entities = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $title = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $views = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $link,

@@ -42,14 +42,14 @@ final class DialogsSlice extends AbstractDialogs
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $count = Deserializer::int32($stream);
-        $dialogs = Deserializer::vectorOfObjects($stream, [AbstractDialog::class, 'deserialize']);
-        $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $count = Deserializer::int32($__payload, $__offset);
+        $dialogs = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDialog::class, 'deserialize']);
+        $messages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $count,

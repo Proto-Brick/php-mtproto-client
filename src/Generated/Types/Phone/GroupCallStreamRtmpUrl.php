@@ -31,14 +31,14 @@ final class GroupCallStreamRtmpUrl extends TlObject
         $buffer .= Serializer::bytes($this->key);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $url = Deserializer::bytes($stream);
-        $key = Deserializer::bytes($stream);
+        $url = Deserializer::bytes($__payload, $__offset);
+        $key = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $url,

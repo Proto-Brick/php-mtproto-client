@@ -58,19 +58,19 @@ final class SavedStarGifts extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $count = Deserializer::int32($stream);
-        $chatNotificationsEnabled = (($flags & (1 << 1)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $gifts = Deserializer::vectorOfObjects($stream, [SavedStarGift::class, 'deserialize']);
-        $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $flags = Deserializer::int32($__payload, $__offset);
+        $count = Deserializer::int32($__payload, $__offset);
+        $chatNotificationsEnabled = (($flags & (1 << 1)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
+        $gifts = Deserializer::vectorOfObjects($__payload, $__offset, [SavedStarGift::class, 'deserialize']);
+        $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $count,

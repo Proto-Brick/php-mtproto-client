@@ -114,24 +114,24 @@ final class MessageActionStarGift extends AbstractMessageAction
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $nameHidden = (($flags & (1 << 0)) !== 0) ? true : null;
         $saved = (($flags & (1 << 2)) !== 0) ? true : null;
         $converted = (($flags & (1 << 3)) !== 0) ? true : null;
         $upgraded = (($flags & (1 << 5)) !== 0) ? true : null;
         $refunded = (($flags & (1 << 9)) !== 0) ? true : null;
         $canUpgrade = (($flags & (1 << 10)) !== 0) ? true : null;
-        $gift = AbstractStarGift::deserialize($stream);
-        $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;
-        $convertStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
-        $upgradeMsgId = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $upgradeStars = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($stream) : null;
-        $fromId = (($flags & (1 << 11)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $peer = (($flags & (1 << 12)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $savedId = (($flags & (1 << 12)) !== 0) ? Deserializer::int64($stream) : null;
+        $gift = AbstractStarGift::deserialize($__payload, $__offset);
+        $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($__payload, $__offset) : null;
+        $convertStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $upgradeMsgId = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $upgradeStars = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $fromId = (($flags & (1 << 11)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $peer = (($flags & (1 << 12)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $savedId = (($flags & (1 << 12)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
 
         return new self(
             $gift,

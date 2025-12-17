@@ -44,16 +44,16 @@ final class UpdateBotMessageReaction extends AbstractUpdate
         $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $peer = AbstractPeer::deserialize($stream);
-        $msgId = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $actor = AbstractPeer::deserialize($stream);
-        $oldReactions = Deserializer::vectorOfObjects($stream, [AbstractReaction::class, 'deserialize']);
-        $newReactions = Deserializer::vectorOfObjects($stream, [AbstractReaction::class, 'deserialize']);
-        $qts = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $msgId = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $actor = AbstractPeer::deserialize($__payload, $__offset);
+        $oldReactions = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractReaction::class, 'deserialize']);
+        $newReactions = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractReaction::class, 'deserialize']);
+        $qts = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $peer,

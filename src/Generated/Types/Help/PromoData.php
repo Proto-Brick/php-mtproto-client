@@ -81,20 +81,20 @@ final class PromoData extends AbstractPromoData
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $proxy = (($flags & (1 << 0)) !== 0) ? true : null;
-        $expires = Deserializer::int32($stream);
-        $peer = (($flags & (1 << 3)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $psaType = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $psaMessage = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $pendingSuggestions = Deserializer::vectorOfStrings($stream);
-        $dismissedSuggestions = Deserializer::vectorOfStrings($stream);
-        $customPendingSuggestion = (($flags & (1 << 4)) !== 0) ? PendingSuggestion::deserialize($stream) : null;
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $expires = Deserializer::int32($__payload, $__offset);
+        $peer = (($flags & (1 << 3)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $psaType = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $psaMessage = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $pendingSuggestions = Deserializer::vectorOfStrings($__payload, $__offset);
+        $dismissedSuggestions = Deserializer::vectorOfStrings($__payload, $__offset);
+        $customPendingSuggestion = (($flags & (1 << 4)) !== 0) ? PendingSuggestion::deserialize($__payload, $__offset) : null;
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $expires,

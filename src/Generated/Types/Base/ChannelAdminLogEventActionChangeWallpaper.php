@@ -29,11 +29,11 @@ final class ChannelAdminLogEventActionChangeWallpaper extends AbstractChannelAdm
         $buffer .= $this->newValue->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $prevValue = AbstractWallPaper::deserialize($stream);
-        $newValue = AbstractWallPaper::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $prevValue = AbstractWallPaper::deserialize($__payload, $__offset);
+        $newValue = AbstractWallPaper::deserialize($__payload, $__offset);
 
         return new self(
             $prevValue,

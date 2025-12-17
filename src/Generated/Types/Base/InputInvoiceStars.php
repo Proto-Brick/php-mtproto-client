@@ -26,10 +26,10 @@ final class InputInvoiceStars extends AbstractInputInvoice
         $buffer .= $this->purpose->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $purpose = AbstractInputStorePaymentPurpose::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $purpose = AbstractInputStorePaymentPurpose::deserialize($__payload, $__offset);
 
         return new self(
             $purpose

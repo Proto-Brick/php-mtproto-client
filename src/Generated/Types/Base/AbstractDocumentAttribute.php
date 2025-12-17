@@ -11,20 +11,20 @@ use RuntimeException;
  */
 abstract class AbstractDocumentAttribute extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x6c37c15c => DocumentAttributeImageSize::deserialize($stream),
-            0x11b58939 => DocumentAttributeAnimated::deserialize($stream),
-            0x6319d612 => DocumentAttributeSticker::deserialize($stream),
-            0x43c57c48 => DocumentAttributeVideo::deserialize($stream),
-            0x9852f9c6 => DocumentAttributeAudio::deserialize($stream),
-            0x15590068 => DocumentAttributeFilename::deserialize($stream),
-            0x9801d2f7 => DocumentAttributeHasStickers::deserialize($stream),
-            0xfd149899 => DocumentAttributeCustomEmoji::deserialize($stream),
+            0x6c37c15c => DocumentAttributeImageSize::deserialize($__payload, $__offset),
+            0x11b58939 => DocumentAttributeAnimated::deserialize($__payload, $__offset),
+            0x6319d612 => DocumentAttributeSticker::deserialize($__payload, $__offset),
+            0x43c57c48 => DocumentAttributeVideo::deserialize($__payload, $__offset),
+            0x9852f9c6 => DocumentAttributeAudio::deserialize($__payload, $__offset),
+            0x15590068 => DocumentAttributeFilename::deserialize($__payload, $__offset),
+            0x9801d2f7 => DocumentAttributeHasStickers::deserialize($__payload, $__offset),
+            0xfd149899 => DocumentAttributeCustomEmoji::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type DocumentAttribute. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

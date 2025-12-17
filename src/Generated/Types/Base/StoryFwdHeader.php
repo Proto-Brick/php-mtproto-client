@@ -56,17 +56,17 @@ final class StoryFwdHeader extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $modified = (($flags & (1 << 3)) !== 0) ? true : null;
-        $from = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $fromName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $storyId = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $from = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $fromName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $storyId = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $modified,

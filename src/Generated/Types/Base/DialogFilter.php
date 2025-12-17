@@ -101,10 +101,10 @@ final class DialogFilter extends AbstractDialogFilter
         $buffer .= Serializer::vectorOfObjects($this->excludePeers);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $contacts = (($flags & (1 << 0)) !== 0) ? true : null;
         $nonContacts = (($flags & (1 << 1)) !== 0) ? true : null;
         $groups = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -114,13 +114,13 @@ final class DialogFilter extends AbstractDialogFilter
         $excludeRead = (($flags & (1 << 12)) !== 0) ? true : null;
         $excludeArchived = (($flags & (1 << 13)) !== 0) ? true : null;
         $titleNoanimate = (($flags & (1 << 28)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
-        $title = TextWithEntities::deserialize($stream);
-        $emoticon = (($flags & (1 << 25)) !== 0) ? Deserializer::bytes($stream) : null;
-        $color = (($flags & (1 << 27)) !== 0) ? Deserializer::int32($stream) : null;
-        $pinnedPeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
-        $includePeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
-        $excludePeers = Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']);
+        $id = Deserializer::int32($__payload, $__offset);
+        $title = TextWithEntities::deserialize($__payload, $__offset);
+        $emoticon = (($flags & (1 << 25)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $color = (($flags & (1 << 27)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $pinnedPeers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputPeer::class, 'deserialize']);
+        $includePeers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputPeer::class, 'deserialize']);
+        $excludePeers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputPeer::class, 'deserialize']);
 
         return new self(
             $id,

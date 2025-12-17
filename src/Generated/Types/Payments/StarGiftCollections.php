@@ -27,10 +27,10 @@ final class StarGiftCollections extends AbstractStarGiftCollections
         $buffer .= Serializer::vectorOfObjects($this->collections);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $collections = Deserializer::vectorOfObjects($stream, [StarGiftCollection::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $collections = Deserializer::vectorOfObjects($__payload, $__offset, [StarGiftCollection::class, 'deserialize']);
 
         return new self(
             $collections

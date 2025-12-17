@@ -31,14 +31,14 @@ final class BotPreparedInlineMessage extends TlObject
         $buffer .= Serializer::int32($this->expireDate);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $id = Deserializer::bytes($stream);
-        $expireDate = Deserializer::int32($stream);
+        $id = Deserializer::bytes($__payload, $__offset);
+        $expireDate = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $id,

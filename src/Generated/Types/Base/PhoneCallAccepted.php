@@ -51,18 +51,18 @@ final class PhoneCallAccepted extends AbstractPhoneCall
         $buffer .= $this->protocol->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $video = (($flags & (1 << 6)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $adminId = Deserializer::int64($stream);
-        $participantId = Deserializer::int64($stream);
-        $gB = Deserializer::bytes($stream);
-        $protocol = PhoneCallProtocol::deserialize($stream);
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $adminId = Deserializer::int64($__payload, $__offset);
+        $participantId = Deserializer::int64($__payload, $__offset);
+        $gB = Deserializer::bytes($__payload, $__offset);
+        $protocol = PhoneCallProtocol::deserialize($__payload, $__offset);
 
         return new self(
             $id,

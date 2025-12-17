@@ -31,14 +31,14 @@ final class BusinessWeeklyOpen extends TlObject
         $buffer .= Serializer::int32($this->endMinute);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $startMinute = Deserializer::int32($stream);
-        $endMinute = Deserializer::int32($stream);
+        $startMinute = Deserializer::int32($__payload, $__offset);
+        $endMinute = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $startMinute,

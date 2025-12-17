@@ -38,13 +38,13 @@ final class ChannelParticipants extends AbstractChannelParticipants
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $count = Deserializer::int32($stream);
-        $participants = Deserializer::vectorOfObjects($stream, [AbstractChannelParticipant::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $count = Deserializer::int32($__payload, $__offset);
+        $participants = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChannelParticipant::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $count,

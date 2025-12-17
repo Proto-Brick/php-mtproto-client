@@ -54,16 +54,16 @@ final class ChatlistInvite extends AbstractChatlistInvite
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $titleNoanimate = (($flags & (1 << 1)) !== 0) ? true : null;
-        $title = TextWithEntities::deserialize($stream);
-        $emoticon = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $peers = Deserializer::vectorOfObjects($stream, [AbstractPeer::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $title = TextWithEntities::deserialize($__payload, $__offset);
+        $emoticon = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $peers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPeer::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $title,

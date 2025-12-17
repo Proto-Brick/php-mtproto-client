@@ -120,13 +120,13 @@ final class StickerSet extends TlObject
         $buffer .= Serializer::int32($this->hash);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $archived = (($flags & (1 << 1)) !== 0) ? true : null;
         $official = (($flags & (1 << 2)) !== 0) ? true : null;
         $masks = (($flags & (1 << 3)) !== 0) ? true : null;
@@ -134,17 +134,17 @@ final class StickerSet extends TlObject
         $textColor = (($flags & (1 << 9)) !== 0) ? true : null;
         $channelEmojiStatus = (($flags & (1 << 10)) !== 0) ? true : null;
         $creator = (($flags & (1 << 11)) !== 0) ? true : null;
-        $installedDate = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $title = Deserializer::bytes($stream);
-        $shortName = Deserializer::bytes($stream);
-        $thumbs = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']) : null;
-        $thumbDcId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $thumbVersion = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $thumbDocumentId = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($stream) : null;
-        $count = Deserializer::int32($stream);
-        $hash = Deserializer::int32($stream);
+        $installedDate = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $shortName = Deserializer::bytes($__payload, $__offset);
+        $thumbs = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPhotoSize::class, 'deserialize']) : null;
+        $thumbDcId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $thumbVersion = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $thumbDocumentId = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $count = Deserializer::int32($__payload, $__offset);
+        $hash = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $id,

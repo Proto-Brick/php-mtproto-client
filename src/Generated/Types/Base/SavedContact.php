@@ -37,16 +37,16 @@ final class SavedContact extends TlObject
         $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $phone = Deserializer::bytes($stream);
-        $firstName = Deserializer::bytes($stream);
-        $lastName = Deserializer::bytes($stream);
-        $date = Deserializer::int32($stream);
+        $phone = Deserializer::bytes($__payload, $__offset);
+        $firstName = Deserializer::bytes($__payload, $__offset);
+        $lastName = Deserializer::bytes($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $phone,

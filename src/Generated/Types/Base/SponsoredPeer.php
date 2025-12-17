@@ -49,17 +49,17 @@ final class SponsoredPeer extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $randomId = Deserializer::bytes($stream);
-        $peer = AbstractPeer::deserialize($stream);
-        $sponsorInfo = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $additionalInfo = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $randomId = Deserializer::bytes($__payload, $__offset);
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $sponsorInfo = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $additionalInfo = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $randomId,

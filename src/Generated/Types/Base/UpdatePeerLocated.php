@@ -26,10 +26,10 @@ final class UpdatePeerLocated extends AbstractUpdate
         $buffer .= Serializer::vectorOfObjects($this->peers);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $peers = Deserializer::vectorOfObjects($stream, [AbstractPeerLocated::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $peers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPeerLocated::class, 'deserialize']);
 
         return new self(
             $peers

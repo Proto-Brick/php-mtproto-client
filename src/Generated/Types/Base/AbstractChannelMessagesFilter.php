@@ -11,14 +11,14 @@ use RuntimeException;
  */
 abstract class AbstractChannelMessagesFilter extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x94d42ee7 => ChannelMessagesFilterEmpty::deserialize($stream),
-            0xcd77d957 => ChannelMessagesFilter::deserialize($stream),
+            0x94d42ee7 => ChannelMessagesFilterEmpty::deserialize($__payload, $__offset),
+            0xcd77d957 => ChannelMessagesFilter::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type ChannelMessagesFilter. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

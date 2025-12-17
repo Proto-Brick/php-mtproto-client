@@ -46,15 +46,15 @@ final class Difference extends AbstractDifference
         $buffer .= $this->state->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $newMessages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $newEncryptedMessages = Deserializer::vectorOfObjects($stream, [AbstractEncryptedMessage::class, 'deserialize']);
-        $otherUpdates = Deserializer::vectorOfObjects($stream, [AbstractUpdate::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $state = State::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $newMessages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);
+        $newEncryptedMessages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractEncryptedMessage::class, 'deserialize']);
+        $otherUpdates = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUpdate::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
+        $state = State::deserialize($__payload, $__offset);
 
         return new self(
             $newMessages,

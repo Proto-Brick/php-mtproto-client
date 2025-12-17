@@ -36,13 +36,13 @@ final class UserInfo extends AbstractUserInfo
         $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $message = Deserializer::bytes($stream);
-        $entities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
-        $author = Deserializer::bytes($stream);
-        $date = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $message = Deserializer::bytes($__payload, $__offset);
+        $entities = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']);
+        $author = Deserializer::bytes($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $message,

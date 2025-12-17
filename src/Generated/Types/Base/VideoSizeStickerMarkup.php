@@ -32,12 +32,12 @@ final class VideoSizeStickerMarkup extends AbstractVideoSize
         $buffer .= Serializer::vectorOfInts($this->backgroundColors);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $stickerset = AbstractInputStickerSet::deserialize($stream);
-        $stickerId = Deserializer::int64($stream);
-        $backgroundColors = Deserializer::vectorOfInts($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $stickerset = AbstractInputStickerSet::deserialize($__payload, $__offset);
+        $stickerId = Deserializer::int64($__payload, $__offset);
+        $backgroundColors = Deserializer::vectorOfInts($__payload, $__offset);
 
         return new self(
             $stickerset,

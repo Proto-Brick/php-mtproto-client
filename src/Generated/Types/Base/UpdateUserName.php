@@ -35,13 +35,13 @@ final class UpdateUserName extends AbstractUpdate
         $buffer .= Serializer::vectorOfObjects($this->usernames);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $userId = Deserializer::int64($stream);
-        $firstName = Deserializer::bytes($stream);
-        $lastName = Deserializer::bytes($stream);
-        $usernames = Deserializer::vectorOfObjects($stream, [Username::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $userId = Deserializer::int64($__payload, $__offset);
+        $firstName = Deserializer::bytes($__payload, $__offset);
+        $lastName = Deserializer::bytes($__payload, $__offset);
+        $usernames = Deserializer::vectorOfObjects($__payload, $__offset, [Username::class, 'deserialize']);
 
         return new self(
             $userId,

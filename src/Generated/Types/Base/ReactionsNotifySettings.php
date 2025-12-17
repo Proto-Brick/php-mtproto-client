@@ -49,17 +49,17 @@ final class ReactionsNotifySettings extends TlObject
         $buffer .= ($this->showPreviews ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $messagesNotifyFrom = (($flags & (1 << 0)) !== 0) ? ReactionNotificationsFrom::deserialize($stream) : null;
-        $storiesNotifyFrom = (($flags & (1 << 1)) !== 0) ? ReactionNotificationsFrom::deserialize($stream) : null;
-        $sound = AbstractNotificationSound::deserialize($stream);
-        $showPreviews = (Deserializer::int32($stream) === 0x997275b5);
+        $flags = Deserializer::int32($__payload, $__offset);
+        $messagesNotifyFrom = (($flags & (1 << 0)) !== 0) ? ReactionNotificationsFrom::deserialize($__payload, $__offset) : null;
+        $storiesNotifyFrom = (($flags & (1 << 1)) !== 0) ? ReactionNotificationsFrom::deserialize($__payload, $__offset) : null;
+        $sound = AbstractNotificationSound::deserialize($__payload, $__offset);
+        $showPreviews = (Deserializer::int32($__payload, $__offset) === 0x997275b5);
 
         return new self(
             $sound,

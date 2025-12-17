@@ -65,20 +65,20 @@ final class Document extends AbstractDocument
         $buffer .= Serializer::vectorOfObjects($this->attributes);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $fileReference = Deserializer::bytes($stream);
-        $date = Deserializer::int32($stream);
-        $mimeType = Deserializer::bytes($stream);
-        $size = Deserializer::int64($stream);
-        $thumbs = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractPhotoSize::class, 'deserialize']) : null;
-        $videoThumbs = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractVideoSize::class, 'deserialize']) : null;
-        $dcId = Deserializer::int32($stream);
-        $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $fileReference = Deserializer::bytes($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $mimeType = Deserializer::bytes($__payload, $__offset);
+        $size = Deserializer::int64($__payload, $__offset);
+        $thumbs = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPhotoSize::class, 'deserialize']) : null;
+        $videoThumbs = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractVideoSize::class, 'deserialize']) : null;
+        $dcId = Deserializer::int32($__payload, $__offset);
+        $attributes = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocumentAttribute::class, 'deserialize']);
 
         return new self(
             $id,

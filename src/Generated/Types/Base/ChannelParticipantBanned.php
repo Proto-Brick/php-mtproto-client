@@ -42,15 +42,15 @@ final class ChannelParticipantBanned extends AbstractChannelParticipant
         $buffer .= $this->bannedRights->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $left = (($flags & (1 << 0)) !== 0) ? true : null;
-        $peer = AbstractPeer::deserialize($stream);
-        $kickedBy = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $bannedRights = ChatBannedRights::deserialize($stream);
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $kickedBy = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $bannedRights = ChatBannedRights::deserialize($__payload, $__offset);
 
         return new self(
             $peer,

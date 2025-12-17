@@ -74,23 +74,23 @@ final class AttachMenuBot extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->icons);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $inactive = (($flags & (1 << 0)) !== 0) ? true : null;
         $hasSettings = (($flags & (1 << 1)) !== 0) ? true : null;
         $requestWriteAccess = (($flags & (1 << 2)) !== 0) ? true : null;
         $showInAttachMenu = (($flags & (1 << 3)) !== 0) ? true : null;
         $showInSideMenu = (($flags & (1 << 4)) !== 0) ? true : null;
         $sideMenuDisclaimerNeeded = (($flags & (1 << 5)) !== 0) ? true : null;
-        $botId = Deserializer::int64($stream);
-        $shortName = Deserializer::bytes($stream);
-        $peerTypes = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [AttachMenuPeerType::class, 'deserialize']) : null;
-        $icons = Deserializer::vectorOfObjects($stream, [AttachMenuBotIcon::class, 'deserialize']);
+        $botId = Deserializer::int64($__payload, $__offset);
+        $shortName = Deserializer::bytes($__payload, $__offset);
+        $peerTypes = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AttachMenuPeerType::class, 'deserialize']) : null;
+        $icons = Deserializer::vectorOfObjects($__payload, $__offset, [AttachMenuBotIcon::class, 'deserialize']);
 
         return new self(
             $botId,

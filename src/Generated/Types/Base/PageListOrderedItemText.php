@@ -29,11 +29,11 @@ final class PageListOrderedItemText extends AbstractPageListOrderedItem
         $buffer .= $this->text->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $num = Deserializer::bytes($stream);
-        $text = AbstractRichText::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $num = Deserializer::bytes($__payload, $__offset);
+        $text = AbstractRichText::deserialize($__payload, $__offset);
 
         return new self(
             $num,

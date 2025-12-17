@@ -74,23 +74,23 @@ final class DcOption extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $ipv6 = (($flags & (1 << 0)) !== 0) ? true : null;
         $mediaOnly = (($flags & (1 << 1)) !== 0) ? true : null;
         $tcpoOnly = (($flags & (1 << 2)) !== 0) ? true : null;
         $cdn = (($flags & (1 << 3)) !== 0) ? true : null;
         $static = (($flags & (1 << 4)) !== 0) ? true : null;
         $thisPortOnly = (($flags & (1 << 5)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
-        $ipAddress = Deserializer::bytes($stream);
-        $port = Deserializer::int32($stream);
-        $secret = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($stream) : null;
+        $id = Deserializer::int32($__payload, $__offset);
+        $ipAddress = Deserializer::bytes($__payload, $__offset);
+        $port = Deserializer::int32($__payload, $__offset);
+        $secret = (($flags & (1 << 10)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $id,

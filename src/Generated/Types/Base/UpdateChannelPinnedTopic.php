@@ -36,13 +36,13 @@ final class UpdateChannelPinnedTopic extends AbstractUpdate
         $buffer .= Serializer::int32($this->topicId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $pinned = (($flags & (1 << 0)) !== 0) ? true : null;
-        $channelId = Deserializer::int64($stream);
-        $topicId = Deserializer::int32($stream);
+        $channelId = Deserializer::int64($__payload, $__offset);
+        $topicId = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $channelId,

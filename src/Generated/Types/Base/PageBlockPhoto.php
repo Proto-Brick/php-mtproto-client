@@ -47,14 +47,14 @@ final class PageBlockPhoto extends AbstractPageBlock
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $photoId = Deserializer::int64($stream);
-        $caption = PageCaption::deserialize($stream);
-        $url = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $webpageId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $photoId = Deserializer::int64($__payload, $__offset);
+        $caption = PageCaption::deserialize($__payload, $__offset);
+        $url = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $webpageId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
 
         return new self(
             $photoId,

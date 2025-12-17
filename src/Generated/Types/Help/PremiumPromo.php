@@ -47,18 +47,18 @@ final class PremiumPromo extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $statusText = Deserializer::bytes($stream);
-        $statusEntities = Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']);
-        $videoSections = Deserializer::vectorOfStrings($stream);
-        $videos = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
-        $periodOptions = Deserializer::vectorOfObjects($stream, [PremiumSubscriptionOption::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $statusText = Deserializer::bytes($__payload, $__offset);
+        $statusEntities = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']);
+        $videoSections = Deserializer::vectorOfStrings($__payload, $__offset);
+        $videos = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
+        $periodOptions = Deserializer::vectorOfObjects($__payload, $__offset, [PremiumSubscriptionOption::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $statusText,

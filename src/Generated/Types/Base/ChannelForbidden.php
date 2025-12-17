@@ -52,16 +52,16 @@ final class ChannelForbidden extends AbstractChat
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $broadcast = (($flags & (1 << 5)) !== 0) ? true : null;
         $megagroup = (($flags & (1 << 8)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $title = Deserializer::bytes($stream);
-        $untilDate = (($flags & (1 << 16)) !== 0) ? Deserializer::int32($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $untilDate = (($flags & (1 << 16)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $id,

@@ -39,13 +39,13 @@ final class InputGeoPoint extends AbstractInputGeoPoint
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $lat = Deserializer::double($stream);
-        $long = Deserializer::double($stream);
-        $accuracyRadius = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $lat = Deserializer::double($__payload, $__offset);
+        $long = Deserializer::double($__payload, $__offset);
+        $accuracyRadius = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $lat,

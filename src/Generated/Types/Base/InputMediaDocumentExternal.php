@@ -57,15 +57,15 @@ final class InputMediaDocumentExternal extends AbstractInputMedia
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $spoiler = (($flags & (1 << 1)) !== 0) ? true : null;
-        $url = Deserializer::bytes($stream);
-        $ttlSeconds = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $videoCover = (($flags & (1 << 2)) !== 0) ? AbstractInputPhoto::deserialize($stream) : null;
-        $videoTimestamp = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $url = Deserializer::bytes($__payload, $__offset);
+        $ttlSeconds = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $videoCover = (($flags & (1 << 2)) !== 0) ? AbstractInputPhoto::deserialize($__payload, $__offset) : null;
+        $videoTimestamp = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $url,

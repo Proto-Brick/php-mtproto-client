@@ -26,10 +26,10 @@ final class UpdateQuickReplies extends AbstractUpdate
         $buffer .= Serializer::vectorOfObjects($this->quickReplies);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $quickReplies = Deserializer::vectorOfObjects($stream, [QuickReply::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $quickReplies = Deserializer::vectorOfObjects($__payload, $__offset, [QuickReply::class, 'deserialize']);
 
         return new self(
             $quickReplies

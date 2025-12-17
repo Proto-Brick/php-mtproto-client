@@ -32,12 +32,12 @@ final class InputPeerUserFromMessage extends AbstractInputPeer
         $buffer .= Serializer::int64($this->userId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $peer = AbstractInputPeer::deserialize($stream);
-        $msgId = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $peer = AbstractInputPeer::deserialize($__payload, $__offset);
+        $msgId = Deserializer::int32($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $peer,

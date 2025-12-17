@@ -96,25 +96,25 @@ final class Dialog extends AbstractDialog
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $pinned = (($flags & (1 << 2)) !== 0) ? true : null;
         $unreadMark = (($flags & (1 << 3)) !== 0) ? true : null;
         $viewForumAsMessages = (($flags & (1 << 6)) !== 0) ? true : null;
-        $peer = AbstractPeer::deserialize($stream);
-        $topMessage = Deserializer::int32($stream);
-        $readInboxMaxId = Deserializer::int32($stream);
-        $readOutboxMaxId = Deserializer::int32($stream);
-        $unreadCount = Deserializer::int32($stream);
-        $unreadMentionsCount = Deserializer::int32($stream);
-        $unreadReactionsCount = Deserializer::int32($stream);
-        $notifySettings = PeerNotifySettings::deserialize($stream);
-        $pts = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $draft = (($flags & (1 << 1)) !== 0) ? AbstractDraftMessage::deserialize($stream) : null;
-        $folderId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $ttlPeriod = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $topMessage = Deserializer::int32($__payload, $__offset);
+        $readInboxMaxId = Deserializer::int32($__payload, $__offset);
+        $readOutboxMaxId = Deserializer::int32($__payload, $__offset);
+        $unreadCount = Deserializer::int32($__payload, $__offset);
+        $unreadMentionsCount = Deserializer::int32($__payload, $__offset);
+        $unreadReactionsCount = Deserializer::int32($__payload, $__offset);
+        $notifySettings = PeerNotifySettings::deserialize($__payload, $__offset);
+        $pts = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $draft = (($flags & (1 << 1)) !== 0) ? AbstractDraftMessage::deserialize($__payload, $__offset) : null;
+        $folderId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $ttlPeriod = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $peer,

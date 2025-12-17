@@ -11,14 +11,14 @@ use RuntimeException;
  */
 abstract class AbstractSponsoredPeers extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0xea32b4b1 => SponsoredPeersEmpty::deserialize($stream),
-            0xeb032884 => SponsoredPeers::deserialize($stream),
+            0xea32b4b1 => SponsoredPeersEmpty::deserialize($__payload, $__offset),
+            0xeb032884 => SponsoredPeers::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type contacts.SponsoredPeers. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

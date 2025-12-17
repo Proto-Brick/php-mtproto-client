@@ -29,11 +29,11 @@ final class PageBlockCollage extends AbstractPageBlock
         $buffer .= $this->caption->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $items = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
-        $caption = PageCaption::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $items = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPageBlock::class, 'deserialize']);
+        $caption = PageCaption::deserialize($__payload, $__offset);
 
         return new self(
             $items,

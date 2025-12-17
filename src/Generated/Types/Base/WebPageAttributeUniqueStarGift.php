@@ -26,10 +26,10 @@ final class WebPageAttributeUniqueStarGift extends AbstractWebPageAttribute
         $buffer .= $this->gift->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $gift = AbstractStarGift::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $gift = AbstractStarGift::deserialize($__payload, $__offset);
 
         return new self(
             $gift

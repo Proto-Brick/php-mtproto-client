@@ -38,14 +38,14 @@ final class EncryptedMessage extends AbstractEncryptedMessage
         $buffer .= $this->file->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $randomId = Deserializer::int64($stream);
-        $chatId = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $bytes = Deserializer::bytes($stream);
-        $file = AbstractEncryptedFile::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $randomId = Deserializer::int64($__payload, $__offset);
+        $chatId = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $bytes = Deserializer::bytes($__payload, $__offset);
+        $file = AbstractEncryptedFile::deserialize($__payload, $__offset);
 
         return new self(
             $randomId,

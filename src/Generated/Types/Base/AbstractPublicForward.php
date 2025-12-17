@@ -11,14 +11,14 @@ use RuntimeException;
  */
 abstract class AbstractPublicForward extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x1f2bf4a => PublicForwardMessage::deserialize($stream),
-            0xedf3add0 => PublicForwardStory::deserialize($stream),
+            0x1f2bf4a => PublicForwardMessage::deserialize($__payload, $__offset),
+            0xedf3add0 => PublicForwardStory::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type PublicForward. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

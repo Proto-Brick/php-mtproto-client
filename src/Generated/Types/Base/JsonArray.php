@@ -26,10 +26,10 @@ final class JsonArray extends AbstractJSONValue
         $buffer .= Serializer::vectorOfObjects($this->value);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $value = Deserializer::vectorOfObjects($stream, [Deserializer::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $value = Deserializer::vectorOfObjects($__payload, $__offset, [Deserializer::class, 'deserialize']);
 
         return new self(
             $value

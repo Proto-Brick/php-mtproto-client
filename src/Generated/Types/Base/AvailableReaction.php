@@ -74,24 +74,24 @@ final class AvailableReaction extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $inactive = (($flags & (1 << 0)) !== 0) ? true : null;
         $premium = (($flags & (1 << 2)) !== 0) ? true : null;
-        $reaction = Deserializer::bytes($stream);
-        $title = Deserializer::bytes($stream);
-        $staticIcon = AbstractDocument::deserialize($stream);
-        $appearAnimation = AbstractDocument::deserialize($stream);
-        $selectAnimation = AbstractDocument::deserialize($stream);
-        $activateAnimation = AbstractDocument::deserialize($stream);
-        $effectAnimation = AbstractDocument::deserialize($stream);
-        $aroundAnimation = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($stream) : null;
-        $centerIcon = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($stream) : null;
+        $reaction = Deserializer::bytes($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $staticIcon = AbstractDocument::deserialize($__payload, $__offset);
+        $appearAnimation = AbstractDocument::deserialize($__payload, $__offset);
+        $selectAnimation = AbstractDocument::deserialize($__payload, $__offset);
+        $activateAnimation = AbstractDocument::deserialize($__payload, $__offset);
+        $effectAnimation = AbstractDocument::deserialize($__payload, $__offset);
+        $aroundAnimation = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
+        $centerIcon = (($flags & (1 << 1)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
 
         return new self(
             $reaction,

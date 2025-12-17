@@ -35,13 +35,13 @@ final class StickerSetFullCovered extends AbstractStickerSetCovered
         $buffer .= Serializer::vectorOfObjects($this->documents);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $set = StickerSet::deserialize($stream);
-        $packs = Deserializer::vectorOfObjects($stream, [StickerPack::class, 'deserialize']);
-        $keywords = Deserializer::vectorOfObjects($stream, [StickerKeyword::class, 'deserialize']);
-        $documents = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $set = StickerSet::deserialize($__payload, $__offset);
+        $packs = Deserializer::vectorOfObjects($__payload, $__offset, [StickerPack::class, 'deserialize']);
+        $keywords = Deserializer::vectorOfObjects($__payload, $__offset, [StickerKeyword::class, 'deserialize']);
+        $documents = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
 
         return new self(
             $set,

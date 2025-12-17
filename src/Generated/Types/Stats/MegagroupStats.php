@@ -83,29 +83,29 @@ final class MegagroupStats extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $period = StatsDateRangeDays::deserialize($stream);
-        $members = StatsAbsValueAndPrev::deserialize($stream);
-        $messages = StatsAbsValueAndPrev::deserialize($stream);
-        $viewers = StatsAbsValueAndPrev::deserialize($stream);
-        $posters = StatsAbsValueAndPrev::deserialize($stream);
-        $growthGraph = AbstractStatsGraph::deserialize($stream);
-        $membersGraph = AbstractStatsGraph::deserialize($stream);
-        $newMembersBySourceGraph = AbstractStatsGraph::deserialize($stream);
-        $languagesGraph = AbstractStatsGraph::deserialize($stream);
-        $messagesGraph = AbstractStatsGraph::deserialize($stream);
-        $actionsGraph = AbstractStatsGraph::deserialize($stream);
-        $topHoursGraph = AbstractStatsGraph::deserialize($stream);
-        $weekdaysGraph = AbstractStatsGraph::deserialize($stream);
-        $topPosters = Deserializer::vectorOfObjects($stream, [StatsGroupTopPoster::class, 'deserialize']);
-        $topAdmins = Deserializer::vectorOfObjects($stream, [StatsGroupTopAdmin::class, 'deserialize']);
-        $topInviters = Deserializer::vectorOfObjects($stream, [StatsGroupTopInviter::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $period = StatsDateRangeDays::deserialize($__payload, $__offset);
+        $members = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $messages = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $viewers = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $posters = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $growthGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $membersGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $newMembersBySourceGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $languagesGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $messagesGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $actionsGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $topHoursGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $weekdaysGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $topPosters = Deserializer::vectorOfObjects($__payload, $__offset, [StatsGroupTopPoster::class, 'deserialize']);
+        $topAdmins = Deserializer::vectorOfObjects($__payload, $__offset, [StatsGroupTopAdmin::class, 'deserialize']);
+        $topInviters = Deserializer::vectorOfObjects($__payload, $__offset, [StatsGroupTopInviter::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $period,

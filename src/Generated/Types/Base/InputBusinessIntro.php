@@ -41,16 +41,16 @@ final class InputBusinessIntro extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $title = Deserializer::bytes($stream);
-        $description = Deserializer::bytes($stream);
-        $sticker = (($flags & (1 << 0)) !== 0) ? AbstractInputDocument::deserialize($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $description = Deserializer::bytes($__payload, $__offset);
+        $sticker = (($flags & (1 << 0)) !== 0) ? AbstractInputDocument::deserialize($__payload, $__offset) : null;
 
         return new self(
             $title,

@@ -31,14 +31,14 @@ final class StickerKeyword extends TlObject
         $buffer .= Serializer::vectorOfStrings($this->keyword);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $documentId = Deserializer::int64($stream);
-        $keyword = Deserializer::vectorOfStrings($stream);
+        $documentId = Deserializer::int64($__payload, $__offset);
+        $keyword = Deserializer::vectorOfStrings($__payload, $__offset);
 
         return new self(
             $documentId,

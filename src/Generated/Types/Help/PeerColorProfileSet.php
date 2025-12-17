@@ -32,12 +32,12 @@ final class PeerColorProfileSet extends AbstractPeerColorSet
         $buffer .= Serializer::vectorOfInts($this->storyColors);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $paletteColors = Deserializer::vectorOfInts($stream);
-        $bgColors = Deserializer::vectorOfInts($stream);
-        $storyColors = Deserializer::vectorOfInts($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $paletteColors = Deserializer::vectorOfInts($__payload, $__offset);
+        $bgColors = Deserializer::vectorOfInts($__payload, $__offset);
+        $storyColors = Deserializer::vectorOfInts($__payload, $__offset);
 
         return new self(
             $paletteColors,

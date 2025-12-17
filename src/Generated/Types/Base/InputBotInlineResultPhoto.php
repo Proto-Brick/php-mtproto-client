@@ -35,13 +35,13 @@ final class InputBotInlineResultPhoto extends AbstractInputBotInlineResult
         $buffer .= $this->sendMessage->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::bytes($stream);
-        $type = Deserializer::bytes($stream);
-        $photo = AbstractInputPhoto::deserialize($stream);
-        $sendMessage = AbstractInputBotInlineMessage::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $id = Deserializer::bytes($__payload, $__offset);
+        $type = Deserializer::bytes($__payload, $__offset);
+        $photo = AbstractInputPhoto::deserialize($__payload, $__offset);
+        $sendMessage = AbstractInputBotInlineMessage::deserialize($__payload, $__offset);
 
         return new self(
             $id,

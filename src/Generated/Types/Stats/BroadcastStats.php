@@ -96,34 +96,34 @@ final class BroadcastStats extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->recentPostsInteractions);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $period = StatsDateRangeDays::deserialize($stream);
-        $followers = StatsAbsValueAndPrev::deserialize($stream);
-        $viewsPerPost = StatsAbsValueAndPrev::deserialize($stream);
-        $sharesPerPost = StatsAbsValueAndPrev::deserialize($stream);
-        $reactionsPerPost = StatsAbsValueAndPrev::deserialize($stream);
-        $viewsPerStory = StatsAbsValueAndPrev::deserialize($stream);
-        $sharesPerStory = StatsAbsValueAndPrev::deserialize($stream);
-        $reactionsPerStory = StatsAbsValueAndPrev::deserialize($stream);
-        $enabledNotifications = StatsPercentValue::deserialize($stream);
-        $growthGraph = AbstractStatsGraph::deserialize($stream);
-        $followersGraph = AbstractStatsGraph::deserialize($stream);
-        $muteGraph = AbstractStatsGraph::deserialize($stream);
-        $topHoursGraph = AbstractStatsGraph::deserialize($stream);
-        $interactionsGraph = AbstractStatsGraph::deserialize($stream);
-        $ivInteractionsGraph = AbstractStatsGraph::deserialize($stream);
-        $viewsBySourceGraph = AbstractStatsGraph::deserialize($stream);
-        $newFollowersBySourceGraph = AbstractStatsGraph::deserialize($stream);
-        $languagesGraph = AbstractStatsGraph::deserialize($stream);
-        $reactionsByEmotionGraph = AbstractStatsGraph::deserialize($stream);
-        $storyInteractionsGraph = AbstractStatsGraph::deserialize($stream);
-        $storyReactionsByEmotionGraph = AbstractStatsGraph::deserialize($stream);
-        $recentPostsInteractions = Deserializer::vectorOfObjects($stream, [AbstractPostInteractionCounters::class, 'deserialize']);
+        $period = StatsDateRangeDays::deserialize($__payload, $__offset);
+        $followers = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $viewsPerPost = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $sharesPerPost = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $reactionsPerPost = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $viewsPerStory = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $sharesPerStory = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $reactionsPerStory = StatsAbsValueAndPrev::deserialize($__payload, $__offset);
+        $enabledNotifications = StatsPercentValue::deserialize($__payload, $__offset);
+        $growthGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $followersGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $muteGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $topHoursGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $interactionsGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $ivInteractionsGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $viewsBySourceGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $newFollowersBySourceGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $languagesGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $reactionsByEmotionGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $storyInteractionsGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $storyReactionsByEmotionGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $recentPostsInteractions = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPostInteractionCounters::class, 'deserialize']);
 
         return new self(
             $period,

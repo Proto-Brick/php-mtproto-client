@@ -58,16 +58,16 @@ final class MessageActionGiftStars extends AbstractMessageAction
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
-        $stars = Deserializer::int64($stream);
-        $cryptoCurrency = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $cryptoAmount = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $transactionId = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $amount = Deserializer::int64($__payload, $__offset);
+        $stars = Deserializer::int64($__payload, $__offset);
+        $cryptoCurrency = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $cryptoAmount = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $transactionId = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $currency,

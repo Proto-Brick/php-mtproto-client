@@ -70,18 +70,18 @@ final class MessagesSlice extends AbstractMessages
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $inexact = (($flags & (1 << 1)) !== 0) ? true : null;
-        $count = Deserializer::int32($stream);
-        $nextRate = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $offsetIdOffset = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $searchFlood = (($flags & (1 << 3)) !== 0) ? SearchPostsFlood::deserialize($stream) : null;
-        $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $count = Deserializer::int32($__payload, $__offset);
+        $nextRate = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $offsetIdOffset = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $searchFlood = (($flags & (1 << 3)) !== 0) ? SearchPostsFlood::deserialize($__payload, $__offset) : null;
+        $messages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $count,

@@ -11,15 +11,15 @@ use RuntimeException;
  */
 abstract class AbstractEmojiGroup extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x7a9abda9 => EmojiGroup::deserialize($stream),
-            0x80d26cc7 => EmojiGroupGreeting::deserialize($stream),
-            0x93bcf34 => EmojiGroupPremium::deserialize($stream),
+            0x7a9abda9 => EmojiGroup::deserialize($__payload, $__offset),
+            0x80d26cc7 => EmojiGroupGreeting::deserialize($__payload, $__offset),
+            0x93bcf34 => EmojiGroupPremium::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type EmojiGroup. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

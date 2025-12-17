@@ -29,11 +29,11 @@ final class ChannelAdminLogEventActionChangeUsernames extends AbstractChannelAdm
         $buffer .= Serializer::vectorOfStrings($this->newValue);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $prevValue = Deserializer::vectorOfStrings($stream);
-        $newValue = Deserializer::vectorOfStrings($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $prevValue = Deserializer::vectorOfStrings($__payload, $__offset);
+        $newValue = Deserializer::vectorOfStrings($__payload, $__offset);
 
         return new self(
             $prevValue,

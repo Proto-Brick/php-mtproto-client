@@ -89,20 +89,20 @@ final class MessageActionGiftCode extends AbstractMessageAction
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $viaGiveaway = (($flags & (1 << 0)) !== 0) ? true : null;
         $unclaimed = (($flags & (1 << 5)) !== 0) ? true : null;
-        $boostPeer = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $months = Deserializer::int32($stream);
-        $slug = Deserializer::bytes($stream);
-        $currency = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $amount = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;
-        $cryptoCurrency = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $cryptoAmount = (($flags & (1 << 3)) !== 0) ? Deserializer::int64($stream) : null;
-        $message = (($flags & (1 << 4)) !== 0) ? TextWithEntities::deserialize($stream) : null;
+        $boostPeer = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $months = Deserializer::int32($__payload, $__offset);
+        $slug = Deserializer::bytes($__payload, $__offset);
+        $currency = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $amount = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $cryptoCurrency = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $cryptoAmount = (($flags & (1 << 3)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $message = (($flags & (1 << 4)) !== 0) ? TextWithEntities::deserialize($__payload, $__offset) : null;
 
         return new self(
             $months,

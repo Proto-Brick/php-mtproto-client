@@ -41,15 +41,15 @@ final class InputWebFileGeoPointLocation extends AbstractInputWebFileLocation
         $buffer .= Serializer::int32($this->scale);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $geoPoint = AbstractInputGeoPoint::deserialize($stream);
-        $accessHash = Deserializer::int64($stream);
-        $w = Deserializer::int32($stream);
-        $h = Deserializer::int32($stream);
-        $zoom = Deserializer::int32($stream);
-        $scale = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $geoPoint = AbstractInputGeoPoint::deserialize($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $w = Deserializer::int32($__payload, $__offset);
+        $h = Deserializer::int32($__payload, $__offset);
+        $zoom = Deserializer::int32($__payload, $__offset);
+        $scale = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $geoPoint,

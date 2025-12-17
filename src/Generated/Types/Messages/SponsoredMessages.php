@@ -61,16 +61,16 @@ final class SponsoredMessages extends AbstractSponsoredMessages
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $postsBetween = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $startDelay = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $betweenDelay = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $messages = Deserializer::vectorOfObjects($stream, [SponsoredMessage::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $postsBetween = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $startDelay = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $betweenDelay = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $messages = Deserializer::vectorOfObjects($__payload, $__offset, [SponsoredMessage::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $messages,

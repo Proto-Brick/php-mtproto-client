@@ -43,17 +43,17 @@ final class PreparedInlineMessage extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $queryId = Deserializer::int64($stream);
-        $result = AbstractBotInlineResult::deserialize($stream);
-        $peerTypes = Deserializer::vectorOfObjects($stream, [InlineQueryPeerType::class, 'deserialize']);
-        $cacheTime = Deserializer::int32($stream);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $queryId = Deserializer::int64($__payload, $__offset);
+        $result = AbstractBotInlineResult::deserialize($__payload, $__offset);
+        $peerTypes = Deserializer::vectorOfObjects($__payload, $__offset, [InlineQueryPeerType::class, 'deserialize']);
+        $cacheTime = Deserializer::int32($__payload, $__offset);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $queryId,

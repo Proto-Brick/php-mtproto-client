@@ -44,16 +44,16 @@ final class PageBlockEmbedPost extends AbstractPageBlock
         $buffer .= $this->caption->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $url = Deserializer::bytes($stream);
-        $webpageId = Deserializer::int64($stream);
-        $authorPhotoId = Deserializer::int64($stream);
-        $author = Deserializer::bytes($stream);
-        $date = Deserializer::int32($stream);
-        $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
-        $caption = PageCaption::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $url = Deserializer::bytes($__payload, $__offset);
+        $webpageId = Deserializer::int64($__payload, $__offset);
+        $authorPhotoId = Deserializer::int64($__payload, $__offset);
+        $author = Deserializer::bytes($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $blocks = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPageBlock::class, 'deserialize']);
+        $caption = PageCaption::deserialize($__payload, $__offset);
 
         return new self(
             $url,

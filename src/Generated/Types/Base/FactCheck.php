@@ -51,17 +51,17 @@ final class FactCheck extends TlObject
         $buffer .= Serializer::int64($this->hash);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $needCheck = (($flags & (1 << 0)) !== 0) ? true : null;
-        $country = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $text = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;
-        $hash = Deserializer::int64($stream);
+        $country = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $text = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($__payload, $__offset) : null;
+        $hash = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $hash,

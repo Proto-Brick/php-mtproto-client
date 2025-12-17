@@ -29,11 +29,11 @@ final class ReportResultChooseOption extends AbstractReportResult
         $buffer .= Serializer::vectorOfObjects($this->options);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $title = Deserializer::bytes($stream);
-        $options = Deserializer::vectorOfObjects($stream, [MessageReportOption::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $title = Deserializer::bytes($__payload, $__offset);
+        $options = Deserializer::vectorOfObjects($__payload, $__offset, [MessageReportOption::class, 'deserialize']);
 
         return new self(
             $title,

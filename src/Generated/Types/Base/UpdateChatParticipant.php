@@ -64,18 +64,18 @@ final class UpdateChatParticipant extends AbstractUpdate
         $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $chatId = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $actorId = Deserializer::int64($stream);
-        $userId = Deserializer::int64($stream);
-        $prevParticipant = (($flags & (1 << 0)) !== 0) ? AbstractChatParticipant::deserialize($stream) : null;
-        $newParticipant = (($flags & (1 << 1)) !== 0) ? AbstractChatParticipant::deserialize($stream) : null;
-        $invite = (($flags & (1 << 2)) !== 0) ? AbstractExportedChatInvite::deserialize($stream) : null;
-        $qts = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $chatId = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $actorId = Deserializer::int64($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $prevParticipant = (($flags & (1 << 0)) !== 0) ? AbstractChatParticipant::deserialize($__payload, $__offset) : null;
+        $newParticipant = (($flags & (1 << 1)) !== 0) ? AbstractChatParticipant::deserialize($__payload, $__offset) : null;
+        $invite = (($flags & (1 << 2)) !== 0) ? AbstractExportedChatInvite::deserialize($__payload, $__offset) : null;
+        $qts = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $chatId,

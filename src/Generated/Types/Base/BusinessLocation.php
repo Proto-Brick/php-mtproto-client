@@ -38,15 +38,15 @@ final class BusinessLocation extends TlObject
         $buffer .= Serializer::bytes($this->address);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $geoPoint = (($flags & (1 << 0)) !== 0) ? AbstractGeoPoint::deserialize($stream) : null;
-        $address = Deserializer::bytes($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
+        $geoPoint = (($flags & (1 << 0)) !== 0) ? AbstractGeoPoint::deserialize($__payload, $__offset) : null;
+        $address = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $address,

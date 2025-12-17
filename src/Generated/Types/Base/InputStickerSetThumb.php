@@ -29,11 +29,11 @@ final class InputStickerSetThumb extends AbstractInputFileLocation
         $buffer .= Serializer::int32($this->thumbVersion);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $stickerset = AbstractInputStickerSet::deserialize($stream);
-        $thumbVersion = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $stickerset = AbstractInputStickerSet::deserialize($__payload, $__offset);
+        $thumbVersion = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $stickerset,

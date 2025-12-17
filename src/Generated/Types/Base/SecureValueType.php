@@ -32,9 +32,9 @@ enum SecureValueType: int implements TlObjectInterface
         return Serializer::int32($this->value);
     }
 
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         try {
             return self::from($constructorId);
         } catch (ValueError $e) {

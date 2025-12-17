@@ -29,11 +29,11 @@ final class InputInvoiceStarGiftTransfer extends AbstractInputInvoice
         $buffer .= $this->toId->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $stargift = AbstractInputSavedStarGift::deserialize($stream);
-        $toId = AbstractInputPeer::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $stargift = AbstractInputSavedStarGift::deserialize($__payload, $__offset);
+        $toId = AbstractInputPeer::deserialize($__payload, $__offset);
 
         return new self(
             $stargift,

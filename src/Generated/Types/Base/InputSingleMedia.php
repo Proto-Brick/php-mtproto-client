@@ -44,17 +44,17 @@ final class InputSingleMedia extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $media = AbstractInputMedia::deserialize($stream);
-        $randomId = Deserializer::int64($stream);
-        $message = Deserializer::bytes($stream);
-        $entities = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $media = AbstractInputMedia::deserialize($__payload, $__offset);
+        $randomId = Deserializer::int64($__payload, $__offset);
+        $message = Deserializer::bytes($__payload, $__offset);
+        $entities = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
 
         return new self(
             $media,

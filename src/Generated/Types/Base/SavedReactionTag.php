@@ -41,16 +41,16 @@ final class SavedReactionTag extends TlObject
         $buffer .= Serializer::int32($this->count);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $reaction = AbstractReaction::deserialize($stream);
-        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $count = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
+        $reaction = AbstractReaction::deserialize($__payload, $__offset);
+        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $count = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $reaction,

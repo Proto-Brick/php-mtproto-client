@@ -57,19 +57,19 @@ final class AvailableEffect extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $premiumRequired = (($flags & (1 << 2)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $emoticon = Deserializer::bytes($stream);
-        $staticIconId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $effectStickerId = Deserializer::int64($stream);
-        $effectAnimationId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $emoticon = Deserializer::bytes($__payload, $__offset);
+        $staticIconId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $effectStickerId = Deserializer::int64($__payload, $__offset);
+        $effectAnimationId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
 
         return new self(
             $id,

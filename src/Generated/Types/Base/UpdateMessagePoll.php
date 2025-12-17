@@ -39,13 +39,13 @@ final class UpdateMessagePoll extends AbstractUpdate
         $buffer .= $this->results->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $pollId = Deserializer::int64($stream);
-        $poll = (($flags & (1 << 0)) !== 0) ? Poll::deserialize($stream) : null;
-        $results = PollResults::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $pollId = Deserializer::int64($__payload, $__offset);
+        $poll = (($flags & (1 << 0)) !== 0) ? Poll::deserialize($__payload, $__offset) : null;
+        $results = PollResults::deserialize($__payload, $__offset);
 
         return new self(
             $pollId,

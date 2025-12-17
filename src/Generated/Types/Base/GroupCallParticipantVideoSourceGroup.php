@@ -31,14 +31,14 @@ final class GroupCallParticipantVideoSourceGroup extends TlObject
         $buffer .= Serializer::vectorOfInts($this->sources);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $semantics = Deserializer::bytes($stream);
-        $sources = Deserializer::vectorOfInts($stream);
+        $semantics = Deserializer::bytes($__payload, $__offset);
+        $sources = Deserializer::vectorOfInts($__payload, $__offset);
 
         return new self(
             $semantics,

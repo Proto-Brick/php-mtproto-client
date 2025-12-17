@@ -29,11 +29,11 @@ final class UpdateUserStatus extends AbstractUpdate
         $buffer .= $this->status->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $userId = Deserializer::int64($stream);
-        $status = AbstractUserStatus::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $userId = Deserializer::int64($__payload, $__offset);
+        $status = AbstractUserStatus::deserialize($__payload, $__offset);
 
         return new self(
             $userId,

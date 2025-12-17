@@ -46,18 +46,18 @@ final class GroupParticipants extends TlObject
         $buffer .= Serializer::int32($this->version);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $count = Deserializer::int32($stream);
-        $participants = Deserializer::vectorOfObjects($stream, [GroupCallParticipant::class, 'deserialize']);
-        $nextOffset = Deserializer::bytes($stream);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $version = Deserializer::int32($stream);
+        $count = Deserializer::int32($__payload, $__offset);
+        $participants = Deserializer::vectorOfObjects($__payload, $__offset, [GroupCallParticipant::class, 'deserialize']);
+        $nextOffset = Deserializer::bytes($__payload, $__offset);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
+        $version = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $count,

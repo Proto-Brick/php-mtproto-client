@@ -61,19 +61,19 @@ final class MonoForumDialog extends AbstractSavedDialog
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $unreadMark = (($flags & (1 << 3)) !== 0) ? true : null;
         $nopaidMessagesException = (($flags & (1 << 4)) !== 0) ? true : null;
-        $peer = AbstractPeer::deserialize($stream);
-        $topMessage = Deserializer::int32($stream);
-        $readInboxMaxId = Deserializer::int32($stream);
-        $readOutboxMaxId = Deserializer::int32($stream);
-        $unreadCount = Deserializer::int32($stream);
-        $unreadReactionsCount = Deserializer::int32($stream);
-        $draft = (($flags & (1 << 1)) !== 0) ? AbstractDraftMessage::deserialize($stream) : null;
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $topMessage = Deserializer::int32($__payload, $__offset);
+        $readInboxMaxId = Deserializer::int32($__payload, $__offset);
+        $readOutboxMaxId = Deserializer::int32($__payload, $__offset);
+        $unreadCount = Deserializer::int32($__payload, $__offset);
+        $unreadReactionsCount = Deserializer::int32($__payload, $__offset);
+        $draft = (($flags & (1 << 1)) !== 0) ? AbstractDraftMessage::deserialize($__payload, $__offset) : null;
 
         return new self(
             $peer,

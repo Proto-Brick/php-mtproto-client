@@ -78,24 +78,24 @@ final class PhoneCall extends AbstractPhoneCall
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $p2pAllowed = (($flags & (1 << 5)) !== 0) ? true : null;
         $video = (($flags & (1 << 6)) !== 0) ? true : null;
         $conferenceSupported = (($flags & (1 << 8)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $adminId = Deserializer::int64($stream);
-        $participantId = Deserializer::int64($stream);
-        $gAOrB = Deserializer::bytes($stream);
-        $keyFingerprint = Deserializer::int64($stream);
-        $protocol = PhoneCallProtocol::deserialize($stream);
-        $connections = Deserializer::vectorOfObjects($stream, [AbstractPhoneConnection::class, 'deserialize']);
-        $startDate = Deserializer::int32($stream);
-        $customParameters = (($flags & (1 << 7)) !== 0) ? Deserializer::deserializeDataJSON($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $adminId = Deserializer::int64($__payload, $__offset);
+        $participantId = Deserializer::int64($__payload, $__offset);
+        $gAOrB = Deserializer::bytes($__payload, $__offset);
+        $keyFingerprint = Deserializer::int64($__payload, $__offset);
+        $protocol = PhoneCallProtocol::deserialize($__payload, $__offset);
+        $connections = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPhoneConnection::class, 'deserialize']);
+        $startDate = Deserializer::int32($__payload, $__offset);
+        $customParameters = (($flags & (1 << 7)) !== 0) ? Deserializer::deserializeDataJSON($__payload, $__offset) : null;
 
         return new self(
             $id,

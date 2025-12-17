@@ -42,14 +42,14 @@ final class UpdateReadMessagesContents extends AbstractUpdate
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $messages = Deserializer::vectorOfInts($stream);
-        $pts = Deserializer::int32($stream);
-        $ptsCount = Deserializer::int32($stream);
-        $date = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $messages = Deserializer::vectorOfInts($__payload, $__offset);
+        $pts = Deserializer::int32($__payload, $__offset);
+        $ptsCount = Deserializer::int32($__payload, $__offset);
+        $date = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $messages,

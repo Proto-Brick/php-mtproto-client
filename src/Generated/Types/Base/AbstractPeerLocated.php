@@ -11,14 +11,14 @@ use RuntimeException;
  */
 abstract class AbstractPeerLocated extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0xca461b5d => PeerLocated::deserialize($stream),
-            0xf8ec284b => PeerSelfLocated::deserialize($stream),
+            0xca461b5d => PeerLocated::deserialize($__payload, $__offset),
+            0xf8ec284b => PeerSelfLocated::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type PeerLocated. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

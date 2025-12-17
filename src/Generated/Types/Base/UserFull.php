@@ -366,13 +366,13 @@ final class UserFull extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $blocked = (($flags & (1 << 0)) !== 0) ? true : null;
         $phoneCallsAvailable = (($flags & (1 << 4)) !== 0) ? true : null;
         $phoneCallsPrivate = (($flags & (1 << 5)) !== 0) ? true : null;
@@ -386,45 +386,45 @@ final class UserFull extends TlObject
         $wallpaperOverridden = (($flags & (1 << 28)) !== 0) ? true : null;
         $contactRequirePremium = (($flags & (1 << 29)) !== 0) ? true : null;
         $readDatesPrivate = (($flags & (1 << 30)) !== 0) ? true : null;
-        $flags2 = Deserializer::int32($stream);
+        $flags2 = Deserializer::int32($__payload, $__offset);
         $sponsoredEnabled = (($flags2 & (1 << 7)) !== 0) ? true : null;
         $canViewRevenue = (($flags2 & (1 << 9)) !== 0) ? true : null;
         $botCanManageEmojiStatus = (($flags2 & (1 << 10)) !== 0) ? true : null;
         $displayGiftsButton = (($flags2 & (1 << 16)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $about = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $settings = PeerSettings::deserialize($stream);
-        $personalPhoto = (($flags & (1 << 21)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
-        $profilePhoto = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
-        $fallbackPhoto = (($flags & (1 << 22)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
-        $notifySettings = PeerNotifySettings::deserialize($stream);
-        $botInfo = (($flags & (1 << 3)) !== 0) ? BotInfo::deserialize($stream) : null;
-        $pinnedMsgId = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
-        $commonChatsCount = Deserializer::int32($stream);
-        $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($stream) : null;
-        $ttlPeriod = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($stream) : null;
-        $themeEmoticon = (($flags & (1 << 15)) !== 0) ? Deserializer::bytes($stream) : null;
-        $privateForwardName = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
-        $botGroupAdminRights = (($flags & (1 << 17)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
-        $botBroadcastAdminRights = (($flags & (1 << 18)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
-        $wallpaper = (($flags & (1 << 24)) !== 0) ? AbstractWallPaper::deserialize($stream) : null;
-        $stories = (($flags & (1 << 25)) !== 0) ? PeerStories::deserialize($stream) : null;
-        $businessWorkHours = (($flags2 & (1 << 0)) !== 0) ? BusinessWorkHours::deserialize($stream) : null;
-        $businessLocation = (($flags2 & (1 << 1)) !== 0) ? BusinessLocation::deserialize($stream) : null;
-        $businessGreetingMessage = (($flags2 & (1 << 2)) !== 0) ? BusinessGreetingMessage::deserialize($stream) : null;
-        $businessAwayMessage = (($flags2 & (1 << 3)) !== 0) ? BusinessAwayMessage::deserialize($stream) : null;
-        $businessIntro = (($flags2 & (1 << 4)) !== 0) ? BusinessIntro::deserialize($stream) : null;
-        $birthday = (($flags2 & (1 << 5)) !== 0) ? Birthday::deserialize($stream) : null;
-        $personalChannelId = (($flags2 & (1 << 6)) !== 0) ? Deserializer::int64($stream) : null;
-        $personalChannelMessage = (($flags2 & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
-        $stargiftsCount = (($flags2 & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
-        $starrefProgram = (($flags2 & (1 << 11)) !== 0) ? StarRefProgram::deserialize($stream) : null;
-        $botVerification = (($flags2 & (1 << 12)) !== 0) ? BotVerification::deserialize($stream) : null;
-        $sendPaidMessagesStars = (($flags2 & (1 << 14)) !== 0) ? Deserializer::int64($stream) : null;
-        $disallowedGifts = (($flags2 & (1 << 15)) !== 0) ? DisallowedGiftsSettings::deserialize($stream) : null;
-        $starsRating = (($flags2 & (1 << 17)) !== 0) ? StarsRating::deserialize($stream) : null;
-        $starsMyPendingRating = (($flags2 & (1 << 18)) !== 0) ? StarsRating::deserialize($stream) : null;
-        $starsMyPendingRatingDate = (($flags2 & (1 << 18)) !== 0) ? Deserializer::int32($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $about = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $settings = PeerSettings::deserialize($__payload, $__offset);
+        $personalPhoto = (($flags & (1 << 21)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
+        $profilePhoto = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
+        $fallbackPhoto = (($flags & (1 << 22)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
+        $notifySettings = PeerNotifySettings::deserialize($__payload, $__offset);
+        $botInfo = (($flags & (1 << 3)) !== 0) ? BotInfo::deserialize($__payload, $__offset) : null;
+        $pinnedMsgId = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $commonChatsCount = Deserializer::int32($__payload, $__offset);
+        $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $ttlPeriod = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $themeEmoticon = (($flags & (1 << 15)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $privateForwardName = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $botGroupAdminRights = (($flags & (1 << 17)) !== 0) ? ChatAdminRights::deserialize($__payload, $__offset) : null;
+        $botBroadcastAdminRights = (($flags & (1 << 18)) !== 0) ? ChatAdminRights::deserialize($__payload, $__offset) : null;
+        $wallpaper = (($flags & (1 << 24)) !== 0) ? AbstractWallPaper::deserialize($__payload, $__offset) : null;
+        $stories = (($flags & (1 << 25)) !== 0) ? PeerStories::deserialize($__payload, $__offset) : null;
+        $businessWorkHours = (($flags2 & (1 << 0)) !== 0) ? BusinessWorkHours::deserialize($__payload, $__offset) : null;
+        $businessLocation = (($flags2 & (1 << 1)) !== 0) ? BusinessLocation::deserialize($__payload, $__offset) : null;
+        $businessGreetingMessage = (($flags2 & (1 << 2)) !== 0) ? BusinessGreetingMessage::deserialize($__payload, $__offset) : null;
+        $businessAwayMessage = (($flags2 & (1 << 3)) !== 0) ? BusinessAwayMessage::deserialize($__payload, $__offset) : null;
+        $businessIntro = (($flags2 & (1 << 4)) !== 0) ? BusinessIntro::deserialize($__payload, $__offset) : null;
+        $birthday = (($flags2 & (1 << 5)) !== 0) ? Birthday::deserialize($__payload, $__offset) : null;
+        $personalChannelId = (($flags2 & (1 << 6)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $personalChannelMessage = (($flags2 & (1 << 6)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $stargiftsCount = (($flags2 & (1 << 8)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $starrefProgram = (($flags2 & (1 << 11)) !== 0) ? StarRefProgram::deserialize($__payload, $__offset) : null;
+        $botVerification = (($flags2 & (1 << 12)) !== 0) ? BotVerification::deserialize($__payload, $__offset) : null;
+        $sendPaidMessagesStars = (($flags2 & (1 << 14)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $disallowedGifts = (($flags2 & (1 << 15)) !== 0) ? DisallowedGiftsSettings::deserialize($__payload, $__offset) : null;
+        $starsRating = (($flags2 & (1 << 17)) !== 0) ? StarsRating::deserialize($__payload, $__offset) : null;
+        $starsMyPendingRating = (($flags2 & (1 << 18)) !== 0) ? StarsRating::deserialize($__payload, $__offset) : null;
+        $starsMyPendingRatingDate = (($flags2 & (1 << 18)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $id,

@@ -50,15 +50,15 @@ final class UpdateBotInlineSend extends AbstractUpdate
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
-        $query = Deserializer::bytes($stream);
-        $geo = (($flags & (1 << 0)) !== 0) ? AbstractGeoPoint::deserialize($stream) : null;
-        $id = Deserializer::bytes($stream);
-        $msgId = (($flags & (1 << 1)) !== 0) ? AbstractInputBotInlineMessageID::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $query = Deserializer::bytes($__payload, $__offset);
+        $geo = (($flags & (1 << 0)) !== 0) ? AbstractGeoPoint::deserialize($__payload, $__offset) : null;
+        $id = Deserializer::bytes($__payload, $__offset);
+        $msgId = (($flags & (1 << 1)) !== 0) ? AbstractInputBotInlineMessageID::deserialize($__payload, $__offset) : null;
 
         return new self(
             $userId,

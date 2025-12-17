@@ -32,12 +32,12 @@ final class UpdateMessageExtendedMedia extends AbstractUpdate
         $buffer .= Serializer::vectorOfObjects($this->extendedMedia);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $peer = AbstractPeer::deserialize($stream);
-        $msgId = Deserializer::int32($stream);
-        $extendedMedia = Deserializer::vectorOfObjects($stream, [AbstractMessageExtendedMedia::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $msgId = Deserializer::int32($__payload, $__offset);
+        $extendedMedia = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageExtendedMedia::class, 'deserialize']);
 
         return new self(
             $peer,

@@ -63,18 +63,18 @@ final class ChannelParticipantAdmin extends AbstractChannelParticipant
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $canEdit = (($flags & (1 << 0)) !== 0) ? true : null;
         $self = (($flags & (1 << 1)) !== 0) ? true : null;
-        $userId = Deserializer::int64($stream);
-        $inviterId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($stream) : null;
-        $promotedBy = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $adminRights = ChatAdminRights::deserialize($stream);
-        $rank = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
+        $userId = Deserializer::int64($__payload, $__offset);
+        $inviterId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $promotedBy = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $adminRights = ChatAdminRights::deserialize($__payload, $__offset);
+        $rank = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $userId,

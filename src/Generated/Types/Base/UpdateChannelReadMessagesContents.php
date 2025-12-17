@@ -47,14 +47,14 @@ final class UpdateChannelReadMessagesContents extends AbstractUpdate
         $buffer .= Serializer::vectorOfInts($this->messages);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $channelId = Deserializer::int64($stream);
-        $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $savedPeerId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $messages = Deserializer::vectorOfInts($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $channelId = Deserializer::int64($__payload, $__offset);
+        $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $savedPeerId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $messages = Deserializer::vectorOfInts($__payload, $__offset);
 
         return new self(
             $channelId,

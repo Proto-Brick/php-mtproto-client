@@ -29,11 +29,11 @@ final class ChannelAdminLogEventActionChangeLocation extends AbstractChannelAdmi
         $buffer .= $this->newValue->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $prevValue = AbstractChannelLocation::deserialize($stream);
-        $newValue = AbstractChannelLocation::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $prevValue = AbstractChannelLocation::deserialize($__payload, $__offset);
+        $newValue = AbstractChannelLocation::deserialize($__payload, $__offset);
 
         return new self(
             $prevValue,

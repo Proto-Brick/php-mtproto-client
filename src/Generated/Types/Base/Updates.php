@@ -38,14 +38,14 @@ final class Updates extends AbstractUpdates
         $buffer .= Serializer::int32($this->seq);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $updates = Deserializer::vectorOfObjects($stream, [AbstractUpdate::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $date = Deserializer::int32($stream);
-        $seq = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $updates = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUpdate::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $date = Deserializer::int32($__payload, $__offset);
+        $seq = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $updates,

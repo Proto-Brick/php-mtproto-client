@@ -53,20 +53,20 @@ final class Game extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $shortName = Deserializer::bytes($stream);
-        $title = Deserializer::bytes($stream);
-        $description = Deserializer::bytes($stream);
-        $photo = AbstractPhoto::deserialize($stream);
-        $document = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $shortName = Deserializer::bytes($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $description = Deserializer::bytes($__payload, $__offset);
+        $photo = AbstractPhoto::deserialize($__payload, $__offset);
+        $document = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
 
         return new self(
             $id,

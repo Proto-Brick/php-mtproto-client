@@ -38,14 +38,14 @@ final class MessageMediaContact extends AbstractMessageMedia
         $buffer .= Serializer::int64($this->userId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $phoneNumber = Deserializer::bytes($stream);
-        $firstName = Deserializer::bytes($stream);
-        $lastName = Deserializer::bytes($stream);
-        $vcard = Deserializer::bytes($stream);
-        $userId = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $phoneNumber = Deserializer::bytes($__payload, $__offset);
+        $firstName = Deserializer::bytes($__payload, $__offset);
+        $lastName = Deserializer::bytes($__payload, $__offset);
+        $vcard = Deserializer::bytes($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $phoneNumber,

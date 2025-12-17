@@ -29,11 +29,11 @@ final class EmojiList extends AbstractEmojiList
         $buffer .= Serializer::vectorOfLongs($this->documentId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
-        $documentId = Deserializer::vectorOfLongs($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int64($__payload, $__offset);
+        $documentId = Deserializer::vectorOfLongs($__payload, $__offset);
 
         return new self(
             $hash,

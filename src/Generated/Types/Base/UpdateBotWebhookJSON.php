@@ -26,10 +26,10 @@ final class UpdateBotWebhookJSON extends AbstractUpdate
         $buffer .= Serializer::serializeDataJSON($this->data);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $data = Deserializer::deserializeDataJSON($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $data = Deserializer::deserializeDataJSON($__payload, $__offset);
 
         return new self(
             $data

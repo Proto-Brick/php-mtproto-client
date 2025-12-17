@@ -52,21 +52,21 @@ final class WebAuthorization extends TlObject
         $buffer .= Serializer::bytes($this->region);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $hash = Deserializer::int64($stream);
-        $botId = Deserializer::int64($stream);
-        $domain = Deserializer::bytes($stream);
-        $browser = Deserializer::bytes($stream);
-        $platform = Deserializer::bytes($stream);
-        $dateCreated = Deserializer::int32($stream);
-        $dateActive = Deserializer::int32($stream);
-        $ip = Deserializer::bytes($stream);
-        $region = Deserializer::bytes($stream);
+        $hash = Deserializer::int64($__payload, $__offset);
+        $botId = Deserializer::int64($__payload, $__offset);
+        $domain = Deserializer::bytes($__payload, $__offset);
+        $browser = Deserializer::bytes($__payload, $__offset);
+        $platform = Deserializer::bytes($__payload, $__offset);
+        $dateCreated = Deserializer::int32($__payload, $__offset);
+        $dateActive = Deserializer::int32($__payload, $__offset);
+        $ip = Deserializer::bytes($__payload, $__offset);
+        $region = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $hash,

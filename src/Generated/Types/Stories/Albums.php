@@ -30,11 +30,11 @@ final class Albums extends AbstractAlbums
         $buffer .= Serializer::vectorOfObjects($this->albums);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
-        $albums = Deserializer::vectorOfObjects($stream, [StoryAlbum::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int64($__payload, $__offset);
+        $albums = Deserializer::vectorOfObjects($__payload, $__offset, [StoryAlbum::class, 'deserialize']);
 
         return new self(
             $hash,

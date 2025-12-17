@@ -29,11 +29,11 @@ final class PageListOrderedItemBlocks extends AbstractPageListOrderedItem
         $buffer .= Serializer::vectorOfObjects($this->blocks);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $num = Deserializer::bytes($stream);
-        $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $num = Deserializer::bytes($__payload, $__offset);
+        $blocks = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPageBlock::class, 'deserialize']);
 
         return new self(
             $num,

@@ -60,21 +60,21 @@ final class StarsGiveawayOption extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->winners);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $extended = (($flags & (1 << 0)) !== 0) ? true : null;
         $default_ = (($flags & (1 << 1)) !== 0) ? true : null;
-        $stars = Deserializer::int64($stream);
-        $yearlyBoosts = Deserializer::int32($stream);
-        $storeProduct = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
-        $winners = Deserializer::vectorOfObjects($stream, [StarsGiveawayWinnersOption::class, 'deserialize']);
+        $stars = Deserializer::int64($__payload, $__offset);
+        $yearlyBoosts = Deserializer::int32($__payload, $__offset);
+        $storeProduct = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $amount = Deserializer::int64($__payload, $__offset);
+        $winners = Deserializer::vectorOfObjects($__payload, $__offset, [StarsGiveawayWinnersOption::class, 'deserialize']);
 
         return new self(
             $stars,

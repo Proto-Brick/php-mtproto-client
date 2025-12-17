@@ -74,18 +74,18 @@ final class InputBotInlineResult extends AbstractInputBotInlineResult
         $buffer .= $this->sendMessage->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $id = Deserializer::bytes($stream);
-        $type = Deserializer::bytes($stream);
-        $title = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $description = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $url = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $thumb = (($flags & (1 << 4)) !== 0) ? InputWebDocument::deserialize($stream) : null;
-        $content = (($flags & (1 << 5)) !== 0) ? InputWebDocument::deserialize($stream) : null;
-        $sendMessage = AbstractInputBotInlineMessage::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $id = Deserializer::bytes($__payload, $__offset);
+        $type = Deserializer::bytes($__payload, $__offset);
+        $title = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $description = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $url = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $thumb = (($flags & (1 << 4)) !== 0) ? InputWebDocument::deserialize($__payload, $__offset) : null;
+        $content = (($flags & (1 << 5)) !== 0) ? InputWebDocument::deserialize($__payload, $__offset) : null;
+        $sendMessage = AbstractInputBotInlineMessage::deserialize($__payload, $__offset);
 
         return new self(
             $id,

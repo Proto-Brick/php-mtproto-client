@@ -37,16 +37,16 @@ final class AffectedFoundMessages extends TlObject
         $buffer .= Serializer::vectorOfInts($this->messages);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $pts = Deserializer::int32($stream);
-        $ptsCount = Deserializer::int32($stream);
-        $offset = Deserializer::int32($stream);
-        $messages = Deserializer::vectorOfInts($stream);
+        $pts = Deserializer::int32($__payload, $__offset);
+        $ptsCount = Deserializer::int32($__payload, $__offset);
+        $offset = Deserializer::int32($__payload, $__offset);
+        $messages = Deserializer::vectorOfInts($__payload, $__offset);
 
         return new self(
             $pts,

@@ -113,24 +113,24 @@ final class ChatInviteExported extends AbstractExportedChatInvite
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $revoked = (($flags & (1 << 0)) !== 0) ? true : null;
         $permanent = (($flags & (1 << 5)) !== 0) ? true : null;
         $requestNeeded = (($flags & (1 << 6)) !== 0) ? true : null;
-        $link = Deserializer::bytes($stream);
-        $adminId = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $startDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $expireDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $usageLimit = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $usage = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $requested = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($stream) : null;
-        $subscriptionExpired = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
-        $title = (($flags & (1 << 8)) !== 0) ? Deserializer::bytes($stream) : null;
-        $subscriptionPricing = (($flags & (1 << 9)) !== 0) ? StarsSubscriptionPricing::deserialize($stream) : null;
+        $link = Deserializer::bytes($__payload, $__offset);
+        $adminId = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $startDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $expireDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $usageLimit = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $usage = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $requested = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $subscriptionExpired = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $title = (($flags & (1 << 8)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $subscriptionPricing = (($flags & (1 << 9)) !== 0) ? StarsSubscriptionPricing::deserialize($__payload, $__offset) : null;
 
         return new self(
             $link,

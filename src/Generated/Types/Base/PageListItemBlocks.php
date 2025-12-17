@@ -26,10 +26,10 @@ final class PageListItemBlocks extends AbstractPageListItem
         $buffer .= Serializer::vectorOfObjects($this->blocks);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $blocks = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPageBlock::class, 'deserialize']);
 
         return new self(
             $blocks

@@ -36,16 +36,16 @@ final class ConnectedBot extends TlObject
         $buffer .= $this->rights->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $botId = Deserializer::int64($stream);
-        $recipients = BusinessBotRecipients::deserialize($stream);
-        $rights = BusinessBotRights::deserialize($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
+        $botId = Deserializer::int64($__payload, $__offset);
+        $recipients = BusinessBotRecipients::deserialize($__payload, $__offset);
+        $rights = BusinessBotRights::deserialize($__payload, $__offset);
 
         return new self(
             $botId,

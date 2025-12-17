@@ -37,16 +37,16 @@ final class EmojiKeywordsDifference extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->keywords);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $langCode = Deserializer::bytes($stream);
-        $fromVersion = Deserializer::int32($stream);
-        $version = Deserializer::int32($stream);
-        $keywords = Deserializer::vectorOfObjects($stream, [AbstractEmojiKeyword::class, 'deserialize']);
+        $langCode = Deserializer::bytes($__payload, $__offset);
+        $fromVersion = Deserializer::int32($__payload, $__offset);
+        $version = Deserializer::int32($__payload, $__offset);
+        $keywords = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractEmojiKeyword::class, 'deserialize']);
 
         return new self(
             $langCode,

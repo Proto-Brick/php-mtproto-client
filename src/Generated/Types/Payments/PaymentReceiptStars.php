@@ -63,20 +63,20 @@ final class PaymentReceiptStars extends AbstractPaymentReceipt
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $botId = Deserializer::int64($stream);
-        $title = Deserializer::bytes($stream);
-        $description = Deserializer::bytes($stream);
-        $photo = (($flags & (1 << 2)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
-        $invoice = Invoice::deserialize($stream);
-        $currency = Deserializer::bytes($stream);
-        $totalAmount = Deserializer::int64($stream);
-        $transactionId = Deserializer::bytes($stream);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $botId = Deserializer::int64($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $description = Deserializer::bytes($__payload, $__offset);
+        $photo = (($flags & (1 << 2)) !== 0) ? AbstractWebDocument::deserialize($__payload, $__offset) : null;
+        $invoice = Invoice::deserialize($__payload, $__offset);
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $totalAmount = Deserializer::int64($__payload, $__offset);
+        $transactionId = Deserializer::bytes($__payload, $__offset);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $date,

@@ -32,12 +32,12 @@ final class UpdateBotPurchasedPaidMedia extends AbstractUpdate
         $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $userId = Deserializer::int64($stream);
-        $payload = Deserializer::bytes($stream);
-        $qts = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $userId = Deserializer::int64($__payload, $__offset);
+        $payload = Deserializer::bytes($__payload, $__offset);
+        $qts = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $userId,

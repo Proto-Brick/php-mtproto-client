@@ -38,16 +38,16 @@ final class StarsGiveawayWinnersOption extends TlObject
         $buffer .= Serializer::int64($this->perUserStars);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $default_ = (($flags & (1 << 0)) !== 0) ? true : null;
-        $users = Deserializer::int32($stream);
-        $perUserStars = Deserializer::int64($stream);
+        $users = Deserializer::int32($__payload, $__offset);
+        $perUserStars = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $users,

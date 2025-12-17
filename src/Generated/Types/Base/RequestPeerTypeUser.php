@@ -41,12 +41,12 @@ final class RequestPeerTypeUser extends AbstractRequestPeerType
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $bot = (($flags & (1 << 0)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $premium = (($flags & (1 << 1)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $bot = (($flags & (1 << 0)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
+        $premium = (($flags & (1 << 1)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
 
         return new self(
             $bot,

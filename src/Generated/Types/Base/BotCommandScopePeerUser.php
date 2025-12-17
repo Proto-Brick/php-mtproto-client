@@ -29,11 +29,11 @@ final class BotCommandScopePeerUser extends AbstractBotCommandScope
         $buffer .= $this->userId->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $peer = AbstractInputPeer::deserialize($stream);
-        $userId = AbstractInputUser::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $peer = AbstractInputPeer::deserialize($__payload, $__offset);
+        $userId = AbstractInputUser::deserialize($__payload, $__offset);
 
         return new self(
             $peer,

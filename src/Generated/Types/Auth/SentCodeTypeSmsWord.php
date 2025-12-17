@@ -33,11 +33,11 @@ final class SentCodeTypeSmsWord extends AbstractSentCodeType
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $beginning = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $beginning = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $beginning

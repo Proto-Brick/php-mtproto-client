@@ -29,11 +29,11 @@ final class UpdateBotMenuButton extends AbstractUpdate
         $buffer .= $this->button->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $botId = Deserializer::int64($stream);
-        $button = AbstractBotMenuButton::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $botId = Deserializer::int64($__payload, $__offset);
+        $button = AbstractBotMenuButton::deserialize($__payload, $__offset);
 
         return new self(
             $botId,

@@ -34,15 +34,15 @@ final class SecureData extends TlObject
         $buffer .= Serializer::bytes($this->secret);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $data = Deserializer::bytes($stream);
-        $dataHash = Deserializer::bytes($stream);
-        $secret = Deserializer::bytes($stream);
+        $data = Deserializer::bytes($__payload, $__offset);
+        $dataHash = Deserializer::bytes($__payload, $__offset);
+        $secret = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $data,

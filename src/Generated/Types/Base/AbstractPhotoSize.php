@@ -11,18 +11,18 @@ use RuntimeException;
  */
 abstract class AbstractPhotoSize extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0xe17e23c => PhotoSizeEmpty::deserialize($stream),
-            0x75c78e60 => PhotoSize::deserialize($stream),
-            0x21e1ad6 => PhotoCachedSize::deserialize($stream),
-            0xe0b0bc2e => PhotoStrippedSize::deserialize($stream),
-            0xfa3efb95 => PhotoSizeProgressive::deserialize($stream),
-            0xd8214d41 => PhotoPathSize::deserialize($stream),
+            0xe17e23c => PhotoSizeEmpty::deserialize($__payload, $__offset),
+            0x75c78e60 => PhotoSize::deserialize($__payload, $__offset),
+            0x21e1ad6 => PhotoCachedSize::deserialize($__payload, $__offset),
+            0xe0b0bc2e => PhotoStrippedSize::deserialize($__payload, $__offset),
+            0xfa3efb95 => PhotoSizeProgressive::deserialize($__payload, $__offset),
+            0xd8214d41 => PhotoPathSize::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type PhotoSize. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

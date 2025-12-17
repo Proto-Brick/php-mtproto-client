@@ -44,14 +44,14 @@ final class DocumentAttributeSticker extends AbstractDocumentAttribute
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $mask = (($flags & (1 << 1)) !== 0) ? true : null;
-        $alt = Deserializer::bytes($stream);
-        $stickerset = AbstractInputStickerSet::deserialize($stream);
-        $maskCoords = (($flags & (1 << 0)) !== 0) ? MaskCoords::deserialize($stream) : null;
+        $alt = Deserializer::bytes($__payload, $__offset);
+        $stickerset = AbstractInputStickerSet::deserialize($__payload, $__offset);
+        $maskCoords = (($flags & (1 << 0)) !== 0) ? MaskCoords::deserialize($__payload, $__offset) : null;
 
         return new self(
             $alt,

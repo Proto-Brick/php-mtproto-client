@@ -32,12 +32,12 @@ final class InputCheckPasswordSRP extends AbstractInputCheckPasswordSRP
         $buffer .= Serializer::bytes($this->m1);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $srpId = Deserializer::int64($stream);
-        $a = Deserializer::bytes($stream);
-        $m1 = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $srpId = Deserializer::int64($__payload, $__offset);
+        $a = Deserializer::bytes($__payload, $__offset);
+        $m1 = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $srpId,

@@ -103,25 +103,25 @@ final class UpdateShortMessage extends AbstractUpdates
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $out = (($flags & (1 << 1)) !== 0) ? true : null;
         $mentioned = (($flags & (1 << 4)) !== 0) ? true : null;
         $mediaUnread = (($flags & (1 << 5)) !== 0) ? true : null;
         $silent = (($flags & (1 << 13)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
-        $message = Deserializer::bytes($stream);
-        $pts = Deserializer::int32($stream);
-        $ptsCount = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $fwdFrom = (($flags & (1 << 2)) !== 0) ? MessageFwdHeader::deserialize($stream) : null;
-        $viaBotId = (($flags & (1 << 11)) !== 0) ? Deserializer::int64($stream) : null;
-        $replyTo = (($flags & (1 << 3)) !== 0) ? AbstractMessageReplyHeader::deserialize($stream) : null;
-        $entities = (($flags & (1 << 7)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $ttlPeriod = (($flags & (1 << 25)) !== 0) ? Deserializer::int32($stream) : null;
+        $id = Deserializer::int32($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $message = Deserializer::bytes($__payload, $__offset);
+        $pts = Deserializer::int32($__payload, $__offset);
+        $ptsCount = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $fwdFrom = (($flags & (1 << 2)) !== 0) ? MessageFwdHeader::deserialize($__payload, $__offset) : null;
+        $viaBotId = (($flags & (1 << 11)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $replyTo = (($flags & (1 << 3)) !== 0) ? AbstractMessageReplyHeader::deserialize($__payload, $__offset) : null;
+        $entities = (($flags & (1 << 7)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $ttlPeriod = (($flags & (1 << 25)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $id,

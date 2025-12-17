@@ -26,10 +26,10 @@ final class UpdateDeleteQuickReply extends AbstractUpdate
         $buffer .= Serializer::int32($this->shortcutId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $shortcutId = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $shortcutId = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $shortcutId

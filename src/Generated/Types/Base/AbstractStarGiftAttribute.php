@@ -11,16 +11,16 @@ use RuntimeException;
  */
 abstract class AbstractStarGiftAttribute extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x39d99013 => StarGiftAttributeModel::deserialize($stream),
-            0x13acff19 => StarGiftAttributePattern::deserialize($stream),
-            0xd93d859c => StarGiftAttributeBackdrop::deserialize($stream),
-            0xe0bff26c => StarGiftAttributeOriginalDetails::deserialize($stream),
+            0x39d99013 => StarGiftAttributeModel::deserialize($__payload, $__offset),
+            0x13acff19 => StarGiftAttributePattern::deserialize($__payload, $__offset),
+            0xd93d859c => StarGiftAttributeBackdrop::deserialize($__payload, $__offset),
+            0xe0bff26c => StarGiftAttributeOriginalDetails::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type StarGiftAttribute. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

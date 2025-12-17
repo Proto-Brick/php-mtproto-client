@@ -72,22 +72,22 @@ final class Poll extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $id = Deserializer::int64($stream);
-        $flags = Deserializer::int32($stream);
+        $id = Deserializer::int64($__payload, $__offset);
+        $flags = Deserializer::int32($__payload, $__offset);
         $closed = (($flags & (1 << 0)) !== 0) ? true : null;
         $publicVoters = (($flags & (1 << 1)) !== 0) ? true : null;
         $multipleChoice = (($flags & (1 << 2)) !== 0) ? true : null;
         $quiz = (($flags & (1 << 3)) !== 0) ? true : null;
-        $question = TextWithEntities::deserialize($stream);
-        $answers = Deserializer::vectorOfObjects($stream, [PollAnswer::class, 'deserialize']);
-        $closePeriod = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $closeDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
+        $question = TextWithEntities::deserialize($__payload, $__offset);
+        $answers = Deserializer::vectorOfObjects($__payload, $__offset, [PollAnswer::class, 'deserialize']);
+        $closePeriod = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $closeDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $id,

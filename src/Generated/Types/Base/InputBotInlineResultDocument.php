@@ -53,16 +53,16 @@ final class InputBotInlineResultDocument extends AbstractInputBotInlineResult
         $buffer .= $this->sendMessage->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $id = Deserializer::bytes($stream);
-        $type = Deserializer::bytes($stream);
-        $title = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $description = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $document = AbstractInputDocument::deserialize($stream);
-        $sendMessage = AbstractInputBotInlineMessage::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $id = Deserializer::bytes($__payload, $__offset);
+        $type = Deserializer::bytes($__payload, $__offset);
+        $title = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $description = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $document = AbstractInputDocument::deserialize($__payload, $__offset);
+        $sendMessage = AbstractInputBotInlineMessage::deserialize($__payload, $__offset);
 
         return new self(
             $id,

@@ -28,13 +28,13 @@ final class PaidMessagesRevenue extends TlObject
         $buffer .= Serializer::int64($this->starsAmount);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $starsAmount = Deserializer::int64($stream);
+        $starsAmount = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $starsAmount

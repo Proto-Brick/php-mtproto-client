@@ -102,29 +102,29 @@ final class ForumTopic extends AbstractForumTopic
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $my = (($flags & (1 << 1)) !== 0) ? true : null;
         $closed = (($flags & (1 << 2)) !== 0) ? true : null;
         $pinned = (($flags & (1 << 3)) !== 0) ? true : null;
         $short = (($flags & (1 << 5)) !== 0) ? true : null;
         $hidden = (($flags & (1 << 6)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $title = Deserializer::bytes($stream);
-        $iconColor = Deserializer::int32($stream);
-        $iconEmojiId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $topMessage = Deserializer::int32($stream);
-        $readInboxMaxId = Deserializer::int32($stream);
-        $readOutboxMaxId = Deserializer::int32($stream);
-        $unreadCount = Deserializer::int32($stream);
-        $unreadMentionsCount = Deserializer::int32($stream);
-        $unreadReactionsCount = Deserializer::int32($stream);
-        $fromId = AbstractPeer::deserialize($stream);
-        $notifySettings = PeerNotifySettings::deserialize($stream);
-        $draft = (($flags & (1 << 4)) !== 0) ? AbstractDraftMessage::deserialize($stream) : null;
+        $id = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $iconColor = Deserializer::int32($__payload, $__offset);
+        $iconEmojiId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $topMessage = Deserializer::int32($__payload, $__offset);
+        $readInboxMaxId = Deserializer::int32($__payload, $__offset);
+        $readOutboxMaxId = Deserializer::int32($__payload, $__offset);
+        $unreadCount = Deserializer::int32($__payload, $__offset);
+        $unreadMentionsCount = Deserializer::int32($__payload, $__offset);
+        $unreadReactionsCount = Deserializer::int32($__payload, $__offset);
+        $fromId = AbstractPeer::deserialize($__payload, $__offset);
+        $notifySettings = PeerNotifySettings::deserialize($__payload, $__offset);
+        $draft = (($flags & (1 << 4)) !== 0) ? AbstractDraftMessage::deserialize($__payload, $__offset) : null;
 
         return new self(
             $id,

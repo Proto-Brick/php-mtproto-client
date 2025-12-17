@@ -104,25 +104,25 @@ final class StarGiftUnique extends AbstractStarGift
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $requirePremium = (($flags & (1 << 6)) !== 0) ? true : null;
         $resaleTonOnly = (($flags & (1 << 7)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $title = Deserializer::bytes($stream);
-        $slug = Deserializer::bytes($stream);
-        $num = Deserializer::int32($stream);
-        $ownerId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $ownerName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $ownerAddress = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $attributes = Deserializer::vectorOfObjects($stream, [AbstractStarGiftAttribute::class, 'deserialize']);
-        $availabilityIssued = Deserializer::int32($stream);
-        $availabilityTotal = Deserializer::int32($stream);
-        $giftAddress = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $resellAmount = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractStarsAmount::class, 'deserialize']) : null;
-        $releasedBy = (($flags & (1 << 5)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $slug = Deserializer::bytes($__payload, $__offset);
+        $num = Deserializer::int32($__payload, $__offset);
+        $ownerId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $ownerName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $ownerAddress = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $attributes = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractStarGiftAttribute::class, 'deserialize']);
+        $availabilityIssued = Deserializer::int32($__payload, $__offset);
+        $availabilityTotal = Deserializer::int32($__payload, $__offset);
+        $giftAddress = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $resellAmount = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractStarsAmount::class, 'deserialize']) : null;
+        $releasedBy = (($flags & (1 << 5)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
 
         return new self(
             $id,

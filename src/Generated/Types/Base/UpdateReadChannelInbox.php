@@ -45,15 +45,15 @@ final class UpdateReadChannelInbox extends AbstractUpdate
         $buffer .= Serializer::int32($this->pts);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $folderId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $channelId = Deserializer::int64($stream);
-        $maxId = Deserializer::int32($stream);
-        $stillUnreadCount = Deserializer::int32($stream);
-        $pts = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $folderId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $channelId = Deserializer::int64($__payload, $__offset);
+        $maxId = Deserializer::int32($__payload, $__offset);
+        $stillUnreadCount = Deserializer::int32($__payload, $__offset);
+        $pts = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $channelId,

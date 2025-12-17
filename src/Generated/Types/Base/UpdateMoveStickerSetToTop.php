@@ -38,13 +38,13 @@ final class UpdateMoveStickerSetToTop extends AbstractUpdate
         $buffer .= Serializer::int64($this->stickerset);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $masks = (($flags & (1 << 0)) !== 0) ? true : null;
         $emojis = (($flags & (1 << 1)) !== 0) ? true : null;
-        $stickerset = Deserializer::int64($stream);
+        $stickerset = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $stickerset,

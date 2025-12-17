@@ -57,14 +57,14 @@ final class MessageActionTopicEdit extends AbstractMessageAction
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $iconEmojiId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($stream) : null;
-        $closed = (($flags & (1 << 2)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $hidden = (($flags & (1 << 3)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $iconEmojiId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $closed = (($flags & (1 << 2)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
+        $hidden = (($flags & (1 << 3)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
 
         return new self(
             $title,

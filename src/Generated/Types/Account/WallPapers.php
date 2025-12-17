@@ -30,11 +30,11 @@ final class WallPapers extends AbstractWallPapers
         $buffer .= Serializer::vectorOfObjects($this->wallpapers);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
-        $wallpapers = Deserializer::vectorOfObjects($stream, [AbstractWallPaper::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int64($__payload, $__offset);
+        $wallpapers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractWallPaper::class, 'deserialize']);
 
         return new self(
             $hash,

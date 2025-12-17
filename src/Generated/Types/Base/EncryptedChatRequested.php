@@ -51,17 +51,17 @@ final class EncryptedChatRequested extends AbstractEncryptedChat
         $buffer .= Serializer::bytes($this->gA);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $folderId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $id = Deserializer::int32($stream);
-        $accessHash = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $adminId = Deserializer::int64($stream);
-        $participantId = Deserializer::int64($stream);
-        $gA = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $folderId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $id = Deserializer::int32($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $adminId = Deserializer::int64($__payload, $__offset);
+        $participantId = Deserializer::int64($__payload, $__offset);
+        $gA = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $id,

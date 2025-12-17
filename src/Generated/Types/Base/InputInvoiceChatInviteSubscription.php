@@ -26,10 +26,10 @@ final class InputInvoiceChatInviteSubscription extends AbstractInputInvoice
         $buffer .= Serializer::bytes($this->hash);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $hash

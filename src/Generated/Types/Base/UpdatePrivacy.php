@@ -29,11 +29,11 @@ final class UpdatePrivacy extends AbstractUpdate
         $buffer .= Serializer::vectorOfObjects($this->rules);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $key = PrivacyKey::deserialize($stream);
-        $rules = Deserializer::vectorOfObjects($stream, [AbstractPrivacyRule::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $key = PrivacyKey::deserialize($__payload, $__offset);
+        $rules = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPrivacyRule::class, 'deserialize']);
 
         return new self(
             $key,

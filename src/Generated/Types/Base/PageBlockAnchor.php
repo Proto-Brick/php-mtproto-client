@@ -26,10 +26,10 @@ final class PageBlockAnchor extends AbstractPageBlock
         $buffer .= Serializer::bytes($this->name);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $name = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $name = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $name

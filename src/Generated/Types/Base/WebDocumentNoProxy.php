@@ -35,13 +35,13 @@ final class WebDocumentNoProxy extends AbstractWebDocument
         $buffer .= Serializer::vectorOfObjects($this->attributes);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $url = Deserializer::bytes($stream);
-        $size = Deserializer::int32($stream);
-        $mimeType = Deserializer::bytes($stream);
-        $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $url = Deserializer::bytes($__payload, $__offset);
+        $size = Deserializer::int32($__payload, $__offset);
+        $mimeType = Deserializer::bytes($__payload, $__offset);
+        $attributes = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocumentAttribute::class, 'deserialize']);
 
         return new self(
             $url,

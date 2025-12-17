@@ -71,17 +71,17 @@ final class LangPackStringPluralized extends AbstractLangPackString
         $buffer .= Serializer::bytes($this->otherValue);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $key = Deserializer::bytes($stream);
-        $zeroValue = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $oneValue = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $twoValue = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $fewValue = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $manyValue = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
-        $otherValue = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $key = Deserializer::bytes($__payload, $__offset);
+        $zeroValue = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $oneValue = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $twoValue = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $fewValue = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $manyValue = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $otherValue = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $key,

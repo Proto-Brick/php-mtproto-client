@@ -49,14 +49,14 @@ final class InputMediaUploadedPhoto extends AbstractInputMedia
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $spoiler = (($flags & (1 << 2)) !== 0) ? true : null;
-        $file = AbstractInputFile::deserialize($stream);
-        $stickers = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputDocument::class, 'deserialize']) : null;
-        $ttlSeconds = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $file = AbstractInputFile::deserialize($__payload, $__offset);
+        $stickers = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputDocument::class, 'deserialize']) : null;
+        $ttlSeconds = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $file,

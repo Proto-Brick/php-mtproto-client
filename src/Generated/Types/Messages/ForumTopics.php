@@ -54,20 +54,20 @@ final class ForumTopics extends TlObject
         $buffer .= Serializer::int32($this->pts);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $orderByCreateDate = (($flags & (1 << 0)) !== 0) ? true : null;
-        $count = Deserializer::int32($stream);
-        $topics = Deserializer::vectorOfObjects($stream, [AbstractForumTopic::class, 'deserialize']);
-        $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $pts = Deserializer::int32($stream);
+        $count = Deserializer::int32($__payload, $__offset);
+        $topics = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractForumTopic::class, 'deserialize']);
+        $messages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
+        $pts = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $count,

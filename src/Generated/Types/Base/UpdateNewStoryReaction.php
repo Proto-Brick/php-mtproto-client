@@ -32,12 +32,12 @@ final class UpdateNewStoryReaction extends AbstractUpdate
         $buffer .= $this->reaction->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $storyId = Deserializer::int32($stream);
-        $peer = AbstractPeer::deserialize($stream);
-        $reaction = AbstractReaction::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $storyId = Deserializer::int32($__payload, $__offset);
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $reaction = AbstractReaction::deserialize($__payload, $__offset);
 
         return new self(
             $storyId,

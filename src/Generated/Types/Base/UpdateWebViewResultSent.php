@@ -26,10 +26,10 @@ final class UpdateWebViewResultSent extends AbstractUpdate
         $buffer .= Serializer::int64($this->queryId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $queryId = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $queryId = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $queryId

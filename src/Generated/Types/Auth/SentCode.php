@@ -47,14 +47,14 @@ final class SentCode extends AbstractSentCode
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $type = AbstractSentCodeType::deserialize($stream);
-        $phoneCodeHash = Deserializer::bytes($stream);
-        $nextType = (($flags & (1 << 1)) !== 0) ? CodeType::deserialize($stream) : null;
-        $timeout = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $type = AbstractSentCodeType::deserialize($__payload, $__offset);
+        $phoneCodeHash = Deserializer::bytes($__payload, $__offset);
+        $nextType = (($flags & (1 << 1)) !== 0) ? CodeType::deserialize($__payload, $__offset) : null;
+        $timeout = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $type,

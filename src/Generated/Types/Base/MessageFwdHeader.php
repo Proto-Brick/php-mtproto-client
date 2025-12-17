@@ -120,26 +120,26 @@ final class MessageFwdHeader extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $imported = (($flags & (1 << 7)) !== 0) ? true : null;
         $savedOut = (($flags & (1 << 11)) !== 0) ? true : null;
-        $fromId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $fromName = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
-        $date = Deserializer::int32($stream);
-        $channelPost = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $postAuthor = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $savedFromPeer = (($flags & (1 << 4)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $savedFromMsgId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $savedFromId = (($flags & (1 << 8)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $savedFromName = (($flags & (1 << 9)) !== 0) ? Deserializer::bytes($stream) : null;
-        $savedDate = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
-        $psaType = (($flags & (1 << 6)) !== 0) ? Deserializer::bytes($stream) : null;
+        $fromId = (($flags & (1 << 0)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $fromName = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $date = Deserializer::int32($__payload, $__offset);
+        $channelPost = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $postAuthor = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $savedFromPeer = (($flags & (1 << 4)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $savedFromMsgId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $savedFromId = (($flags & (1 << 8)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $savedFromName = (($flags & (1 << 9)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $savedDate = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $psaType = (($flags & (1 << 6)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $date,

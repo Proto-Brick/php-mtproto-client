@@ -29,13 +29,13 @@ final class TranslatedText extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->result);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $result = Deserializer::vectorOfObjects($stream, [TextWithEntities::class, 'deserialize']);
+        $result = Deserializer::vectorOfObjects($__payload, $__offset, [TextWithEntities::class, 'deserialize']);
 
         return new self(
             $result

@@ -85,22 +85,22 @@ final class MessageMediaGiveawayResults extends AbstractMessageMedia
         $buffer .= Serializer::int32($this->untilDate);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $onlyNewSubscribers = (($flags & (1 << 0)) !== 0) ? true : null;
         $refunded = (($flags & (1 << 2)) !== 0) ? true : null;
-        $channelId = Deserializer::int64($stream);
-        $additionalPeersCount = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $launchMsgId = Deserializer::int32($stream);
-        $winnersCount = Deserializer::int32($stream);
-        $unclaimedCount = Deserializer::int32($stream);
-        $winners = Deserializer::vectorOfLongs($stream);
-        $months = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $stars = (($flags & (1 << 5)) !== 0) ? Deserializer::int64($stream) : null;
-        $prizeDescription = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $untilDate = Deserializer::int32($stream);
+        $channelId = Deserializer::int64($__payload, $__offset);
+        $additionalPeersCount = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $launchMsgId = Deserializer::int32($__payload, $__offset);
+        $winnersCount = Deserializer::int32($__payload, $__offset);
+        $unclaimedCount = Deserializer::int32($__payload, $__offset);
+        $winners = Deserializer::vectorOfLongs($__payload, $__offset);
+        $months = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $stars = (($flags & (1 << 5)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $prizeDescription = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $untilDate = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $channelId,

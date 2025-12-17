@@ -33,14 +33,14 @@ final class ExportedChatlistInvite extends TlObject
         $buffer .= $this->invite->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $filter = AbstractDialogFilter::deserialize($stream);
-        $invite = BaseExportedChatlistInvite::deserialize($stream);
+        $filter = AbstractDialogFilter::deserialize($__payload, $__offset);
+        $invite = BaseExportedChatlistInvite::deserialize($__payload, $__offset);
 
         return new self(
             $filter,

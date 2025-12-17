@@ -40,17 +40,17 @@ final class State extends TlObject
         $buffer .= Serializer::int32($this->unreadCount);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $pts = Deserializer::int32($stream);
-        $qts = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $seq = Deserializer::int32($stream);
-        $unreadCount = Deserializer::int32($stream);
+        $pts = Deserializer::int32($__payload, $__offset);
+        $qts = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $seq = Deserializer::int32($__payload, $__offset);
+        $unreadCount = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $pts,

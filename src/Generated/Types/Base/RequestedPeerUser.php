@@ -60,15 +60,15 @@ final class RequestedPeerUser extends AbstractRequestedPeer
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $userId = Deserializer::int64($stream);
-        $firstName = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $lastName = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $username = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $photo = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $firstName = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $lastName = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $username = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $photo = (($flags & (1 << 2)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
 
         return new self(
             $userId,

@@ -39,13 +39,13 @@ final class MessageActionTopicCreate extends AbstractMessageAction
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $title = Deserializer::bytes($stream);
-        $iconColor = Deserializer::int32($stream);
-        $iconEmojiId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $iconColor = Deserializer::int32($__payload, $__offset);
+        $iconEmojiId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
 
         return new self(
             $title,

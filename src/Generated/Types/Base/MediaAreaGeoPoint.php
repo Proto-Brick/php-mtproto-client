@@ -39,13 +39,13 @@ final class MediaAreaGeoPoint extends AbstractMediaArea
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $coordinates = MediaAreaCoordinates::deserialize($stream);
-        $geo = AbstractGeoPoint::deserialize($stream);
-        $address = (($flags & (1 << 0)) !== 0) ? GeoPointAddress::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $coordinates = MediaAreaCoordinates::deserialize($__payload, $__offset);
+        $geo = AbstractGeoPoint::deserialize($__payload, $__offset);
+        $address = (($flags & (1 << 0)) !== 0) ? GeoPointAddress::deserialize($__payload, $__offset) : null;
 
         return new self(
             $coordinates,

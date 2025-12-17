@@ -35,13 +35,13 @@ final class UpdateChatParticipantAdmin extends AbstractUpdate
         $buffer .= Serializer::int32($this->version);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $chatId = Deserializer::int64($stream);
-        $userId = Deserializer::int64($stream);
-        $isAdmin = (Deserializer::int32($stream) === 0x997275b5);
-        $version = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $chatId = Deserializer::int64($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $isAdmin = (Deserializer::int32($__payload, $__offset) === 0x997275b5);
+        $version = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $chatId,

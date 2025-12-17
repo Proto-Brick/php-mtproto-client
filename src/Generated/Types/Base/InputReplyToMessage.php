@@ -84,18 +84,18 @@ final class InputReplyToMessage extends AbstractInputReplyTo
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $replyToMsgId = Deserializer::int32($stream);
-        $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $replyToPeerId = (($flags & (1 << 1)) !== 0) ? AbstractInputPeer::deserialize($stream) : null;
-        $quoteText = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $quoteEntities = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $quoteOffset = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $monoforumPeerId = (($flags & (1 << 5)) !== 0) ? AbstractInputPeer::deserialize($stream) : null;
-        $todoItemId = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $replyToMsgId = Deserializer::int32($__payload, $__offset);
+        $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $replyToPeerId = (($flags & (1 << 1)) !== 0) ? AbstractInputPeer::deserialize($__payload, $__offset) : null;
+        $quoteText = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $quoteEntities = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $quoteOffset = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $monoforumPeerId = (($flags & (1 << 5)) !== 0) ? AbstractInputPeer::deserialize($__payload, $__offset) : null;
+        $todoItemId = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $replyToMsgId,

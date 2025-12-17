@@ -45,15 +45,15 @@ final class MessageActionPaymentRefunded extends AbstractMessageAction
         $buffer .= $this->charge->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $peer = AbstractPeer::deserialize($stream);
-        $currency = Deserializer::bytes($stream);
-        $totalAmount = Deserializer::int64($stream);
-        $payload = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $charge = PaymentCharge::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $totalAmount = Deserializer::int64($__payload, $__offset);
+        $payload = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $charge = PaymentCharge::deserialize($__payload, $__offset);
 
         return new self(
             $peer,

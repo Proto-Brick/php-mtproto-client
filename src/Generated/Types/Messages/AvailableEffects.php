@@ -34,12 +34,12 @@ final class AvailableEffects extends AbstractAvailableEffects
         $buffer .= Serializer::vectorOfObjects($this->documents);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int32($stream);
-        $effects = Deserializer::vectorOfObjects($stream, [AvailableEffect::class, 'deserialize']);
-        $documents = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int32($__payload, $__offset);
+        $effects = Deserializer::vectorOfObjects($__payload, $__offset, [AvailableEffect::class, 'deserialize']);
+        $documents = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
 
         return new self(
             $hash,

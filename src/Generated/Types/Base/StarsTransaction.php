@@ -231,13 +231,13 @@ final class StarsTransaction extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $refund = (($flags & (1 << 3)) !== 0) ? true : null;
         $pending = (($flags & (1 << 4)) !== 0) ? true : null;
         $failed = (($flags & (1 << 6)) !== 0) ? true : null;
@@ -246,29 +246,29 @@ final class StarsTransaction extends TlObject
         $stargiftUpgrade = (($flags & (1 << 18)) !== 0) ? true : null;
         $businessTransfer = (($flags & (1 << 21)) !== 0) ? true : null;
         $stargiftResale = (($flags & (1 << 22)) !== 0) ? true : null;
-        $id = Deserializer::bytes($stream);
-        $amount = AbstractStarsAmount::deserialize($stream);
-        $date = Deserializer::int32($stream);
-        $peer = AbstractStarsTransactionPeer::deserialize($stream);
-        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $photo = (($flags & (1 << 2)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
-        $transactionDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $transactionUrl = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
-        $botPayload = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
-        $msgId = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
-        $extendedMedia = (($flags & (1 << 9)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageMedia::class, 'deserialize']) : null;
-        $subscriptionPeriod = (($flags & (1 << 12)) !== 0) ? Deserializer::int32($stream) : null;
-        $giveawayPostId = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($stream) : null;
-        $stargift = (($flags & (1 << 14)) !== 0) ? AbstractStarGift::deserialize($stream) : null;
-        $floodskipNumber = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($stream) : null;
-        $starrefCommissionPermille = (($flags & (1 << 16)) !== 0) ? Deserializer::int32($stream) : null;
-        $starrefPeer = (($flags & (1 << 17)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $starrefAmount = (($flags & (1 << 17)) !== 0) ? AbstractStarsAmount::deserialize($stream) : null;
-        $paidMessages = (($flags & (1 << 19)) !== 0) ? Deserializer::int32($stream) : null;
-        $premiumGiftMonths = (($flags & (1 << 20)) !== 0) ? Deserializer::int32($stream) : null;
-        $adsProceedsFromDate = (($flags & (1 << 23)) !== 0) ? Deserializer::int32($stream) : null;
-        $adsProceedsToDate = (($flags & (1 << 23)) !== 0) ? Deserializer::int32($stream) : null;
+        $id = Deserializer::bytes($__payload, $__offset);
+        $amount = AbstractStarsAmount::deserialize($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $peer = AbstractStarsTransactionPeer::deserialize($__payload, $__offset);
+        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $photo = (($flags & (1 << 2)) !== 0) ? AbstractWebDocument::deserialize($__payload, $__offset) : null;
+        $transactionDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $transactionUrl = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $botPayload = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $msgId = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $extendedMedia = (($flags & (1 << 9)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageMedia::class, 'deserialize']) : null;
+        $subscriptionPeriod = (($flags & (1 << 12)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $giveawayPostId = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $stargift = (($flags & (1 << 14)) !== 0) ? AbstractStarGift::deserialize($__payload, $__offset) : null;
+        $floodskipNumber = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $starrefCommissionPermille = (($flags & (1 << 16)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $starrefPeer = (($flags & (1 << 17)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $starrefAmount = (($flags & (1 << 17)) !== 0) ? AbstractStarsAmount::deserialize($__payload, $__offset) : null;
+        $paidMessages = (($flags & (1 << 19)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $premiumGiftMonths = (($flags & (1 << 20)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $adsProceedsFromDate = (($flags & (1 << 23)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $adsProceedsToDate = (($flags & (1 << 23)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $id,

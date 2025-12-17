@@ -29,11 +29,11 @@ final class InputNotifyForumTopic extends AbstractInputNotifyPeer
         $buffer .= Serializer::int32($this->topMsgId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $peer = AbstractInputPeer::deserialize($stream);
-        $topMsgId = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $peer = AbstractInputPeer::deserialize($__payload, $__offset);
+        $topMsgId = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $peer,

@@ -81,19 +81,19 @@ final class DraftMessage extends AbstractDraftMessage
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $noWebpage = (($flags & (1 << 1)) !== 0) ? true : null;
         $invertMedia = (($flags & (1 << 6)) !== 0) ? true : null;
-        $replyTo = (($flags & (1 << 4)) !== 0) ? AbstractInputReplyTo::deserialize($stream) : null;
-        $message = Deserializer::bytes($stream);
-        $entities = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $media = (($flags & (1 << 5)) !== 0) ? AbstractInputMedia::deserialize($stream) : null;
-        $date = Deserializer::int32($stream);
-        $effect = (($flags & (1 << 7)) !== 0) ? Deserializer::int64($stream) : null;
-        $suggestedPost = (($flags & (1 << 8)) !== 0) ? SuggestedPost::deserialize($stream) : null;
+        $replyTo = (($flags & (1 << 4)) !== 0) ? AbstractInputReplyTo::deserialize($__payload, $__offset) : null;
+        $message = Deserializer::bytes($__payload, $__offset);
+        $entities = (($flags & (1 << 3)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $media = (($flags & (1 << 5)) !== 0) ? AbstractInputMedia::deserialize($__payload, $__offset) : null;
+        $date = Deserializer::int32($__payload, $__offset);
+        $effect = (($flags & (1 << 7)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $suggestedPost = (($flags & (1 << 8)) !== 0) ? SuggestedPost::deserialize($__payload, $__offset) : null;
 
         return new self(
             $message,

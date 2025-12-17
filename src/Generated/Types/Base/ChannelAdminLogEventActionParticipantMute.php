@@ -26,10 +26,10 @@ final class ChannelAdminLogEventActionParticipantMute extends AbstractChannelAdm
         $buffer .= $this->participant->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $participant = GroupCallParticipant::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $participant = GroupCallParticipant::deserialize($__payload, $__offset);
 
         return new self(
             $participant

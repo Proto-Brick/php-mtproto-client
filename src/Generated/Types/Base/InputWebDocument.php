@@ -37,16 +37,16 @@ final class InputWebDocument extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->attributes);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $url = Deserializer::bytes($stream);
-        $size = Deserializer::int32($stream);
-        $mimeType = Deserializer::bytes($stream);
-        $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
+        $url = Deserializer::bytes($__payload, $__offset);
+        $size = Deserializer::int32($__payload, $__offset);
+        $mimeType = Deserializer::bytes($__payload, $__offset);
+        $attributes = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocumentAttribute::class, 'deserialize']);
 
         return new self(
             $url,

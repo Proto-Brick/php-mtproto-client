@@ -35,13 +35,13 @@ final class PhotoSizeProgressive extends AbstractPhotoSize
         $buffer .= Serializer::vectorOfInts($this->sizes);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $type = Deserializer::bytes($stream);
-        $w = Deserializer::int32($stream);
-        $h = Deserializer::int32($stream);
-        $sizes = Deserializer::vectorOfInts($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $type = Deserializer::bytes($__payload, $__offset);
+        $w = Deserializer::int32($__payload, $__offset);
+        $h = Deserializer::int32($__payload, $__offset);
+        $sizes = Deserializer::vectorOfInts($__payload, $__offset);
 
         return new self(
             $type,

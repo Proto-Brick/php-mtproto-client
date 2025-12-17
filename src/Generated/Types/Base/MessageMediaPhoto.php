@@ -46,13 +46,13 @@ final class MessageMediaPhoto extends AbstractMessageMedia
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $spoiler = (($flags & (1 << 3)) !== 0) ? true : null;
-        $photo = (($flags & (1 << 0)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
-        $ttlSeconds = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $photo = (($flags & (1 << 0)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
+        $ttlSeconds = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $spoiler,

@@ -116,28 +116,28 @@ final class SponsoredMessage extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $recommended = (($flags & (1 << 5)) !== 0) ? true : null;
         $canReport = (($flags & (1 << 12)) !== 0) ? true : null;
-        $randomId = Deserializer::bytes($stream);
-        $url = Deserializer::bytes($stream);
-        $title = Deserializer::bytes($stream);
-        $message = Deserializer::bytes($stream);
-        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractMessageEntity::class, 'deserialize']) : null;
-        $photo = (($flags & (1 << 6)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
-        $media = (($flags & (1 << 14)) !== 0) ? AbstractMessageMedia::deserialize($stream) : null;
-        $color = (($flags & (1 << 13)) !== 0) ? PeerColor::deserialize($stream) : null;
-        $buttonText = Deserializer::bytes($stream);
-        $sponsorInfo = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
-        $additionalInfo = (($flags & (1 << 8)) !== 0) ? Deserializer::bytes($stream) : null;
-        $minDisplayDuration = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($stream) : null;
-        $maxDisplayDuration = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($stream) : null;
+        $randomId = Deserializer::bytes($__payload, $__offset);
+        $url = Deserializer::bytes($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $message = Deserializer::bytes($__payload, $__offset);
+        $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
+        $photo = (($flags & (1 << 6)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
+        $media = (($flags & (1 << 14)) !== 0) ? AbstractMessageMedia::deserialize($__payload, $__offset) : null;
+        $color = (($flags & (1 << 13)) !== 0) ? PeerColor::deserialize($__payload, $__offset) : null;
+        $buttonText = Deserializer::bytes($__payload, $__offset);
+        $sponsorInfo = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $additionalInfo = (($flags & (1 << 8)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $minDisplayDuration = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $maxDisplayDuration = (($flags & (1 << 15)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $randomId,

@@ -34,11 +34,11 @@ final class AuthorizationSignUpRequired extends AbstractAuthorization
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $termsOfService = (($flags & (1 << 0)) !== 0) ? TermsOfService::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $termsOfService = (($flags & (1 << 0)) !== 0) ? TermsOfService::deserialize($__payload, $__offset) : null;
 
         return new self(
             $termsOfService

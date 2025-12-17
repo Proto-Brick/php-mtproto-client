@@ -26,10 +26,10 @@ final class UpdateDcOptions extends AbstractUpdate
         $buffer .= Serializer::vectorOfObjects($this->dcOptions);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $dcOptions = Deserializer::vectorOfObjects($stream, [DcOption::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $dcOptions = Deserializer::vectorOfObjects($__payload, $__offset, [DcOption::class, 'deserialize']);
 
         return new self(
             $dcOptions

@@ -41,14 +41,14 @@ final class MediaAreaSuggestedReaction extends AbstractMediaArea
         $buffer .= $this->reaction->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $dark = (($flags & (1 << 0)) !== 0) ? true : null;
         $flipped = (($flags & (1 << 1)) !== 0) ? true : null;
-        $coordinates = MediaAreaCoordinates::deserialize($stream);
-        $reaction = AbstractReaction::deserialize($stream);
+        $coordinates = MediaAreaCoordinates::deserialize($__payload, $__offset);
+        $reaction = AbstractReaction::deserialize($__payload, $__offset);
 
         return new self(
             $coordinates,

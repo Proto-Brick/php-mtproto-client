@@ -11,14 +11,14 @@ use RuntimeException;
  */
 abstract class AbstractPeerColors extends TlObject
 {
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, int &$__offset): static
     {
         // Peek at the constructor ID to determine the concrete type
-        $constructorId = Deserializer::peekInt32($stream);
+        $constructorId = Deserializer::peekInt32($__payload, $__offset);
         
         return match ($constructorId) {
-            0x2ba1f5ce => PeerColorsNotModified::deserialize($stream),
-            0xf8ed08 => PeerColors::deserialize($stream),
+            0x2ba1f5ce => PeerColorsNotModified::deserialize($__payload, $__offset),
+            0xf8ed08 => PeerColors::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type help.PeerColors. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

@@ -112,10 +112,10 @@ final class MessageService extends AbstractMessage
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $out = (($flags & (1 << 1)) !== 0) ? true : null;
         $mentioned = (($flags & (1 << 4)) !== 0) ? true : null;
         $mediaUnread = (($flags & (1 << 5)) !== 0) ? true : null;
@@ -123,15 +123,15 @@ final class MessageService extends AbstractMessage
         $silent = (($flags & (1 << 13)) !== 0) ? true : null;
         $post = (($flags & (1 << 14)) !== 0) ? true : null;
         $legacy = (($flags & (1 << 19)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
-        $fromId = (($flags & (1 << 8)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $peerId = AbstractPeer::deserialize($stream);
-        $savedPeerId = (($flags & (1 << 28)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $replyTo = (($flags & (1 << 3)) !== 0) ? AbstractMessageReplyHeader::deserialize($stream) : null;
-        $date = Deserializer::int32($stream);
-        $action = AbstractMessageAction::deserialize($stream);
-        $reactions = (($flags & (1 << 20)) !== 0) ? MessageReactions::deserialize($stream) : null;
-        $ttlPeriod = (($flags & (1 << 25)) !== 0) ? Deserializer::int32($stream) : null;
+        $id = Deserializer::int32($__payload, $__offset);
+        $fromId = (($flags & (1 << 8)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $peerId = AbstractPeer::deserialize($__payload, $__offset);
+        $savedPeerId = (($flags & (1 << 28)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $replyTo = (($flags & (1 << 3)) !== 0) ? AbstractMessageReplyHeader::deserialize($__payload, $__offset) : null;
+        $date = Deserializer::int32($__payload, $__offset);
+        $action = AbstractMessageAction::deserialize($__payload, $__offset);
+        $reactions = (($flags & (1 << 20)) !== 0) ? MessageReactions::deserialize($__payload, $__offset) : null;
+        $ttlPeriod = (($flags & (1 << 25)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $id,

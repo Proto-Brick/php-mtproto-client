@@ -57,15 +57,15 @@ final class InputMediaGeoLive extends AbstractInputMedia
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $stopped = (($flags & (1 << 0)) !== 0) ? true : null;
-        $geoPoint = AbstractInputGeoPoint::deserialize($stream);
-        $heading = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $period = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $proximityNotificationRadius = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $geoPoint = AbstractInputGeoPoint::deserialize($__payload, $__offset);
+        $heading = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $period = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $proximityNotificationRadius = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $geoPoint,

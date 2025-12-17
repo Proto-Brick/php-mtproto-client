@@ -37,13 +37,13 @@ final class RecentStickers extends AbstractRecentStickers
         $buffer .= Serializer::vectorOfInts($this->dates);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
-        $packs = Deserializer::vectorOfObjects($stream, [StickerPack::class, 'deserialize']);
-        $stickers = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
-        $dates = Deserializer::vectorOfInts($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int64($__payload, $__offset);
+        $packs = Deserializer::vectorOfObjects($__payload, $__offset, [StickerPack::class, 'deserialize']);
+        $stickers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
+        $dates = Deserializer::vectorOfInts($__payload, $__offset);
 
         return new self(
             $hash,

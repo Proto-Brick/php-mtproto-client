@@ -29,11 +29,11 @@ final class ChannelAdminLogEventActionParticipantJoinByRequest extends AbstractC
         $buffer .= Serializer::int64($this->approvedBy);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $invite = AbstractExportedChatInvite::deserialize($stream);
-        $approvedBy = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $invite = AbstractExportedChatInvite::deserialize($__payload, $__offset);
+        $approvedBy = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $invite,

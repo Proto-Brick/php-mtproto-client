@@ -33,12 +33,12 @@ final class EncryptedChatDiscarded extends AbstractEncryptedChat
         $buffer .= Serializer::int32($this->id);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $historyDeleted = (($flags & (1 << 0)) !== 0) ? true : null;
-        $id = Deserializer::int32($stream);
+        $id = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $id,

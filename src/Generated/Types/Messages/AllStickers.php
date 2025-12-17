@@ -30,11 +30,11 @@ final class AllStickers extends AbstractAllStickers
         $buffer .= Serializer::vectorOfObjects($this->sets);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $hash = Deserializer::int64($stream);
-        $sets = Deserializer::vectorOfObjects($stream, [StickerSet::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $hash = Deserializer::int64($__payload, $__offset);
+        $sets = Deserializer::vectorOfObjects($__payload, $__offset, [StickerSet::class, 'deserialize']);
 
         return new self(
             $hash,

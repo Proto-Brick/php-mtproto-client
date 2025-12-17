@@ -138,10 +138,10 @@ final class GroupCall extends AbstractGroupCall
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $joinMuted = (($flags & (1 << 1)) !== 0) ? true : null;
         $canChangeJoinMuted = (($flags & (1 << 2)) !== 0) ? true : null;
         $joinDateAsc = (($flags & (1 << 6)) !== 0) ? true : null;
@@ -152,17 +152,17 @@ final class GroupCall extends AbstractGroupCall
         $listenersHidden = (($flags & (1 << 13)) !== 0) ? true : null;
         $conference = (($flags & (1 << 14)) !== 0) ? true : null;
         $creator = (($flags & (1 << 15)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = Deserializer::int64($stream);
-        $participantsCount = Deserializer::int32($stream);
-        $title = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $streamDcId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $recordStartDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $scheduleDate = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($stream) : null;
-        $unmutedVideoCount = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
-        $unmutedVideoLimit = Deserializer::int32($stream);
-        $version = Deserializer::int32($stream);
-        $inviteLink = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = Deserializer::int64($__payload, $__offset);
+        $participantsCount = Deserializer::int32($__payload, $__offset);
+        $title = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $streamDcId = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $recordStartDate = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $scheduleDate = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $unmutedVideoCount = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $unmutedVideoLimit = Deserializer::int32($__payload, $__offset);
+        $version = Deserializer::int32($__payload, $__offset);
+        $inviteLink = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $id,

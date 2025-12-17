@@ -29,11 +29,11 @@ final class MessageMediaPaidMedia extends AbstractMessageMedia
         $buffer .= Serializer::vectorOfObjects($this->extendedMedia);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $starsAmount = Deserializer::int64($stream);
-        $extendedMedia = Deserializer::vectorOfObjects($stream, [AbstractMessageExtendedMedia::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $starsAmount = Deserializer::int64($__payload, $__offset);
+        $extendedMedia = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageExtendedMedia::class, 'deserialize']);
 
         return new self(
             $starsAmount,

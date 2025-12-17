@@ -73,21 +73,21 @@ final class GlobalPrivacySettings extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $archiveAndMuteNewNoncontactPeers = (($flags & (1 << 0)) !== 0) ? true : null;
         $keepArchivedUnmuted = (($flags & (1 << 1)) !== 0) ? true : null;
         $keepArchivedFolders = (($flags & (1 << 2)) !== 0) ? true : null;
         $hideReadMarks = (($flags & (1 << 3)) !== 0) ? true : null;
         $newNoncontactPeersRequirePremium = (($flags & (1 << 4)) !== 0) ? true : null;
         $displayGiftsButton = (($flags & (1 << 7)) !== 0) ? true : null;
-        $noncontactPeersPaidStars = (($flags & (1 << 5)) !== 0) ? Deserializer::int64($stream) : null;
-        $disallowedGifts = (($flags & (1 << 6)) !== 0) ? DisallowedGiftsSettings::deserialize($stream) : null;
+        $noncontactPeersPaidStars = (($flags & (1 << 5)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $disallowedGifts = (($flags & (1 << 6)) !== 0) ? DisallowedGiftsSettings::deserialize($__payload, $__offset) : null;
 
         return new self(
             $archiveAndMuteNewNoncontactPeers,

@@ -29,11 +29,11 @@ final class DifferenceEmpty extends AbstractDifference
         $buffer .= Serializer::int32($this->seq);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $date = Deserializer::int32($stream);
-        $seq = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $date = Deserializer::int32($__payload, $__offset);
+        $seq = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $date,

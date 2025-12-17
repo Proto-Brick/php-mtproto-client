@@ -41,17 +41,17 @@ final class InputBusinessAwayMessage extends TlObject
         $buffer .= $this->recipients->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $offlineOnly = (($flags & (1 << 0)) !== 0) ? true : null;
-        $shortcutId = Deserializer::int32($stream);
-        $schedule = AbstractBusinessAwayMessageSchedule::deserialize($stream);
-        $recipients = InputBusinessRecipients::deserialize($stream);
+        $shortcutId = Deserializer::int32($__payload, $__offset);
+        $schedule = AbstractBusinessAwayMessageSchedule::deserialize($__payload, $__offset);
+        $recipients = InputBusinessRecipients::deserialize($__payload, $__offset);
 
         return new self(
             $shortcutId,

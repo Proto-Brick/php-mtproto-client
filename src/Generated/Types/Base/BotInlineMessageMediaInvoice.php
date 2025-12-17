@@ -63,18 +63,18 @@ final class BotInlineMessageMediaInvoice extends AbstractBotInlineMessage
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $shippingAddressRequested = (($flags & (1 << 1)) !== 0) ? true : null;
         $test = (($flags & (1 << 3)) !== 0) ? true : null;
-        $title = Deserializer::bytes($stream);
-        $description = Deserializer::bytes($stream);
-        $photo = (($flags & (1 << 0)) !== 0) ? AbstractWebDocument::deserialize($stream) : null;
-        $currency = Deserializer::bytes($stream);
-        $totalAmount = Deserializer::int64($stream);
-        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($stream) : null;
+        $title = Deserializer::bytes($__payload, $__offset);
+        $description = Deserializer::bytes($__payload, $__offset);
+        $photo = (($flags & (1 << 0)) !== 0) ? AbstractWebDocument::deserialize($__payload, $__offset) : null;
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $totalAmount = Deserializer::int64($__payload, $__offset);
+        $replyMarkup = (($flags & (1 << 2)) !== 0) ? AbstractReplyMarkup::deserialize($__payload, $__offset) : null;
 
         return new self(
             $title,

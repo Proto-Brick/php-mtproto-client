@@ -150,30 +150,30 @@ final class StarGift extends AbstractStarGift
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $limited = (($flags & (1 << 0)) !== 0) ? true : null;
         $soldOut = (($flags & (1 << 1)) !== 0) ? true : null;
         $birthday = (($flags & (1 << 2)) !== 0) ? true : null;
         $requirePremium = (($flags & (1 << 7)) !== 0) ? true : null;
         $limitedPerUser = (($flags & (1 << 8)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $sticker = AbstractDocument::deserialize($stream);
-        $stars = Deserializer::int64($stream);
-        $availabilityRemains = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $availabilityTotal = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $availabilityResale = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
-        $convertStars = Deserializer::int64($stream);
-        $firstSaleDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $lastSaleDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $upgradeStars = (($flags & (1 << 3)) !== 0) ? Deserializer::int64($stream) : null;
-        $resellMinStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
-        $title = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
-        $releasedBy = (($flags & (1 << 6)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $perUserTotal = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
-        $perUserRemains = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $sticker = AbstractDocument::deserialize($__payload, $__offset);
+        $stars = Deserializer::int64($__payload, $__offset);
+        $availabilityRemains = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $availabilityTotal = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $availabilityResale = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $convertStars = Deserializer::int64($__payload, $__offset);
+        $firstSaleDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $lastSaleDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $upgradeStars = (($flags & (1 << 3)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $resellMinStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $title = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $releasedBy = (($flags & (1 << 6)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $perUserTotal = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $perUserRemains = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $id,

@@ -32,14 +32,14 @@ final class Authorizations extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->authorizations);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $authorizationTtlDays = Deserializer::int32($stream);
-        $authorizations = Deserializer::vectorOfObjects($stream, [Authorization::class, 'deserialize']);
+        $authorizationTtlDays = Deserializer::int32($__payload, $__offset);
+        $authorizations = Deserializer::vectorOfObjects($__payload, $__offset, [Authorization::class, 'deserialize']);
 
         return new self(
             $authorizationTtlDays,

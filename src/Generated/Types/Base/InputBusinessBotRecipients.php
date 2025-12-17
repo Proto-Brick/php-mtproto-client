@@ -68,20 +68,20 @@ final class InputBusinessBotRecipients extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $existingChats = (($flags & (1 << 0)) !== 0) ? true : null;
         $newChats = (($flags & (1 << 1)) !== 0) ? true : null;
         $contacts = (($flags & (1 << 2)) !== 0) ? true : null;
         $nonContacts = (($flags & (1 << 3)) !== 0) ? true : null;
         $excludeSelected = (($flags & (1 << 5)) !== 0) ? true : null;
-        $users = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']) : null;
-        $excludeUsers = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']) : null;
+        $users = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputUser::class, 'deserialize']) : null;
+        $excludeUsers = (($flags & (1 << 6)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputUser::class, 'deserialize']) : null;
 
         return new self(
             $existingChats,

@@ -50,15 +50,15 @@ final class InputStorePaymentPremiumGiftCode extends AbstractInputStorePaymentPu
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractInputUser::class, 'deserialize']);
-        $boostPeer = (($flags & (1 << 0)) !== 0) ? AbstractInputPeer::deserialize($stream) : null;
-        $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
-        $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputUser::class, 'deserialize']);
+        $boostPeer = (($flags & (1 << 0)) !== 0) ? AbstractInputPeer::deserialize($__payload, $__offset) : null;
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $amount = Deserializer::int64($__payload, $__offset);
+        $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($__payload, $__offset) : null;
 
         return new self(
             $users,

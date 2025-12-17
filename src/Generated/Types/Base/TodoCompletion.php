@@ -34,15 +34,15 @@ final class TodoCompletion extends TlObject
         $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $id = Deserializer::int32($stream);
-        $completedBy = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
+        $id = Deserializer::int32($__payload, $__offset);
+        $completedBy = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $id,

@@ -30,11 +30,11 @@ final class ChatsSlice extends AbstractChats
         $buffer .= Serializer::vectorOfObjects($this->chats);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $count = Deserializer::int32($stream);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $count = Deserializer::int32($__payload, $__offset);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
 
         return new self(
             $count,

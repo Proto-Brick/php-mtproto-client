@@ -32,12 +32,12 @@ final class UpdateBotChatBoost extends AbstractUpdate
         $buffer .= Serializer::int32($this->qts);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $peer = AbstractPeer::deserialize($stream);
-        $boost = Boost::deserialize($stream);
-        $qts = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $boost = Boost::deserialize($__payload, $__offset);
+        $qts = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $peer,

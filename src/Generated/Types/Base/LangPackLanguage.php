@@ -71,24 +71,24 @@ final class LangPackLanguage extends TlObject
         $buffer .= Serializer::bytes($this->translationsUrl);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $official = (($flags & (1 << 0)) !== 0) ? true : null;
         $rtl = (($flags & (1 << 2)) !== 0) ? true : null;
         $beta = (($flags & (1 << 3)) !== 0) ? true : null;
-        $name = Deserializer::bytes($stream);
-        $nativeName = Deserializer::bytes($stream);
-        $langCode = Deserializer::bytes($stream);
-        $baseLangCode = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $pluralCode = Deserializer::bytes($stream);
-        $stringsCount = Deserializer::int32($stream);
-        $translatedCount = Deserializer::int32($stream);
-        $translationsUrl = Deserializer::bytes($stream);
+        $name = Deserializer::bytes($__payload, $__offset);
+        $nativeName = Deserializer::bytes($__payload, $__offset);
+        $langCode = Deserializer::bytes($__payload, $__offset);
+        $baseLangCode = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $pluralCode = Deserializer::bytes($__payload, $__offset);
+        $stringsCount = Deserializer::int32($__payload, $__offset);
+        $translatedCount = Deserializer::int32($__payload, $__offset);
+        $translationsUrl = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $name,

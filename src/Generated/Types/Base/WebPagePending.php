@@ -39,13 +39,13 @@ final class WebPagePending extends AbstractWebPage
         $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $id = Deserializer::int64($stream);
-        $url = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $date = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $id = Deserializer::int64($__payload, $__offset);
+        $url = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $date = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $id,

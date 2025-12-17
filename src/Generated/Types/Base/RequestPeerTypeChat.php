@@ -67,16 +67,16 @@ final class RequestPeerTypeChat extends AbstractRequestPeerType
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $creator = (($flags & (1 << 0)) !== 0) ? true : null;
         $botParticipant = (($flags & (1 << 5)) !== 0) ? true : null;
-        $hasUsername = (($flags & (1 << 3)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $forum = (($flags & (1 << 4)) !== 0) ? (Deserializer::int32($stream) === 0x997275b5) : null;
-        $userAdminRights = (($flags & (1 << 1)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
-        $botAdminRights = (($flags & (1 << 2)) !== 0) ? ChatAdminRights::deserialize($stream) : null;
+        $hasUsername = (($flags & (1 << 3)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
+        $forum = (($flags & (1 << 4)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
+        $userAdminRights = (($flags & (1 << 1)) !== 0) ? ChatAdminRights::deserialize($__payload, $__offset) : null;
+        $botAdminRights = (($flags & (1 << 2)) !== 0) ? ChatAdminRights::deserialize($__payload, $__offset) : null;
 
         return new self(
             $creator,

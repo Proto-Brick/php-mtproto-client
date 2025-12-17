@@ -74,20 +74,20 @@ final class InputStorePaymentPremiumGiveaway extends AbstractInputStorePaymentPu
         $buffer .= Serializer::int64($this->amount);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $onlyNewSubscribers = (($flags & (1 << 0)) !== 0) ? true : null;
         $winnersAreVisible = (($flags & (1 << 3)) !== 0) ? true : null;
-        $boostPeer = AbstractInputPeer::deserialize($stream);
-        $additionalPeers = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputPeer::class, 'deserialize']) : null;
-        $countriesIso2 = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfStrings($stream) : null;
-        $prizeDescription = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
-        $randomId = Deserializer::int64($stream);
-        $untilDate = Deserializer::int32($stream);
-        $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
+        $boostPeer = AbstractInputPeer::deserialize($__payload, $__offset);
+        $additionalPeers = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputPeer::class, 'deserialize']) : null;
+        $countriesIso2 = (($flags & (1 << 2)) !== 0) ? Deserializer::vectorOfStrings($__payload, $__offset) : null;
+        $prizeDescription = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $randomId = Deserializer::int64($__payload, $__offset);
+        $untilDate = Deserializer::int32($__payload, $__offset);
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $amount = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $boostPeer,

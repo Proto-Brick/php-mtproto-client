@@ -26,10 +26,10 @@ final class TextConcat extends AbstractRichText
         $buffer .= Serializer::vectorOfObjects($this->texts);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $texts = Deserializer::vectorOfObjects($stream, [AbstractRichText::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $texts = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractRichText::class, 'deserialize']);
 
         return new self(
             $texts

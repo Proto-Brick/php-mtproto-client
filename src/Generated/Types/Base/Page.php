@@ -62,21 +62,21 @@ final class Page extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $part = (($flags & (1 << 0)) !== 0) ? true : null;
         $rtl = (($flags & (1 << 1)) !== 0) ? true : null;
         $v2 = (($flags & (1 << 2)) !== 0) ? true : null;
-        $url = Deserializer::bytes($stream);
-        $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
-        $photos = Deserializer::vectorOfObjects($stream, [AbstractPhoto::class, 'deserialize']);
-        $documents = Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']);
-        $views = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
+        $url = Deserializer::bytes($__payload, $__offset);
+        $blocks = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPageBlock::class, 'deserialize']);
+        $photos = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPhoto::class, 'deserialize']);
+        $documents = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
+        $views = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $url,

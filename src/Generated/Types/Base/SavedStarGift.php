@@ -146,31 +146,31 @@ final class SavedStarGift extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $nameHidden = (($flags & (1 << 0)) !== 0) ? true : null;
         $unsaved = (($flags & (1 << 5)) !== 0) ? true : null;
         $refunded = (($flags & (1 << 9)) !== 0) ? true : null;
         $canUpgrade = (($flags & (1 << 10)) !== 0) ? true : null;
         $pinnedToTop = (($flags & (1 << 12)) !== 0) ? true : null;
-        $fromId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $date = Deserializer::int32($stream);
-        $gift = AbstractStarGift::deserialize($stream);
-        $message = (($flags & (1 << 2)) !== 0) ? TextWithEntities::deserialize($stream) : null;
-        $msgId = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $savedId = (($flags & (1 << 11)) !== 0) ? Deserializer::int64($stream) : null;
-        $convertStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($stream) : null;
-        $upgradeStars = (($flags & (1 << 6)) !== 0) ? Deserializer::int64($stream) : null;
-        $canExportAt = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($stream) : null;
-        $transferStars = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($stream) : null;
-        $canTransferAt = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($stream) : null;
-        $canResellAt = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($stream) : null;
-        $collectionId = (($flags & (1 << 15)) !== 0) ? Deserializer::vectorOfInts($stream) : null;
+        $fromId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $date = Deserializer::int32($__payload, $__offset);
+        $gift = AbstractStarGift::deserialize($__payload, $__offset);
+        $message = (($flags & (1 << 2)) !== 0) ? TextWithEntities::deserialize($__payload, $__offset) : null;
+        $msgId = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $savedId = (($flags & (1 << 11)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $convertStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $upgradeStars = (($flags & (1 << 6)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $canExportAt = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $transferStars = (($flags & (1 << 8)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $canTransferAt = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $canResellAt = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $collectionId = (($flags & (1 << 15)) !== 0) ? Deserializer::vectorOfInts($__payload, $__offset) : null;
 
         return new self(
             $date,

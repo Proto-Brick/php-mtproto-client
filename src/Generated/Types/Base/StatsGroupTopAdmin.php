@@ -37,16 +37,16 @@ final class StatsGroupTopAdmin extends TlObject
         $buffer .= Serializer::int32($this->banned);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $userId = Deserializer::int64($stream);
-        $deleted = Deserializer::int32($stream);
-        $kicked = Deserializer::int32($stream);
-        $banned = Deserializer::int32($stream);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $deleted = Deserializer::int32($__payload, $__offset);
+        $kicked = Deserializer::int32($__payload, $__offset);
+        $banned = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $userId,

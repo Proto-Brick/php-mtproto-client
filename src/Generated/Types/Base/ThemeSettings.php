@@ -62,19 +62,19 @@ final class ThemeSettings extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $messageColorsAnimated = (($flags & (1 << 2)) !== 0) ? true : null;
-        $baseTheme = BaseTheme::deserialize($stream);
-        $accentColor = Deserializer::int32($stream);
-        $outboxAccentColor = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $messageColors = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfInts($stream) : null;
-        $wallpaper = (($flags & (1 << 1)) !== 0) ? AbstractWallPaper::deserialize($stream) : null;
+        $baseTheme = BaseTheme::deserialize($__payload, $__offset);
+        $accentColor = Deserializer::int32($__payload, $__offset);
+        $outboxAccentColor = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $messageColors = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfInts($__payload, $__offset) : null;
+        $wallpaper = (($flags & (1 << 1)) !== 0) ? AbstractWallPaper::deserialize($__payload, $__offset) : null;
 
         return new self(
             $baseTheme,

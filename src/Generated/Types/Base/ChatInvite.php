@@ -122,10 +122,10 @@ final class ChatInvite extends AbstractChatInvite
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $channel = (($flags & (1 << 0)) !== 0) ? true : null;
         $broadcast = (($flags & (1 << 1)) !== 0) ? true : null;
         $public = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -135,15 +135,15 @@ final class ChatInvite extends AbstractChatInvite
         $scam = (($flags & (1 << 8)) !== 0) ? true : null;
         $fake = (($flags & (1 << 9)) !== 0) ? true : null;
         $canRefulfillSubscription = (($flags & (1 << 11)) !== 0) ? true : null;
-        $title = Deserializer::bytes($stream);
-        $about = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($stream) : null;
-        $photo = AbstractPhoto::deserialize($stream);
-        $participantsCount = Deserializer::int32($stream);
-        $participants = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']) : null;
-        $color = Deserializer::int32($stream);
-        $subscriptionPricing = (($flags & (1 << 10)) !== 0) ? StarsSubscriptionPricing::deserialize($stream) : null;
-        $subscriptionFormId = (($flags & (1 << 12)) !== 0) ? Deserializer::int64($stream) : null;
-        $botVerification = (($flags & (1 << 13)) !== 0) ? BotVerification::deserialize($stream) : null;
+        $title = Deserializer::bytes($__payload, $__offset);
+        $about = (($flags & (1 << 5)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $photo = AbstractPhoto::deserialize($__payload, $__offset);
+        $participantsCount = Deserializer::int32($__payload, $__offset);
+        $participants = (($flags & (1 << 4)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']) : null;
+        $color = Deserializer::int32($__payload, $__offset);
+        $subscriptionPricing = (($flags & (1 << 10)) !== 0) ? StarsSubscriptionPricing::deserialize($__payload, $__offset) : null;
+        $subscriptionFormId = (($flags & (1 << 12)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $botVerification = (($flags & (1 << 13)) !== 0) ? BotVerification::deserialize($__payload, $__offset) : null;
 
         return new self(
             $title,

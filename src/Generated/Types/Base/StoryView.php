@@ -49,15 +49,15 @@ final class StoryView extends AbstractStoryView
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $blocked = (($flags & (1 << 0)) !== 0) ? true : null;
         $blockedMyStoriesFrom = (($flags & (1 << 1)) !== 0) ? true : null;
-        $userId = Deserializer::int64($stream);
-        $date = Deserializer::int32($stream);
-        $reaction = (($flags & (1 << 2)) !== 0) ? AbstractReaction::deserialize($stream) : null;
+        $userId = Deserializer::int64($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $reaction = (($flags & (1 << 2)) !== 0) ? AbstractReaction::deserialize($__payload, $__offset) : null;
 
         return new self(
             $userId,

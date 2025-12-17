@@ -73,20 +73,20 @@ final class PageRelatedArticle extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $url = Deserializer::bytes($stream);
-        $webpageId = Deserializer::int64($stream);
-        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $photoId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($stream) : null;
-        $author = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $publishedDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $url = Deserializer::bytes($__payload, $__offset);
+        $webpageId = Deserializer::int64($__payload, $__offset);
+        $title = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $description = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $photoId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $author = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $publishedDate = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $url,

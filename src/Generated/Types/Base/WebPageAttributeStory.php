@@ -39,13 +39,13 @@ final class WebPageAttributeStory extends AbstractWebPageAttribute
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $peer = AbstractPeer::deserialize($stream);
-        $id = Deserializer::int32($stream);
-        $story = (($flags & (1 << 0)) !== 0) ? AbstractStoryItem::deserialize($stream) : null;
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $id = Deserializer::int32($__payload, $__offset);
+        $story = (($flags & (1 << 0)) !== 0) ? AbstractStoryItem::deserialize($__payload, $__offset) : null;
 
         return new self(
             $peer,

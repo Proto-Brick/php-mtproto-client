@@ -65,22 +65,22 @@ final class SearchResultsCalendar extends TlObject
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $inexact = (($flags & (1 << 0)) !== 0) ? true : null;
-        $count = Deserializer::int32($stream);
-        $minDate = Deserializer::int32($stream);
-        $minMsgId = Deserializer::int32($stream);
-        $offsetIdOffset = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $periods = Deserializer::vectorOfObjects($stream, [SearchResultsCalendarPeriod::class, 'deserialize']);
-        $messages = Deserializer::vectorOfObjects($stream, [AbstractMessage::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
+        $count = Deserializer::int32($__payload, $__offset);
+        $minDate = Deserializer::int32($__payload, $__offset);
+        $minMsgId = Deserializer::int32($__payload, $__offset);
+        $offsetIdOffset = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $periods = Deserializer::vectorOfObjects($__payload, $__offset, [SearchResultsCalendarPeriod::class, 'deserialize']);
+        $messages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $count,

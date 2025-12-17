@@ -312,10 +312,10 @@ final class User extends AbstractUser implements PeerEntity
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $self = (($flags & (1 << 10)) !== 0) ? true : null;
         $contact = (($flags & (1 << 11)) !== 0) ? true : null;
         $mutualContact = (($flags & (1 << 12)) !== 0) ? true : null;
@@ -334,7 +334,7 @@ final class User extends AbstractUser implements PeerEntity
         $botAttachMenu = (($flags & (1 << 27)) !== 0) ? true : null;
         $premium = (($flags & (1 << 28)) !== 0) ? true : null;
         $attachMenuEnabled = (($flags & (1 << 29)) !== 0) ? true : null;
-        $flags2 = Deserializer::int32($stream);
+        $flags2 = Deserializer::int32($__payload, $__offset);
         $botCanEdit = (($flags2 & (1 << 1)) !== 0) ? true : null;
         $closeFriend = (($flags2 & (1 << 2)) !== 0) ? true : null;
         $storiesHidden = (($flags2 & (1 << 3)) !== 0) ? true : null;
@@ -342,26 +342,26 @@ final class User extends AbstractUser implements PeerEntity
         $contactRequirePremium = (($flags2 & (1 << 10)) !== 0) ? true : null;
         $botBusiness = (($flags2 & (1 << 11)) !== 0) ? true : null;
         $botHasMainApp = (($flags2 & (1 << 13)) !== 0) ? true : null;
-        $id = Deserializer::int64($stream);
-        $accessHash = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $firstName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($stream) : null;
-        $lastName = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $username = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($stream) : null;
-        $phone = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
-        $photo = (($flags & (1 << 5)) !== 0) ? AbstractUserProfilePhoto::deserialize($stream) : null;
-        $status = (($flags & (1 << 6)) !== 0) ? AbstractUserStatus::deserialize($stream) : null;
-        $botInfoVersion = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($stream) : null;
-        $restrictionReason = (($flags & (1 << 18)) !== 0) ? Deserializer::vectorOfObjects($stream, [RestrictionReason::class, 'deserialize']) : null;
-        $botInlinePlaceholder = (($flags & (1 << 19)) !== 0) ? Deserializer::bytes($stream) : null;
-        $langCode = (($flags & (1 << 22)) !== 0) ? Deserializer::bytes($stream) : null;
-        $emojiStatus = (($flags & (1 << 30)) !== 0) ? AbstractEmojiStatus::deserialize($stream) : null;
-        $usernames = (($flags2 & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [Username::class, 'deserialize']) : null;
-        $storiesMaxId = (($flags2 & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $color = (($flags2 & (1 << 8)) !== 0) ? PeerColor::deserialize($stream) : null;
-        $profileColor = (($flags2 & (1 << 9)) !== 0) ? PeerColor::deserialize($stream) : null;
-        $botActiveUsers = (($flags2 & (1 << 12)) !== 0) ? Deserializer::int32($stream) : null;
-        $botVerificationIcon = (($flags2 & (1 << 14)) !== 0) ? Deserializer::int64($stream) : null;
-        $sendPaidMessagesStars = (($flags2 & (1 << 15)) !== 0) ? Deserializer::int64($stream) : null;
+        $id = Deserializer::int64($__payload, $__offset);
+        $accessHash = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $firstName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $lastName = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $username = (($flags & (1 << 3)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $phone = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $photo = (($flags & (1 << 5)) !== 0) ? AbstractUserProfilePhoto::deserialize($__payload, $__offset) : null;
+        $status = (($flags & (1 << 6)) !== 0) ? AbstractUserStatus::deserialize($__payload, $__offset) : null;
+        $botInfoVersion = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $restrictionReason = (($flags & (1 << 18)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [RestrictionReason::class, 'deserialize']) : null;
+        $botInlinePlaceholder = (($flags & (1 << 19)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $langCode = (($flags & (1 << 22)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $emojiStatus = (($flags & (1 << 30)) !== 0) ? AbstractEmojiStatus::deserialize($__payload, $__offset) : null;
+        $usernames = (($flags2 & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [Username::class, 'deserialize']) : null;
+        $storiesMaxId = (($flags2 & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $color = (($flags2 & (1 << 8)) !== 0) ? PeerColor::deserialize($__payload, $__offset) : null;
+        $profileColor = (($flags2 & (1 << 9)) !== 0) ? PeerColor::deserialize($__payload, $__offset) : null;
+        $botActiveUsers = (($flags2 & (1 << 12)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $botVerificationIcon = (($flags2 & (1 << 14)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $sendPaidMessagesStars = (($flags2 & (1 << 15)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
 
         return new self(
             $id,

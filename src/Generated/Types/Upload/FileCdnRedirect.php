@@ -39,14 +39,14 @@ final class FileCdnRedirect extends AbstractFile
         $buffer .= Serializer::vectorOfObjects($this->fileHashes);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $dcId = Deserializer::int32($stream);
-        $fileToken = Deserializer::bytes($stream);
-        $encryptionKey = Deserializer::bytes($stream);
-        $encryptionIv = Deserializer::bytes($stream);
-        $fileHashes = Deserializer::vectorOfObjects($stream, [FileHash::class, 'deserialize']);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $dcId = Deserializer::int32($__payload, $__offset);
+        $fileToken = Deserializer::bytes($__payload, $__offset);
+        $encryptionKey = Deserializer::bytes($__payload, $__offset);
+        $encryptionIv = Deserializer::bytes($__payload, $__offset);
+        $fileHashes = Deserializer::vectorOfObjects($__payload, $__offset, [FileHash::class, 'deserialize']);
 
         return new self(
             $dcId,

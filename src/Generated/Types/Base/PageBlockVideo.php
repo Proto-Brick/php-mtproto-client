@@ -41,14 +41,14 @@ final class PageBlockVideo extends AbstractPageBlock
         $buffer .= $this->caption->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $autoplay = (($flags & (1 << 0)) !== 0) ? true : null;
         $loop = (($flags & (1 << 1)) !== 0) ? true : null;
-        $videoId = Deserializer::int64($stream);
-        $caption = PageCaption::deserialize($stream);
+        $videoId = Deserializer::int64($__payload, $__offset);
+        $caption = PageCaption::deserialize($__payload, $__offset);
 
         return new self(
             $videoId,

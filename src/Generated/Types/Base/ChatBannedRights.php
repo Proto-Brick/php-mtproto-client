@@ -130,13 +130,13 @@ final class ChatBannedRights extends TlObject
         $buffer .= Serializer::int32($this->untilDate);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $viewMessages = (($flags & (1 << 0)) !== 0) ? true : null;
         $sendMessages = (($flags & (1 << 1)) !== 0) ? true : null;
         $sendMedia = (($flags & (1 << 2)) !== 0) ? true : null;
@@ -157,7 +157,7 @@ final class ChatBannedRights extends TlObject
         $sendVoices = (($flags & (1 << 23)) !== 0) ? true : null;
         $sendDocs = (($flags & (1 << 24)) !== 0) ? true : null;
         $sendPlain = (($flags & (1 << 25)) !== 0) ? true : null;
-        $untilDate = Deserializer::int32($stream);
+        $untilDate = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $untilDate,

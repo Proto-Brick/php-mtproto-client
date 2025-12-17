@@ -89,21 +89,21 @@ final class InputMediaUploadedDocument extends AbstractInputMedia
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $nosoundVideo = (($flags & (1 << 3)) !== 0) ? true : null;
         $forceFile = (($flags & (1 << 4)) !== 0) ? true : null;
         $spoiler = (($flags & (1 << 5)) !== 0) ? true : null;
-        $file = AbstractInputFile::deserialize($stream);
-        $thumb = (($flags & (1 << 2)) !== 0) ? AbstractInputFile::deserialize($stream) : null;
-        $mimeType = Deserializer::bytes($stream);
-        $attributes = Deserializer::vectorOfObjects($stream, [AbstractDocumentAttribute::class, 'deserialize']);
-        $stickers = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractInputDocument::class, 'deserialize']) : null;
-        $videoCover = (($flags & (1 << 6)) !== 0) ? AbstractInputPhoto::deserialize($stream) : null;
-        $videoTimestamp = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($stream) : null;
-        $ttlSeconds = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
+        $file = AbstractInputFile::deserialize($__payload, $__offset);
+        $thumb = (($flags & (1 << 2)) !== 0) ? AbstractInputFile::deserialize($__payload, $__offset) : null;
+        $mimeType = Deserializer::bytes($__payload, $__offset);
+        $attributes = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocumentAttribute::class, 'deserialize']);
+        $stickers = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractInputDocument::class, 'deserialize']) : null;
+        $videoCover = (($flags & (1 << 6)) !== 0) ? AbstractInputPhoto::deserialize($__payload, $__offset) : null;
+        $videoTimestamp = (($flags & (1 << 7)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $ttlSeconds = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $file,

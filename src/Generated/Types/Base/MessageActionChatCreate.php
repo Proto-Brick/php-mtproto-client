@@ -29,11 +29,11 @@ final class MessageActionChatCreate extends AbstractMessageAction
         $buffer .= Serializer::vectorOfLongs($this->users);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $title = Deserializer::bytes($stream);
-        $users = Deserializer::vectorOfLongs($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $title = Deserializer::bytes($__payload, $__offset);
+        $users = Deserializer::vectorOfLongs($__payload, $__offset);
 
         return new self(
             $title,

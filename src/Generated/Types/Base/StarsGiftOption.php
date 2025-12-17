@@ -49,18 +49,18 @@ final class StarsGiftOption extends TlObject
         $buffer .= Serializer::int64($this->amount);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $extended = (($flags & (1 << 1)) !== 0) ? true : null;
-        $stars = Deserializer::int64($stream);
-        $storeProduct = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $currency = Deserializer::bytes($stream);
-        $amount = Deserializer::int64($stream);
+        $stars = Deserializer::int64($__payload, $__offset);
+        $storeProduct = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $amount = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $stars,

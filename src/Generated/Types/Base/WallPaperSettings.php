@@ -93,22 +93,22 @@ final class WallPaperSettings extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $blur = (($flags & (1 << 1)) !== 0) ? true : null;
         $motion = (($flags & (1 << 2)) !== 0) ? true : null;
-        $backgroundColor = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $secondBackgroundColor = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $thirdBackgroundColor = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $fourthBackgroundColor = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($stream) : null;
-        $intensity = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($stream) : null;
-        $rotation = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($stream) : null;
-        $emoticon = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($stream) : null;
+        $backgroundColor = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $secondBackgroundColor = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $thirdBackgroundColor = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $fourthBackgroundColor = (($flags & (1 << 6)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $intensity = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $rotation = (($flags & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $emoticon = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $blur,

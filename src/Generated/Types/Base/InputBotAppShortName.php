@@ -29,11 +29,11 @@ final class InputBotAppShortName extends AbstractInputBotApp
         $buffer .= Serializer::bytes($this->shortName);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $botId = AbstractInputUser::deserialize($stream);
-        $shortName = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $botId = AbstractInputUser::deserialize($__payload, $__offset);
+        $shortName = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $botId,

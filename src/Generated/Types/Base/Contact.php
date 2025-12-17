@@ -31,14 +31,14 @@ final class Contact extends TlObject
         $buffer .= ($this->mutual ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $userId = Deserializer::int64($stream);
-        $mutual = (Deserializer::int32($stream) === 0x997275b5);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $mutual = (Deserializer::int32($__payload, $__offset) === 0x997275b5);
 
         return new self(
             $userId,

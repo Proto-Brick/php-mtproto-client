@@ -26,10 +26,10 @@ final class InputReplyToMonoForum extends AbstractInputReplyTo
         $buffer .= $this->monoforumPeerId->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $monoforumPeerId = AbstractInputPeer::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $monoforumPeerId = AbstractInputPeer::deserialize($__payload, $__offset);
 
         return new self(
             $monoforumPeerId

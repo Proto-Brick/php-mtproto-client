@@ -29,11 +29,11 @@ final class InputMessageCallbackQuery extends AbstractInputMessage
         $buffer .= Serializer::int64($this->queryId);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int32($stream);
-        $queryId = Deserializer::int64($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $id = Deserializer::int32($__payload, $__offset);
+        $queryId = Deserializer::int64($__payload, $__offset);
 
         return new self(
             $id,

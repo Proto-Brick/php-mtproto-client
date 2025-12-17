@@ -36,13 +36,13 @@ final class PageBlockDetails extends AbstractPageBlock
         $buffer .= $this->title->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $open = (($flags & (1 << 0)) !== 0) ? true : null;
-        $blocks = Deserializer::vectorOfObjects($stream, [AbstractPageBlock::class, 'deserialize']);
-        $title = AbstractRichText::deserialize($stream);
+        $blocks = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPageBlock::class, 'deserialize']);
+        $title = AbstractRichText::deserialize($__payload, $__offset);
 
         return new self(
             $blocks,

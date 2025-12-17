@@ -52,19 +52,19 @@ final class BotBusinessConnection extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $disabled = (($flags & (1 << 1)) !== 0) ? true : null;
-        $connectionId = Deserializer::bytes($stream);
-        $userId = Deserializer::int64($stream);
-        $dcId = Deserializer::int32($stream);
-        $date = Deserializer::int32($stream);
-        $rights = (($flags & (1 << 2)) !== 0) ? BusinessBotRights::deserialize($stream) : null;
+        $connectionId = Deserializer::bytes($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $dcId = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $rights = (($flags & (1 << 2)) !== 0) ? BusinessBotRights::deserialize($__payload, $__offset) : null;
 
         return new self(
             $connectionId,

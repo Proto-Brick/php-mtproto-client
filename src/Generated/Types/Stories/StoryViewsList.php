@@ -59,21 +59,21 @@ final class StoryViewsList extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $count = Deserializer::int32($stream);
-        $viewsCount = Deserializer::int32($stream);
-        $forwardsCount = Deserializer::int32($stream);
-        $reactionsCount = Deserializer::int32($stream);
-        $views = Deserializer::vectorOfObjects($stream, [AbstractStoryView::class, 'deserialize']);
-        $chats = Deserializer::vectorOfObjects($stream, [AbstractChat::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $count = Deserializer::int32($__payload, $__offset);
+        $viewsCount = Deserializer::int32($__payload, $__offset);
+        $forwardsCount = Deserializer::int32($__payload, $__offset);
+        $reactionsCount = Deserializer::int32($__payload, $__offset);
+        $views = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractStoryView::class, 'deserialize']);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
+        $nextOffset = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $count,

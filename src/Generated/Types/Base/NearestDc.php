@@ -34,15 +34,15 @@ final class NearestDc extends TlObject
         $buffer .= Serializer::int32($this->nearestDc);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $country = Deserializer::bytes($stream);
-        $thisDc = Deserializer::int32($stream);
-        $nearestDc = Deserializer::int32($stream);
+        $country = Deserializer::bytes($__payload, $__offset);
+        $thisDc = Deserializer::int32($__payload, $__offset);
+        $nearestDc = Deserializer::int32($__payload, $__offset);
 
         return new self(
             $country,

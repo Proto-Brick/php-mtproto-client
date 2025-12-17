@@ -91,24 +91,24 @@ final class Boost extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
+        $flags = Deserializer::int32($__payload, $__offset);
         $gift = (($flags & (1 << 1)) !== 0) ? true : null;
         $giveaway = (($flags & (1 << 2)) !== 0) ? true : null;
         $unclaimed = (($flags & (1 << 3)) !== 0) ? true : null;
-        $id = Deserializer::bytes($stream);
-        $userId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($stream) : null;
-        $giveawayMsgId = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
-        $date = Deserializer::int32($stream);
-        $expires = Deserializer::int32($stream);
-        $usedGiftSlug = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($stream) : null;
-        $multiplier = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($stream) : null;
-        $stars = (($flags & (1 << 6)) !== 0) ? Deserializer::int64($stream) : null;
+        $id = Deserializer::bytes($__payload, $__offset);
+        $userId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $giveawayMsgId = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $date = Deserializer::int32($__payload, $__offset);
+        $expires = Deserializer::int32($__payload, $__offset);
+        $usedGiftSlug = (($flags & (1 << 4)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $multiplier = (($flags & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $stars = (($flags & (1 << 6)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
 
         return new self(
             $id,

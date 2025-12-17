@@ -44,15 +44,15 @@ final class ValidatedRequestedInfo extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $id = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
-        $shippingOptions = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($stream, [ShippingOption::class, 'deserialize']) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $id = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $shippingOptions = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [ShippingOption::class, 'deserialize']) : null;
 
         return new self(
             $id,

@@ -32,12 +32,12 @@ final class SecureValueErrorFiles extends AbstractSecureValueError
         $buffer .= Serializer::bytes($this->text);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $type = SecureValueType::deserialize($stream);
-        $fileHash = Deserializer::vectorOfStrings($stream);
-        $text = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $type = SecureValueType::deserialize($__payload, $__offset);
+        $fileHash = Deserializer::vectorOfStrings($__payload, $__offset);
+        $text = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $type,

@@ -51,18 +51,18 @@ final class AuthorizationForm extends TlObject
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($stream);
+        $constructorId = Deserializer::int32($__payload, $__offset);
         if ($constructorId !== self::CONSTRUCTOR_ID) {
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
-        $flags = Deserializer::int32($stream);
-        $requiredTypes = Deserializer::vectorOfObjects($stream, [AbstractSecureRequiredType::class, 'deserialize']);
-        $values = Deserializer::vectorOfObjects($stream, [SecureValue::class, 'deserialize']);
-        $errors = Deserializer::vectorOfObjects($stream, [AbstractSecureValueError::class, 'deserialize']);
-        $users = Deserializer::vectorOfObjects($stream, [AbstractUser::class, 'deserialize']);
-        $privacyPolicyUrl = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($stream) : null;
+        $flags = Deserializer::int32($__payload, $__offset);
+        $requiredTypes = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractSecureRequiredType::class, 'deserialize']);
+        $values = Deserializer::vectorOfObjects($__payload, $__offset, [SecureValue::class, 'deserialize']);
+        $errors = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractSecureValueError::class, 'deserialize']);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
+        $privacyPolicyUrl = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
 
         return new self(
             $requiredTypes,

@@ -26,10 +26,10 @@ final class UpdateChatParticipants extends AbstractUpdate
         $buffer .= $this->participants->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $participants = AbstractChatParticipants::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $participants = AbstractChatParticipants::deserialize($__payload, $__offset);
 
         return new self(
             $participants

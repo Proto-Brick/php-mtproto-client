@@ -35,13 +35,13 @@ final class UpdateBotShippingQuery extends AbstractUpdate
         $buffer .= $this->shippingAddress->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $queryId = Deserializer::int64($stream);
-        $userId = Deserializer::int64($stream);
-        $payload = Deserializer::bytes($stream);
-        $shippingAddress = PostAddress::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $queryId = Deserializer::int64($__payload, $__offset);
+        $userId = Deserializer::int64($__payload, $__offset);
+        $payload = Deserializer::bytes($__payload, $__offset);
+        $shippingAddress = PostAddress::deserialize($__payload, $__offset);
 
         return new self(
             $queryId,

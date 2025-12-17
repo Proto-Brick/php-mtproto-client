@@ -38,14 +38,14 @@ final class PageBlockMap extends AbstractPageBlock
         $buffer .= $this->caption->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $geo = AbstractGeoPoint::deserialize($stream);
-        $zoom = Deserializer::int32($stream);
-        $w = Deserializer::int32($stream);
-        $h = Deserializer::int32($stream);
-        $caption = PageCaption::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $geo = AbstractGeoPoint::deserialize($__payload, $__offset);
+        $zoom = Deserializer::int32($__payload, $__offset);
+        $w = Deserializer::int32($__payload, $__offset);
+        $h = Deserializer::int32($__payload, $__offset);
+        $caption = PageCaption::deserialize($__payload, $__offset);
 
         return new self(
             $geo,

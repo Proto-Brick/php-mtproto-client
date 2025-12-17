@@ -47,14 +47,14 @@ final class UpdateDraftMessage extends AbstractUpdate
         $buffer .= $this->draft->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
-        $peer = AbstractPeer::deserialize($stream);
-        $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $savedPeerId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($stream) : null;
-        $draft = AbstractDraftMessage::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $topMsgId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $savedPeerId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
+        $draft = AbstractDraftMessage::deserialize($__payload, $__offset);
 
         return new self(
             $peer,

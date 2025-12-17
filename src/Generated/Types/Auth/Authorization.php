@@ -58,15 +58,15 @@ final class Authorization extends AbstractAuthorization
         $buffer .= $this->user->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $setupPasswordRequired = (($flags & (1 << 1)) !== 0) ? true : null;
-        $otherwiseReloginDays = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($stream) : null;
-        $tmpSessions = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($stream) : null;
-        $futureAuthToken = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($stream) : null;
-        $user = AbstractUser::deserialize($stream);
+        $otherwiseReloginDays = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $tmpSessions = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $futureAuthToken = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $user = AbstractUser::deserialize($__payload, $__offset);
 
         return new self(
             $user,

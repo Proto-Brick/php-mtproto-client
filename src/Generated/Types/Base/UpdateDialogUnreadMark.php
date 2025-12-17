@@ -41,13 +41,13 @@ final class UpdateDialogUnreadMark extends AbstractUpdate
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $unread = (($flags & (1 << 0)) !== 0) ? true : null;
-        $peer = AbstractDialogPeer::deserialize($stream);
-        $savedPeerId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($stream) : null;
+        $peer = AbstractDialogPeer::deserialize($__payload, $__offset);
+        $savedPeerId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
 
         return new self(
             $peer,

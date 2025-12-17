@@ -38,14 +38,14 @@ final class InputSecureFileUploaded extends AbstractInputSecureFile
         $buffer .= Serializer::bytes($this->secret);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int64($stream);
-        $parts = Deserializer::int32($stream);
-        $md5Checksum = Deserializer::bytes($stream);
-        $fileHash = Deserializer::bytes($stream);
-        $secret = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $id = Deserializer::int64($__payload, $__offset);
+        $parts = Deserializer::int32($__payload, $__offset);
+        $md5Checksum = Deserializer::bytes($__payload, $__offset);
+        $fileHash = Deserializer::bytes($__payload, $__offset);
+        $secret = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $id,

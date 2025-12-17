@@ -49,15 +49,15 @@ final class InputInvoiceStarGift extends AbstractInputInvoice
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $hideName = (($flags & (1 << 0)) !== 0) ? true : null;
         $includeUpgrade = (($flags & (1 << 2)) !== 0) ? true : null;
-        $peer = AbstractInputPeer::deserialize($stream);
-        $giftId = Deserializer::int64($stream);
-        $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($stream) : null;
+        $peer = AbstractInputPeer::deserialize($__payload, $__offset);
+        $giftId = Deserializer::int64($__payload, $__offset);
+        $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($__payload, $__offset) : null;
 
         return new self(
             $peer,

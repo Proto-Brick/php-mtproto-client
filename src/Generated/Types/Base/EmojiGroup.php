@@ -32,12 +32,12 @@ final class EmojiGroup extends AbstractEmojiGroup
         $buffer .= Serializer::vectorOfStrings($this->emoticons);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $title = Deserializer::bytes($stream);
-        $iconEmojiId = Deserializer::int64($stream);
-        $emoticons = Deserializer::vectorOfStrings($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $title = Deserializer::bytes($__payload, $__offset);
+        $iconEmojiId = Deserializer::int64($__payload, $__offset);
+        $emoticons = Deserializer::vectorOfStrings($__payload, $__offset);
 
         return new self(
             $title,

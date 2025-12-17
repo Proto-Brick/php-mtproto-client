@@ -29,11 +29,11 @@ final class UpdateNotifySettings extends AbstractUpdate
         $buffer .= $this->notifySettings->serialize();
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $peer = AbstractNotifyPeer::deserialize($stream);
-        $notifySettings = PeerNotifySettings::deserialize($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $peer = AbstractNotifyPeer::deserialize($__payload, $__offset);
+        $notifySettings = PeerNotifySettings::deserialize($__payload, $__offset);
 
         return new self(
             $peer,

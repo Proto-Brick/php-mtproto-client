@@ -29,11 +29,11 @@ final class ChannelLocation extends AbstractChannelLocation
         $buffer .= Serializer::bytes($this->address);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $geoPoint = AbstractGeoPoint::deserialize($stream);
-        $address = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $geoPoint = AbstractGeoPoint::deserialize($__payload, $__offset);
+        $address = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $geoPoint,

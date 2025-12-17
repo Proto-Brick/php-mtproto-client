@@ -90,20 +90,20 @@ final class MessageMediaDocument extends AbstractMessageMedia
         }
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $flags = Deserializer::int32($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
         $nopremium = (($flags & (1 << 3)) !== 0) ? true : null;
         $spoiler = (($flags & (1 << 4)) !== 0) ? true : null;
         $video = (($flags & (1 << 6)) !== 0) ? true : null;
         $round = (($flags & (1 << 7)) !== 0) ? true : null;
         $voice = (($flags & (1 << 8)) !== 0) ? true : null;
-        $document = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($stream) : null;
-        $altDocuments = (($flags & (1 << 5)) !== 0) ? Deserializer::vectorOfObjects($stream, [AbstractDocument::class, 'deserialize']) : null;
-        $videoCover = (($flags & (1 << 9)) !== 0) ? AbstractPhoto::deserialize($stream) : null;
-        $videoTimestamp = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($stream) : null;
-        $ttlSeconds = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($stream) : null;
+        $document = (($flags & (1 << 0)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
+        $altDocuments = (($flags & (1 << 5)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']) : null;
+        $videoCover = (($flags & (1 << 9)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
+        $videoTimestamp = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $ttlSeconds = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $nopremium,

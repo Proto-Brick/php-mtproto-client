@@ -35,13 +35,13 @@ final class InputFile extends AbstractInputFile
         $buffer .= Serializer::bytes($this->md5Checksum);
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $id = Deserializer::int64($stream);
-        $parts = Deserializer::int32($stream);
-        $name = Deserializer::bytes($stream);
-        $md5Checksum = Deserializer::bytes($stream);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $id = Deserializer::int64($__payload, $__offset);
+        $parts = Deserializer::int32($__payload, $__offset);
+        $name = Deserializer::bytes($__payload, $__offset);
+        $md5Checksum = Deserializer::bytes($__payload, $__offset);
 
         return new self(
             $id,

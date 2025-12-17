@@ -26,10 +26,10 @@ final class ChannelAdminLogEventActionToggleNoForwards extends AbstractChannelAd
         $buffer .= ($this->newValue ? Serializer::int32(0x997275b5) : Serializer::int32(0xbc799737));
         return $buffer;
     }
-    public static function deserialize(string &$stream): static
+    public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($stream); // Constructor ID
-        $newValue = (Deserializer::int32($stream) === 0x997275b5);
+        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $newValue = (Deserializer::int32($__payload, $__offset) === 0x997275b5);
 
         return new self(
             $newValue
