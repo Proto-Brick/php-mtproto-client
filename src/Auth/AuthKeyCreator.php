@@ -43,12 +43,18 @@ class AuthKeyCreator
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
             try {
                 // Шаг 1: req_pq_multi
+                $start = hrtime(true);
                 $resPQData = $this->sendReqPq();
+
                 // echo "Step 1 (req_pq): OK (Attempt $attempt)\n";
 
                 // Шаг 2: Факторизация pq
+                $fStart = hrtime(true);
                 $pqBig = new BigInteger($resPQData['pq'], 256);
                 [$pInt, $qInt] = Factorizer::factorize($pqBig->toString());
+                $fTime = (hrtime(true) - $fStart) / 1e+6;
+
+                echo sprintf("[Crypto] PQ Factorized in %.2fms\n", $fTime);
 
                 $pBytes = Serializer::intToBinary($pInt);
                 $qBytes = Serializer::intToBinary($qInt);
@@ -61,8 +67,9 @@ class AuthKeyCreator
 
                 // Шаг 4: set_client_DH_params
 
+                $totalTime = (hrtime(true) - $start) / 1e+6;
                 $authKey = $this->sendSetClientDhParams($resPQData, $serverDhParams);
-                // echo "Step 4 (set_client_DH_params): OK, AuthKey created!\n";
+                echo sprintf("[Auth] AuthKey created in %.2fms (ID: %s)\n", $totalTime, bin2hex($authKey->id));
                 echo "AuthKey created!\n";
 
                 return $authKey;
@@ -353,6 +360,7 @@ class AuthKeyCreator
      */
     private function _generateClientDhData(array $dhInnerData): array
     {
+        $start = hrtime(true);
         $dh_prime = new BigInteger($dhInnerData['dh_prime'], 256);
         $g_a = new BigInteger($dhInnerData['g_a'], 256);
         $g = new BigInteger($dhInnerData['g']);
@@ -367,6 +375,9 @@ class AuthKeyCreator
         // Вычисляем ключ авторизации
         $authKey_bi = $g_a->modPow($b_bi, $dh_prime);
         $authKeyBytes = str_pad($authKey_bi->toBytes(false), 256, "\0", STR_PAD_LEFT);
+
+        $time = (hrtime(true) - $start) / 1e+6;
+        echo sprintf("[Crypto] DH Math (modPow): %.2fms\n", $time);
 
         return [
             'authKey' => new AuthKey($authKeyBytes),

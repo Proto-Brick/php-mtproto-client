@@ -13,14 +13,14 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
 class Rsa
 {
     private const TELEGRAM_PUBLIC_KEYS = [
-        "-----BEGIN PUBLIC KEY-----\n" .
+        "-----BEGIN RSA PUBLIC KEY-----\n" .
         "MIIBCgKCAQEA6LszBcC1LGzyr992NzE0ieY+BSaOW622Aa9Bd4ZHLl+TuFQ4lo4g\n" .
         "5nKaMBwK/BIb9xUfg0Q29/2mgIR6Zr9krM7HjuIcCzFvDtr+L0GQjae9H0pRB2OO\n" .
         "62cECs5HKhT5DZ98K33vmWiLowc621dQuwKWSQKjWf50XYFw42h21P2KXUGyp2y/\n" .
         "+aEyZ+uVgLLQbRA1dEjSDZ2iGRy12Mk5gpYc397aYp438fsJoHIgJ2lgMv5h7WY9\n" .
         "t6N/byY9Nw9p21Og3AoXSL2q/2IJ1WRUhebgAdGVMlV1fkuOQoEzR7EdpqtQD9Cs\n" .
         "5+bfo3Nhmcyvk5ftB0WkJ9z6bNZ7yxrP8wIDAQAB\n" .
-        '-----END PUBLIC KEY-----',
+        '-----END RSA PUBLIC KEY-----',
     ];
 
     private const TELEGRAM_TEST_PUBLIC_KEYS = [
@@ -113,9 +113,11 @@ class Rsa
 
     public function encryptPqInnerData(string $data, string $publicKeyPem): string
     {
+        $start = hrtime(true);
         $modulusBigInt = null;
         $openSslKeyRes = null;
         $phpseclibKey = null;
+
 
         // 1. Попытка использовать OpenSSL (быстро)
         if ($this->useOpenSsl) {
@@ -183,12 +185,17 @@ class Rsa
                     if (\strlen($encryptedData) !== 256) {
                         throw new \RuntimeException("RSA encryption result is not 256 bytes long.");
                     }
+                    $time = (hrtime(true) - $start) / 1e+6;
+                    echo sprintf("[Crypto] OpenSSL RSA Encryption (with padding hunt): %.2fms\n", $time);
                     return $encryptedData;
                 }
 
                 // Используем phpseclib
                 $key = $phpseclibKey->withPadding(PhpseclibRSA::ENCRYPTION_NONE);
-                return $key->encrypt($key_aes_encrypted);
+                $encryptedData = $key->encrypt($key_aes_encrypted);
+                $time = (hrtime(true) - $start) / 1e+6;
+                echo sprintf("[Crypto] phpseclib RSA Encryption (with padding hunt): %.2fms\n", $time);
+                return $encryptedData;
             }
         }
 

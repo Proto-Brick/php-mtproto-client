@@ -298,6 +298,7 @@ class Client
                     null,
                     true,
                 );
+                $encTime = $this->messagePacker->lastOutboundCryptoTime;
                 echo "[SEND] >> {$request->getPredicate()} (msg_id: {$finalMsgId}, seqno: $sequence)\n";
                 $this->transport->send($encryptedRequest)->await();
             } else {
@@ -315,6 +316,7 @@ class Client
                     throw new \LogicException("Packer did not return RPC msg_id from container.");
                 }
                 $finalMsgId = $rpcRequestMsgId;
+                $encTime = $this->messagePacker->lastOutboundCryptoTime;
 
                 echo "[SEND] >> Packing {$request->getPredicate()} with " . \count(
                     $ackIds,
@@ -323,7 +325,7 @@ class Client
             }
 
             // Регистрируем запрос и deferred вместе.
-            $this->pendingRequests[$finalMsgId] = ['deferred' => $deferred, 'request' => $request];
+            $this->pendingRequests[$finalMsgId] = ['deferred' => $deferred, 'request' => $request, 'enc_time' => $encTime];
             $this->session->save($this->authKey);
             $this->resetAckTimer();
         });
@@ -464,7 +466,7 @@ class Client
                     return;
                 }
 
-                ['deferred' => $deferred, 'request' => $request] = $this->pendingRequests[$req_msg_id];
+                ['deferred' => $deferred, 'request' => $request, 'enc_time' => $encTime] = $this->pendingRequests[$req_msg_id];
                 unset($this->pendingRequests[$req_msg_id]);
 
                 echo "[RECV] << rpc_result for {$request->getPredicate()} (msg_id: {$req_msg_id})\n";
@@ -481,19 +483,25 @@ class Client
                         $offsetToParse = 0;
                     }
 
-                    $t1 = hrtime(true);
+                    $t_start = hrtime(true);
                     $responseObject = $this->deserializeResponsePayload($request, $payloadToParse, $offsetToParse);
-                    $dt1 = (hrtime(true) - $t1) / 1e+6;
-                    echo "[Десериализация] {$request->getPredicate()} - " . number_format($dt1, 2) . "ms\n";
+                    $t_deser = (hrtime(true) - $t_start) / 1e+6;
 
                     if (!$this->session->isInitialized) {
                         $this->session->isInitialized = true;
                         echo "[INFO] Session initialized.\n";
                     }
-                    $t2 = hrtime(true);
+                    $t_pm_start = hrtime(true);
                     $this->peerManager->collect($responseObject);
-                    $dt2 = (hrtime(true) - $t2) / 1e+6;
-                    echo "[PeerManager] Сбор пиров - " . number_format($dt2, 2) . "ms\n";
+                    $t_pm = (hrtime(true) - $t_pm_start) / 1e+6;
+                    echo sprintf(
+                        "[Perf] %s -> Crypto: %.3fms (Enc) / %.3fms (Dec) | Deser: %.3fms | PeerMgr: %.3fms\n",
+                        $request->getPredicate(),
+                        $encTime,
+                        $this->messagePacker->lastInboundCryptoTime, // Время расшифровки AES
+                        $t_deser,
+                        $t_pm
+                    );
                     $this->session->save($this->authKey);
                     $deferred->complete($responseObject);
                 } catch (\Throwable $e) {

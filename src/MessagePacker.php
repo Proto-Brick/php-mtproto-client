@@ -15,6 +15,11 @@ use Random\RandomException;
 
 class MessagePacker
 {
+    /** Время в мс, затраченное на последнее шифрование (исходящее) */
+    public float $lastOutboundCryptoTime = 0.0;
+
+    /** Время в мс, затраченное на последнюю расшифровку (входящее) */
+    public float $lastInboundCryptoTime = 0.0;
     public function __construct(
         private readonly Session $session,
         private readonly Aes $aes
@@ -56,6 +61,7 @@ class MessagePacker
      */
     public function packEncrypted(string $payload, AuthKey $authKey, ?int $overrideMsgId = null, bool $isContentRelated = true): array
     {
+        $start = hrtime(true);
         // если соли нет, делаем заглушку, чтобы следующим запросом получить актуальную соль
         $salt = $this->session->getServerSalt() ?? random_int(PHP_INT_MIN, PHP_INT_MAX);
         $sessionId = $this->session->getId() ?? throw new \LogicException("Session ID is not set");
@@ -90,6 +96,7 @@ class MessagePacker
         // 7. Собираем финальный пакет: ID ключа + ключ сообщения + зашифрованные данные.
         $finalPacket = $authKey->id . $msgKey . $encryptedData;
 
+        $this->lastOutboundCryptoTime = (hrtime(true) - $start) / 1e+6;
         // 8. Возвращаем и сам пакет, и msg_id, который был в него "зашит".
         return [$finalPacket, $messageId, $sequence];
     }
@@ -125,6 +132,7 @@ class MessagePacker
      */
     public function unpackEncrypted(string $rawResponse, AuthKey $authKey): array
     {
+        $start = hrtime(true);
         if (\strlen($rawResponse) < 24) {
             throw new TransportException("Received encrypted response is too short (less than 24 bytes).");
         }
@@ -154,6 +162,9 @@ class MessagePacker
         if (\strlen($decryptedPayload) < 32) {
             throw new \RuntimeException("Decrypted payload is too short to contain a valid MTProto header.");
         }
+
+        $this->lastInboundCryptoTime = (hrtime(true) - $start) / 1e+6;
+
         $serverSalt = substr($decryptedPayload, 0, 8);
         $sessionId = substr($decryptedPayload, 8, 8);
         $messageId = substr($decryptedPayload, 16, 8);
