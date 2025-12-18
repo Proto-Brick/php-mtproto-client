@@ -43,7 +43,23 @@ class FilePeerStorage implements PeerStorage
             return;
         }
 
-        $data = json_decode($content, true) ?: [];
+        $data = [];
+
+        if (function_exists('igbinary_unserialize')) {
+            // igbinary data (usually starts with non-printable chars) or just try unserialize
+            $unserialized = @igbinary_unserialize($content);
+            if ($unserialized !== null && $unserialized !== false) {
+                $data = $unserialized;
+            }
+        }
+
+        if (empty($data)) {
+            $data = json_decode($content, true);
+        }
+
+        if (!is_array($data)) {
+            return;
+        }
 
         foreach ($data as $row) {
             $peer = new PeerInfo(
@@ -219,7 +235,14 @@ class FilePeerStorage implements PeerStorage
         }
 
         $tempFile = $this->storageFile . '.tmp';
-        file_put_contents($tempFile, json_encode($data, JSON_UNESCAPED_UNICODE));
+
+        if (function_exists('igbinary_serialize')) {
+            $content = igbinary_serialize($data);
+        } else {
+            $content = json_encode($data, JSON_UNESCAPED_UNICODE);
+        }
+
+        file_put_contents($tempFile, $content);
 
         if (file_exists($tempFile)) {
             rename($tempFile, $this->storageFile);
