@@ -101,9 +101,9 @@ class Deserializer
             $offset++;
             $padding = (4 - ($len + 1)) & 3;
         } else {
-            if ($firstByte !== 254) {
-                throw new \RuntimeException("Invalid length prefix at $offset: " . dechex($firstByte));
-            }
+//            if ($firstByte !== 254) {
+//                throw new \RuntimeException("Invalid length prefix at $offset: " . dechex($firstByte));
+//            }
             // Читаем 3 байта длины (little endian)
             $fullInt = unpack('V', $payload, $offset)[1];
             $len = $fullInt >> 8;
@@ -112,9 +112,9 @@ class Deserializer
             $padding = (4 - $len) & 3;
         }
 
-        if (strlen($payload) < $offset + $len) {
-            throw new \RuntimeException("Not enough data for bytes content");
-        }
+//        if (strlen($payload) < $offset + $len) {
+//            throw new \RuntimeException("Not enough data for bytes content");
+//        }
 
         $data = substr($payload, $offset, $len);
         $offset += $len + $padding;
@@ -215,9 +215,9 @@ class Deserializer
     {
         $id = unpack('V', $payload, $offset)[1];
         $offset += 4;
-        if ($id !== 0x1cb5c415) {
-            throw new \RuntimeException('Invalid vector constructor for Vector<string>');
-        }
+//        if ($id !== 0x1cb5c415) {
+//            throw new \RuntimeException('Invalid vector constructor for Vector<string>');
+//        }
         $count = unpack('V', $payload, $offset)[1];
         $offset += 4;
 
@@ -251,6 +251,7 @@ class Deserializer
                 if ($boolConstructor === 0xbc799737) {
                     return false;
                 }
+                //return $boolConstructor === 0x997275b5;
                 throw new \RuntimeException("Invalid bool in json");
 
             case 0x2be0dfa4: // jsonNumber
@@ -265,12 +266,13 @@ class Deserializer
                 $offset += 4;
                 $vecId = unpack('V', $payload, $offset)[1];
                 $offset += 4;
-                if ($vecId !== 481674261) {
-                    throw new \RuntimeException('Invalid vector ID');
-                }
+//                if ($vecId !== 481674261) {
+//                    throw new \RuntimeException('Invalid vector ID');
+//                }
 
                 $count = unpack('V', $payload, $offset)[1];
                 $offset += 4;
+
                 $result = [];
                 for ($i = 0; $i < $count; $i++) {
                     $result[] = self::deserializeJsonValue($payload, $offset);
@@ -281,9 +283,9 @@ class Deserializer
                 $offset += 4;
                 $vecId = unpack('V', $payload, $offset)[1];
                 $offset += 4;
-                if ($vecId !== 481674261) {
-                    throw new \RuntimeException('Invalid vector ID');
-                }
+//                if ($vecId !== 481674261) {
+//                    throw new \RuntimeException('Invalid vector ID');
+//                }
 
                 $count = unpack('V', $payload, $offset)[1];
                 $offset += 4;
@@ -291,9 +293,9 @@ class Deserializer
                 for ($i = 0; $i < $count; $i++) {
                     $objValId = unpack('V', $payload, $offset)[1];
                     $offset += 4;
-                    if ($objValId !== 0xc0de1bd9) {
-                        throw new \RuntimeException('Invalid jsonObjectValue');
-                    }
+//                    if ($objValId !== 0xc0de1bd9) {
+//                        throw new \RuntimeException('Invalid jsonObjectValue');
+//                    }
 
                     $key = self::bytes($payload, $offset);
                     $value = self::deserializeJsonValue($payload, $offset);

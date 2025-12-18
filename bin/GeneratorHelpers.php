@@ -577,7 +577,7 @@ trait GeneratorHelpers
         if (!$isMethod) {
             $deserializeBody = '';
             if ($isConcreteOfAbstract) {
-                $deserializeBody = "        Deserializer::int32(\$__payload, \$__offset); // Constructor ID\n";
+                $deserializeBody = "        \$__offset += 4; // Constructor ID\n";
             } else {
                 $deserializeBody = "        \$constructorId = Deserializer::int32(\$__payload, \$__offset);\n" .
                     "        if (\$constructorId !== self::CONSTRUCTOR_ID) {\n" .
