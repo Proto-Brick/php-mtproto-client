@@ -32,7 +32,7 @@ final class SavedReactionTags extends AbstractSavedReactionTags
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $tags = Deserializer::vectorOfObjects($__payload, $__offset, [SavedReactionTag::class, 'deserialize']);
         $hash = Deserializer::int64($__payload, $__offset);
 

@@ -34,7 +34,7 @@ final class UpdateGroupCallParticipants extends AbstractUpdate
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $call = AbstractInputGroupCall::deserialize($__payload, $__offset);
         $participants = Deserializer::vectorOfObjects($__payload, $__offset, [GroupCallParticipant::class, 'deserialize']);
         $version = Deserializer::int32($__payload, $__offset);

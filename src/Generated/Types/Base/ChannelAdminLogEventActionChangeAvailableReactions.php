@@ -31,7 +31,7 @@ final class ChannelAdminLogEventActionChangeAvailableReactions extends AbstractC
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $prevValue = AbstractChatReactions::deserialize($__payload, $__offset);
         $newValue = AbstractChatReactions::deserialize($__payload, $__offset);
 

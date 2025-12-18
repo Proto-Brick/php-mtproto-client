@@ -34,7 +34,7 @@ final class MediaAreaChannelPost extends AbstractMediaArea
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $coordinates = MediaAreaCoordinates::deserialize($__payload, $__offset);
         $channelId = Deserializer::int64($__payload, $__offset);
         $msgId = Deserializer::int32($__payload, $__offset);

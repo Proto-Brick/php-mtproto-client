@@ -67,7 +67,7 @@ final class WallPaper extends AbstractWallPaper
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $id = Deserializer::int64($__payload, $__offset);
         $flags = Deserializer::int32($__payload, $__offset);
         $creator = (($flags & (1 << 0)) !== 0) ? true : null;

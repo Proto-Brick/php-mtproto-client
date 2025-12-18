@@ -41,7 +41,7 @@ final class StoryItemSkipped extends AbstractStoryItem
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $closeFriends = (($flags & (1 << 8)) !== 0) ? true : null;
         $id = Deserializer::int32($__payload, $__offset);

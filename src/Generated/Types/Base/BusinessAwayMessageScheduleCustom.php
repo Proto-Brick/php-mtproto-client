@@ -31,7 +31,7 @@ final class BusinessAwayMessageScheduleCustom extends AbstractBusinessAwayMessag
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $startDate = Deserializer::int32($__payload, $__offset);
         $endDate = Deserializer::int32($__payload, $__offset);
 

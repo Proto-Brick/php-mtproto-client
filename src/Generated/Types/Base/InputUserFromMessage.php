@@ -34,7 +34,7 @@ final class InputUserFromMessage extends AbstractInputUser
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $peer = AbstractInputPeer::deserialize($__payload, $__offset);
         $msgId = Deserializer::int32($__payload, $__offset);
         $userId = Deserializer::int64($__payload, $__offset);

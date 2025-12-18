@@ -38,7 +38,7 @@ final class KeyboardButtonRequestPoll extends AbstractKeyboardButton
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $quiz = (($flags & (1 << 0)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;
         $text = Deserializer::bytes($__payload, $__offset);

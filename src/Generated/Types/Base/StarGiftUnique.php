@@ -106,7 +106,7 @@ final class StarGiftUnique extends AbstractStarGift
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $requirePremium = (($flags & (1 << 6)) !== 0) ? true : null;
         $resaleTonOnly = (($flags & (1 << 7)) !== 0) ? true : null;

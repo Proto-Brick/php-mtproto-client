@@ -45,7 +45,7 @@ final class InputMediaWebPage extends AbstractInputMedia
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $forceLargeMedia = (($flags & (1 << 0)) !== 0) ? true : null;
         $forceSmallMedia = (($flags & (1 << 1)) !== 0) ? true : null;

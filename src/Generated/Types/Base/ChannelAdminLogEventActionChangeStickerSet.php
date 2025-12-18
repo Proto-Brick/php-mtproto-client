@@ -31,7 +31,7 @@ final class ChannelAdminLogEventActionChangeStickerSet extends AbstractChannelAd
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $prevStickerset = AbstractInputStickerSet::deserialize($__payload, $__offset);
         $newStickerset = AbstractInputStickerSet::deserialize($__payload, $__offset);
 

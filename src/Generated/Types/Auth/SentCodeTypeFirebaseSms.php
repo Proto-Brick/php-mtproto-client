@@ -70,7 +70,7 @@ final class SentCodeTypeFirebaseSms extends AbstractSentCodeType
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $nonce = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
         $playIntegrityProjectId = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;

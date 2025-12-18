@@ -37,7 +37,7 @@ final class SecureValueErrorData extends AbstractSecureValueError
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $type = SecureValueType::deserialize($__payload, $__offset);
         $dataHash = Deserializer::bytes($__payload, $__offset);
         $field = Deserializer::bytes($__payload, $__offset);

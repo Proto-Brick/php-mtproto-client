@@ -32,7 +32,7 @@ final class EmailVerifiedLogin extends AbstractEmailVerified
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $email = Deserializer::bytes($__payload, $__offset);
         $sentCode = AbstractSentCode::deserialize($__payload, $__offset);
 

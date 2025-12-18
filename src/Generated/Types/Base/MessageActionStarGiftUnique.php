@@ -114,7 +114,7 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $upgrade = (($flags & (1 << 0)) !== 0) ? true : null;
         $transferred = (($flags & (1 << 1)) !== 0) ? true : null;

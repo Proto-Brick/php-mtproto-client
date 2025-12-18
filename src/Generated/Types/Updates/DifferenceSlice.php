@@ -48,7 +48,7 @@ final class DifferenceSlice extends AbstractDifference
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $newMessages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);
         $newEncryptedMessages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractEncryptedMessage::class, 'deserialize']);
         $otherUpdates = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUpdate::class, 'deserialize']);

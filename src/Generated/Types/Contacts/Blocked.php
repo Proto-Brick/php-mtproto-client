@@ -37,7 +37,7 @@ final class Blocked extends AbstractBlocked
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $blocked = Deserializer::vectorOfObjects($__payload, $__offset, [PeerBlocked::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);

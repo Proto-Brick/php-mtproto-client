@@ -37,7 +37,7 @@ final class InputMediaContact extends AbstractInputMedia
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $phoneNumber = Deserializer::bytes($__payload, $__offset);
         $firstName = Deserializer::bytes($__payload, $__offset);
         $lastName = Deserializer::bytes($__payload, $__offset);

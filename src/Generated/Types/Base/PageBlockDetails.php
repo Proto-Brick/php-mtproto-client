@@ -38,7 +38,7 @@ final class PageBlockDetails extends AbstractPageBlock
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $open = (($flags & (1 << 0)) !== 0) ? true : null;
         $blocks = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPageBlock::class, 'deserialize']);

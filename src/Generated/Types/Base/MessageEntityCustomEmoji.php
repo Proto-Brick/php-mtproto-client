@@ -34,7 +34,7 @@ final class MessageEntityCustomEmoji extends AbstractMessageEntity
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $offset = Deserializer::int32($__payload, $__offset);
         $length = Deserializer::int32($__payload, $__offset);
         $documentId = Deserializer::int64($__payload, $__offset);

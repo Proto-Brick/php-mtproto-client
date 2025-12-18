@@ -114,7 +114,7 @@ final class MessageReplyHeader extends AbstractMessageReplyHeader
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $replyToScheduled = (($flags & (1 << 2)) !== 0) ? true : null;
         $forumTopic = (($flags & (1 << 3)) !== 0) ? true : null;

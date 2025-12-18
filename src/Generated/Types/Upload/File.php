@@ -35,7 +35,7 @@ final class File extends AbstractFile
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $type = FileType::deserialize($__payload, $__offset);
         $mtime = Deserializer::int32($__payload, $__offset);
         $bytes = Deserializer::bytes($__payload, $__offset);

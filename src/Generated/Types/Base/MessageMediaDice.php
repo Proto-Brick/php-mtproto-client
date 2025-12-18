@@ -31,7 +31,7 @@ final class MessageMediaDice extends AbstractMessageMedia
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $value = Deserializer::int32($__payload, $__offset);
         $emoticon = Deserializer::bytes($__payload, $__offset);
 

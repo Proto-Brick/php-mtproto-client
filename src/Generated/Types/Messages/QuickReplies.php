@@ -41,7 +41,7 @@ final class QuickReplies extends AbstractQuickReplies
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $quickReplies = Deserializer::vectorOfObjects($__payload, $__offset, [QuickReply::class, 'deserialize']);
         $messages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);

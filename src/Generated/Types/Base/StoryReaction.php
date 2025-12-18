@@ -34,7 +34,7 @@ final class StoryReaction extends AbstractStoryReaction
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $peerId = AbstractPeer::deserialize($__payload, $__offset);
         $date = Deserializer::int32($__payload, $__offset);
         $reaction = AbstractReaction::deserialize($__payload, $__offset);

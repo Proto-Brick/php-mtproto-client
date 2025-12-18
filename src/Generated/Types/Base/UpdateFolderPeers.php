@@ -34,7 +34,7 @@ final class UpdateFolderPeers extends AbstractUpdate
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $folderPeers = Deserializer::vectorOfObjects($__payload, $__offset, [FolderPeer::class, 'deserialize']);
         $pts = Deserializer::int32($__payload, $__offset);
         $ptsCount = Deserializer::int32($__payload, $__offset);

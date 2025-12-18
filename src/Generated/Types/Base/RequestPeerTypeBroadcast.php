@@ -56,7 +56,7 @@ final class RequestPeerTypeBroadcast extends AbstractRequestPeerType
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $creator = (($flags & (1 << 0)) !== 0) ? true : null;
         $hasUsername = (($flags & (1 << 3)) !== 0) ? (Deserializer::int32($__payload, $__offset) === 0x997275b5) : null;

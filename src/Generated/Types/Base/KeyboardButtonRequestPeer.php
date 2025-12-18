@@ -37,7 +37,7 @@ final class KeyboardButtonRequestPeer extends AbstractKeyboardButton
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $text = Deserializer::bytes($__payload, $__offset);
         $buttonId = Deserializer::int32($__payload, $__offset);
         $peerType = AbstractRequestPeerType::deserialize($__payload, $__offset);

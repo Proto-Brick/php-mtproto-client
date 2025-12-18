@@ -34,7 +34,7 @@ final class InputBotInlineResultGame extends AbstractInputBotInlineResult
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $id = Deserializer::bytes($__payload, $__offset);
         $shortName = Deserializer::bytes($__payload, $__offset);
         $sendMessage = AbstractInputBotInlineMessage::deserialize($__payload, $__offset);

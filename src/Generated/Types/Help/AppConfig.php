@@ -31,7 +31,7 @@ final class AppConfig extends AbstractAppConfig
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $hash = Deserializer::int32($__payload, $__offset);
         $config = Deserializer::deserializeJsonValue($__payload, $__offset);
 

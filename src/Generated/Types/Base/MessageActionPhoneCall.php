@@ -51,7 +51,7 @@ final class MessageActionPhoneCall extends AbstractMessageAction
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $video = (($flags & (1 << 2)) !== 0) ? true : null;
         $callId = Deserializer::int64($__payload, $__offset);

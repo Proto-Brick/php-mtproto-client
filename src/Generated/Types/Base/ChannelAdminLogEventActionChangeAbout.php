@@ -31,7 +31,7 @@ final class ChannelAdminLogEventActionChangeAbout extends AbstractChannelAdminLo
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $prevValue = Deserializer::bytes($__payload, $__offset);
         $newValue = Deserializer::bytes($__payload, $__offset);
 

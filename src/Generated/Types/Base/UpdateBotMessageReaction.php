@@ -46,7 +46,7 @@ final class UpdateBotMessageReaction extends AbstractUpdate
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $peer = AbstractPeer::deserialize($__payload, $__offset);
         $msgId = Deserializer::int32($__payload, $__offset);
         $date = Deserializer::int32($__payload, $__offset);

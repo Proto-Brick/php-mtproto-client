@@ -53,7 +53,7 @@ final class MessageActionBotAllowed extends AbstractMessageAction
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $attachMenu = (($flags & (1 << 1)) !== 0) ? true : null;
         $fromRequest = (($flags & (1 << 3)) !== 0) ? true : null;

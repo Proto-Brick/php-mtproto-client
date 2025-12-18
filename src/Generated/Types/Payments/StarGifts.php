@@ -40,7 +40,7 @@ final class StarGifts extends AbstractStarGifts
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $hash = Deserializer::int32($__payload, $__offset);
         $gifts = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractStarGift::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);

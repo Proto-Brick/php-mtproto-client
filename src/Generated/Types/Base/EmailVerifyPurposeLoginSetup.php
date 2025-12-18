@@ -31,7 +31,7 @@ final class EmailVerifyPurposeLoginSetup extends AbstractEmailVerifyPurpose
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $phoneNumber = Deserializer::bytes($__payload, $__offset);
         $phoneCodeHash = Deserializer::bytes($__payload, $__offset);
 

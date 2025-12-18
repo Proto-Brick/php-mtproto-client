@@ -44,7 +44,7 @@ final class GeoPoint extends AbstractGeoPoint
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $long = Deserializer::double($__payload, $__offset);
         $lat = Deserializer::double($__payload, $__offset);

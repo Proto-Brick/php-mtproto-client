@@ -34,7 +34,7 @@ final class UpdateBotChatBoost extends AbstractUpdate
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $peer = AbstractPeer::deserialize($__payload, $__offset);
         $boost = Boost::deserialize($__payload, $__offset);
         $qts = Deserializer::int32($__payload, $__offset);

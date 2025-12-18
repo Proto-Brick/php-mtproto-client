@@ -38,7 +38,7 @@ final class UserInfo extends AbstractUserInfo
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $message = Deserializer::bytes($__payload, $__offset);
         $entities = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']);
         $author = Deserializer::bytes($__payload, $__offset);

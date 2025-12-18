@@ -35,7 +35,7 @@ final class ChannelMessagesFilter extends AbstractChannelMessagesFilter
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $excludeNewMessages = (($flags & (1 << 1)) !== 0) ? true : null;
         $ranges = Deserializer::vectorOfObjects($__payload, $__offset, [MessageRange::class, 'deserialize']);

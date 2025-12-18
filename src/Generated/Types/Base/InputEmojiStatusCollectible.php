@@ -38,7 +38,7 @@ final class InputEmojiStatusCollectible extends AbstractEmojiStatus
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $collectibleId = Deserializer::int64($__payload, $__offset);
         $until = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;

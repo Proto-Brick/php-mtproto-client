@@ -34,7 +34,7 @@ final class StarGiftAttributeModel extends AbstractStarGiftAttribute
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $name = Deserializer::bytes($__payload, $__offset);
         $document = AbstractDocument::deserialize($__payload, $__offset);
         $rarityPermille = Deserializer::int32($__payload, $__offset);

@@ -46,7 +46,7 @@ final class StarGiftAttributeBackdrop extends AbstractStarGiftAttribute
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $name = Deserializer::bytes($__payload, $__offset);
         $backdropId = Deserializer::int32($__payload, $__offset);
         $centerColor = Deserializer::int32($__payload, $__offset);

@@ -34,7 +34,7 @@ final class EmojiGroup extends AbstractEmojiGroup
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $title = Deserializer::bytes($__payload, $__offset);
         $iconEmojiId = Deserializer::int64($__payload, $__offset);
         $emoticons = Deserializer::vectorOfStrings($__payload, $__offset);

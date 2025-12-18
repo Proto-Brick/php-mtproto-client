@@ -158,7 +158,7 @@ final class ChatFull extends AbstractChatFull
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $canSetUsername = (($flags & (1 << 7)) !== 0) ? true : null;
         $hasScheduled = (($flags & (1 << 8)) !== 0) ? true : null;

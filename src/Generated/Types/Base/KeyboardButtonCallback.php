@@ -38,7 +38,7 @@ final class KeyboardButtonCallback extends AbstractKeyboardButton
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $requiresPassword = (($flags & (1 << 0)) !== 0) ? true : null;
         $text = Deserializer::bytes($__payload, $__offset);

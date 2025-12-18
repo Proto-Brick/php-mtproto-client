@@ -31,7 +31,7 @@ final class NotificationSoundLocal extends AbstractNotificationSound
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $title = Deserializer::bytes($__payload, $__offset);
         $data = Deserializer::bytes($__payload, $__offset);
 

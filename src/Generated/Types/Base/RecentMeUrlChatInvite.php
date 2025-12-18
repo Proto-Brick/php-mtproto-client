@@ -31,7 +31,7 @@ final class RecentMeUrlChatInvite extends AbstractRecentMeUrl
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $url = Deserializer::bytes($__payload, $__offset);
         $chatInvite = AbstractChatInvite::deserialize($__payload, $__offset);
 

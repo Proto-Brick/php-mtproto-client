@@ -31,7 +31,7 @@ final class PageBlockSlideshow extends AbstractPageBlock
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $items = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractPageBlock::class, 'deserialize']);
         $caption = PageCaption::deserialize($__payload, $__offset);
 

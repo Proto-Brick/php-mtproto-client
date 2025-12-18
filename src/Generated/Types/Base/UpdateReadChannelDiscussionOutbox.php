@@ -34,7 +34,7 @@ final class UpdateReadChannelDiscussionOutbox extends AbstractUpdate
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $channelId = Deserializer::int64($__payload, $__offset);
         $topMsgId = Deserializer::int32($__payload, $__offset);
         $readMaxId = Deserializer::int32($__payload, $__offset);

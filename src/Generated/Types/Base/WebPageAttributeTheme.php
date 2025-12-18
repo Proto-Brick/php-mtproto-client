@@ -43,7 +43,7 @@ final class WebPageAttributeTheme extends AbstractWebPageAttribute
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $documents = (($flags & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']) : null;
         $settings = (($flags & (1 << 1)) !== 0) ? ThemeSettings::deserialize($__payload, $__offset) : null;

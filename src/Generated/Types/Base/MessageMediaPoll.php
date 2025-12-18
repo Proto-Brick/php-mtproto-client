@@ -31,7 +31,7 @@ final class MessageMediaPoll extends AbstractMessageMedia
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $poll = Poll::deserialize($__payload, $__offset);
         $results = PollResults::deserialize($__payload, $__offset);
 

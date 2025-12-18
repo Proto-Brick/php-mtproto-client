@@ -63,7 +63,7 @@ final class SponsoredMessages extends AbstractSponsoredMessages
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $postsBetween = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $startDelay = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;

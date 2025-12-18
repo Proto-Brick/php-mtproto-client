@@ -36,7 +36,7 @@ final class ExportedChatInviteReplaced extends AbstractExportedChatInvite
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $invite = BaseAbstractExportedChatInvite::deserialize($__payload, $__offset);
         $newInvite = BaseAbstractExportedChatInvite::deserialize($__payload, $__offset);
         $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);

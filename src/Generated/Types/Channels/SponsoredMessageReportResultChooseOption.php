@@ -32,7 +32,7 @@ final class SponsoredMessageReportResultChooseOption extends AbstractSponsoredMe
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $title = Deserializer::bytes($__payload, $__offset);
         $options = Deserializer::vectorOfObjects($__payload, $__offset, [SponsoredMessageReportOption::class, 'deserialize']);
 

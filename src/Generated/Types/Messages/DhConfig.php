@@ -37,7 +37,7 @@ final class DhConfig extends AbstractDhConfig
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $g = Deserializer::int32($__payload, $__offset);
         $p = Deserializer::bytes($__payload, $__offset);
         $version = Deserializer::int32($__payload, $__offset);

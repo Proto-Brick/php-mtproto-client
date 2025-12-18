@@ -40,7 +40,7 @@ final class PageBlockMap extends AbstractPageBlock
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $geo = AbstractGeoPoint::deserialize($__payload, $__offset);
         $zoom = Deserializer::int32($__payload, $__offset);
         $w = Deserializer::int32($__payload, $__offset);

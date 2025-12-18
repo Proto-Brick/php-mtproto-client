@@ -83,7 +83,7 @@ final class DraftMessage extends AbstractDraftMessage
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $noWebpage = (($flags & (1 << 1)) !== 0) ? true : null;
         $invertMedia = (($flags & (1 << 6)) !== 0) ? true : null;

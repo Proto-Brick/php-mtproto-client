@@ -28,7 +28,7 @@ final class UpdateNewQuickReply extends AbstractUpdate
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $quickReply = QuickReply::deserialize($__payload, $__offset);
 
         return new self(

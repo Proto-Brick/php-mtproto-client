@@ -31,7 +31,7 @@ final class MessageActionInviteToGroupCall extends AbstractMessageAction
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $call = AbstractInputGroupCall::deserialize($__payload, $__offset);
         $users = Deserializer::vectorOfLongs($__payload, $__offset);
 

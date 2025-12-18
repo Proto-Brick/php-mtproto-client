@@ -32,7 +32,7 @@ final class Reactions extends AbstractReactions
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $hash = Deserializer::int64($__payload, $__offset);
         $reactions = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractReaction::class, 'deserialize']);
 

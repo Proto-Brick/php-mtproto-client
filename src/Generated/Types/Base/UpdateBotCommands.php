@@ -34,7 +34,7 @@ final class UpdateBotCommands extends AbstractUpdate
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $peer = AbstractPeer::deserialize($__payload, $__offset);
         $botId = Deserializer::int64($__payload, $__offset);
         $commands = Deserializer::vectorOfObjects($__payload, $__offset, [BotCommand::class, 'deserialize']);

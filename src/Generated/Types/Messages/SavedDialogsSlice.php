@@ -44,7 +44,7 @@ final class SavedDialogsSlice extends AbstractSavedDialogs
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $count = Deserializer::int32($__payload, $__offset);
         $dialogs = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractSavedDialog::class, 'deserialize']);
         $messages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);

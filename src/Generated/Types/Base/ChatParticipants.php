@@ -34,7 +34,7 @@ final class ChatParticipants extends AbstractChatParticipants
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $chatId = Deserializer::int64($__payload, $__offset);
         $participants = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChatParticipant::class, 'deserialize']);
         $version = Deserializer::int32($__payload, $__offset);

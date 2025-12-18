@@ -32,7 +32,7 @@ final class TimezonesList extends AbstractTimezonesList
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $timezones = Deserializer::vectorOfObjects($__payload, $__offset, [Timezone::class, 'deserialize']);
         $hash = Deserializer::int32($__payload, $__offset);
 

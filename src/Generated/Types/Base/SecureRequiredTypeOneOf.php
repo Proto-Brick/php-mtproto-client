@@ -28,7 +28,7 @@ final class SecureRequiredTypeOneOf extends AbstractSecureRequiredType
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        Deserializer::int32($__payload, $__offset); // Constructor ID
+        $__offset += 4; // Constructor ID
         $types = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractSecureRequiredType::class, 'deserialize']);
 
         return new self(
