@@ -47,7 +47,7 @@ Run this script **once** in your terminal to log in. It will interactively ask f
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
-use ProtoBrick\MTProtoClient\ClientFactory;
+use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Settings;
 
 // These example values won't work. You must get your own api_id and
@@ -57,16 +57,16 @@ $settings = new Settings(
     api_hash: 'your_api_hash'
 );
 
-$client = ClientFactory::create($settings, __DIR__ . '/session_name');
+$client = Client::create($settings, __DIR__ . '/session_name');
 $auth = $client->login();
 
-$client->"Logged in as {$auth->user->firstName}\n";
+echo "Logged in as {$auth->user->firstName}\n";
 ```
 
 ### Advanced Authentication
 If you need to handle login programmatically (e.g., via a web form or custom logic), you can pass callables to the login method:
 ```php
-$authorization = $client->login(
+$auth = $client->login(
     phoneNumber: '+1234567890',
     codeProvider: function () {
         // Logic to get code (e.g., from database, API, or custom input)
@@ -93,7 +93,7 @@ Now that the session is saved, you can use the client. The client will automatic
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
-use ProtoBrick\MTProtoClient\ClientFactory;
+use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Settings;
 
 $settings = new Settings(
