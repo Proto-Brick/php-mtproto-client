@@ -4,46 +4,53 @@ declare(strict_types=1);
 
 namespace ProtoBrick\MTProtoClient;
 
-use ProtoBrick\MTProtoClient\Auth\AuthKeyCreator;
 use ProtoBrick\MTProtoClient\Auth\Storage\FileAuthKeyStorage;
-use ProtoBrick\MTProtoClient\Crypto\Aes;
-use ProtoBrick\MTProtoClient\Crypto\Rsa;
+use ProtoBrick\MTProtoClient\Logger\ConsoleLogger;
+use ProtoBrick\MTProtoClient\Logger\InternalLogger;
 use ProtoBrick\MTProtoClient\Peer\PeerManager;
 use ProtoBrick\MTProtoClient\Peer\Storage\FilePeerStorage;
-use ProtoBrick\MTProtoClient\Session\Session;
 use ProtoBrick\MTProtoClient\Session\Storage\FileSessionStorage;
-use ProtoBrick\MTProtoClient\TL\Deserializer;
-use ProtoBrick\MTProtoClient\TL\Serializer;
-use ProtoBrick\MTProtoClient\Transport\TcpTransport;
+use ProtoBrick\MTProtoClient\Session\Storage\SessionStorage;
+use Psr\Log\LoggerInterface;
 
 class ClientFactory
 {
-    public static function create(Settings $settings, string $storagePath = './session'): Client
+    /**
+     * Creates a fully initialized Client instance with file-based storage.
+     *
+     * @param Settings $settings Client configuration
+     * @param string $storagePath Directory path to store session data (auth keys, peers)
+     */
+    public static function create(Settings $settings, string $storagePath = './session', ?LoggerInterface $logger = null): Client
     {
-        // Создаем папки, если их нет
+        // Ensure storage directory exists
         if (!is_dir($storagePath)) {
             mkdir($storagePath, 0777, true);
         }
 
+        // Initialize persistent storage
+        // Note: FileAuthKeyStorage currently stores only one key.
+        // In the future, it should support storing keys per DC ID (e.g. auth_dc2.key).
         $authKeyStorage = new FileAuthKeyStorage($storagePath . '/auth.key');
-        $sessionStorage = new FileSessionStorage($storagePath);
-        $transport = new TcpTransport($settings);
-        $rsa = new Rsa();
-        $aes = new Aes();
-        $session = new Session($sessionStorage);
-        $messagePacker = new MessagePacker($session, $aes);
-        $authKeyCreator = new AuthKeyCreator($transport, $rsa, $messagePacker, $session);
-        $peerFileStorage = new FilePeerStorage($storagePath . '/peers.json');
-        $peerManager = new PeerManager($peerFileStorage);
 
+        $peerStorage = new FilePeerStorage($storagePath . '/peers.json');
+        $peerManager = new PeerManager($peerStorage);
+
+        $internalLogger = new InternalLogger(
+            $logger ?? new ConsoleLogger($settings->logger_level),
+            $settings->logger_channels
+        );
+
+        $sessionStorage = new FileSessionStorage($storagePath);
+
+        // We no longer need to manually instantiate Transport, Crypto, Session, etc.
+        // The Client internals (ConnectionManager) handle this based on Settings.
         return new Client(
             $settings,
             $authKeyStorage,
-            $session,
-            $transport,
-            $authKeyCreator,
-            $messagePacker,
-            $peerManager
+            $peerManager,
+            $sessionStorage,
+            $internalLogger
         );
     }
 }

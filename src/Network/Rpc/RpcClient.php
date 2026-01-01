@@ -14,19 +14,22 @@ use ProtoBrick\MTProtoClient\TL\Deserializer;
 use ProtoBrick\MTProtoClient\TL\RpcRequest;
 
 use Psr\Log\LoggerInterface;
+use Revolt\EventLoop;
 
 use function Amp\async;
 
 class RpcClient
 {
     /**
-     * Структура:
+     * Structure:
      * [
      *    msg_id => [
      *       'deferred' => DeferredFuture,
      *       'request'  => RpcRequest,
      *       'payload'  => string,
-     *       'trace'    => RequestTrace
+     *       'trace'    => RequestTrace,
+     *       'timer_id' => string|null,
+     *       'timeout_sec' => int
      *    ]
      * ]
      */
@@ -46,51 +49,64 @@ class RpcClient
         return $this->connection;
     }
 
-    public function send(RpcRequest $request, int $timeout = 30): Future
+    public function send(RpcRequest $request, int $timeout = 30, bool $isContentRelated = true): Future
     {
         $deferred = new DeferredFuture();
         $trace = new RequestTrace();
-
 
         $t0 = hrtime(true);
         $payload = $request->serialize();
         $trace->ser = (hrtime(true) - $t0) / 1e+6;
         $trace->reqBytes = strlen($payload);
 
-        // Отправляем (или ставим в очередь, если реконнект)
-        $this->sendPayload($payload, $request, $deferred, $trace);
+        $this->sendPayload($payload, $request, $deferred, $trace, $timeout, $isContentRelated);
 
         return $deferred->getFuture();
     }
 
-    /**
-     * Внутренний метод отправки сырых байтов.
-     * Используется и для первичной отправки, и для ресенда.
-     */
     private function sendPayload(
         string $payload,
         RpcRequest $request,
         DeferredFuture $deferred,
-        RequestTrace $trace
+        RequestTrace $trace,
+        int $timeout,
+        bool $isContextRelated,
     ): void {
         $trace->attempts++;
 
-        async(function () use ($payload, $request, $deferred, $trace) {
+        //temp logging
+        $methodName = $request->getMethodName();
+        $isService = str_contains($methodName, 'ping') || str_contains($methodName, 'ack');
+        $channel = $isService ? LogChannel::SERVICE : LogChannel::RPC;
+
+        $this->logger->debug("→ (sending) " . $methodName, [
+            'channel' => $channel,
+            'out' => strlen($payload) . 'B',
+            'dc' => $this->connection->dcId,
+        ]);
+
+        async(function () use ($payload, $request, $deferred, $trace, $timeout, $isContextRelated) {
             try {
                 /** @var array{0: int, 1: float} $result */
-                $result = $this->connection->sendPacket($payload, true)->await();
-                [$msgId, $encTime] = $result;
+                $result = $this->connection->sendPacket($payload, $isContextRelated)->await();
+                [$msgId, $seqNo, $encTime] = $result;
+
+                $shortMsg = '...' . substr((string)$msgId, -6);
 
                 $trace->enc = $encTime;
+
+                $timerId = EventLoop::delay($timeout, function () use ($msgId, $timeout) {
+                    $this->failRequest($msgId, new \RuntimeException("Request timed out after {$timeout}ms (GC)"));
+                });
 
                 $this->pendingRequests[$msgId] = [
                     'deferred' => $deferred,
                     'request' => $request,
                     'payload' => $payload,
-                    'trace' => $trace
+                    'trace' => $trace,
+                    'timer_id' => $timerId,
+                    'timeout_sec' => $timeout
                 ];
-
-                $shortMsg = '...' . substr((string)$msgId, -6); // Берем последние 6 цифр
 
                 $methodName = $request->getMethodName();
 
@@ -99,10 +115,10 @@ class RpcClient
 
                 $this->logger->debug("→ " . $methodName, [
                     'channel' => $channel,
-                    'msg'     => $shortMsg,
-                    'dc'      => $this->connection->dcId,
-                    // 'size' уберем, если args есть, или оставим
-//                    'args'    => $this->extractParams($request)
+                    'msg' => $shortMsg,
+                    'seq' => $seqNo,
+                    'out' => strlen($payload) . 'B',
+                    'dc' => $this->connection->dcId,
                 ]);
             } catch (\Throwable $e) {
                 $this->logger->error("Transport write failed", [
@@ -114,10 +130,6 @@ class RpcClient
         })->ignore();
     }
 
-    /**
-     * Переотправляет ВСЕ висящие запросы.
-     * Вызывается после успешного реконнекта.
-     */
     public function resendAll(): void
     {
         if (empty($this->pendingRequests)) {
@@ -127,32 +139,48 @@ class RpcClient
         $this->logger->info("Resending pending requests", [
             'channel' => LogChannel::RPC,
             'count' => count($this->pendingRequests),
-            'type'  => 'RECONNECT_RETRY'
+            'type' => 'RECONNECT_RETRY'
         ]);
 
         $toResend = $this->pendingRequests;
         $this->pendingRequests = [];
 
         foreach ($toResend as $oldMsgId => $entry) {
-            // Используем тот же deferred, чтобы пользовательский await продолжил ждать
-            $this->sendPayload($entry['payload'], $entry['request'], $entry['deferred'], $entry['trace']);
+            if (isset($entry['timer_id'])) {
+                EventLoop::cancel($entry['timer_id']);
+            }
+
+            $this->sendPayload(
+                $entry['payload'],
+                $entry['request'],
+                $entry['deferred'],
+                $entry['trace'],
+                $entry['timeout_sec'] ?? 30,
+                true
+            );
         }
     }
 
-    /**
-     * Переотправка одного конкретного запроса (для bad_server_salt)
-     */
     public function resendRequest(int $badMsgId): void
     {
         if (!isset($this->pendingRequests[$badMsgId])) {
             return;
         }
-
         $entry = $this->pendingRequests[$badMsgId];
         unset($this->pendingRequests[$badMsgId]);
 
-        // Переотправляем
-        $this->sendPayload($entry['payload'], $entry['request'], $entry['deferred'], $entry['trace']);
+        if (isset($entry['timer_id'])) {
+            EventLoop::cancel($entry['timer_id']);
+        }
+
+        $this->sendPayload(
+            $entry['payload'],
+            $entry['request'],
+            $entry['deferred'],
+            $entry['trace'],
+            $entry['timeout_sec'] ?? 30,
+            true
+        );
     }
 
     public function handleMessage(array $message): void
@@ -167,14 +195,18 @@ class RpcClient
         }
 
         $entry = $this->pendingRequests[$reqMsgId];
+        unset($this->pendingRequests[$reqMsgId]);
+
+        if (isset($entry['timer_id'])) {
+            EventLoop::cancel($entry['timer_id']);
+        }
+
         /** @var DeferredFuture $deferred */
         $deferred = $entry['deferred'];
         /** @var RpcRequest $request */
         $request = $entry['request'];
         /** @var RequestTrace $trace */
         $trace = $entry['trace'];
-
-        unset($this->pendingRequests[$reqMsgId]);
 
         try {
             $trace->resBytes = strlen($rawBody);
@@ -185,47 +217,77 @@ class RpcClient
             $trace->des = (hrtime(true) - $tDeserStart) / 1e+6;
 
             $stats = $trace->finish();
-
-            // Считаем общее CPU время для компактного отображения
             $totalCpu = $stats['ser'] + $stats['enc'] + $stats['dec'] + $stats['des'];
-
             $shortMsg = '...' . substr((string)$reqMsgId, -6);
 
-            $this->logger->debug("← " . $request->getMethodName(), [
-                'channel' => LogChannel::RPC,
-                'msg'     => $shortMsg, // Короткий ID
-                'net'     => $stats['net'] . 'ms',
-                'cpu'     => number_format($totalCpu, 2, '.', '') . 'ms',
-                'in'      => $stats['res_size'],
-                'res'     => $this->summarizeResult($result)
+            $methodName = $request->getMethodName();
+            $isService = str_contains($methodName, 'ping') || str_contains($methodName, 'ack');
+            $logChannel = $isService ? LogChannel::SERVICE : LogChannel::RPC;
+
+            $this->logger->debug("← " . $methodName, [
+                'channel' => $logChannel,
+                'msg' => $shortMsg,
+                'net' => $stats['net'] . 'ms',
+                'cpu' => number_format($totalCpu, 2, '.', '') . 'ms',
+                'in' => $stats['res_size'],
+                'res' => $this->summarizeResult($result)
             ]);
 
-            $deferred->complete($result);
+            if (!$deferred->isComplete()) {
+                $deferred->complete($result);
+            }
         } catch (\Throwable $e) {
             $this->logger->error("RPC Failed: {$request->getMethodName()}", [
                 'channel' => LogChannel::RPC,
                 'exception' => $e
             ]);
-            $deferred->error($e);
+            if (!$deferred->isComplete()) {
+                $deferred->error($e);
+            }
         }
     }
 
     public function failRequest(int $reqMsgId, \Throwable $error): void
     {
         if (!isset($this->pendingRequests[$reqMsgId])) {
+            $this->logger->debug("Attempted to fail unknown request $reqMsgId", ['channel' => LogChannel::RPC]);
             return;
         }
 
-        $deferred = $this->pendingRequests[$reqMsgId]['deferred'];
+        $entry = $this->pendingRequests[$reqMsgId];
+
+        // --- ДОБАВЛЯЕМ ЛОГИРОВАНИЕ ---
+        /** @var RpcRequest $request */
+        $request = $entry['request'];
+
+        $this->logger->warning("✕ Request Failed: " . $request->getMethodName(), [
+            'channel' => LogChannel::RPC,
+            'msg_id' => $reqMsgId,
+            'error' => $error->getMessage(),
+            // 'trace' => $error->getTraceAsString() // Раскомментировать для глубокой отладки
+        ]);
+        // -----------------------------
+
         unset($this->pendingRequests[$reqMsgId]);
 
-        $deferred->error($error);
+        if (isset($entry['timer_id'])) {
+            EventLoop::cancel($entry['timer_id']);
+        }
+
+        if (!$entry['deferred']->isComplete()) {
+            $entry['deferred']->error($error);
+        }
     }
 
     public function abortAll(\Throwable $reason): void
     {
         foreach ($this->pendingRequests as $entry) {
-            $entry['deferred']->error($reason);
+            if (isset($entry['timer_id'])) {
+                EventLoop::cancel($entry['timer_id']);
+            }
+            if (!$entry['deferred']->isComplete()) {
+                $entry['deferred']->error($reason);
+            }
         }
         $this->pendingRequests = [];
     }
@@ -237,15 +299,11 @@ class RpcClient
 
     public function onUpdateReceived(object $update): void
     {
-        // Пробрасываем в соединение
         $this->connection->onUpdateReceived($update);
     }
 
-    // Также добавьте геттер для PeerManager, если его нет, чтобы Dispatcher мог сохранять юзеров
     public function getPeerManager(): PeerManager
     {
-        // PeerManager живет в Client, но у нас тут только Connection.
-        // Connection может иметь ссылку на PeerManager (переданную из Factory).
         return $this->connection->getPeerManager();
     }
 
@@ -253,7 +311,6 @@ class RpcClient
     {
         $responseClassOrType = $request->getResponseClass();
         $offset = 0;
-
         if (str_starts_with($responseClassOrType, 'vector<')) {
             $innerType = substr($responseClassOrType, 7, -1);
             if (class_exists($innerType)) {
@@ -266,11 +323,9 @@ class RpcClient
                 default => throw new \RuntimeException("Unsupported vector type: $innerType"),
             };
         }
-
         if (class_exists($responseClassOrType)) {
             return $responseClassOrType::deserialize($body, $offset);
         }
-
         return match ($responseClassOrType) {
             'bool' => Deserializer::bool($body, $offset),
             'int' => Deserializer::int32($body, $offset),
@@ -281,9 +336,6 @@ class RpcClient
         };
     }
 
-    /**
-     * Формирует краткую сводку ответа.
-     */
     private function summarizeResult(mixed $result): string
     {
         if (is_array($result)) {
@@ -293,15 +345,17 @@ class RpcClient
         }
         if (is_object($result)) {
             $name = $this->shortenClass($result);
-            // Если это Slice (список с общим кол-вом), покажем count
-            if (isset($result->count)) return "{$name} (n={$result->count})";
-            // Если это Updates, покажем кол-во событий
+            if (isset($result->count)) {
+                return "{$name} (n={$result->count})";
+            }
             if (isset($result->updates) && is_array($result->updates)) {
                 return "{$name} [" . count($result->updates) . "]";
             }
             return $name;
         }
-        if (is_bool($result)) return $result ? 'True' : 'False';
+        if (is_bool($result)) {
+            return $result ? 'True' : 'False';
+        }
         return (string)$result;
     }
 

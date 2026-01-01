@@ -16,88 +16,103 @@ use ProtoBrick\MTProtoClient\Transport\Framing\AbridgedFramer;
 use ProtoBrick\MTProtoClient\Transport\Framing\FramerInterface;
 use ProtoBrick\MTProtoClient\Transport\Framing\IntermediateFramer;
 use ProtoBrick\MTProtoClient\Transport\Framing\IntermediatePaddedFramer;
+use ProtoBrick\MTProtoClient\Transport\Security\Obfuscator; // <-- Новый путь
+use ProtoBrick\MTProtoClient\Transport\Stream\SocketStreamAdapter;
+use ProtoBrick\MTProtoClient\Transport\Stream\StreamInterface;
 
-class TcpTransport implements Transport
+class TcpTransport implements TransportInterface
 {
-    /**
-     * Underlying Amp socket instance.
-     */
-    private ?AmpSocket $socket = null;
-    
-    /**
-     * Buffer for bytes read in excess of requested length.
-     */
+    private ?StreamInterface $stream = null;
     private string $readBuffer = '';
-
     private FramerInterface $framer;
 
-    /**
-     * Body length announced by prefix for the NEXT receive() call and whether it includes random padding
-     * (padded_intermediate).
-     */
+    /** @var int|null Ожидаемая длина тела пакета (из префикса) */
     private ?int $pendingBodyWireLength = null;
+
+    /** @var bool Нужно ли декодировать следующее чтение через Framer (убрать паддинг) */
     private bool $useFramerForNextBody = false;
 
-    public function __construct(private readonly Settings $settings)
-    {
+    public function __construct(
+        private readonly Settings $settings,
+        private readonly Obfuscator $obfuscator = new Obfuscator()
+    ) {
         $this->framer = match ($settings->transport) {
             TransportProtocol::Abridged => new AbridgedFramer(),
             TransportProtocol::PaddedIntermediate => new IntermediatePaddedFramer(),
             default => new IntermediateFramer(),
         };
+
+        // ВАЖНО: Obfuscated2 по стандарту Telegram работает поверх Padded Intermediate.
+        // Если юзер включил Obfuscation, но выбрал другой транспорт, мы могли бы принудительно менять фреймер,
+        // но здесь оставим выбор за пользователем (или Settings).
     }
 
     public function isConnected(): bool
     {
-        return $this->socket !== null && !$this->socket->isClosed();
+        return $this->stream !== null && !$this->stream->isClosed();
     }
 
     public function connect(): Future
     {
         return async(function (): void {
-            if ($this->socket !== null) {
+            if ($this->stream !== null) {
                 $this->close();
             }
 
             $uri = "tcp://{$this->settings->server_address}:{$this->settings->server_port}";
 
             try {
-                $context = (new ConnectContext())
-                    ->withTcpNoDelay();
+                $context = (new ConnectContext())->withTcpNoDelay();
 
-                $this->socket = AmpSocketNamespace\connect(
+                /** @var AmpSocket $rawSocket */
+                $rawSocket = AmpSocketNamespace\connect(
                     $uri,
                     $context,
                     new TimeoutCancellation($this->settings->connect_timeout_seconds)
                 );
+
+                if ($this->settings->use_obfuscation) {
+                    $this->stream = $this->obfuscator->handshake(
+                        $rawSocket,
+                        $this->framer->handshakeHeader(),
+                        $this->settings->obfuscation_secret,
+                        $this->settings->dc_id
+                    );
+                } else {
+                    $this->stream = new SocketStreamAdapter($rawSocket);
+                }
+
             } catch (\Throwable $e) {
                 throw new TransportException('Unable to connect: ' . $e->getMessage(), previous: $e);
             }
 
-            echo "Connected to {$this->settings->server_address}:{$this->settings->server_port}\n";
             $this->readBuffer = '';
 
-            // Отправляем приветственный заголовок выбранного протокола
-            $this->send('', true)->await();
+            // Если используем Obfuscated2, тег уже ушел внутри handshake пакета.
+            // Если соединение чистое (Cleartext) — шлем тег первым отдельным сообщением.
+            if (!$this->settings->use_obfuscation) {
+                $this->send('', true)->await();
+            }
         });
     }
 
     public function send(string $payload, bool $isHeader = false): Future
     {
         return async(function () use ($payload, $isHeader): void {
-            if ($this->socket === null || $this->socket->isClosed()) {
-                throw new TransportException('Socket is not connected.');
+            if ($this->stream === null || $this->stream->isClosed()) {
+                throw new TransportException('Stream is not connected.');
             }
 
             try {
                 if ($isHeader) {
-                    $this->socket->write($this->framer->handshakeHeader());
+                    $this->stream->write($this->framer->handshakeHeader());
                     return;
                 }
 
-                $this->socket->write($this->framer->frame($payload));
+                $frame = $this->framer->frame($payload);
+                $this->stream->write($frame);
             } catch (\Throwable $e) {
-                throw new TransportException('Failed to send data to socket: ' . $e->getMessage(), previous: $e);
+                throw new TransportException('Failed to write data: ' . $e->getMessage(), previous: $e);
             }
         });
     }
@@ -105,46 +120,48 @@ class TcpTransport implements Transport
     public function receive(int $length): Future
     {
         return async(function () use ($length) {
-            if ($this->socket === null || $this->socket->isClosed()) {
-                throw new TransportException('Socket is not connected.');
+            if ($this->stream === null || $this->stream->isClosed()) {
+                throw new TransportException('Stream is not connected.');
             }
 
-            // Специальная обработка для фрейминга: первый вызов receive(4)
+            // 1. Читаем длину пакета (Prefix)
             if ($length === 4) {
+                // Если мы в Padded режиме, префикс может содержать случайную длину
+                // Фреймер знает, как ее прочитать
                 $prefix = $this->framer->readPrefix(fn (int $n) => $this->readExactly($n));
                 $this->pendingBodyWireLength = unpack('V', $prefix)[1];
                 $this->useFramerForNextBody = true;
                 return $prefix;
             }
 
-            // Если ожидается тело с известной длиной (из префикса), читаем его особым образом
+            // 2. Читаем тело пакета
             if ($this->pendingBodyWireLength !== null && $length === $this->pendingBodyWireLength) {
+                // Фреймер читает "грязные" данные (с паддингом) и возвращает чистые
                 $data = $this->useFramerForNextBody
                     ? $this->framer->readBody(fn (int $n) => $this->readExactly($n), $length)
                     : $this->readExactly($length);
+
                 $this->pendingBodyWireLength = null;
                 $this->useFramerForNextBody = false;
                 return $data;
             }
 
-            // Обычное побайтное чтение на заданную длину
             return $this->readExactly($length);
         });
     }
 
     public function close(): void
     {
-        if ($this->socket !== null) {
-            $this->socket->close();
-            $this->socket = null;
+        if ($this->stream !== null) {
+            $this->stream->close();
+            $this->stream = null;
             $this->readBuffer = '';
-            echo "Connection closed.\n";
         }
     }
 
     public function getSocket(): ?AmpSocket
     {
-        return $this->socket;
+        return null; // Абстракция скрывает нативный сокет
     }
 
     private function readExactly(int $length): string
@@ -152,30 +169,32 @@ class TcpTransport implements Transport
         $data = '';
         $remaining = $length;
 
-        // Сначала отдаем из readBuffer
+        // Читаем из буфера
         if ($this->readBuffer !== '') {
-            if (\strlen($this->readBuffer) >= $remaining) {
+            if (strlen($this->readBuffer) >= $remaining) {
                 $data = substr($this->readBuffer, 0, $remaining);
                 $this->readBuffer = (string) substr($this->readBuffer, $remaining);
                 return $data;
             }
             $data = $this->readBuffer;
-            $remaining -= \strlen($this->readBuffer);
+            $remaining -= strlen($this->readBuffer);
             $this->readBuffer = '';
         }
 
+        // Дочитываем из сети
         while ($remaining > 0) {
             try {
-                $chunk = $this->socket->read();
+                $chunk = $this->stream->read();
             } catch (\Throwable $e) {
-                throw new TransportException('Failed to read from socket: ' . $e->getMessage(), previous: $e);
+                throw new TransportException('Read error: ' . $e->getMessage(), previous: $e);
             }
 
             if ($chunk === null) {
-                throw new TransportException('Connection closed while reading.');
+                throw new TransportException('Connection closed (EOF).');
             }
 
-            if (\strlen($chunk) > $remaining) {
+            $chunkLen = strlen($chunk);
+            if ($chunkLen > $remaining) {
                 $data .= substr($chunk, 0, $remaining);
                 $this->readBuffer = substr($chunk, $remaining);
                 $remaining = 0;
@@ -183,11 +202,9 @@ class TcpTransport implements Transport
             }
 
             $data .= $chunk;
-            $remaining -= \strlen($chunk);
+            $remaining -= $chunkLen;
         }
 
         return $data;
     }
-
-    private function readFramedPrefix(): string { return ''; }
 }

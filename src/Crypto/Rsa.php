@@ -6,21 +6,20 @@ namespace ProtoBrick\MTProtoClient\Crypto;
 
 use phpseclib3\Crypt\PublicKeyLoader;
 use phpseclib3\Crypt\RSA as PhpseclibRSA;
-use phpseclib3\Crypt\Common\PublicKey as PhpseclibPublicKey;
 use phpseclib3\Math\BigInteger;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 
 class Rsa
 {
     private const TELEGRAM_PUBLIC_KEYS = [
-        "-----BEGIN RSA PUBLIC KEY-----\n" .
+        "-----BEGIN PUBLIC KEY-----\n" .
         "MIIBCgKCAQEA6LszBcC1LGzyr992NzE0ieY+BSaOW622Aa9Bd4ZHLl+TuFQ4lo4g\n" .
         "5nKaMBwK/BIb9xUfg0Q29/2mgIR6Zr9krM7HjuIcCzFvDtr+L0GQjae9H0pRB2OO\n" .
         "62cECs5HKhT5DZ98K33vmWiLowc621dQuwKWSQKjWf50XYFw42h21P2KXUGyp2y/\n" .
         "+aEyZ+uVgLLQbRA1dEjSDZ2iGRy12Mk5gpYc397aYp438fsJoHIgJ2lgMv5h7WY9\n" .
         "t6N/byY9Nw9p21Og3AoXSL2q/2IJ1WRUhebgAdGVMlV1fkuOQoEzR7EdpqtQD9Cs\n" .
         "5+bfo3Nhmcyvk5ftB0WkJ9z6bNZ7yxrP8wIDAQAB\n" .
-        '-----END RSA PUBLIC KEY-----',
+        '-----END PUBLIC KEY-----',
     ];
 
     private const TELEGRAM_TEST_PUBLIC_KEYS = [
@@ -34,131 +33,77 @@ class Rsa
         '-----END PUBLIC KEY-----',
     ];
 
-    private bool $useOpenSsl;
-
-    public function __construct()
-    {
-        $this->useOpenSsl = extension_loaded('openssl');
-    }
-
+    /**
+     * Finds the PEM key by its fingerprint (lower 64 bits of SHA1(n+e)).
+     */
     public function findKeyByFingerprint(int $fingerprint): ?string
     {
         foreach (self::TELEGRAM_PUBLIC_KEYS as $keyPem) {
-            $n = null;
-            $e = null;
+            try {
+                // phpseclib automatically detects key format (PKCS#1 or PKCS#8)
+                /** @var PhpseclibRSA $key */
+                $key = PublicKeyLoader::load($keyPem);
 
-            // 1. Сначала пробуем быстрый OpenSSL (если доступен)
-            if ($this->useOpenSsl) {
-                // Используем @ для подавления варнингов OpenSSL в логах
-                $publicKey = @openssl_pkey_get_public($keyPem);
+                $raw = $key->toString('Raw');
+                /** @var BigInteger $n */
+                $n = $raw['n'];
+                /** @var BigInteger $e */
+                $e = $raw['e'];
 
-                if ($publicKey === false) {
-                    while ($msg = openssl_error_string()) {
-                        echo "OpenSSL Error: $msg\n";
-                    }
+                $nBytes = Serializer::bytes($n->toBytes());
+                $eBytes = Serializer::bytes($e->toBytes());
+
+                $hash = sha1($nBytes . $eBytes, true);
+
+                $fingerprintPart = substr($hash, -8);
+                $calculatedFingerprint = unpack('q', $fingerprintPart)[1];
+
+                if ($calculatedFingerprint === $fingerprint) {
+                    return $keyPem;
                 }
-
-                if ($publicKey !== false) {
-                    $details = openssl_pkey_get_details($publicKey);
-                    if ($details && isset($details['rsa']['n'], $details['rsa']['e'])) {
-                        $n = $details['rsa']['n'];
-                        $e = $details['rsa']['e'];
-
-                        // Убираем лидирующий ноль, если OpenSSL его добавил
-                        if (\strlen($n) === 257 && $n[0] === "\0") {
-                            $n = substr($n, 1);
-                        }
-                    }
-                }
-            }
-
-            // 2. Fallback: Если OpenSSL не справился (вернул false) или выключен,
-            // пробуем phpseclib. Он работает на чистом PHP и "всеяден".
-            if ($n === null) {
-                try {
-                    /** @var PhpseclibPublicKey $key */
-                    $key = PublicKeyLoader::load($keyPem);
-                    $raw = $key->toString('Raw');
-
-                    if (isset($raw['n'], $raw['e'])) {
-                        $n = $raw['n']->toBytes();
-                        $e = $raw['e']->toBytes();
-                    }
-                } catch (\Throwable) {
-                    // Если даже phpseclib не смог прочитать — ключ реально битый
-                    continue;
-                }
-            }
-
-            // Если не удалось извлечь компоненты ни одним способом — пропускаем
-            if ($n === null || $e === null) {
+            } catch (\Throwable) {
                 continue;
-            }
-
-            // 3. Считаем фингерпринт
-            $n_tl_bytes = Serializer::bytes($n);
-            $e_tl_bytes = Serializer::bytes($e);
-            $dataForHash = $n_tl_bytes . $e_tl_bytes;
-
-            $fingerprint_part_be = substr(sha1($dataForHash, true), -8);
-            $calculatedFingerprint_int = unpack('q', $fingerprint_part_be)[1];
-
-            if ($calculatedFingerprint_int === $fingerprint) {
-                return $keyPem;
             }
         }
 
         return null;
     }
 
+    /**
+     * Encrypts P_Q_inner_data using "Padding Hunt" to ensure m < n.
+     */
     public function encryptPqInnerData(string $data, string $publicKeyPem): string
     {
         $start = hrtime(true);
-        $modulusBigInt = null;
-        $openSslKeyRes = null;
-        $phpseclibKey = null;
 
+        try {
+            // phpseclib automatically detects key format (PKCS#1 or PKCS#8)
+            /** @var PhpseclibRSA $key */
+            $key = PublicKeyLoader::load($publicKeyPem);
 
-        // 1. Попытка использовать OpenSSL (быстро)
-        if ($this->useOpenSsl) {
-            // @ - подавляем ошибки, если OpenSSL не понимает формат ключа
-            $resource = @openssl_pkey_get_public($publicKeyPem);
+            $rawKey = $key->toString('Raw');
+            /** @var BigInteger $modulus */
+            $modulus = $rawKey['n'];
 
-            if ($resource !== false) {
-                $details = openssl_pkey_get_details($resource);
-                if (isset($details['rsa']['n'])) {
-                    $openSslKeyRes = $resource;
-                    $modulusBigInt = new BigInteger($details['rsa']['n'], 256);
-                }
-            }
-        }
-
-        // 2. Fallback на phpseclib (медленно, но надежно), если OpenSSL не справился
-        if ($modulusBigInt === null) {
-            try {
-                /** @var PhpseclibPublicKey $phpseclibKey */
-                $phpseclibKey = PublicKeyLoader::load($publicKeyPem);
-                $raw = $phpseclibKey->toString('Raw');
-
-                if (!isset($raw['n'])) {
-                    throw new \RuntimeException("Invalid RSA key format in phpseclib.");
-                }
-                $modulusBigInt = $raw['n'];
-            } catch (\Throwable $e) {
-                throw new \RuntimeException("Failed to load RSA key via both OpenSSL and phpseclib.", 0, $e);
-            }
+            // MTProto uses custom padding, disable standard PKCS#1/OAEP
+            $key = $key->withPadding(PhpseclibRSA::ENCRYPTION_NONE);
+        } catch (\Throwable $e) {
+            throw new \RuntimeException("Failed to load RSA key.", 0, $e);
         }
 
         if (\strlen($data) > 144) {
             throw new \InvalidArgumentException("Data for RSA_PAD must not exceed 144 bytes.");
         }
 
+        // 256 bytes (block) - 32 bytes (hash) - data_len
         $paddingLen = 192 - \strlen($data);
 
-        // Попытки подобрать такой паддинг, чтобы (data < modulus)
         for ($i = 0; $i < 20; $i++) {
             $data_with_padding = $data . random_bytes($paddingLen);
+
+            // Reverse before hashing (MTProto specific)
             $data_pad_reversed = strrev($data_with_padding);
+
             $temp_key = random_bytes(32);
             $data_with_hash = $data_pad_reversed . hash('sha256', $temp_key . $data_with_padding, true);
 
@@ -168,33 +113,14 @@ class Rsa
             $temp_key_xor = $temp_key ^ hash('sha256', $aes_encrypted, true);
             $key_aes_encrypted = $temp_key_xor . $aes_encrypted;
 
-            // Проверка условия RSA: m < n
-            if ((new BigInteger($key_aes_encrypted, 256))->compare($modulusBigInt) < 0) {
-
-                // ВЕТВЛЕНИЕ: Выбираем метод шифрования в зависимости от того, как загрузили ключ
-                if ($openSslKeyRes !== null) {
-                    $encryptedData = '';
-                    if (!openssl_public_encrypt(
-                        $key_aes_encrypted,
-                        $encryptedData,
-                        $openSslKeyRes,
-                        OPENSSL_NO_PADDING
-                    )) {
-                        throw new \RuntimeException("Failed to encrypt with RSA OpenSSL: " . openssl_error_string());
-                    }
-                    if (\strlen($encryptedData) !== 256) {
-                        throw new \RuntimeException("RSA encryption result is not 256 bytes long.");
-                    }
-                    $time = (hrtime(true) - $start) / 1e+6;
-                    echo sprintf("[Crypto] OpenSSL RSA Encryption (with padding hunt): %.2fms\n", $time);
-                    return $encryptedData;
-                }
-
-                // Используем phpseclib
-                $key = $phpseclibKey->withPadding(PhpseclibRSA::ENCRYPTION_NONE);
+            // Check m < n
+            if ((new BigInteger($key_aes_encrypted, 256))->compare($modulus) < 0) {
+                // phpseclib automatically uses OpenSSL/GMP/BCMath or Native PHP engine
                 $encryptedData = $key->encrypt($key_aes_encrypted);
+
                 $time = (hrtime(true) - $start) / 1e+6;
-                echo sprintf("[Crypto] phpseclib RSA Encryption (with padding hunt): %.2fms\n", $time);
+                echo sprintf("[Crypto] RSA Encryption: %.2fms\n", $time);
+
                 return $encryptedData;
             }
         }

@@ -37,4 +37,14 @@ final class Constructors
     public const VECTOR = 0x1cb5c415;
 
     public const GZIP_PACKED = 0x3072cfa1;
+
+    public const BAD_SERVER_SALT = 0xedab447b;
+
+    public const NEW_SESSION_CREATED = 0x9ec20908;
+
+    public const MSG_DETAILED_INFO = 0x276d3ec6;
+    public const MSG_NEW_DETAILED_INFO = 0x809db6df;
+
+    public const PING_DELAY_DISCONNECT = 0xf3427b8c;
+    public const PONG = 0x347773c5;
 }

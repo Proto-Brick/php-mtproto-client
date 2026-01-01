@@ -4,39 +4,41 @@ declare(strict_types=1);
 
 namespace ProtoBrick\MTProtoClient\Auth;
 
+use phpseclib3\Math\BigInteger;
 use ProtoBrick\MTProtoClient\Crypto\Factorizer;
 use ProtoBrick\MTProtoClient\Crypto\Ige;
 use ProtoBrick\MTProtoClient\Crypto\Rsa;
 use ProtoBrick\MTProtoClient\Exception\DhGenRetryException;
 use ProtoBrick\MTProtoClient\Exception\TransportException;
-use ProtoBrick\MTProtoClient\MessagePacker;
-use ProtoBrick\MTProtoClient\Session\Session;
 use ProtoBrick\MTProtoClient\TL\Deserializer;
 use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
 use ProtoBrick\MTProtoClient\TL\Serializer;
-use ProtoBrick\MTProtoClient\Transport\Transport;
-use phpseclib3\Math\BigInteger;
+use ProtoBrick\MTProtoClient\Transport\TransportInterface;
 use Random\RandomException;
+
+/**
+ * Результат создания ключа: сам ключ + начальные настройки сессии.
+ */
+class AuthResult
+{
+    public function __construct(
+        public AuthKey $authKey,
+        public int $initialSalt,
+        public int $timeOffset
+    ) {}
+}
 
 class AuthKeyCreator
 {
-    /**
-     * @param Transport $transport
-     * @param Rsa $rsa
-     * @param MessagePacker $messagePacker
-     * @param Session $session
-     */
     public function __construct(
-        private readonly Transport $transport,
-        private readonly Rsa $rsa,
-        private readonly MessagePacker $messagePacker,
-        private readonly Session $session,
+        private readonly TransportInterface $transport,
+        private readonly Rsa $rsa = new Rsa()
     ) {}
 
     /**
      * Выполняет полный цикл создания ключа авторизации (шаги 1-4).
      */
-    public function create(): AuthKey
+    public function create(): AuthResult
     {
         $maxRetries = 5;
 
@@ -68,11 +70,11 @@ class AuthKeyCreator
                 // Шаг 4: set_client_DH_params
 
                 $totalTime = (hrtime(true) - $start) / 1e+6;
-                $authKey = $this->sendSetClientDhParams($resPQData, $serverDhParams);
-                echo sprintf("[Auth] AuthKey created in %.2fms (ID: %s)\n", $totalTime, bin2hex($authKey->id));
+                $authResult = $this->sendSetClientDhParams($resPQData, $serverDhParams);
+                echo sprintf("[Auth] AuthKey created in %.2fms (ID: %s)\n", $totalTime, bin2hex($authResult->authKey->id));
                 echo "AuthKey created!\n";
 
-                return $authKey;
+                return $authResult;
             } catch (DhGenRetryException) {
                 echo "Server asked for retry (dh_gen_retry). Attempt $attempt/$maxRetries...\n";
                 continue;
@@ -80,6 +82,40 @@ class AuthKeyCreator
         }
 
         throw new \RuntimeException("Failed to create AuthKey after $maxRetries attempts.");
+    }
+
+    private function packUnencrypted(string $payload): string
+    {
+        $authKeyId = pack('P', 0);
+
+        // Правильная генерация msg_id (UnixTime + Microseconds), кратная 4
+        $time = microtime(true);
+        $sec = (int) $time;
+        $usec = (int) (($time - $sec) * 1000000);
+
+        // Сдвигаем секунды на 32 бита влево, добавляем микросекунды сдвинутые на 2 бита
+        // Это гарантирует уникальность и делимость на 4 (так как младшие 2 бита всегда 0)
+        $msgIdInt = ($sec << 32) | ($usec << 2);
+
+        $msgId = pack('P', $msgIdInt);
+        $length = pack('V', strlen($payload));
+
+        return $authKeyId . $msgId . $length . $payload;
+    }
+
+    private function unpackUnencrypted(string $rawPacket): string
+    {
+        if (strlen($rawPacket) < 20) {
+            throw new TransportException("Packet too short for unencrypted message");
+        }
+
+        $authKeyId = substr($rawPacket, 0, 8);
+        if ($authKeyId !== pack('P', 0)) {
+            throw new TransportException("Invalid auth_key_id. Expected 0, got " . bin2hex($authKeyId));
+        }
+
+        // Возвращаем Payload (все, что после 20 байт заголовка)
+        return substr($rawPacket, 20);
     }
 
     /**
@@ -90,8 +126,7 @@ class AuthKeyCreator
      * присылает `resPQ`, который содержит, среди прочего, `server_nonce` и число `pq`.
      *
      * @return array Десериализованный ответ `resPQ`, дополненный ключом `original_nonce` для использования в последующих шагах.
-     * @throws TransportException
-     * @throws RandomException
+     * @throws TransportException|RandomException
      * @see https://core.telegram.org/mtproto/auth_key#1-dh-key-exchange
      */
     private function sendReqPq(): array
@@ -105,7 +140,7 @@ class AuthKeyCreator
 
         // 3. Упаковываем TL-объект в незашифрованный MTProto-контейнер.
         // Структура контейнера: [auth_key_id (8 байт) = 0] [msg_id (8 байт)] [message_length (4 байта)] [payload]
-        $request = $this->messagePacker->packUnencrypted($payload);
+        $request = $this->packUnencrypted($payload);
 
         // 4. Отправляем полный пакет через транспорт.
         $this->transport->send($request)->await();
@@ -120,21 +155,11 @@ class AuthKeyCreator
         $rawResponse = $this->transport->receive($lengthOrError)->await();
 
         // 6. Распаковываем MTProto-контейнер. На этом этапе `unpackUnencrypted` просто возвращает сырой MTProto-пакет.
-        $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
-
-        // 7. Проводим базовую валидацию ответа. `auth_key_id` для незашифрованных сообщений всегда должен быть равен 0.
-        $auth_key_id = substr($responsePayload, 0, 8);
-        if ($auth_key_id !== pack('P', 0)) {
-            throw new \RuntimeException("Invalid auth_key_id in response. Expected 0, got " . bin2hex($auth_key_id));
-        }
-
-        // 8. Извлекаем "внутреннюю" часть - сам TL-объект `resPQ`.
-        // Для этого пропускаем заголовок MTProto-контейнера: [auth_key_id (8)] + [msg_id (8)] + [length (4)] = 20 байт.
-        $tlObjectPayload = substr($responsePayload, 20);
+        $responsePayload = $this->unpackUnencrypted($rawResponse);
 
         // 9. Десериализуем TL-объект `resPQ` в PHP-массив.
         $offset = 0;
-        $deserialized = Deserializer::deserializeResPQ($tlObjectPayload, $offset);
+        $deserialized = Deserializer::deserializeResPQ($responsePayload, $offset);
 
         // 10. Финальная проверка безопасности: nonce в ответе должен совпадать с тем, что мы отправили.
         // Это защищает от атак повторного воспроизведения (replay attacks).
@@ -198,21 +223,14 @@ class AuthKeyCreator
             . Serializer::int64($foundFingerprint_int)
             . Serializer::bytes($encryptedInnerData);
 
-        $request = $this->messagePacker->packUnencrypted($payload);
+        $request = $this->packUnencrypted($payload);
         $this->transport->send($request)->await();
 
         $prefixBytes = $this->transport->receive(4)->await();
-        $lengthOrError = unpack('V', $prefixBytes)[1];
+        $length = unpack('V', $prefixBytes)[1];
 
-        if ($lengthOrError <= 0) {
-            throw new TransportException("Invalid packet length or transport error received: {$lengthOrError}");
-        }
-
-        $rawResponse = $this->transport->receive($lengthOrError)->await();
-        $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
-
-        // Снова пропускаем заголовок
-        $responsePayload = substr($responsePayload, 20);
+        $rawResponse = $this->transport->receive($length)->await();
+        $responsePayload = $this->unpackUnencrypted($rawResponse);
 
         $offset = 0;
         $serverDhData = Deserializer::deserializeServerDhParamsOk($responsePayload, $offset);
@@ -236,11 +254,11 @@ class AuthKeyCreator
      *
      * @param array $resPQData Данные из ответа на req_pq (шаг 1).
      * @param array $serverDhParams Данные из ответа на req_DH_params (шаг 3).
-     * @return AuthKey Готовый ключ авторизации.
+     * @return AuthResult Готовый ключ авторизации.
      * @throws DhGenRetryException
      * @throws TransportException
      */
-    public function sendSetClientDhParams(array $resPQData, array $serverDhParams): AuthKey
+    public function sendSetClientDhParams(array $resPQData, array $serverDhParams): AuthResult
     {
         // Этап 4.1: Вычисляем временные ключи и расшифровываем ответ сервера
         $tempKeys = $this->_calculateTemporaryKeys($serverDhParams['new_nonce'], $resPQData['server_nonce']);
@@ -273,23 +291,16 @@ class AuthKeyCreator
 
         print 'step 4.4 (parseAndValidateFinalResponse): OK' . PHP_EOL;
 
-        // 1. Извлекаем первые 8 байт (little-endian)
+        // Вычисляем Initial Salt
         $new_nonce_part_le = substr($serverDhParams['new_nonce'], 0, 8);
         $server_nonce_part_le = substr($resPQData['server_nonce'], 0, 8);
-
-        // 2. Распаковываем их в 64-битные числа (int)
         $new_nonce_int = unpack('q', $new_nonce_part_le)[1];
         $server_nonce_int = unpack('q', $server_nonce_part_le)[1];
-
-        // 3. Выполняем XOR над числами
         $initialSalt_int = $new_nonce_int ^ $server_nonce_int;
-        $this->session->reset();
-        $this->session->setServerSalt($initialSalt_int);
-        $this->session->setTimeOffset($time_offset);
-        $this->session->save($authKey);
+
         echo "Initial server_salt calculated and set.\n";
 
-        return $authKey;
+        return new AuthResult($authKey, $initialSalt_int, $time_offset);
     }
 
     /**
@@ -417,7 +428,7 @@ class AuthKeyCreator
             . Serializer::raw128($resPQData['server_nonce'])
             . Serializer::bytes($encryptedClientInnerData);
 
-        $request = $this->messagePacker->packUnencrypted($finalPayload);
+        $request = $this->packUnencrypted($finalPayload);
         $this->transport->send($request)->await();
 
         $prefixBytes = $this->transport->receive(4)->await();
@@ -439,8 +450,7 @@ class AuthKeyCreator
         array $resPQData,
         string $newNonce,
     ): void {
-        $responsePayload = $this->messagePacker->unpackUnencrypted($rawResponse);
-        $responsePayload = substr($responsePayload, 20); // Пропускаем заголовок
+        $responsePayload = $this->unpackUnencrypted($rawResponse);
 
         $offset = 0;
         $finalConstructor = Deserializer::int32($responsePayload, $offset);

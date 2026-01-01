@@ -32,17 +32,25 @@
     "phpseclib/phpseclib": "^3.0",
     "amphp/sync": "^2.3",
     "amphp/socket": "^2.3",
-    "revolt/event-loop": "^1.0"
+    "revolt/event-loop": "^1.0",
+    "psr/log": "^3.0"
   },
   "suggest": {
     "ext-gmp": "Install the gmp extension to speed up authorization",
     "ext-bcmath": "Install the bcmath extension to speed up authorization",
     "ext-openssl": "Speeds up crypto operations (AES/RSA) significantly",
-    "ext-mbstring": "Recommended for correct handling of UTF-8 strings in Telegram messages"
+    "ext-mbstring": "Recommended for correct handling of UTF-8 strings in Telegram messages",
+    "ext-pcntl": "Allows graceful shutdown using SIGINT/SIGTERM signals",
+    "ext-uv": "Drastically reduces CPU usage and improves concurrency. Enables true async file I/O"
   },
   "autoload": {
     "psr-4": {
       "ProtoBrick\\MTProtoClient\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "ProtoBrick\\Automation\\": "Automation/"
     }
   },
   "require-dev": {

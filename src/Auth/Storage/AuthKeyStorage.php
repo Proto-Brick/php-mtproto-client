@@ -8,10 +8,19 @@ use ProtoBrick\MTProtoClient\Auth\AuthKey;
 
 /**
  * Интерфейс для хранения и получения ключа авторизации.
- * Соответствует принципам: Low Coupling, DI-ready.
+ * Поддерживает работу с несколькими дата-центрами (Multi-DC).
  */
 interface AuthKeyStorage
 {
-    public function get(): ?AuthKey;
-    public function set(AuthKey $authKey): void;
+    /**
+     * Возвращает ключ авторизации для указанного DC.
+     * Если $dcId null, возвращает основной (Main) ключ.
+     */
+    public function get(?int $dcId = null): ?AuthKey;
+
+    /**
+     * Сохраняет ключ авторизации для указанного DC.
+     * Если $dcId null, сохраняет как основной ключ.
+     */
+    public function set(AuthKey $authKey, ?int $dcId = null): void;
 }

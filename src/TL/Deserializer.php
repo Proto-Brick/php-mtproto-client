@@ -427,11 +427,7 @@ class Deserializer
      */
     public static function deserializeBadServerSalt(string $payload, int &$offset): array
     {
-        $constructor = self::int32($payload, $offset);
-        if ($constructor !== 0xedab447b) {
-            throw new \RuntimeException("Expected bad_server_salt");
-        }
-
+        self::int32($payload, $offset); //skip constructor
         return [
             '_' => 'bad_server_salt',
             'bad_msg_id' => self::int64($payload, $offset),
@@ -452,7 +448,7 @@ class Deserializer
      */
     public static function deserializeConfig(string $payload, int &$offset): array
     {
-        $constructor = self::int32($payload, $offset);
+        $constructor = self::int32($payload, $offset); //skip constructor
         if ($constructor !== 0xcc1a241e) {
             throw new \RuntimeException("Expected config constructor");
         }
@@ -469,7 +465,6 @@ class Deserializer
         ];
 
         // Вектор DcOption
-        // Инлайним логику вектора для скорости
         $vecId = unpack('V', $payload, $offset)[1];
         $offset += 4;
         $count = unpack('V', $payload, $offset)[1];
@@ -589,6 +584,31 @@ class Deserializer
             'first_msg_id' => self::int64($payload, $offset),
             'unique_id' => self::int64($payload, $offset),
             'server_salt' => self::int64($payload, $offset),
+        ];
+    }
+
+    public static function deserializeMsgDetailedInfo(string $payload, int &$offset): array
+    {
+        $constructor = self::int32($payload, $offset);
+
+        return [
+            '_' => 'msg_detailed_info',
+            'msg_id' => self::int64($payload, $offset),
+            'answer_msg_id' => self::int64($payload, $offset),
+            'bytes' => self::int32($payload, $offset),
+            'status' => self::int32($payload, $offset),
+        ];
+    }
+
+    public static function deserializeMsgNewDetailedInfo(string $payload, int &$offset): array
+    {
+        $constructor = self::int32($payload, $offset);
+
+        return [
+            '_' => 'msg_new_detailed_info',
+            'answer_msg_id' => self::int64($payload, $offset),
+            'bytes' => self::int32($payload, $offset),
+            'status' => self::int32($payload, $offset),
         ];
     }
 }
