@@ -1,0 +1,67 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
+
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Messages\AbstractSavedDialogs;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+
+/**
+ * @see https://core.telegram.org/method/messages.getSavedDialogs
+ */
+final class GetSavedDialogsRequest extends RpcRequest
+{
+    public const CONSTRUCTOR_ID = 0x1e91fc99;
+    
+    public string $predicate = 'messages.getSavedDialogs';
+    
+    public function getMethodName(): string
+    {
+        return 'messages.getSavedDialogs';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return AbstractSavedDialogs::class;
+    }
+    /**
+     * @param int $offsetDate
+     * @param int $offsetId
+     * @param AbstractInputPeer $offsetPeer
+     * @param int $limit
+     * @param int $hash
+     * @param true|null $excludePinned
+     * @param AbstractInputPeer|null $parentPeer
+     */
+    public function __construct(
+        public readonly int $offsetDate,
+        public readonly int $offsetId,
+        public readonly AbstractInputPeer $offsetPeer,
+        public readonly int $limit,
+        public readonly int $hash,
+        public readonly ?true $excludePinned = null,
+        public readonly ?AbstractInputPeer $parentPeer = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->excludePinned) {
+            $flags |= (1 << 0);
+        }
+        if ($this->parentPeer !== null) {
+            $flags |= (1 << 1);
+        }
+        $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 1)) {
+            $buffer .= $this->parentPeer->serialize();
+        }
+        $buffer .= Serializer::int32($this->offsetDate);
+        $buffer .= Serializer::int32($this->offsetId);
+        $buffer .= $this->offsetPeer->serialize();
+        $buffer .= Serializer::int32($this->limit);
+        $buffer .= Serializer::int64($this->hash);
+        return $buffer;
+    }
+}

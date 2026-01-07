@@ -1,0 +1,28 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
+
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+
+/**
+ * @see https://core.telegram.org/type/botCommandScopeChatAdmins
+ */
+final class BotCommandScopeChatAdmins extends AbstractBotCommandScope
+{
+    public const CONSTRUCTOR_ID = 0xb9aa606a;
+    
+    public string $predicate = 'botCommandScopeChatAdmins';
+    
+    public function __construct() {}
+    
+    public function serialize(): string
+    {
+        return Serializer::int32(self::CONSTRUCTOR_ID);
+    }
+    public static function deserialize(string $__payload, &$__offset): static
+    {
+        $__offset += 4; // Constructor ID
+
+        return new self();
+    }
+}

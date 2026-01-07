@@ -1,0 +1,65 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
+
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AutoSaveSettings;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+
+/**
+ * @see https://core.telegram.org/method/account.saveAutoSaveSettings
+ */
+final class SaveAutoSaveSettingsRequest extends RpcRequest
+{
+    public const CONSTRUCTOR_ID = 0xd69b8361;
+    
+    public string $predicate = 'account.saveAutoSaveSettings';
+    
+    public function getMethodName(): string
+    {
+        return 'account.saveAutoSaveSettings';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return 'bool';
+    }
+    /**
+     * @param AutoSaveSettings $settings
+     * @param true|null $users
+     * @param true|null $chats
+     * @param true|null $broadcasts
+     * @param AbstractInputPeer|null $peer
+     */
+    public function __construct(
+        public readonly AutoSaveSettings $settings,
+        public readonly ?true $users = null,
+        public readonly ?true $chats = null,
+        public readonly ?true $broadcasts = null,
+        public readonly ?AbstractInputPeer $peer = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->users) {
+            $flags |= (1 << 0);
+        }
+        if ($this->chats) {
+            $flags |= (1 << 1);
+        }
+        if ($this->broadcasts) {
+            $flags |= (1 << 2);
+        }
+        if ($this->peer !== null) {
+            $flags |= (1 << 3);
+        }
+        $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 3)) {
+            $buffer .= $this->peer->serialize();
+        }
+        $buffer .= $this->settings->serialize();
+        return $buffer;
+    }
+}

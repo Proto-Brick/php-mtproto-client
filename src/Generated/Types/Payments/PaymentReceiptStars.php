@@ -1,0 +1,94 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
+
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractWebDocument;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Invoice;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+
+/**
+ * @see https://core.telegram.org/type/payments.paymentReceiptStars
+ */
+final class PaymentReceiptStars extends AbstractPaymentReceipt
+{
+    public const CONSTRUCTOR_ID = 0xdabbf83a;
+    
+    public string $predicate = 'payments.paymentReceiptStars';
+    
+    /**
+     * @param int $date
+     * @param int $botId
+     * @param string $title
+     * @param string $description
+     * @param Invoice $invoice
+     * @param string $currency
+     * @param int $totalAmount
+     * @param string $transactionId
+     * @param list<AbstractUser> $users
+     * @param AbstractWebDocument|null $photo
+     */
+    public function __construct(
+        public readonly int $date,
+        public readonly int $botId,
+        public readonly string $title,
+        public readonly string $description,
+        public readonly Invoice $invoice,
+        public readonly string $currency,
+        public readonly int $totalAmount,
+        public readonly string $transactionId,
+        public readonly array $users,
+        public readonly ?AbstractWebDocument $photo = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->photo !== null) {
+            $flags |= (1 << 2);
+        }
+        $buffer .= Serializer::int32($flags);
+        $buffer .= Serializer::int32($this->date);
+        $buffer .= Serializer::int64($this->botId);
+        $buffer .= Serializer::bytes($this->title);
+        $buffer .= Serializer::bytes($this->description);
+        if ($flags & (1 << 2)) {
+            $buffer .= $this->photo->serialize();
+        }
+        $buffer .= $this->invoice->serialize();
+        $buffer .= Serializer::bytes($this->currency);
+        $buffer .= Serializer::int64($this->totalAmount);
+        $buffer .= Serializer::bytes($this->transactionId);
+        $buffer .= Serializer::vectorOfObjects($this->users);
+        return $buffer;
+    }
+    public static function deserialize(string $__payload, &$__offset): static
+    {
+        $__offset += 4; // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $date = Deserializer::int32($__payload, $__offset);
+        $botId = Deserializer::int64($__payload, $__offset);
+        $title = Deserializer::bytes($__payload, $__offset);
+        $description = Deserializer::bytes($__payload, $__offset);
+        $photo = (($flags & (1 << 2)) !== 0) ? AbstractWebDocument::deserialize($__payload, $__offset) : null;
+        $invoice = Invoice::deserialize($__payload, $__offset);
+        $currency = Deserializer::bytes($__payload, $__offset);
+        $totalAmount = Deserializer::int64($__payload, $__offset);
+        $transactionId = Deserializer::bytes($__payload, $__offset);
+        $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
+
+        return new self(
+            $date,
+            $botId,
+            $title,
+            $description,
+            $invoice,
+            $currency,
+            $totalAmount,
+            $transactionId,
+            $users,
+            $photo
+        );
+    }
+}

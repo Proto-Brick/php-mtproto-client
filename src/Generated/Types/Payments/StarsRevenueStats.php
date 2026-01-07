@@ -1,0 +1,68 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Types\Payments;
+
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractStatsGraph;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\StarsRevenueStatus;
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use RuntimeException;
+
+/**
+ * @see https://core.telegram.org/type/payments.starsRevenueStats
+ */
+final class StarsRevenueStats extends TlObject
+{
+    public const CONSTRUCTOR_ID = 0x6c207376;
+    
+    public string $predicate = 'payments.starsRevenueStats';
+    
+    /**
+     * @param AbstractStatsGraph $revenueGraph
+     * @param StarsRevenueStatus $status
+     * @param float $usdRate
+     * @param AbstractStatsGraph|null $topHoursGraph
+     */
+    public function __construct(
+        public readonly AbstractStatsGraph $revenueGraph,
+        public readonly StarsRevenueStatus $status,
+        public readonly float $usdRate,
+        public readonly ?AbstractStatsGraph $topHoursGraph = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->topHoursGraph !== null) {
+            $flags |= (1 << 0);
+        }
+        $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 0)) {
+            $buffer .= $this->topHoursGraph->serialize();
+        }
+        $buffer .= $this->revenueGraph->serialize();
+        $buffer .= $this->status->serialize();
+        $buffer .= pack('d', $this->usdRate);
+        return $buffer;
+    }
+    public static function deserialize(string $__payload, &$__offset): static
+    {
+        $constructorId = Deserializer::int32($__payload, $__offset);
+        if ($constructorId !== self::CONSTRUCTOR_ID) {
+            throw new RuntimeException('Invalid constructor ID for ' . self::class);
+        }
+        $flags = Deserializer::int32($__payload, $__offset);
+        $topHoursGraph = (($flags & (1 << 0)) !== 0) ? AbstractStatsGraph::deserialize($__payload, $__offset) : null;
+        $revenueGraph = AbstractStatsGraph::deserialize($__payload, $__offset);
+        $status = StarsRevenueStatus::deserialize($__payload, $__offset);
+        $usdRate = Deserializer::double($__payload, $__offset);
+
+        return new self(
+            $revenueGraph,
+            $status,
+            $usdRate,
+            $topHoursGraph
+        );
+    }
+}

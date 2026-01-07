@@ -1,0 +1,67 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Auth;
+
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+
+/**
+ * @see https://core.telegram.org/method/auth.requestFirebaseSms
+ */
+final class RequestFirebaseSmsRequest extends RpcRequest
+{
+    public const CONSTRUCTOR_ID = 0x8e39261e;
+    
+    public string $predicate = 'auth.requestFirebaseSms';
+    
+    public function getMethodName(): string
+    {
+        return 'auth.requestFirebaseSms';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return 'bool';
+    }
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param string|null $safetyNetToken
+     * @param string|null $playIntegrityToken
+     * @param string|null $iosPushSecret
+     */
+    public function __construct(
+        public readonly string $phoneNumber,
+        public readonly string $phoneCodeHash,
+        public readonly ?string $safetyNetToken = null,
+        public readonly ?string $playIntegrityToken = null,
+        public readonly ?string $iosPushSecret = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->safetyNetToken !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->playIntegrityToken !== null) {
+            $flags |= (1 << 2);
+        }
+        if ($this->iosPushSecret !== null) {
+            $flags |= (1 << 1);
+        }
+        $buffer .= Serializer::int32($flags);
+        $buffer .= Serializer::bytes($this->phoneNumber);
+        $buffer .= Serializer::bytes($this->phoneCodeHash);
+        if ($flags & (1 << 0)) {
+            $buffer .= Serializer::bytes($this->safetyNetToken);
+        }
+        if ($flags & (1 << 2)) {
+            $buffer .= Serializer::bytes($this->playIntegrityToken);
+        }
+        if ($flags & (1 << 1)) {
+            $buffer .= Serializer::bytes($this->iosPushSecret);
+        }
+        return $buffer;
+    }
+}

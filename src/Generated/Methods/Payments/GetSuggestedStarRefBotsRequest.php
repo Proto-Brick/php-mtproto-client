@@ -1,0 +1,58 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Payments;
+
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\SuggestedStarRefBots;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+
+/**
+ * @see https://core.telegram.org/method/payments.getSuggestedStarRefBots
+ */
+final class GetSuggestedStarRefBotsRequest extends RpcRequest
+{
+    public const CONSTRUCTOR_ID = 0xd6b48f7;
+    
+    public string $predicate = 'payments.getSuggestedStarRefBots';
+    
+    public function getMethodName(): string
+    {
+        return 'payments.getSuggestedStarRefBots';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return SuggestedStarRefBots::class;
+    }
+    /**
+     * @param AbstractInputPeer $peer
+     * @param string $offset
+     * @param int $limit
+     * @param true|null $orderByRevenue
+     * @param true|null $orderByDate
+     */
+    public function __construct(
+        public readonly AbstractInputPeer $peer,
+        public readonly string $offset,
+        public readonly int $limit,
+        public readonly ?true $orderByRevenue = null,
+        public readonly ?true $orderByDate = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->orderByRevenue) {
+            $flags |= (1 << 0);
+        }
+        if ($this->orderByDate) {
+            $flags |= (1 << 1);
+        }
+        $buffer .= Serializer::int32($flags);
+        $buffer .= $this->peer->serialize();
+        $buffer .= Serializer::bytes($this->offset);
+        $buffer .= Serializer::int32($this->limit);
+        return $buffer;
+    }
+}

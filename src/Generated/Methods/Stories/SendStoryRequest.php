@@ -1,0 +1,126 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Stories;
+
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputMedia;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPrivacyRule;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMediaArea;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessageEntity;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+
+/**
+ * @see https://core.telegram.org/method/stories.sendStory
+ */
+final class SendStoryRequest extends RpcRequest
+{
+    public const CONSTRUCTOR_ID = 0x737fc2ec;
+    
+    public string $predicate = 'stories.sendStory';
+    
+    public function getMethodName(): string
+    {
+        return 'stories.sendStory';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return AbstractUpdates::class;
+    }
+    /**
+     * @param AbstractInputPeer $peer
+     * @param AbstractInputMedia $media
+     * @param list<AbstractInputPrivacyRule> $privacyRules
+     * @param int $randomId
+     * @param true|null $pinned
+     * @param true|null $noforwards
+     * @param true|null $fwdModified
+     * @param list<AbstractMediaArea>|null $mediaAreas
+     * @param string|null $caption
+     * @param list<AbstractMessageEntity>|null $entities
+     * @param int|null $period
+     * @param AbstractInputPeer|null $fwdFromId
+     * @param int|null $fwdFromStory
+     * @param list<int>|null $albums
+     */
+    public function __construct(
+        public readonly AbstractInputPeer $peer,
+        public readonly AbstractInputMedia $media,
+        public readonly array $privacyRules,
+        public readonly int $randomId,
+        public readonly ?true $pinned = null,
+        public readonly ?true $noforwards = null,
+        public readonly ?true $fwdModified = null,
+        public readonly ?array $mediaAreas = null,
+        public readonly ?string $caption = null,
+        public readonly ?array $entities = null,
+        public readonly ?int $period = null,
+        public readonly ?AbstractInputPeer $fwdFromId = null,
+        public readonly ?int $fwdFromStory = null,
+        public readonly ?array $albums = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->pinned) {
+            $flags |= (1 << 2);
+        }
+        if ($this->noforwards) {
+            $flags |= (1 << 4);
+        }
+        if ($this->fwdModified) {
+            $flags |= (1 << 7);
+        }
+        if ($this->mediaAreas !== null) {
+            $flags |= (1 << 5);
+        }
+        if ($this->caption !== null) {
+            $flags |= (1 << 0);
+        }
+        if ($this->entities !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->period !== null) {
+            $flags |= (1 << 3);
+        }
+        if ($this->fwdFromId !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->fwdFromStory !== null) {
+            $flags |= (1 << 6);
+        }
+        if ($this->albums !== null) {
+            $flags |= (1 << 8);
+        }
+        $buffer .= Serializer::int32($flags);
+        $buffer .= $this->peer->serialize();
+        $buffer .= $this->media->serialize();
+        if ($flags & (1 << 5)) {
+            $buffer .= Serializer::vectorOfObjects($this->mediaAreas);
+        }
+        if ($flags & (1 << 0)) {
+            $buffer .= Serializer::bytes($this->caption);
+        }
+        if ($flags & (1 << 1)) {
+            $buffer .= Serializer::vectorOfObjects($this->entities);
+        }
+        $buffer .= Serializer::vectorOfObjects($this->privacyRules);
+        $buffer .= Serializer::int64($this->randomId);
+        if ($flags & (1 << 3)) {
+            $buffer .= Serializer::int32($this->period);
+        }
+        if ($flags & (1 << 6)) {
+            $buffer .= $this->fwdFromId->serialize();
+        }
+        if ($flags & (1 << 6)) {
+            $buffer .= Serializer::int32($this->fwdFromStory);
+        }
+        if ($flags & (1 << 8)) {
+            $buffer .= Serializer::vectorOfInts($this->albums);
+        }
+        return $buffer;
+    }
+}

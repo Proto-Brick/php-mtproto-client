@@ -1,0 +1,55 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
+
+use ProtoBrick\MTProtoClient\TL\Deserializer;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+
+/**
+ * @see https://core.telegram.org/type/webPageAttributeStickerSet
+ */
+final class WebPageAttributeStickerSet extends AbstractWebPageAttribute
+{
+    public const CONSTRUCTOR_ID = 0x50cc03d3;
+    
+    public string $predicate = 'webPageAttributeStickerSet';
+    
+    /**
+     * @param list<AbstractDocument> $stickers
+     * @param true|null $emojis
+     * @param true|null $textColor
+     */
+    public function __construct(
+        public readonly array $stickers,
+        public readonly ?true $emojis = null,
+        public readonly ?true $textColor = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->emojis) {
+            $flags |= (1 << 0);
+        }
+        if ($this->textColor) {
+            $flags |= (1 << 1);
+        }
+        $buffer .= Serializer::int32($flags);
+        $buffer .= Serializer::vectorOfObjects($this->stickers);
+        return $buffer;
+    }
+    public static function deserialize(string $__payload, &$__offset): static
+    {
+        $__offset += 4; // Constructor ID
+        $flags = Deserializer::int32($__payload, $__offset);
+        $emojis = (($flags & (1 << 0)) !== 0) ? true : null;
+        $textColor = (($flags & (1 << 1)) !== 0) ? true : null;
+        $stickers = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractDocument::class, 'deserialize']);
+
+        return new self(
+            $stickers,
+            $emojis,
+            $textColor
+        );
+    }
+}

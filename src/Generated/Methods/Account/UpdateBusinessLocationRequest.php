@@ -1,0 +1,54 @@
+<?php declare(strict_types=1);
+namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
+
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputGeoPoint;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\TL\Serializer;
+
+/**
+ * @see https://core.telegram.org/method/account.updateBusinessLocation
+ */
+final class UpdateBusinessLocationRequest extends RpcRequest
+{
+    public const CONSTRUCTOR_ID = 0x9e6b131a;
+    
+    public string $predicate = 'account.updateBusinessLocation';
+    
+    public function getMethodName(): string
+    {
+        return 'account.updateBusinessLocation';
+    }
+    
+    public function getResponseClass(): string
+    {
+        return 'bool';
+    }
+    /**
+     * @param AbstractInputGeoPoint|null $geoPoint
+     * @param string|null $address
+     */
+    public function __construct(
+        public readonly ?AbstractInputGeoPoint $geoPoint = null,
+        public readonly ?string $address = null
+    ) {}
+    
+    public function serialize(): string
+    {
+        $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
+        $flags = 0;
+        if ($this->geoPoint !== null) {
+            $flags |= (1 << 1);
+        }
+        if ($this->address !== null) {
+            $flags |= (1 << 0);
+        }
+        $buffer .= Serializer::int32($flags);
+        if ($flags & (1 << 1)) {
+            $buffer .= $this->geoPoint->serialize();
+        }
+        if ($flags & (1 << 0)) {
+            $buffer .= Serializer::bytes($this->address);
+        }
+        return $buffer;
+    }
+}
