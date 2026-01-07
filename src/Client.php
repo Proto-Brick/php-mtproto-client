@@ -4,21 +4,6 @@ declare(strict_types=1);
 
 namespace ProtoBrick\MTProtoClient;
 
-use Amp\DeferredFuture;
-use Amp\Future;
-use Amp\TimeoutCancellation;
-use Closure;
-use ProtoBrick\MTProtoClient\Auth\Storage\AuthKeyStorage;
-use ProtoBrick\MTProtoClient\Generated\Methods\Updates\GetStateRequest;
-use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserSelf;
-use ProtoBrick\MTProtoClient\Logger\LogChannel;
-use ProtoBrick\MTProtoClient\Network\ConnectionFactory;
-use ProtoBrick\MTProtoClient\Network\ConnectionManager;
-use ProtoBrick\MTProtoClient\Peer\PeerManager;
-use ProtoBrick\MTProtoClient\Session\Storage\SessionStorage;
-use ProtoBrick\MTProtoClient\TL\RpcRequest;
-use ProtoBrick\MTProtoClient\Transport\Security\Obfuscator;
-
 // #-- API_HANDLERS_USE_START --#
 use ProtoBrick\MTProtoClient\Generated\Api\AccountMethods;
 use ProtoBrick\MTProtoClient\Generated\Api\AuthMethods;
@@ -42,13 +27,38 @@ use ProtoBrick\MTProtoClient\Generated\Api\StoriesMethods;
 use ProtoBrick\MTProtoClient\Generated\Api\UpdatesMethods;
 use ProtoBrick\MTProtoClient\Generated\Api\UploadMethods;
 use ProtoBrick\MTProtoClient\Generated\Api\UsersMethods;
-use ProtoBrick\MTProtoClient\System\Process\SignalHandler;
-use Psr\Log\LoggerInterface;
-use Revolt\EventLoop;
-
-use function Amp\async;
-
 // #-- API_HANDLERS_USE_END --#
+
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Message;
+use ProtoBrick\MTProtoClient\Logger\ConsoleLogger;
+use ProtoBrick\MTProtoClient\Logger\InternalLogger;
+use ProtoBrick\MTProtoClient\Peer\Storage\FilePeerStorage;
+use ProtoBrick\MTProtoClient\Session\Storage\FileSessionStorage;
+use ProtoBrick\MTProtoClient\System\Process\SignalHandler;
+use ProtoBrick\MTProtoClient\TL\Contracts\MessageUpdateInterface;
+use ProtoBrick\MTProtoClient\TL\TlObject;
+use Psr\Log\LoggerInterface;
+use Amp\DeferredFuture;
+use Amp\Future;
+use Amp\TimeoutCancellation;
+use Closure;
+use ProtoBrick\MTProtoClient\Auth\Authenticator;
+use ProtoBrick\MTProtoClient\Auth\Storage\AuthKeyStorage;
+use ProtoBrick\MTProtoClient\Exception\RpcErrorException;
+use ProtoBrick\MTProtoClient\Generated\Methods\Updates\GetStateRequest;
+use ProtoBrick\MTProtoClient\Generated\Types\Auth\Authorization;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserSelf;
+use ProtoBrick\MTProtoClient\Logger\LogChannel;
+use ProtoBrick\MTProtoClient\Network\ConnectionFactory;
+use ProtoBrick\MTProtoClient\Network\ConnectionManager;
+use ProtoBrick\MTProtoClient\Peer\PeerManager;
+use ProtoBrick\MTProtoClient\Session\Storage\SessionStorage;
+use ProtoBrick\MTProtoClient\TL\RpcRequest;
+use ProtoBrick\MTProtoClient\Transport\Security\Obfuscator;
+use Revolt\EventLoop;
+use Throwable;
+use ProtoBrick\MTProtoClient\Auth\Storage\FileAuthKeyStorage;
+use ProtoBrick\MTProtoClient\Event\MessageContext;
 
 /**
  * Main client class for interacting with the MTProto API.
@@ -104,12 +114,19 @@ class Client
     public readonly UpdatesMethods $updates;
     public readonly UploadMethods $upload;
     public readonly UsersMethods $users;
+
     #-- API_HANDLERS_PROPERTIES_END --#
 
     private ConnectionManager $connectionManager;
 
-    /** @var Closure(object):void|null */
+    /** @var Closure(TlObject):void|null */
     private ?Closure $updateCallback = null;
+    /** @var Closure(MessageContext):void|null */
+    private ?Closure $messageCallback = null;
+    /** @var Closure(MessageContext):void|null */
+    private ?Closure $messageEditCallback = null;
+    /** @var Closure(MessageServiceContext):void|null */
+    private ?Closure $serviceMessageCallback = null;
     private ?DeferredFuture $stopSignal = null;
     private ?string $saveTimerId = null;
 
@@ -143,6 +160,9 @@ class Client
         $this->connectionManager->setOnUpdateHandler(function ($update) {
             if ($this->updateCallback) {
                 ($this->updateCallback)($update);
+            }
+            if ($this->messageCallback || $this->messageEditCallback) {
+                $this->dispatchMessageEvent($update);
             }
         });
 
@@ -178,6 +198,42 @@ class Client
         #-- API_HANDLERS_INIT_END --#
     }
 
+    public static function create(
+        Settings $settings,
+        string $storagePath = './session',
+        ?LoggerInterface $logger = null
+    ): Client {
+        // Ensure storage directory exists
+        if (!is_dir($storagePath)) {
+            mkdir($storagePath, 0777, true);
+        }
+
+        // Initialize persistent storage
+        // Note: FileAuthKeyStorage currently stores only one key.
+        // In the future, it should support storing keys per DC ID (e.g. auth_dc2.key).
+        $authKeyStorage = new FileAuthKeyStorage($storagePath . '/auth.key');
+
+        $peerStorage = new FilePeerStorage($storagePath . '/peers.json');
+        $peerManager = new PeerManager($peerStorage);
+
+        $internalLogger = new InternalLogger(
+            $logger ?? new ConsoleLogger($settings->logger_level),
+            $settings->logger_channels
+        );
+
+        $sessionStorage = new FileSessionStorage($storagePath);
+
+        // We no longer need to manually instantiate Transport, Crypto, Session, etc.
+        // The Client internals (ConnectionManager) handle this based on Settings.
+        return new self(
+            $settings,
+            $authKeyStorage,
+            $peerManager,
+            $sessionStorage,
+            $internalLogger
+        );
+    }
+
     /**
      * Connects to the main Data Center.
      * This method blocks until the connection is established or fails.
@@ -188,6 +244,9 @@ class Client
         $this->connectionManager->getMainConnection()->connect()->await();
     }
 
+    /**
+     * @throws Throwable
+     */
     public function start(): void
     {
         $this->connect();
@@ -198,10 +257,13 @@ class Client
             $users = $this->users->getUsers([new InputUserSelf()]);
             if (!empty($users) && isset($users[0])) {
                 $this->me = $users[0];
-                $this->logger->info("Logged in as: " . ($this->me->username ?? $this->me->id), ['channel' => LogChannel::APP]);
+                $this->logger->info(
+                    "Logged in as: " . ($this->me->username ?? $this->me->id),
+                    ['channel' => LogChannel::APP]
+                );
             }
             $this->updates->getState();
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->logger->error("Startup sync failed: " . $e->getMessage(), ['channel' => LogChannel::APP]);
             throw $e;
         }
@@ -215,7 +277,8 @@ class Client
         $signalHandler = new SignalHandler();
 
         $signalHandler->onShutdown(function () {
-            $this->logger->info("Received stop signal. Initiating graceful shutdown...", ['channel' => LogChannel::APP]);
+            $this->logger->info("Received stop signal. Initiating graceful shutdown...", ['channel' => LogChannel::APP]
+            );
             $this->stop();
         });
 
@@ -224,13 +287,20 @@ class Client
 
         if (PHP_OS_FAMILY === 'Windows') {
             //fix graceful shutdown
-            EventLoop::repeat(0.5, static function () {});
+            EventLoop::repeat(0.5, static function () {
+            });
         }
 
-        $this->logger->info("Client started. Event loop driver: {$driverName}. Press Ctrl+C to stop.", ['channel' => LogChannel::APP]);
+        $this->logger->info(
+            "Client started. Event loop driver: {$driverName}. Press Ctrl+C to stop.",
+            ['channel' => LogChannel::APP]
+        );
 
         if ($driverName !== 'UvDriver') {
-            $this->logger->notice("Suggestion: Install 'ext-uv' for better performance in production", ['channel' => LogChannel::APP]);
+            $this->logger->notice(
+                "Suggestion: Install 'ext-uv' for better performance in production",
+                ['channel' => LogChannel::APP]
+            );
         }
 
         if ($this->stopSignal) {
@@ -264,12 +334,74 @@ class Client
         }
     }
 
+    /**
+     * Easy Mode: Subscribe to new messages only.
+     * Automatically handles ShortMessage, NewMessage, and ChannelMessage wrappers.
+     *
+     * @param callable(Message):void $callback
+     */
+    public function onMessage(callable $callback): void
+    {
+        $this->messageCallback = $callback(...);
+    }
+
+    /**
+     * Subscribe to message edits.
+     * Triggers when a message is edited in private chats, groups, or channels.
+     *
+     * @param callable(Message):void $callback
+     */
+    public function onMessageEdit(callable $callback): void
+    {
+        $this->messageEditCallback = $callback(...);
+    }
+
+    public function onServiceMessage(callable $callback): void
+    {
+        $this->serviceMessageCallback = $callback(...);
+    }
+
+    private function dispatchMessageEvent(object $update): void
+    {
+        // 1. Проверяем, реализует ли апдейт наш контракт "MessageUpdate"
+        if ($update instanceof MessageUpdateInterface) {
+            $abstractMessage = $update->toFullMessage($this->me?->id ?? 0);
+
+            if ($abstractMessage instanceof MessageService) {
+                if ($this->serviceMessageCallback) {
+                    ($this->serviceMessageCallback)($abstractMessage);
+                }
+            }
+            // 3. Отсекаем сервисные сообщения (вступление в группу, пин сообщения и т.д.)
+            // Нам нужны только обычные (текст/медиа).
+            // Если тебе нужны и сервисные, убери эту проверку или сделай отдельный коллбэк.
+            if (!($abstractMessage instanceof Message)) {
+                return;
+            }
+
+            // 4. Маршрутизация (Новое или Правка)
+            $ctx = new MessageContext($this, $abstractMessage);
+
+            if ($update->isEdit()) {
+                if ($this->messageEditCallback) {
+                    ($this->messageEditCallback)($ctx);
+                }
+            } else {
+                if ($this->messageCallback) {
+                    ($this->messageCallback)($ctx);
+                }
+            }
+        }
+    }
+
     private function startPeriodicSave(): void
     {
-        if ($this->saveTimerId) return;
+        if ($this->saveTimerId) {
+            return;
+        }
 
         // Сохраняем каждые 10 секунд (можно реже)
-        $this->saveTimerId = EventLoop::repeat(30, function() {
+        $this->saveTimerId = EventLoop::repeat(30, function () {
             $this->saveSession();
         });
     }
@@ -283,7 +415,8 @@ class Client
             $state = $conn->getSessionState();
             $this->sessionStorage->setFor($conn->authKey->id, $state->toArray());
             $this->logger->debug('Сохранил сессию', ['channel' => LogChannel::STORAGE]);
-        } catch (\Throwable $e) {}
+        } catch (Throwable $e) {
+        }
     }
 
     /**
@@ -325,5 +458,64 @@ class Client
     public function onUpdate(callable $callback): void
     {
         $this->updateCallback = $callback(...);
+    }
+
+    /**
+     * Performs an interactive login.
+     * If arguments are missing, prompts the user via CLI (STDIN).
+     *
+     * @param string|null $phoneNumber Phone number in international format (e.g. "+1234567890").
+     * @param callable|null $codeProvider Optional custom code provider. Defaults to reading from STDIN.
+     * @param callable|null $passwordProvider Optional 2FA password provider. Defaults to reading from STDIN.
+     * @param callable|null $signupProvider Optional registration provider. Defaults to reading First/Last name from STDIN.
+     * @throws RpcErrorException
+     */
+    public function login(
+        ?string $phoneNumber = null,
+        ?callable $codeProvider = null,
+        ?callable $passwordProvider = null,
+        ?callable $signupProvider = null
+    ): Authorization {
+        $this->connect();
+
+        if ($phoneNumber === null) {
+            echo "Enter phone number: ";
+            $input = fgets(STDIN);
+            if ($input === false) {
+                throw new \RuntimeException("Failed to read input");
+            }
+            $phoneNumber = trim($input);
+            if ($phoneNumber === '') {
+                throw new \InvalidArgumentException("Phone number cannot be empty");
+            }
+        }
+
+        $codeProvider ??= static function (): string {
+            echo "Enter code: ";
+            $line = fgets(STDIN);
+            return $line ? trim($line) : '';
+        };
+
+        $passwordProvider ??= static function (): string {
+            echo "Enter 2FA password: ";
+            $line = fgets(STDIN);
+            return $line ? trim($line) : '';
+        };
+
+        $signupProvider ??= static function (): array {
+            echo "Account not found. Registration required.\n";
+            echo "Enter First Name: ";
+            $first = trim((string)fgets(STDIN));
+            echo "Enter Last Name (optional): ";
+            $last = trim((string)fgets(STDIN));
+            return [$first, $last];
+        };
+
+        return (new Authenticator($this))->login(
+            $phoneNumber,
+            $codeProvider,
+            $passwordProvider,
+            $signupProvider
+        );
     }
 }

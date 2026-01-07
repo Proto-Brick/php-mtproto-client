@@ -14,6 +14,7 @@ class ApiGenerator
     private const OUTPUT_DIR = __DIR__ . '/../src/Generated/Api';
     private const BASE_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Api';
     private const GENERATED_METHODS_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Methods';
+    private const TYPES_BASE_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Types\\Base';
     private const CLIENT_FQN = Client::class;
 
     private const PEER_TYPES_TO_RESOLVE = [
@@ -105,10 +106,15 @@ class ApiGenerator
 
             $apiMethodParams = $this->buildApiMethodParams($method['params'], $className);
             $paramDefs = $apiMethodParams['definitions'];
+
+            // ВЕРНУЛИСЬ К СТАНДАРТНОМУ ВАРИАНТУ:
+            // Берем строку аргументов, которую сформировал buildApiMethodParams
             $paramVarsStr = $apiMethodParams['call_vars'];
+
             $paramDocs = $apiMethodParams['param_docs'];
 
-            $resolveCodeBlock = $this->generateResolveBlock($method['params']);
+            $resolveCodeBlock = $this->generateResolveBlock($method['params'], $className);
+            $randomIdCodeBlock = $this->generateRandomIdBlock($method['params']);
 
             $returnTypeInfo = $this->resolvePhpTypeInfo($method['type'], $className, null);
 
@@ -134,13 +140,12 @@ class ApiGenerator
             if ($returnTypeInfo['native_type'] === 'bool') $call = "(bool) {$call}";
             if ($returnTypeInfo['native_type'] === 'int') $call = "(int) {$call}";
 
-            // Убираем `?` из нативного типа для возвращаемого значения, так как callSync вернет null или объект
             $nativeReturnType = $returnTypeInfo['native_type'];
 
             $methodsContent[] = $phpdoc . <<<PHP
                 public function {$methodName}({$paramDefs}): {$nativeReturnType}
                 {
-            {$resolveCodeBlock}        return {$call};
+            {$resolveCodeBlock}{$randomIdCodeBlock}        return {$call};
                 }
             PHP;
         }
@@ -177,8 +182,15 @@ class ApiGenerator
 
         $requiredParams = [];
         $optionalParams = [];
+
+        // Сортировка: обязательные -> опциональные (random_id всегда опциональный)
         foreach ($params as $param) {
             if ($param['type'] === '#') continue;
+
+            if ($param['name'] === 'random_id') {
+                $optionalParams[] = $param;
+                continue;
+            }
             if (str_contains($param['type'], '?')) {
                 $optionalParams[] = $param;
             } else {
@@ -189,11 +201,21 @@ class ApiGenerator
 
         foreach ($sortedParams as $param) {
             $paramName = $this->sanitizeParamName($param['name']);
-            $callVars[] = '$' . $paramName;
+
+            // --- ГЛАВНОЕ ИЗМЕНЕНИЕ: ИМЕНОВАННЫЕ АРГУМЕНТЫ ---
+            // Генерируем строку вида "paramName: $paramName"
+            $callVars[] = "{$paramName}: \${$paramName}";
+            // -----------------------------------------------
 
             $originalTlType = $param['type'];
-            $isConditional = str_contains($originalTlType, '?');
-            $actualType = $isConditional ? explode('?', $originalTlType)[1] : $originalTlType;
+
+            // Безопасное определение типа
+            $parts = explode('?', $originalTlType);
+            $actualType = count($parts) > 1 ? $parts[1] : $originalTlType;
+            $isConditionalInSchema = count($parts) > 1;
+
+            $isConditional = $isConditionalInSchema || $param['name'] === 'random_id';
+
             if ($actualType === 'true' || $actualType === 'Bool') $actualType = 'bool';
 
             $typeInfo = $this->resolvePhpTypeInfo($actualType, $currentClassName, null);
@@ -204,36 +226,26 @@ class ApiGenerator
             $isPeerType = $this->isInputPeerType($actualType);
 
             if ($isPeerType) {
-                // 1. Очищаем тип от '?' и '|null', полученных из resolvePhpTypeInfo
-                // Это гарантирует, что мы начинаем с чистого имени класса (напр. "AbstractInputPeer")
                 $cleanType = str_replace(['?', '|null'], '', $nativeType);
                 $cleanDocType = str_replace(['|null'], '', $docType);
-
-                // 2. Строим Union Type
                 $nativeType = $cleanType . '|string|int';
                 $docType = $cleanDocType . '|string|int';
 
-                // 3. Явно добавляем null, если параметр опциональный
                 if ($isConditional) {
                     $nativeType .= '|null';
                     $docType .= '|null';
                 }
             } else {
-                // Стандартная логика для не-пиров
                 if ($isConditional) {
-                    // Если тип уже nullable (объект или union), то |null в phpdoc уже есть.
                     if (!str_contains($docType, 'null')) {
                         $docType .= '|null';
                     }
-                    // Нативный тип тоже делаем nullable, если это не Union Type (в PHP < 8.2 нельзя ?A|B)
-                    // Но если это простой объект, добавляем ?
                     if (!str_starts_with($nativeType, '?') && !str_contains($nativeType, '|')) {
                         $nativeType = '?' . $nativeType;
                     } elseif (str_contains($nativeType, '|') && !str_contains($nativeType, 'null')) {
                         $nativeType .= '|null';
                     }
                 } else {
-                    // Убираем nullable из документации и тайп-хинта, если поле обязательное
                     $docType = str_replace('|null', '', $docType);
                     $nativeType = str_replace(['?', '|null'], '', $nativeType);
                 }
@@ -250,9 +262,27 @@ class ApiGenerator
 
         return [
             'definitions' => implode(', ', $definitions),
-            'call_vars' => implode(', ', $callVars),
+            'call_vars' => implode(', ', $callVars), // Здесь они склеятся в одну строку через запятую
             'param_docs' => $paramDocs,
         ];
+    }
+
+    private function generateRandomIdBlock(array $params): string
+    {
+        $code = "";
+        foreach ($params as $param) {
+            if ($param['name'] === 'random_id') {
+                $varName = '$' . $this->sanitizeParamName($param['name']);
+
+                $code .= <<<PHP
+        if ({$varName} === null) {
+            {$varName} = random_int(0, 9223372036854775807);
+        }
+
+PHP;
+            }
+        }
+        return $code;
     }
 
     private function isInputPeerType(string $type): bool
@@ -263,24 +293,63 @@ class ApiGenerator
     /**
      * Генерирует PHP-код для автоматического резолвинга пиров.
      */
-    private function generateResolveBlock(array $params): string
+    private function generateResolveBlock(array $params, string $currentClassName): string
     {
         $code = "";
         foreach ($params as $param) {
             if ($param['type'] === '#') continue;
 
-            $originalType = $param['type'];
-            $actualType = str_contains($originalType, '?') ? explode('?', $originalType)[1] : $originalType;
+            $parts = explode('?', $param['type']);
+            $actualType = count($parts) > 1 ? $parts[1] : $param['type'];
 
             if ($this->isInputPeerType($actualType)) {
                 $varName = '$' . $this->sanitizeParamName($param['name']);
 
-                $code .= <<<PHP
+                // Проверяем, нужна ли конвертация типа
+                $needsConversion = ($actualType === 'InputChannel' || $actualType === 'InputUser');
+
+                if ($needsConversion) {
+                    // --- ЛОГИКА С КОНВЕРТАЦИЕЙ (используем $__tmpPeer) ---
+                    $code .= <<<PHP
+        if (is_string({$varName}) || is_int({$varName})) {
+            \$__tmpPeer = \$this->client->peerManager->resolve({$varName});
+
+PHP;
+                    if ($actualType === 'InputChannel') {
+                        $peerChannelClass = $this->registerUse(self::TYPES_BASE_NAMESPACE . '\\InputPeerChannel', $currentClassName, null);
+                        $inputChannelClass = $this->registerUse(self::TYPES_BASE_NAMESPACE . '\\InputChannel', $currentClassName, null);
+                        $code .= <<<PHP
+            if (\$__tmpPeer instanceof {$peerChannelClass}) {
+                {$varName} = new {$inputChannelClass}(channelId: \$__tmpPeer->channelId, accessHash: \$__tmpPeer->accessHash);
+            } else {
+                {$varName} = \$__tmpPeer;
+            }
+        }
+
+PHP;
+                    } elseif ($actualType === 'InputUser') {
+                        $peerUserClass = $this->registerUse(self::TYPES_BASE_NAMESPACE . '\\InputPeerUser', $currentClassName, null);
+                        $inputUserClass = $this->registerUse(self::TYPES_BASE_NAMESPACE . '\\InputUser', $currentClassName, null);
+                        $code .= <<<PHP
+            if (\$__tmpPeer instanceof {$peerUserClass}) {
+                {$varName} = new {$inputUserClass}(userId: \$__tmpPeer->userId, accessHash: \$__tmpPeer->accessHash);
+            } else {
+                {$varName} = \$__tmpPeer;
+            }
+        }
+
+PHP;
+                    }
+                } else {
+                    // --- ЛОГИКА БЕЗ КОНВЕРТАЦИИ (Чистая) ---
+                    // Сразу присваиваем в переменную аргумента
+                    $code .= <<<PHP
         if (is_string({$varName}) || is_int({$varName})) {
             {$varName} = \$this->client->peerManager->resolve({$varName});
         }
 
 PHP;
+                }
             }
         }
         return $code;

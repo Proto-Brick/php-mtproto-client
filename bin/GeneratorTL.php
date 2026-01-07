@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Message;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PeerChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PeerUser;
+use ProtoBrick\MTProtoClient\TL\Contracts\MessageUpdateInterface;
 use ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity;
 use ProtoBrick\MTProtoClient\TL\Deserializer;
 use ProtoBrick\MTProtoClient\TL\Serializer;
@@ -40,6 +44,7 @@ class GeneratorTL
     private const GENERATED_METHODS_NAMESPACE = self::BASE_NAMESPACE . '\\Methods';
     private const TL_OBJECT_FQN = TlObject::class;
     private const RPC_REQUEST_FQN = RpcRequest::class;
+    private const MESSAGE_UPDATE_CONTRACT_FQN = MessageUpdateInterface::class;
 
     private array $schema;
     public array $abstractTypes = [];
@@ -612,6 +617,99 @@ PHP;
         $extraMethods = '';
 
         if (!$isMethod) {
+            $messagePredicates = [
+                'updateNewMessage' => false,
+                'updateNewChannelMessage' => false,
+                'updateShortMessage' => false,
+                'updateShortChatMessage' => false,
+
+                // Редактирование
+                'updateEditMessage' => true,
+                'updateEditChannelMessage' => true,
+            ];
+
+            if (isset($messagePredicates[$predicate])) {
+                $isEdit = $messagePredicates[$predicate];
+
+                // 1. Добавляем интерфейс
+                $implements[] = $this->registerUse(self::MESSAGE_UPDATE_CONTRACT_FQN, $className, $parentFqcn);
+                // Нам нужен класс Message для возвращаемого типа
+                $this->registerUse(Message::class, $className, $parentFqcn);
+
+                // Для сложных конвертаций нужны PeerUser/PeerChat
+                if (in_array($predicate, ['updateShortMessage', 'updateShortChatMessage'])) {
+                    $this->registerUse(PeerUser::class, $className, $parentFqcn);
+                    $this->registerUse(PeerChat::class, $className, $parentFqcn);
+                }
+
+                // 2. Генерируем метод isEdit()
+                $isEditBool = $isEdit ? 'true' : 'false';
+                $extraMethods .= <<<PHP
+
+    public function isEdit(): bool
+    {
+        return {$isEditBool};
+    }
+PHP;
+
+                // 3. Генерируем метод toFullMessage()
+                // Логика зависит от типа апдейта
+                $toFullBody = '';
+
+                if (in_array($predicate, ['updateNewMessage', 'updateNewChannelMessage', 'updateEditMessage', 'updateEditChannelMessage'])) {
+                    // Простой случай: сообщение уже внутри
+                    $toFullBody = "return \$this->message;";
+                }
+                elseif ($predicate === 'updateShortMessage') {
+                    $toFullBody = <<<BODY
+return new Message(
+            id: \$this->id,
+            peerId: new PeerUser(\$this->userId), // Всегда собеседник
+            date: \$this->date,
+            message: \$this->message,
+            out: \$this->out,
+            mentioned: \$this->mentioned,
+            mediaUnread: \$this->mediaUnread,
+            silent: \$this->silent,
+            fromId: new PeerUser(\$this->out ? \$selfId : \$this->userId), // Кто отправил
+            fwdFrom: \$this->fwdFrom,
+            viaBotId: \$this->viaBotId,
+            replyTo: \$this->replyTo,
+            entities: \$this->entities,
+            ttlPeriod: \$this->ttlPeriod
+        );
+BODY;
+                }
+                elseif ($predicate === 'updateShortChatMessage') {
+                    $toFullBody = <<<BODY
+return new Message(
+            id: \$this->id,
+            peerId: new PeerChat(\$this->chatId),
+            date: \$this->date,
+            message: \$this->message,
+            out: \$this->out,
+            mentioned: \$this->mentioned,
+            mediaUnread: \$this->mediaUnread,
+            silent: \$this->silent,
+            fromId: new PeerUser(\$this->fromId),
+            fwdFrom: \$this->fwdFrom,
+            viaBotId: \$this->viaBotId,
+            replyTo: \$this->replyTo,
+            entities: \$this->entities,
+            ttlPeriod: \$this->ttlPeriod
+        );
+BODY;
+                }
+
+                $extraMethods .= <<<PHP
+
+    public function toFullMessage(int \$selfId): AbstractMessage
+    {
+        {$toFullBody}
+    }
+PHP;
+            }
+
             // Проверяем, нужно ли добавлять PeerEntity
             if ($this->shouldImplementPeerEntity($predicate, $item['params'])) {
                 $this->registerUse(\ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity::class, $className, $parentFqcn);
@@ -635,6 +733,27 @@ PHP;
     }
 PHP;
             }
+
+            // --- ДОБАВЛЕНО: Реализация getId() для наследников Peer ---
+            if ($parentType === 'Peer') {
+                $idField = match($predicate) {
+                    'peerUser' => 'userId',
+                    'peerChat' => 'chatId',
+                    'peerChannel' => 'channelId',
+                    default => null
+                };
+
+                if ($idField) {
+                    $extraMethods .= <<<PHP
+
+    public function getId(): int
+    {
+        return \$this->{$idField};
+    }
+PHP;
+                }
+            }
+            // -----------------------------------------------------------
         }
 
         if (!empty($implements)) {

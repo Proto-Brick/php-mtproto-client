@@ -64,7 +64,7 @@ class PeerManager
                     $this->client->contacts->resolveUsername($username);
                     $info = $this->storage->getByUsername($username);
                 } catch (\Throwable $e) {
-                    // Игнорируем ошибки резолвинга
+                    //echo "\n[DEBUG] Resolve error: " . $e->getMessage() . "\n";
                 }
             }
         }

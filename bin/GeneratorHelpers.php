@@ -840,6 +840,11 @@ trait GeneratorHelpers
         // Собираем ЕДИНСТВЕННЫЙ use-блок для всего файла
         $useBlock = $this->buildUseBlock($dependencies, $fullNamespace, null);
 
+        $extraAbstractMethods = '';
+        if ($abstractType === 'Peer') {
+            $extraAbstractMethods = "\n    abstract public function getId(): int;\n";
+        }
+
         $body = <<<PHP
     public static function deserialize(string \$__payload, int &\$__offset): static
     {
@@ -850,6 +855,7 @@ trait GeneratorHelpers
 {$cases}
         };
     }
+{$extraAbstractMethods}
 PHP;
 
         return <<<PHP

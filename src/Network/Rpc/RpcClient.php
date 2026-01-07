@@ -79,12 +79,6 @@ class RpcClient
         $isService = str_contains($methodName, 'ping') || str_contains($methodName, 'ack');
         $channel = $isService ? LogChannel::SERVICE : LogChannel::RPC;
 
-        $this->logger->debug("→ (sending) " . $methodName, [
-            'channel' => $channel,
-            'out' => strlen($payload) . 'B',
-            'dc' => $this->connection->dcId,
-        ]);
-
         async(function () use ($payload, $request, $deferred, $trace, $timeout, $isContextRelated) {
             try {
                 /** @var array{0: int, 1: float} $result */
@@ -215,6 +209,17 @@ class RpcClient
             $tDeserStart = hrtime(true);
             $result = $this->deserializeResponse($request, $rawBody);
             $trace->des = (hrtime(true) - $tDeserStart) / 1e+6;
+
+            if (is_object($result) || is_array($result)) {
+                try {
+                    $this->getPeerManager()->collect($result);
+                } catch (\Throwable $e) {
+                    $this->logger->warning("Auto-collect failed", [
+                        'channel' => LogChannel::PEER,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
 
             $stats = $trace->finish();
             $totalCpu = $stats['ser'] + $stats['enc'] + $stats['dec'] + $stats['des'];
