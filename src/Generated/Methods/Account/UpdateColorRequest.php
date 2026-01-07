@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace ProtoBrick\MTProtoClient\Generated\Methods\Account;
 
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractPeerColor;
 use ProtoBrick\MTProtoClient\TL\RpcRequest;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 
@@ -9,7 +10,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class UpdateColorRequest extends RpcRequest
 {
-    public const CONSTRUCTOR_ID = 0x7cefa15d;
+    public const CONSTRUCTOR_ID = 0x684d214e;
     
     public string $predicate = 'account.updateColor';
     
@@ -24,13 +25,11 @@ final class UpdateColorRequest extends RpcRequest
     }
     /**
      * @param true|null $forProfile
-     * @param int|null $color
-     * @param int|null $backgroundEmojiId
+     * @param AbstractPeerColor|null $color
      */
     public function __construct(
         public readonly ?true $forProfile = null,
-        public readonly ?int $color = null,
-        public readonly ?int $backgroundEmojiId = null
+        public readonly ?AbstractPeerColor $color = null
     ) {}
     
     public function serialize(): string
@@ -43,15 +42,9 @@ final class UpdateColorRequest extends RpcRequest
         if ($this->color !== null) {
             $flags |= (1 << 2);
         }
-        if ($this->backgroundEmojiId !== null) {
-            $flags |= (1 << 0);
-        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 2)) {
-            $buffer .= Serializer::int32($this->color);
-        }
-        if ($flags & (1 << 0)) {
-            $buffer .= Serializer::int64($this->backgroundEmojiId);
+            $buffer .= $this->color->serialize();
         }
         return $buffer;
     }

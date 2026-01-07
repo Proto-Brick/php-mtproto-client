@@ -18,7 +18,7 @@ abstract class AbstractMessage extends TlObject
         
         return match ($constructorId) {
             0x90a6ca84 => MessageEmpty::deserialize($__payload, $__offset),
-            0x9815cec8 => Message::deserialize($__payload, $__offset),
+            0xb92f76cf => Message::deserialize($__payload, $__offset),
             0x7a800e0a => MessageService::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type Message. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };

@@ -26,7 +26,7 @@ final class SponsoredMessage extends TlObject
      * @param list<AbstractMessageEntity>|null $entities
      * @param AbstractPhoto|null $photo
      * @param AbstractMessageMedia|null $media
-     * @param PeerColor|null $color
+     * @param AbstractPeerColor|null $color
      * @param string|null $sponsorInfo
      * @param string|null $additionalInfo
      * @param int|null $minDisplayDuration
@@ -43,7 +43,7 @@ final class SponsoredMessage extends TlObject
         public readonly ?array $entities = null,
         public readonly ?AbstractPhoto $photo = null,
         public readonly ?AbstractMessageMedia $media = null,
-        public readonly ?PeerColor $color = null,
+        public readonly ?AbstractPeerColor $color = null,
         public readonly ?string $sponsorInfo = null,
         public readonly ?string $additionalInfo = null,
         public readonly ?int $minDisplayDuration = null,
@@ -132,7 +132,7 @@ final class SponsoredMessage extends TlObject
         $entities = (($flags & (1 << 1)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessageEntity::class, 'deserialize']) : null;
         $photo = (($flags & (1 << 6)) !== 0) ? AbstractPhoto::deserialize($__payload, $__offset) : null;
         $media = (($flags & (1 << 14)) !== 0) ? AbstractMessageMedia::deserialize($__payload, $__offset) : null;
-        $color = (($flags & (1 << 13)) !== 0) ? PeerColor::deserialize($__payload, $__offset) : null;
+        $color = (($flags & (1 << 13)) !== 0) ? AbstractPeerColor::deserialize($__payload, $__offset) : null;
         $buttonText = Deserializer::bytes($__payload, $__offset);
         $sponsorInfo = (($flags & (1 << 7)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
         $additionalInfo = (($flags & (1 << 8)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;

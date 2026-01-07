@@ -18,7 +18,7 @@ abstract class AbstractGroupCall extends TlObject
         
         return match ($constructorId) {
             0x7780bcb4 => GroupCallDiscarded::deserialize($__payload, $__offset),
-            0x553b0ba1 => GroupCall::deserialize($__payload, $__offset),
+            0xefb2b617 => GroupCall::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type GroupCall. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

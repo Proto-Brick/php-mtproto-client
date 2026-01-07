@@ -10,7 +10,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class User extends AbstractUser implements PeerEntity
 {
-    public const CONSTRUCTOR_ID = 0x20b1422;
+    public const CONSTRUCTOR_ID = 0x31774388;
     
     public string $predicate = 'user';
     
@@ -45,6 +45,7 @@ final class User extends AbstractUser implements PeerEntity
      * @param true|null $contactRequirePremium
      * @param true|null $botBusiness
      * @param true|null $botHasMainApp
+     * @param true|null $botForumView
      * @param int|null $accessHash
      * @param string|null $firstName
      * @param string|null $lastName
@@ -58,9 +59,9 @@ final class User extends AbstractUser implements PeerEntity
      * @param string|null $langCode
      * @param AbstractEmojiStatus|null $emojiStatus
      * @param list<Username>|null $usernames
-     * @param int|null $storiesMaxId
-     * @param PeerColor|null $color
-     * @param PeerColor|null $profileColor
+     * @param RecentStory|null $storiesMaxId
+     * @param AbstractPeerColor|null $color
+     * @param AbstractPeerColor|null $profileColor
      * @param int|null $botActiveUsers
      * @param int|null $botVerificationIcon
      * @param int|null $sendPaidMessagesStars
@@ -92,6 +93,7 @@ final class User extends AbstractUser implements PeerEntity
         public readonly ?true $contactRequirePremium = null,
         public readonly ?true $botBusiness = null,
         public readonly ?true $botHasMainApp = null,
+        public readonly ?true $botForumView = null,
         public readonly ?int $accessHash = null,
         public readonly ?string $firstName = null,
         public readonly ?string $lastName = null,
@@ -105,9 +107,9 @@ final class User extends AbstractUser implements PeerEntity
         public readonly ?string $langCode = null,
         public readonly ?AbstractEmojiStatus $emojiStatus = null,
         public readonly ?array $usernames = null,
-        public readonly ?int $storiesMaxId = null,
-        public readonly ?PeerColor $color = null,
-        public readonly ?PeerColor $profileColor = null,
+        public readonly ?RecentStory $storiesMaxId = null,
+        public readonly ?AbstractPeerColor $color = null,
+        public readonly ?AbstractPeerColor $profileColor = null,
         public readonly ?int $botActiveUsers = null,
         public readonly ?int $botVerificationIcon = null,
         public readonly ?int $sendPaidMessagesStars = null
@@ -192,6 +194,9 @@ final class User extends AbstractUser implements PeerEntity
         }
         if ($this->botHasMainApp) {
             $flags2 |= (1 << 13);
+        }
+        if ($this->botForumView) {
+            $flags2 |= (1 << 16);
         }
         if ($this->accessHash !== null) {
             $flags |= (1 << 0);
@@ -293,7 +298,7 @@ final class User extends AbstractUser implements PeerEntity
             $buffer .= Serializer::vectorOfObjects($this->usernames);
         }
         if ($flags2 & (1 << 5)) {
-            $buffer .= Serializer::int32($this->storiesMaxId);
+            $buffer .= $this->storiesMaxId->serialize();
         }
         if ($flags2 & (1 << 8)) {
             $buffer .= $this->color->serialize();
@@ -342,6 +347,7 @@ final class User extends AbstractUser implements PeerEntity
         $contactRequirePremium = (($flags2 & (1 << 10)) !== 0) ? true : null;
         $botBusiness = (($flags2 & (1 << 11)) !== 0) ? true : null;
         $botHasMainApp = (($flags2 & (1 << 13)) !== 0) ? true : null;
+        $botForumView = (($flags2 & (1 << 16)) !== 0) ? true : null;
         $id = Deserializer::int64($__payload, $__offset);
         $accessHash = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
         $firstName = (($flags & (1 << 1)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
@@ -356,9 +362,9 @@ final class User extends AbstractUser implements PeerEntity
         $langCode = (($flags & (1 << 22)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
         $emojiStatus = (($flags & (1 << 30)) !== 0) ? AbstractEmojiStatus::deserialize($__payload, $__offset) : null;
         $usernames = (($flags2 & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [Username::class, 'deserialize']) : null;
-        $storiesMaxId = (($flags2 & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
-        $color = (($flags2 & (1 << 8)) !== 0) ? PeerColor::deserialize($__payload, $__offset) : null;
-        $profileColor = (($flags2 & (1 << 9)) !== 0) ? PeerColor::deserialize($__payload, $__offset) : null;
+        $storiesMaxId = (($flags2 & (1 << 5)) !== 0) ? RecentStory::deserialize($__payload, $__offset) : null;
+        $color = (($flags2 & (1 << 8)) !== 0) ? AbstractPeerColor::deserialize($__payload, $__offset) : null;
+        $profileColor = (($flags2 & (1 << 9)) !== 0) ? AbstractPeerColor::deserialize($__payload, $__offset) : null;
         $botActiveUsers = (($flags2 & (1 << 12)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $botVerificationIcon = (($flags2 & (1 << 14)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
         $sendPaidMessagesStars = (($flags2 & (1 << 15)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
@@ -390,6 +396,7 @@ final class User extends AbstractUser implements PeerEntity
             $contactRequirePremium,
             $botBusiness,
             $botHasMainApp,
+            $botForumView,
             $accessHash,
             $firstName,
             $lastName,

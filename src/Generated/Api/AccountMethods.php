@@ -16,6 +16,7 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Account\DeclinePasswordResetReque
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\DeleteAccountRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\DeleteAutoSaveExceptionsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\DeleteBusinessChatLinkRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Account\DeletePasskeyRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\DeleteSecureValueRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\DisablePeerConnectedBotRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\EditBusinessChatLinkRequest;
@@ -44,24 +45,29 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetMultiWallPapersRequest
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetNotifyExceptionsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetNotifySettingsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetPaidMessagesRevenueRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetPasskeysRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetPasswordRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetPasswordSettingsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetPrivacyRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetReactionsNotifySettingsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetRecentEmojiStatusesRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetSavedMusicIdsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetSavedRingtonesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetSecureValueRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetThemeRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetThemesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetTmpPasswordRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetUniqueGiftChatThemesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetWallPaperRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetWallPapersRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\GetWebAuthorizationsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Account\InitPasskeyRegistrationRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\InitTakeoutSessionRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\InstallThemeRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\InstallWallPaperRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\InvalidateSignInCodesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\RegisterDeviceRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Account\RegisterPasskeyRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\ReorderUsernamesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\ReportPeerRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\ReportProfilePhotoRequest;
@@ -75,6 +81,7 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Account\ResetWebAuthorizationsReq
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\ResolveBusinessChatLinkRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SaveAutoDownloadSettingsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SaveAutoSaveSettingsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Account\SaveMusicRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SaveRingtoneRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SaveSecureValueRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SaveThemeRequest;
@@ -88,6 +95,7 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Account\SetAuthorizationTTLReques
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SetContactSignUpNotificationRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SetContentSettingsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SetGlobalPrivacySettingsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Account\SetMainProfileTabRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SetPrivacyRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\SetReactionsNotifySettingsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\ToggleConnectedBotPausedRequest;
@@ -117,9 +125,11 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Account\UploadThemeRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\UploadWallPaperRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\VerifyEmailRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\VerifyPhoneRequest;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\AbstractChatThemes;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\AbstractEmailVerified;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\AbstractEmojiStatuses;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\AbstractResetPasswordResult;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\AbstractSavedMusicIds;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\AbstractSavedRingtone;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\AbstractSavedRingtones;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\AbstractThemes;
@@ -129,6 +139,8 @@ use ProtoBrick\MTProtoClient\Generated\Types\Account\Authorizations;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\AutoDownloadSettings;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\AutoSaveSettings;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\BusinessChatLinks;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\ChatThemes;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\ChatThemesNotModified;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\ConnectedBots;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\ContentSettings;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\EmailVerified;
@@ -136,6 +148,8 @@ use ProtoBrick\MTProtoClient\Generated\Types\Account\EmailVerifiedLogin;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\EmojiStatuses;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\EmojiStatusesNotModified;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\PaidMessagesRevenue;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\PasskeyRegistrationOptions;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\Passkeys;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\Password;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\PasswordInputSettings;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\PasswordSettings;
@@ -144,6 +158,8 @@ use ProtoBrick\MTProtoClient\Generated\Types\Account\ResetPasswordFailedWait;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\ResetPasswordOk;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\ResetPasswordRequestedWait;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\ResolvedBusinessChatLinks;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\SavedMusicIds;
+use ProtoBrick\MTProtoClient\Generated\Types\Account\SavedMusicIdsNotModified;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\SavedRingtone;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\SavedRingtoneConverted;
 use ProtoBrick\MTProtoClient\Generated\Types\Account\SavedRingtones;
@@ -177,6 +193,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPrivacyRule;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputTheme;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputWallPaper;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractPeerColor;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractWallPaper;
@@ -226,9 +243,11 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\InputNotifyChats;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputNotifyForumTopic;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputNotifyPeer;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputNotifyUsers;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPasskeyCredential;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerChannel;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerChannelFromMessage;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerColorCollectible;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerEmpty;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerNotifySettings;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerSelf;
@@ -260,7 +279,11 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserSelf;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputWallPaper;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputWallPaperNoFile;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputWallPaperSlug;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\Passkey;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PeerColor;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\PeerColorCollectible;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\PeerNotifySettings;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ProfileTab;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\ReactionsNotifySettings;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\ReportReason;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\SecureCredentialsEncrypted;
@@ -1331,15 +1354,14 @@ final readonly class AccountMethods
 
     /**
      * @param bool|null $forProfile
-     * @param int|null $color
-     * @param int|null $backgroundEmojiId
+     * @param PeerColor|PeerColorCollectible|InputPeerColorCollectible|null $color
      * @return bool
      * @see https://core.telegram.org/method/account.updateColor
      * @api
      */
-    public function updateColor(?bool $forProfile = null, ?int $color = null, ?int $backgroundEmojiId = null): bool
+    public function updateColor(?bool $forProfile = null, ?AbstractPeerColor $color = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateColorRequest(forProfile: $forProfile, color: $color, backgroundEmojiId: $backgroundEmojiId));
+        return (bool) $this->client->callSync(new UpdateColorRequest(forProfile: $forProfile, color: $color));
     }
 
     /**
@@ -1677,5 +1699,95 @@ final readonly class AccountMethods
             }
         }
         return (bool) $this->client->callSync(new ToggleNoPaidMessagesExceptionRequest(userId: $userId, refundCharged: $refundCharged, requirePayment: $requirePayment, parentPeer: $parentPeer));
+    }
+
+    /**
+     * @param ProfileTab $tab
+     * @return bool
+     * @see https://core.telegram.org/method/account.setMainProfileTab
+     * @api
+     */
+    public function setMainProfileTab(ProfileTab $tab): bool
+    {
+        return (bool) $this->client->callSync(new SetMainProfileTabRequest(tab: $tab));
+    }
+
+    /**
+     * @param InputDocumentEmpty|InputDocument $id
+     * @param bool|null $unsave
+     * @param InputDocumentEmpty|InputDocument|null $afterId
+     * @return bool
+     * @see https://core.telegram.org/method/account.saveMusic
+     * @api
+     */
+    public function saveMusic(AbstractInputDocument $id, ?bool $unsave = null, ?AbstractInputDocument $afterId = null): bool
+    {
+        return (bool) $this->client->callSync(new SaveMusicRequest(id: $id, unsave: $unsave, afterId: $afterId));
+    }
+
+    /**
+     * @param int $hash
+     * @return SavedMusicIdsNotModified|SavedMusicIds|null
+     * @see https://core.telegram.org/method/account.getSavedMusicIds
+     * @api
+     */
+    public function getSavedMusicIds(int $hash): ?AbstractSavedMusicIds
+    {
+        return $this->client->callSync(new GetSavedMusicIdsRequest(hash: $hash));
+    }
+
+    /**
+     * @param string $offset
+     * @param int $limit
+     * @param int $hash
+     * @return ChatThemesNotModified|ChatThemes|null
+     * @see https://core.telegram.org/method/account.getUniqueGiftChatThemes
+     * @api
+     */
+    public function getUniqueGiftChatThemes(string $offset, int $limit, int $hash): ?AbstractChatThemes
+    {
+        return $this->client->callSync(new GetUniqueGiftChatThemesRequest(offset: $offset, limit: $limit, hash: $hash));
+    }
+
+    /**
+     * @return PasskeyRegistrationOptions|null
+     * @see https://core.telegram.org/method/account.initPasskeyRegistration
+     * @api
+     */
+    public function initPasskeyRegistration(): ?PasskeyRegistrationOptions
+    {
+        return $this->client->callSync(new InitPasskeyRegistrationRequest());
+    }
+
+    /**
+     * @param InputPasskeyCredential $credential
+     * @return Passkey|null
+     * @see https://core.telegram.org/method/account.registerPasskey
+     * @api
+     */
+    public function registerPasskey(InputPasskeyCredential $credential): ?Passkey
+    {
+        return $this->client->callSync(new RegisterPasskeyRequest(credential: $credential));
+    }
+
+    /**
+     * @return Passkeys|null
+     * @see https://core.telegram.org/method/account.getPasskeys
+     * @api
+     */
+    public function getPasskeys(): ?Passkeys
+    {
+        return $this->client->callSync(new GetPasskeysRequest());
+    }
+
+    /**
+     * @param string $id
+     * @return bool
+     * @see https://core.telegram.org/method/account.deletePasskey
+     * @api
+     */
+    public function deletePasskey(string $id): bool
+    {
+        return (bool) $this->client->callSync(new DeletePasskeyRequest(id: $id));
     }
 }

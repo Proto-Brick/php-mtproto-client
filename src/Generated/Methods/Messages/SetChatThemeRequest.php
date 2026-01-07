@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace ProtoBrick\MTProtoClient\Generated\Methods\Messages;
 
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputChatTheme;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
 use ProtoBrick\MTProtoClient\TL\RpcRequest;
@@ -11,7 +12,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class SetChatThemeRequest extends RpcRequest
 {
-    public const CONSTRUCTOR_ID = 0xe63be13f;
+    public const CONSTRUCTOR_ID = 0x81202c9;
     
     public string $predicate = 'messages.setChatTheme';
     
@@ -26,18 +27,18 @@ final class SetChatThemeRequest extends RpcRequest
     }
     /**
      * @param AbstractInputPeer $peer
-     * @param string $emoticon
+     * @param AbstractInputChatTheme $theme
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
-        public readonly string $emoticon
+        public readonly AbstractInputChatTheme $theme
     ) {}
     
     public function serialize(): string
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->peer->serialize();
-        $buffer .= Serializer::bytes($this->emoticon);
+        $buffer .= $this->theme->serialize();
         return $buffer;
     }
 }

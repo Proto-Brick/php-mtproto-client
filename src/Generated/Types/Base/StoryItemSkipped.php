@@ -18,12 +18,14 @@ final class StoryItemSkipped extends AbstractStoryItem
      * @param int $date
      * @param int $expireDate
      * @param true|null $closeFriends
+     * @param true|null $live
      */
     public function __construct(
         public readonly int $id,
         public readonly int $date,
         public readonly int $expireDate,
-        public readonly ?true $closeFriends = null
+        public readonly ?true $closeFriends = null,
+        public readonly ?true $live = null
     ) {}
     
     public function serialize(): string
@@ -32,6 +34,9 @@ final class StoryItemSkipped extends AbstractStoryItem
         $flags = 0;
         if ($this->closeFriends) {
             $flags |= (1 << 8);
+        }
+        if ($this->live) {
+            $flags |= (1 << 9);
         }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
@@ -44,6 +49,7 @@ final class StoryItemSkipped extends AbstractStoryItem
         $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $closeFriends = (($flags & (1 << 8)) !== 0) ? true : null;
+        $live = (($flags & (1 << 9)) !== 0) ? true : null;
         $id = Deserializer::int32($__payload, $__offset);
         $date = Deserializer::int32($__payload, $__offset);
         $expireDate = Deserializer::int32($__payload, $__offset);
@@ -52,7 +58,8 @@ final class StoryItemSkipped extends AbstractStoryItem
             $id,
             $date,
             $expireDate,
-            $closeFriends
+            $closeFriends,
+            $live
         );
     }
 }

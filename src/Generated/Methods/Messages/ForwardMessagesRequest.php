@@ -14,7 +14,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class ForwardMessagesRequest extends RpcRequest
 {
-    public const CONSTRUCTOR_ID = 0x978928ca;
+    public const CONSTRUCTOR_ID = 0x13704a7c;
     
     public string $predicate = 'messages.forwardMessages';
     
@@ -42,8 +42,10 @@ final class ForwardMessagesRequest extends RpcRequest
      * @param int|null $topMsgId
      * @param AbstractInputReplyTo|null $replyTo
      * @param int|null $scheduleDate
+     * @param int|null $scheduleRepeatPeriod
      * @param AbstractInputPeer|null $sendAs
      * @param AbstractInputQuickReplyShortcut|null $quickReplyShortcut
+     * @param int|null $effect
      * @param int|null $videoTimestamp
      * @param int|null $allowPaidStars
      * @param SuggestedPost|null $suggestedPost
@@ -63,8 +65,10 @@ final class ForwardMessagesRequest extends RpcRequest
         public readonly ?int $topMsgId = null,
         public readonly ?AbstractInputReplyTo $replyTo = null,
         public readonly ?int $scheduleDate = null,
+        public readonly ?int $scheduleRepeatPeriod = null,
         public readonly ?AbstractInputPeer $sendAs = null,
         public readonly ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null,
+        public readonly ?int $effect = null,
         public readonly ?int $videoTimestamp = null,
         public readonly ?int $allowPaidStars = null,
         public readonly ?SuggestedPost $suggestedPost = null
@@ -104,11 +108,17 @@ final class ForwardMessagesRequest extends RpcRequest
         if ($this->scheduleDate !== null) {
             $flags |= (1 << 10);
         }
+        if ($this->scheduleRepeatPeriod !== null) {
+            $flags |= (1 << 24);
+        }
         if ($this->sendAs !== null) {
             $flags |= (1 << 13);
         }
         if ($this->quickReplyShortcut !== null) {
             $flags |= (1 << 17);
+        }
+        if ($this->effect !== null) {
+            $flags |= (1 << 18);
         }
         if ($this->videoTimestamp !== null) {
             $flags |= (1 << 20);
@@ -133,11 +143,17 @@ final class ForwardMessagesRequest extends RpcRequest
         if ($flags & (1 << 10)) {
             $buffer .= Serializer::int32($this->scheduleDate);
         }
+        if ($flags & (1 << 24)) {
+            $buffer .= Serializer::int32($this->scheduleRepeatPeriod);
+        }
         if ($flags & (1 << 13)) {
             $buffer .= $this->sendAs->serialize();
         }
         if ($flags & (1 << 17)) {
             $buffer .= $this->quickReplyShortcut->serialize();
+        }
+        if ($flags & (1 << 18)) {
+            $buffer .= Serializer::int64($this->effect);
         }
         if ($flags & (1 << 20)) {
             $buffer .= Serializer::int32($this->videoTimestamp);

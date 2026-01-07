@@ -20,12 +20,14 @@ final class DisallowedGiftsSettings extends TlObject
      * @param true|null $disallowLimitedStargifts
      * @param true|null $disallowUniqueStargifts
      * @param true|null $disallowPremiumGifts
+     * @param true|null $disallowStargiftsFromChannels
      */
     public function __construct(
         public readonly ?true $disallowUnlimitedStargifts = null,
         public readonly ?true $disallowLimitedStargifts = null,
         public readonly ?true $disallowUniqueStargifts = null,
-        public readonly ?true $disallowPremiumGifts = null
+        public readonly ?true $disallowPremiumGifts = null,
+        public readonly ?true $disallowStargiftsFromChannels = null
     ) {}
     
     public function serialize(): string
@@ -44,6 +46,9 @@ final class DisallowedGiftsSettings extends TlObject
         if ($this->disallowPremiumGifts) {
             $flags |= (1 << 3);
         }
+        if ($this->disallowStargiftsFromChannels) {
+            $flags |= (1 << 4);
+        }
         $buffer .= Serializer::int32($flags);
         return $buffer;
     }
@@ -58,12 +63,14 @@ final class DisallowedGiftsSettings extends TlObject
         $disallowLimitedStargifts = (($flags & (1 << 1)) !== 0) ? true : null;
         $disallowUniqueStargifts = (($flags & (1 << 2)) !== 0) ? true : null;
         $disallowPremiumGifts = (($flags & (1 << 3)) !== 0) ? true : null;
+        $disallowStargiftsFromChannels = (($flags & (1 << 4)) !== 0) ? true : null;
 
         return new self(
             $disallowUnlimitedStargifts,
             $disallowLimitedStargifts,
             $disallowUniqueStargifts,
-            $disallowPremiumGifts
+            $disallowPremiumGifts,
+            $disallowStargiftsFromChannels
         );
     }
 }

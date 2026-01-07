@@ -28,6 +28,12 @@ final class StarsTransaction extends TlObject
      * @param true|null $stargiftUpgrade
      * @param true|null $businessTransfer
      * @param true|null $stargiftResale
+     * @param true|null $postsSearch
+     * @param true|null $stargiftPrepaidUpgrade
+     * @param true|null $stargiftDropOriginalDetails
+     * @param true|null $phonegroupMessage
+     * @param true|null $stargiftAuctionBid
+     * @param true|null $offer
      * @param string|null $title
      * @param string|null $description
      * @param AbstractWebDocument|null $photo
@@ -61,6 +67,12 @@ final class StarsTransaction extends TlObject
         public readonly ?true $stargiftUpgrade = null,
         public readonly ?true $businessTransfer = null,
         public readonly ?true $stargiftResale = null,
+        public readonly ?true $postsSearch = null,
+        public readonly ?true $stargiftPrepaidUpgrade = null,
+        public readonly ?true $stargiftDropOriginalDetails = null,
+        public readonly ?true $phonegroupMessage = null,
+        public readonly ?true $stargiftAuctionBid = null,
+        public readonly ?true $offer = null,
         public readonly ?string $title = null,
         public readonly ?string $description = null,
         public readonly ?AbstractWebDocument $photo = null,
@@ -109,6 +121,24 @@ final class StarsTransaction extends TlObject
         }
         if ($this->stargiftResale) {
             $flags |= (1 << 22);
+        }
+        if ($this->postsSearch) {
+            $flags |= (1 << 24);
+        }
+        if ($this->stargiftPrepaidUpgrade) {
+            $flags |= (1 << 25);
+        }
+        if ($this->stargiftDropOriginalDetails) {
+            $flags |= (1 << 26);
+        }
+        if ($this->phonegroupMessage) {
+            $flags |= (1 << 27);
+        }
+        if ($this->stargiftAuctionBid) {
+            $flags |= (1 << 28);
+        }
+        if ($this->offer) {
+            $flags |= (1 << 29);
         }
         if ($this->title !== null) {
             $flags |= (1 << 0);
@@ -246,6 +276,12 @@ final class StarsTransaction extends TlObject
         $stargiftUpgrade = (($flags & (1 << 18)) !== 0) ? true : null;
         $businessTransfer = (($flags & (1 << 21)) !== 0) ? true : null;
         $stargiftResale = (($flags & (1 << 22)) !== 0) ? true : null;
+        $postsSearch = (($flags & (1 << 24)) !== 0) ? true : null;
+        $stargiftPrepaidUpgrade = (($flags & (1 << 25)) !== 0) ? true : null;
+        $stargiftDropOriginalDetails = (($flags & (1 << 26)) !== 0) ? true : null;
+        $phonegroupMessage = (($flags & (1 << 27)) !== 0) ? true : null;
+        $stargiftAuctionBid = (($flags & (1 << 28)) !== 0) ? true : null;
+        $offer = (($flags & (1 << 29)) !== 0) ? true : null;
         $id = Deserializer::bytes($__payload, $__offset);
         $amount = AbstractStarsAmount::deserialize($__payload, $__offset);
         $date = Deserializer::int32($__payload, $__offset);
@@ -283,6 +319,12 @@ final class StarsTransaction extends TlObject
             $stargiftUpgrade,
             $businessTransfer,
             $stargiftResale,
+            $postsSearch,
+            $stargiftPrepaidUpgrade,
+            $stargiftDropOriginalDetails,
+            $phonegroupMessage,
+            $stargiftAuctionBid,
+            $offer,
             $title,
             $description,
             $photo,

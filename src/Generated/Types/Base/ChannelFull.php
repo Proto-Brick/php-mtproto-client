@@ -9,7 +9,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class ChannelFull extends AbstractChatFull
 {
-    public const CONSTRUCTOR_ID = 0xe07429de;
+    public const CONSTRUCTOR_ID = 0xe4e0b29d;
     
     public string $predicate = 'channelFull';
     
@@ -79,6 +79,7 @@ final class ChannelFull extends AbstractChatFull
      * @param BotVerification|null $botVerification
      * @param int|null $stargiftsCount
      * @param int|null $sendPaidMessagesStars
+     * @param ProfileTab|null $mainTab
      */
     public function __construct(
         public readonly int $id,
@@ -145,7 +146,8 @@ final class ChannelFull extends AbstractChatFull
         public readonly ?StickerSet $emojiset = null,
         public readonly ?BotVerification $botVerification = null,
         public readonly ?int $stargiftsCount = null,
-        public readonly ?int $sendPaidMessagesStars = null
+        public readonly ?int $sendPaidMessagesStars = null,
+        public readonly ?ProfileTab $mainTab = null
     ) {}
     
     public function serialize(): string
@@ -321,6 +323,9 @@ final class ChannelFull extends AbstractChatFull
         if ($this->sendPaidMessagesStars !== null) {
             $flags2 |= (1 << 21);
         }
+        if ($this->mainTab !== null) {
+            $flags2 |= (1 << 22);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int64($this->id);
@@ -437,6 +442,9 @@ final class ChannelFull extends AbstractChatFull
         if ($flags2 & (1 << 21)) {
             $buffer .= Serializer::int64($this->sendPaidMessagesStars);
         }
+        if ($flags2 & (1 << 22)) {
+            $buffer .= $this->mainTab->serialize();
+        }
         return $buffer;
     }
     public static function deserialize(string $__payload, &$__offset): static
@@ -509,6 +517,7 @@ final class ChannelFull extends AbstractChatFull
         $botVerification = (($flags2 & (1 << 17)) !== 0) ? BotVerification::deserialize($__payload, $__offset) : null;
         $stargiftsCount = (($flags2 & (1 << 18)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $sendPaidMessagesStars = (($flags2 & (1 << 21)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $mainTab = (($flags2 & (1 << 22)) !== 0) ? ProfileTab::deserialize($__payload, $__offset) : null;
 
         return new self(
             $id,
@@ -575,7 +584,8 @@ final class ChannelFull extends AbstractChatFull
             $emojiset,
             $botVerification,
             $stargiftsCount,
-            $sendPaidMessagesStars
+            $sendPaidMessagesStars,
+            $mainTab
         );
     }
 }

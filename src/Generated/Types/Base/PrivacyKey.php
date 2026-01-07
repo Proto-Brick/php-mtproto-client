@@ -26,6 +26,7 @@ enum PrivacyKey: int implements TlObjectInterface
     case PrivacyKeyBirthday = 0x2000a518;
     case PrivacyKeyStarGiftsAutoSave = 0x2ca4fdf8;
     case PrivacyKeyNoPaidMessages = 0x17d348d2;
+    case PrivacyKeySavedMusic = 0xff7a571b;
 
     public function serialize(): string
     {
@@ -68,6 +69,7 @@ enum PrivacyKey: int implements TlObjectInterface
             self::PrivacyKeyBirthday => 'privacyKeyBirthday',
             self::PrivacyKeyStarGiftsAutoSave => 'privacyKeyStarGiftsAutoSave',
             self::PrivacyKeyNoPaidMessages => 'privacyKeyNoPaidMessages',
+            self::PrivacyKeySavedMusic => 'privacyKeySavedMusic',
         };
     }
 }

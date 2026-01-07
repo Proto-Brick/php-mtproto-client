@@ -14,12 +14,12 @@ final class ChannelAdminLogEventActionChangeProfilePeerColor extends AbstractCha
     public string $predicate = 'channelAdminLogEventActionChangeProfilePeerColor';
     
     /**
-     * @param PeerColor $prevValue
-     * @param PeerColor $newValue
+     * @param AbstractPeerColor $prevValue
+     * @param AbstractPeerColor $newValue
      */
     public function __construct(
-        public readonly PeerColor $prevValue,
-        public readonly PeerColor $newValue
+        public readonly AbstractPeerColor $prevValue,
+        public readonly AbstractPeerColor $newValue
     ) {}
     
     public function serialize(): string
@@ -32,8 +32,8 @@ final class ChannelAdminLogEventActionChangeProfilePeerColor extends AbstractCha
     public static function deserialize(string $__payload, &$__offset): static
     {
         $__offset += 4; // Constructor ID
-        $prevValue = PeerColor::deserialize($__payload, $__offset);
-        $newValue = PeerColor::deserialize($__payload, $__offset);
+        $prevValue = AbstractPeerColor::deserialize($__payload, $__offset);
+        $newValue = AbstractPeerColor::deserialize($__payload, $__offset);
 
         return new self(
             $prevValue,

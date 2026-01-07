@@ -9,7 +9,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class StarGift extends AbstractStarGift
 {
-    public const CONSTRUCTOR_ID = 0xbcff5b;
+    public const CONSTRUCTOR_ID = 0x313a9547;
     
     public string $predicate = 'starGift';
     
@@ -23,6 +23,8 @@ final class StarGift extends AbstractStarGift
      * @param true|null $birthday
      * @param true|null $requirePremium
      * @param true|null $limitedPerUser
+     * @param true|null $peerColorAvailable
+     * @param true|null $auction
      * @param int|null $availabilityRemains
      * @param int|null $availabilityTotal
      * @param int|null $availabilityResale
@@ -34,6 +36,12 @@ final class StarGift extends AbstractStarGift
      * @param AbstractPeer|null $releasedBy
      * @param int|null $perUserTotal
      * @param int|null $perUserRemains
+     * @param int|null $lockedUntilDate
+     * @param string|null $auctionSlug
+     * @param int|null $giftsPerRound
+     * @param int|null $auctionStartDate
+     * @param int|null $upgradeVariants
+     * @param StarGiftBackground|null $background
      */
     public function __construct(
         public readonly int $id,
@@ -45,6 +53,8 @@ final class StarGift extends AbstractStarGift
         public readonly ?true $birthday = null,
         public readonly ?true $requirePremium = null,
         public readonly ?true $limitedPerUser = null,
+        public readonly ?true $peerColorAvailable = null,
+        public readonly ?true $auction = null,
         public readonly ?int $availabilityRemains = null,
         public readonly ?int $availabilityTotal = null,
         public readonly ?int $availabilityResale = null,
@@ -55,7 +65,13 @@ final class StarGift extends AbstractStarGift
         public readonly ?string $title = null,
         public readonly ?AbstractPeer $releasedBy = null,
         public readonly ?int $perUserTotal = null,
-        public readonly ?int $perUserRemains = null
+        public readonly ?int $perUserRemains = null,
+        public readonly ?int $lockedUntilDate = null,
+        public readonly ?string $auctionSlug = null,
+        public readonly ?int $giftsPerRound = null,
+        public readonly ?int $auctionStartDate = null,
+        public readonly ?int $upgradeVariants = null,
+        public readonly ?StarGiftBackground $background = null
     ) {}
     
     public function serialize(): string
@@ -76,6 +92,12 @@ final class StarGift extends AbstractStarGift
         }
         if ($this->limitedPerUser) {
             $flags |= (1 << 8);
+        }
+        if ($this->peerColorAvailable) {
+            $flags |= (1 << 10);
+        }
+        if ($this->auction) {
+            $flags |= (1 << 11);
         }
         if ($this->availabilityRemains !== null) {
             $flags |= (1 << 0);
@@ -109,6 +131,24 @@ final class StarGift extends AbstractStarGift
         }
         if ($this->perUserRemains !== null) {
             $flags |= (1 << 8);
+        }
+        if ($this->lockedUntilDate !== null) {
+            $flags |= (1 << 9);
+        }
+        if ($this->auctionSlug !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->giftsPerRound !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->auctionStartDate !== null) {
+            $flags |= (1 << 11);
+        }
+        if ($this->upgradeVariants !== null) {
+            $flags |= (1 << 12);
+        }
+        if ($this->background !== null) {
+            $flags |= (1 << 13);
         }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
@@ -148,6 +188,24 @@ final class StarGift extends AbstractStarGift
         if ($flags & (1 << 8)) {
             $buffer .= Serializer::int32($this->perUserRemains);
         }
+        if ($flags & (1 << 9)) {
+            $buffer .= Serializer::int32($this->lockedUntilDate);
+        }
+        if ($flags & (1 << 11)) {
+            $buffer .= Serializer::bytes($this->auctionSlug);
+        }
+        if ($flags & (1 << 11)) {
+            $buffer .= Serializer::int32($this->giftsPerRound);
+        }
+        if ($flags & (1 << 11)) {
+            $buffer .= Serializer::int32($this->auctionStartDate);
+        }
+        if ($flags & (1 << 12)) {
+            $buffer .= Serializer::int32($this->upgradeVariants);
+        }
+        if ($flags & (1 << 13)) {
+            $buffer .= $this->background->serialize();
+        }
         return $buffer;
     }
     public static function deserialize(string $__payload, &$__offset): static
@@ -159,6 +217,8 @@ final class StarGift extends AbstractStarGift
         $birthday = (($flags & (1 << 2)) !== 0) ? true : null;
         $requirePremium = (($flags & (1 << 7)) !== 0) ? true : null;
         $limitedPerUser = (($flags & (1 << 8)) !== 0) ? true : null;
+        $peerColorAvailable = (($flags & (1 << 10)) !== 0) ? true : null;
+        $auction = (($flags & (1 << 11)) !== 0) ? true : null;
         $id = Deserializer::int64($__payload, $__offset);
         $sticker = AbstractDocument::deserialize($__payload, $__offset);
         $stars = Deserializer::int64($__payload, $__offset);
@@ -174,6 +234,12 @@ final class StarGift extends AbstractStarGift
         $releasedBy = (($flags & (1 << 6)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
         $perUserTotal = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $perUserRemains = (($flags & (1 << 8)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $lockedUntilDate = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $auctionSlug = (($flags & (1 << 11)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $giftsPerRound = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $auctionStartDate = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $upgradeVariants = (($flags & (1 << 12)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $background = (($flags & (1 << 13)) !== 0) ? StarGiftBackground::deserialize($__payload, $__offset) : null;
 
         return new self(
             $id,
@@ -185,6 +251,8 @@ final class StarGift extends AbstractStarGift
             $birthday,
             $requirePremium,
             $limitedPerUser,
+            $peerColorAvailable,
+            $auction,
             $availabilityRemains,
             $availabilityTotal,
             $availabilityResale,
@@ -195,7 +263,13 @@ final class StarGift extends AbstractStarGift
             $title,
             $releasedBy,
             $perUserTotal,
-            $perUserRemains
+            $perUserRemains,
+            $lockedUntilDate,
+            $auctionSlug,
+            $giftsPerRound,
+            $auctionStartDate,
+            $upgradeVariants,
+            $background
         );
     }
 }

@@ -9,12 +9,12 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class MessageActionGiftCode extends AbstractMessageAction
 {
-    public const CONSTRUCTOR_ID = 0x56d03994;
+    public const CONSTRUCTOR_ID = 0x31c48347;
     
     public string $predicate = 'messageActionGiftCode';
     
     /**
-     * @param int $months
+     * @param int $days
      * @param string $slug
      * @param true|null $viaGiveaway
      * @param true|null $unclaimed
@@ -26,7 +26,7 @@ final class MessageActionGiftCode extends AbstractMessageAction
      * @param TextWithEntities|null $message
      */
     public function __construct(
-        public readonly int $months,
+        public readonly int $days,
         public readonly string $slug,
         public readonly ?true $viaGiveaway = null,
         public readonly ?true $unclaimed = null,
@@ -70,7 +70,7 @@ final class MessageActionGiftCode extends AbstractMessageAction
         if ($flags & (1 << 1)) {
             $buffer .= $this->boostPeer->serialize();
         }
-        $buffer .= Serializer::int32($this->months);
+        $buffer .= Serializer::int32($this->days);
         $buffer .= Serializer::bytes($this->slug);
         if ($flags & (1 << 2)) {
             $buffer .= Serializer::bytes($this->currency);
@@ -96,7 +96,7 @@ final class MessageActionGiftCode extends AbstractMessageAction
         $viaGiveaway = (($flags & (1 << 0)) !== 0) ? true : null;
         $unclaimed = (($flags & (1 << 5)) !== 0) ? true : null;
         $boostPeer = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
-        $months = Deserializer::int32($__payload, $__offset);
+        $days = Deserializer::int32($__payload, $__offset);
         $slug = Deserializer::bytes($__payload, $__offset);
         $currency = (($flags & (1 << 2)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
         $amount = (($flags & (1 << 2)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
@@ -105,7 +105,7 @@ final class MessageActionGiftCode extends AbstractMessageAction
         $message = (($flags & (1 << 4)) !== 0) ? TextWithEntities::deserialize($__payload, $__offset) : null;
 
         return new self(
-            $months,
+            $days,
             $slug,
             $viaGiveaway,
             $unclaimed,

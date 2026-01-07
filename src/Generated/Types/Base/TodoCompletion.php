@@ -11,18 +11,18 @@ use RuntimeException;
  */
 final class TodoCompletion extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x4cc120b7;
+    public const CONSTRUCTOR_ID = 0x221bb5e4;
     
     public string $predicate = 'todoCompletion';
     
     /**
      * @param int $id
-     * @param int $completedBy
+     * @param AbstractPeer $completedBy
      * @param int $date
      */
     public function __construct(
         public readonly int $id,
-        public readonly int $completedBy,
+        public readonly AbstractPeer $completedBy,
         public readonly int $date
     ) {}
     
@@ -30,7 +30,7 @@ final class TodoCompletion extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::int32($this->id);
-        $buffer .= Serializer::int64($this->completedBy);
+        $buffer .= $this->completedBy->serialize();
         $buffer .= Serializer::int32($this->date);
         return $buffer;
     }
@@ -41,7 +41,7 @@ final class TodoCompletion extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $id = Deserializer::int32($__payload, $__offset);
-        $completedBy = Deserializer::int64($__payload, $__offset);
+        $completedBy = AbstractPeer::deserialize($__payload, $__offset);
         $date = Deserializer::int32($__payload, $__offset);
 
         return new self(

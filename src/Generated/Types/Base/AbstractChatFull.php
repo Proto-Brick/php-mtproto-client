@@ -18,7 +18,7 @@ abstract class AbstractChatFull extends TlObject
         
         return match ($constructorId) {
             0x2633421b => ChatFull::deserialize($__payload, $__offset),
-            0xe07429de => ChannelFull::deserialize($__payload, $__offset),
+            0xe4e0b29d => ChannelFull::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type ChatFull. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

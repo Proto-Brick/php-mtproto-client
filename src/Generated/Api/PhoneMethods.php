@@ -9,6 +9,8 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Phone\CreateConferenceCallRequest
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\CreateGroupCallRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\DeclineConferenceCallInviteRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\DeleteConferenceCallParticipantsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Phone\DeleteGroupCallMessagesRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Phone\DeleteGroupCallParticipantMessagesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\DiscardCallRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\DiscardGroupCallRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\EditGroupCallParticipantRequest;
@@ -18,6 +20,7 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Phone\GetCallConfigRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\GetGroupCallChainBlocksRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\GetGroupCallJoinAsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\GetGroupCallRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Phone\GetGroupCallStarsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\GetGroupCallStreamChannelsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\GetGroupCallStreamRtmpUrlRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\GetGroupParticipantsRequest;
@@ -32,7 +35,10 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Phone\RequestCallRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\SaveCallDebugRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\SaveCallLogRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\SaveDefaultGroupCallJoinAsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Phone\SaveDefaultSendAsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\SendConferenceCallBroadcastRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Phone\SendGroupCallEncryptedMessageRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Phone\SendGroupCallMessageRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\SendSignalingDataRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\SetCallRatingRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Phone\StartScheduledGroupCallRequest;
@@ -69,6 +75,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\PhoneCallDiscardReasonHangup;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\PhoneCallDiscardReasonMigrateConferenceCall;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\PhoneCallDiscardReasonMissed;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\PhoneCallProtocol;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\TextWithEntities;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShort;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShortChatMessage;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShortMessage;
@@ -78,6 +85,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdatesCombined;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdatesTooLong;
 use ProtoBrick\MTProtoClient\Generated\Types\Phone\ExportedGroupCallInvite;
 use ProtoBrick\MTProtoClient\Generated\Types\Phone\GroupCall;
+use ProtoBrick\MTProtoClient\Generated\Types\Phone\GroupCallStars;
 use ProtoBrick\MTProtoClient\Generated\Types\Phone\GroupCallStreamChannels;
 use ProtoBrick\MTProtoClient\Generated\Types\Phone\GroupCallStreamRtmpUrl;
 use ProtoBrick\MTProtoClient\Generated\Types\Phone\GroupParticipants;
@@ -302,13 +310,15 @@ final readonly class PhoneMethods
      * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
      * @param bool|null $resetInviteHash
      * @param bool|null $joinMuted
+     * @param bool|null $messagesEnabled
+     * @param int|null $sendPaidMessagesStars
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/phone.toggleGroupCallSettings
      * @api
      */
-    public function toggleGroupCallSettings(AbstractInputGroupCall $call, ?bool $resetInviteHash = null, ?bool $joinMuted = null): ?AbstractUpdates
+    public function toggleGroupCallSettings(AbstractInputGroupCall $call, ?bool $resetInviteHash = null, ?bool $joinMuted = null, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new ToggleGroupCallSettingsRequest(call: $call, resetInviteHash: $resetInviteHash, joinMuted: $joinMuted));
+        return $this->client->callSync(new ToggleGroupCallSettingsRequest(call: $call, resetInviteHash: $resetInviteHash, joinMuted: $joinMuted, messagesEnabled: $messagesEnabled, sendPaidMessagesStars: $sendPaidMessagesStars));
     }
 
     /**
@@ -502,16 +512,17 @@ final readonly class PhoneMethods
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param bool $revoke
+     * @param bool|null $liveStory
      * @return GroupCallStreamRtmpUrl|null
      * @see https://core.telegram.org/method/phone.getGroupCallStreamRtmpUrl
      * @api
      */
-    public function getGroupCallStreamRtmpUrl(AbstractInputPeer|string|int $peer, bool $revoke): ?GroupCallStreamRtmpUrl
+    public function getGroupCallStreamRtmpUrl(AbstractInputPeer|string|int $peer, bool $revoke, ?bool $liveStory = null): ?GroupCallStreamRtmpUrl
     {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetGroupCallStreamRtmpUrlRequest(peer: $peer, revoke: $revoke));
+        return $this->client->callSync(new GetGroupCallStreamRtmpUrlRequest(peer: $peer, revoke: $revoke, liveStory: $liveStory));
     }
 
     /**
@@ -617,5 +628,93 @@ final readonly class PhoneMethods
     public function getGroupCallChainBlocks(AbstractInputGroupCall $call, int $subChainId, int $offset, int $limit): ?AbstractUpdates
     {
         return $this->client->callSync(new GetGroupCallChainBlocksRequest(call: $call, subChainId: $subChainId, offset: $offset, limit: $limit));
+    }
+
+    /**
+     * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
+     * @param TextWithEntities $message
+     * @param int|null $randomId
+     * @param int|null $allowPaidStars
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/phone.sendGroupCallMessage
+     * @api
+     */
+    public function sendGroupCallMessage(AbstractInputGroupCall $call, TextWithEntities $message, ?int $randomId = null, ?int $allowPaidStars = null, AbstractInputPeer|string|int|null $sendAs = null): ?AbstractUpdates
+    {
+        if (is_string($sendAs) || is_int($sendAs)) {
+            $sendAs = $this->client->peerManager->resolve($sendAs);
+        }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->callSync(new SendGroupCallMessageRequest(call: $call, message: $message, randomId: $randomId, allowPaidStars: $allowPaidStars, sendAs: $sendAs));
+    }
+
+    /**
+     * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
+     * @param string $encryptedMessage
+     * @return bool
+     * @see https://core.telegram.org/method/phone.sendGroupCallEncryptedMessage
+     * @api
+     */
+    public function sendGroupCallEncryptedMessage(AbstractInputGroupCall $call, string $encryptedMessage): bool
+    {
+        return (bool) $this->client->callSync(new SendGroupCallEncryptedMessageRequest(call: $call, encryptedMessage: $encryptedMessage));
+    }
+
+    /**
+     * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
+     * @param list<int> $messages
+     * @param bool|null $reportSpam
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/phone.deleteGroupCallMessages
+     * @api
+     */
+    public function deleteGroupCallMessages(AbstractInputGroupCall $call, array $messages, ?bool $reportSpam = null): ?AbstractUpdates
+    {
+        return $this->client->callSync(new DeleteGroupCallMessagesRequest(call: $call, messages: $messages, reportSpam: $reportSpam));
+    }
+
+    /**
+     * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
+     * @param bool|null $reportSpam
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/phone.deleteGroupCallParticipantMessages
+     * @api
+     */
+    public function deleteGroupCallParticipantMessages(AbstractInputGroupCall $call, AbstractInputPeer|string|int $participant, ?bool $reportSpam = null): ?AbstractUpdates
+    {
+        if (is_string($participant) || is_int($participant)) {
+            $participant = $this->client->peerManager->resolve($participant);
+        }
+        return $this->client->callSync(new DeleteGroupCallParticipantMessagesRequest(call: $call, participant: $participant, reportSpam: $reportSpam));
+    }
+
+    /**
+     * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
+     * @return GroupCallStars|null
+     * @see https://core.telegram.org/method/phone.getGroupCallStars
+     * @api
+     */
+    public function getGroupCallStars(AbstractInputGroupCall $call): ?GroupCallStars
+    {
+        return $this->client->callSync(new GetGroupCallStarsRequest(call: $call));
+    }
+
+    /**
+     * @param InputGroupCall|InputGroupCallSlug|InputGroupCallInviteMessage $call
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $sendAs
+     * @return bool
+     * @see https://core.telegram.org/method/phone.saveDefaultSendAs
+     * @api
+     */
+    public function saveDefaultSendAs(AbstractInputGroupCall $call, AbstractInputPeer|string|int $sendAs): bool
+    {
+        if (is_string($sendAs) || is_int($sendAs)) {
+            $sendAs = $this->client->peerManager->resolve($sendAs);
+        }
+        return (bool) $this->client->callSync(new SaveDefaultSendAsRequest(call: $call, sendAs: $sendAs));
     }
 }

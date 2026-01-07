@@ -29,6 +29,7 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Stories\ReportRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Stories\SearchPostsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Stories\SendReactionRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Stories\SendStoryRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Stories\StartLiveRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Stories\ToggleAllStoriesHiddenRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Stories\TogglePeerStoriesHiddenRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Stories\TogglePinnedRequest;
@@ -115,6 +116,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\ReactionCustomEmoji;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\ReactionEmoji;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\ReactionEmpty;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\ReactionPaid;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\RecentStory;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\ReportResultAddComment;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\ReportResultChooseOption;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\ReportResultReported;
@@ -475,7 +477,7 @@ final readonly class StoriesMethods
 
     /**
      * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $id
-     * @return list<int>
+     * @return list<RecentStory>
      * @see https://core.telegram.org/method/stories.getPeerMaxIDs
      * @api
      */
@@ -656,5 +658,31 @@ final readonly class StoriesMethods
             $peer = $this->client->peerManager->resolve($peer);
         }
         return $this->client->callSync(new GetAlbumStoriesRequest(peer: $peer, albumId: $albumId, offset: $offset, limit: $limit));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<InputPrivacyValueAllowContacts|InputPrivacyValueAllowAll|InputPrivacyValueAllowUsers|InputPrivacyValueDisallowContacts|InputPrivacyValueDisallowAll|InputPrivacyValueDisallowUsers|InputPrivacyValueAllowChatParticipants|InputPrivacyValueDisallowChatParticipants|InputPrivacyValueAllowCloseFriends|InputPrivacyValueAllowPremium|InputPrivacyValueAllowBots|InputPrivacyValueDisallowBots> $privacyRules
+     * @param bool|null $pinned
+     * @param bool|null $noforwards
+     * @param bool|null $rtmpStream
+     * @param string|null $caption
+     * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
+     * @param int|null $randomId
+     * @param bool|null $messagesEnabled
+     * @param int|null $sendPaidMessagesStars
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/stories.startLive
+     * @api
+     */
+    public function startLive(AbstractInputPeer|string|int $peer, array $privacyRules, ?bool $pinned = null, ?bool $noforwards = null, ?bool $rtmpStream = null, ?string $caption = null, ?array $entities = null, ?int $randomId = null, ?bool $messagesEnabled = null, ?int $sendPaidMessagesStars = null): ?AbstractUpdates
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->callSync(new StartLiveRequest(peer: $peer, privacyRules: $privacyRules, pinned: $pinned, noforwards: $noforwards, rtmpStream: $rtmpStream, caption: $caption, entities: $entities, randomId: $randomId, messagesEnabled: $messagesEnabled, sendPaidMessagesStars: $sendPaidMessagesStars));
     }
 }

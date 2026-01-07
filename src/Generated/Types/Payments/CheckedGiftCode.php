@@ -14,13 +14,13 @@ use RuntimeException;
  */
 final class CheckedGiftCode extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x284a1096;
+    public const CONSTRUCTOR_ID = 0xeb983f8f;
     
     public string $predicate = 'payments.checkedGiftCode';
     
     /**
      * @param int $date
-     * @param int $months
+     * @param int $days
      * @param list<AbstractChat> $chats
      * @param list<AbstractUser> $users
      * @param true|null $viaGiveaway
@@ -31,7 +31,7 @@ final class CheckedGiftCode extends TlObject
      */
     public function __construct(
         public readonly int $date,
-        public readonly int $months,
+        public readonly int $days,
         public readonly array $chats,
         public readonly array $users,
         public readonly ?true $viaGiveaway = null,
@@ -71,7 +71,7 @@ final class CheckedGiftCode extends TlObject
             $buffer .= Serializer::int64($this->toId);
         }
         $buffer .= Serializer::int32($this->date);
-        $buffer .= Serializer::int32($this->months);
+        $buffer .= Serializer::int32($this->days);
         if ($flags & (1 << 1)) {
             $buffer .= Serializer::int32($this->usedDate);
         }
@@ -91,14 +91,14 @@ final class CheckedGiftCode extends TlObject
         $giveawayMsgId = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $toId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
         $date = Deserializer::int32($__payload, $__offset);
-        $months = Deserializer::int32($__payload, $__offset);
+        $days = Deserializer::int32($__payload, $__offset);
         $usedDate = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $date,
-            $months,
+            $days,
             $chats,
             $users,
             $viaGiveaway,

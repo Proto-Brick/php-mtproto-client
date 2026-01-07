@@ -2,6 +2,7 @@
 namespace ProtoBrick\MTProtoClient\Generated\Methods\Stories;
 
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\RecentStory;
 use ProtoBrick\MTProtoClient\TL\RpcRequest;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 
@@ -10,7 +11,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class GetPeerMaxIDsRequest extends RpcRequest
 {
-    public const CONSTRUCTOR_ID = 0x535983c3;
+    public const CONSTRUCTOR_ID = 0x78499170;
     
     public string $predicate = 'stories.getPeerMaxIDs';
     
@@ -21,7 +22,7 @@ final class GetPeerMaxIDsRequest extends RpcRequest
     
     public function getResponseClass(): string
     {
-        return 'vector<int>';
+        return 'vector<' . RecentStory::class . '>';
     }
     /**
      * @param list<AbstractInputPeer> $id

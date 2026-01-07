@@ -9,13 +9,14 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class ForumTopic extends AbstractForumTopic
 {
-    public const CONSTRUCTOR_ID = 0x71701da9;
+    public const CONSTRUCTOR_ID = 0xcdff0eca;
     
     public string $predicate = 'forumTopic';
     
     /**
      * @param int $id
      * @param int $date
+     * @param AbstractPeer $peer
      * @param string $title
      * @param int $iconColor
      * @param int $topMessage
@@ -31,12 +32,14 @@ final class ForumTopic extends AbstractForumTopic
      * @param true|null $pinned
      * @param true|null $short
      * @param true|null $hidden
+     * @param true|null $titleMissing
      * @param int|null $iconEmojiId
      * @param AbstractDraftMessage|null $draft
      */
     public function __construct(
         public readonly int $id,
         public readonly int $date,
+        public readonly AbstractPeer $peer,
         public readonly string $title,
         public readonly int $iconColor,
         public readonly int $topMessage,
@@ -52,6 +55,7 @@ final class ForumTopic extends AbstractForumTopic
         public readonly ?true $pinned = null,
         public readonly ?true $short = null,
         public readonly ?true $hidden = null,
+        public readonly ?true $titleMissing = null,
         public readonly ?int $iconEmojiId = null,
         public readonly ?AbstractDraftMessage $draft = null
     ) {}
@@ -75,6 +79,9 @@ final class ForumTopic extends AbstractForumTopic
         if ($this->hidden) {
             $flags |= (1 << 6);
         }
+        if ($this->titleMissing) {
+            $flags |= (1 << 7);
+        }
         if ($this->iconEmojiId !== null) {
             $flags |= (1 << 0);
         }
@@ -84,6 +91,7 @@ final class ForumTopic extends AbstractForumTopic
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($this->id);
         $buffer .= Serializer::int32($this->date);
+        $buffer .= $this->peer->serialize();
         $buffer .= Serializer::bytes($this->title);
         $buffer .= Serializer::int32($this->iconColor);
         if ($flags & (1 << 0)) {
@@ -111,8 +119,10 @@ final class ForumTopic extends AbstractForumTopic
         $pinned = (($flags & (1 << 3)) !== 0) ? true : null;
         $short = (($flags & (1 << 5)) !== 0) ? true : null;
         $hidden = (($flags & (1 << 6)) !== 0) ? true : null;
+        $titleMissing = (($flags & (1 << 7)) !== 0) ? true : null;
         $id = Deserializer::int32($__payload, $__offset);
         $date = Deserializer::int32($__payload, $__offset);
+        $peer = AbstractPeer::deserialize($__payload, $__offset);
         $title = Deserializer::bytes($__payload, $__offset);
         $iconColor = Deserializer::int32($__payload, $__offset);
         $iconEmojiId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
@@ -129,6 +139,7 @@ final class ForumTopic extends AbstractForumTopic
         return new self(
             $id,
             $date,
+            $peer,
             $title,
             $iconColor,
             $topMessage,
@@ -144,6 +155,7 @@ final class ForumTopic extends AbstractForumTopic
             $pinned,
             $short,
             $hidden,
+            $titleMissing,
             $iconEmojiId,
             $draft
         );

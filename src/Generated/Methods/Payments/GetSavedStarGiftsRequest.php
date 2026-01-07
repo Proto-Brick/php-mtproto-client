@@ -31,9 +31,12 @@ final class GetSavedStarGiftsRequest extends RpcRequest
      * @param true|null $excludeUnsaved
      * @param true|null $excludeSaved
      * @param true|null $excludeUnlimited
-     * @param true|null $excludeLimited
      * @param true|null $excludeUnique
      * @param true|null $sortByValue
+     * @param true|null $excludeUpgradable
+     * @param true|null $excludeUnupgradable
+     * @param true|null $peerColorAvailable
+     * @param true|null $excludeHosted
      * @param int|null $collectionId
      */
     public function __construct(
@@ -43,9 +46,12 @@ final class GetSavedStarGiftsRequest extends RpcRequest
         public readonly ?true $excludeUnsaved = null,
         public readonly ?true $excludeSaved = null,
         public readonly ?true $excludeUnlimited = null,
-        public readonly ?true $excludeLimited = null,
         public readonly ?true $excludeUnique = null,
         public readonly ?true $sortByValue = null,
+        public readonly ?true $excludeUpgradable = null,
+        public readonly ?true $excludeUnupgradable = null,
+        public readonly ?true $peerColorAvailable = null,
+        public readonly ?true $excludeHosted = null,
         public readonly ?int $collectionId = null
     ) {}
     
@@ -62,14 +68,23 @@ final class GetSavedStarGiftsRequest extends RpcRequest
         if ($this->excludeUnlimited) {
             $flags |= (1 << 2);
         }
-        if ($this->excludeLimited) {
-            $flags |= (1 << 3);
-        }
         if ($this->excludeUnique) {
             $flags |= (1 << 4);
         }
         if ($this->sortByValue) {
             $flags |= (1 << 5);
+        }
+        if ($this->excludeUpgradable) {
+            $flags |= (1 << 7);
+        }
+        if ($this->excludeUnupgradable) {
+            $flags |= (1 << 8);
+        }
+        if ($this->peerColorAvailable) {
+            $flags |= (1 << 9);
+        }
+        if ($this->excludeHosted) {
+            $flags |= (1 << 10);
         }
         if ($this->collectionId !== null) {
             $flags |= (1 << 6);

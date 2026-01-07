@@ -9,7 +9,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class MessageActionStarGiftUnique extends AbstractMessageAction
 {
-    public const CONSTRUCTOR_ID = 0x34f762f3;
+    public const CONSTRUCTOR_ID = 0x95728543;
     
     public string $predicate = 'messageActionStarGiftUnique';
     
@@ -19,6 +19,9 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
      * @param true|null $transferred
      * @param true|null $saved
      * @param true|null $refunded
+     * @param true|null $prepaidUpgrade
+     * @param true|null $assigned
+     * @param true|null $fromOffer
      * @param int|null $canExportAt
      * @param int|null $transferStars
      * @param AbstractPeer|null $fromId
@@ -27,6 +30,7 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
      * @param AbstractStarsAmount|null $resaleAmount
      * @param int|null $canTransferAt
      * @param int|null $canResellAt
+     * @param int|null $dropOriginalDetailsStars
      */
     public function __construct(
         public readonly AbstractStarGift $gift,
@@ -34,6 +38,9 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
         public readonly ?true $transferred = null,
         public readonly ?true $saved = null,
         public readonly ?true $refunded = null,
+        public readonly ?true $prepaidUpgrade = null,
+        public readonly ?true $assigned = null,
+        public readonly ?true $fromOffer = null,
         public readonly ?int $canExportAt = null,
         public readonly ?int $transferStars = null,
         public readonly ?AbstractPeer $fromId = null,
@@ -41,7 +48,8 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
         public readonly ?int $savedId = null,
         public readonly ?AbstractStarsAmount $resaleAmount = null,
         public readonly ?int $canTransferAt = null,
-        public readonly ?int $canResellAt = null
+        public readonly ?int $canResellAt = null,
+        public readonly ?int $dropOriginalDetailsStars = null
     ) {}
     
     public function serialize(): string
@@ -59,6 +67,15 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
         }
         if ($this->refunded) {
             $flags |= (1 << 5);
+        }
+        if ($this->prepaidUpgrade) {
+            $flags |= (1 << 11);
+        }
+        if ($this->assigned) {
+            $flags |= (1 << 13);
+        }
+        if ($this->fromOffer) {
+            $flags |= (1 << 14);
         }
         if ($this->canExportAt !== null) {
             $flags |= (1 << 3);
@@ -83,6 +100,9 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
         }
         if ($this->canResellAt !== null) {
             $flags |= (1 << 10);
+        }
+        if ($this->dropOriginalDetailsStars !== null) {
+            $flags |= (1 << 12);
         }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->gift->serialize();
@@ -110,6 +130,9 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
         if ($flags & (1 << 10)) {
             $buffer .= Serializer::int32($this->canResellAt);
         }
+        if ($flags & (1 << 12)) {
+            $buffer .= Serializer::int64($this->dropOriginalDetailsStars);
+        }
         return $buffer;
     }
     public static function deserialize(string $__payload, &$__offset): static
@@ -120,6 +143,9 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
         $transferred = (($flags & (1 << 1)) !== 0) ? true : null;
         $saved = (($flags & (1 << 2)) !== 0) ? true : null;
         $refunded = (($flags & (1 << 5)) !== 0) ? true : null;
+        $prepaidUpgrade = (($flags & (1 << 11)) !== 0) ? true : null;
+        $assigned = (($flags & (1 << 13)) !== 0) ? true : null;
+        $fromOffer = (($flags & (1 << 14)) !== 0) ? true : null;
         $gift = AbstractStarGift::deserialize($__payload, $__offset);
         $canExportAt = (($flags & (1 << 3)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $transferStars = (($flags & (1 << 4)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
@@ -129,6 +155,7 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
         $resaleAmount = (($flags & (1 << 8)) !== 0) ? AbstractStarsAmount::deserialize($__payload, $__offset) : null;
         $canTransferAt = (($flags & (1 << 9)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $canResellAt = (($flags & (1 << 10)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $dropOriginalDetailsStars = (($flags & (1 << 12)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
 
         return new self(
             $gift,
@@ -136,6 +163,9 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
             $transferred,
             $saved,
             $refunded,
+            $prepaidUpgrade,
+            $assigned,
+            $fromOffer,
             $canExportAt,
             $transferStars,
             $fromId,
@@ -143,7 +173,8 @@ final class MessageActionStarGiftUnique extends AbstractMessageAction
             $savedId,
             $resaleAmount,
             $canTransferAt,
-            $canResellAt
+            $canResellAt,
+            $dropOriginalDetailsStars
         );
     }
 }

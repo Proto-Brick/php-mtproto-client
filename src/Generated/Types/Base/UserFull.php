@@ -11,7 +11,7 @@ use RuntimeException;
  */
 final class UserFull extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x7e63ce1f;
+    public const CONSTRUCTOR_ID = 0xa02bc13e;
     
     public string $predicate = 'userFull';
     
@@ -45,7 +45,7 @@ final class UserFull extends TlObject
      * @param int|null $pinnedMsgId
      * @param int|null $folderId
      * @param int|null $ttlPeriod
-     * @param string|null $themeEmoticon
+     * @param AbstractChatTheme|null $theme
      * @param string|null $privateForwardName
      * @param ChatAdminRights|null $botGroupAdminRights
      * @param ChatAdminRights|null $botBroadcastAdminRights
@@ -67,6 +67,9 @@ final class UserFull extends TlObject
      * @param StarsRating|null $starsRating
      * @param StarsRating|null $starsMyPendingRating
      * @param int|null $starsMyPendingRatingDate
+     * @param ProfileTab|null $mainTab
+     * @param AbstractDocument|null $savedMusic
+     * @param TextWithEntities|null $note
      */
     public function __construct(
         public readonly int $id,
@@ -98,7 +101,7 @@ final class UserFull extends TlObject
         public readonly ?int $pinnedMsgId = null,
         public readonly ?int $folderId = null,
         public readonly ?int $ttlPeriod = null,
-        public readonly ?string $themeEmoticon = null,
+        public readonly ?AbstractChatTheme $theme = null,
         public readonly ?string $privateForwardName = null,
         public readonly ?ChatAdminRights $botGroupAdminRights = null,
         public readonly ?ChatAdminRights $botBroadcastAdminRights = null,
@@ -119,7 +122,10 @@ final class UserFull extends TlObject
         public readonly ?DisallowedGiftsSettings $disallowedGifts = null,
         public readonly ?StarsRating $starsRating = null,
         public readonly ?StarsRating $starsMyPendingRating = null,
-        public readonly ?int $starsMyPendingRatingDate = null
+        public readonly ?int $starsMyPendingRatingDate = null,
+        public readonly ?ProfileTab $mainTab = null,
+        public readonly ?AbstractDocument $savedMusic = null,
+        public readonly ?TextWithEntities $note = null
     ) {}
     
     public function serialize(): string
@@ -202,7 +208,7 @@ final class UserFull extends TlObject
         if ($this->ttlPeriod !== null) {
             $flags |= (1 << 14);
         }
-        if ($this->themeEmoticon !== null) {
+        if ($this->theme !== null) {
             $flags |= (1 << 15);
         }
         if ($this->privateForwardName !== null) {
@@ -268,6 +274,15 @@ final class UserFull extends TlObject
         if ($this->starsMyPendingRatingDate !== null) {
             $flags2 |= (1 << 18);
         }
+        if ($this->mainTab !== null) {
+            $flags2 |= (1 << 20);
+        }
+        if ($this->savedMusic !== null) {
+            $flags2 |= (1 << 21);
+        }
+        if ($this->note !== null) {
+            $flags2 |= (1 << 22);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int64($this->id);
@@ -299,7 +314,7 @@ final class UserFull extends TlObject
             $buffer .= Serializer::int32($this->ttlPeriod);
         }
         if ($flags & (1 << 15)) {
-            $buffer .= Serializer::bytes($this->themeEmoticon);
+            $buffer .= $this->theme->serialize();
         }
         if ($flags & (1 << 16)) {
             $buffer .= Serializer::bytes($this->privateForwardName);
@@ -364,6 +379,15 @@ final class UserFull extends TlObject
         if ($flags2 & (1 << 18)) {
             $buffer .= Serializer::int32($this->starsMyPendingRatingDate);
         }
+        if ($flags2 & (1 << 20)) {
+            $buffer .= $this->mainTab->serialize();
+        }
+        if ($flags2 & (1 << 21)) {
+            $buffer .= $this->savedMusic->serialize();
+        }
+        if ($flags2 & (1 << 22)) {
+            $buffer .= $this->note->serialize();
+        }
         return $buffer;
     }
     public static function deserialize(string $__payload, &$__offset): static
@@ -403,7 +427,7 @@ final class UserFull extends TlObject
         $commonChatsCount = Deserializer::int32($__payload, $__offset);
         $folderId = (($flags & (1 << 11)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $ttlPeriod = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
-        $themeEmoticon = (($flags & (1 << 15)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $theme = (($flags & (1 << 15)) !== 0) ? AbstractChatTheme::deserialize($__payload, $__offset) : null;
         $privateForwardName = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
         $botGroupAdminRights = (($flags & (1 << 17)) !== 0) ? ChatAdminRights::deserialize($__payload, $__offset) : null;
         $botBroadcastAdminRights = (($flags & (1 << 18)) !== 0) ? ChatAdminRights::deserialize($__payload, $__offset) : null;
@@ -425,6 +449,9 @@ final class UserFull extends TlObject
         $starsRating = (($flags2 & (1 << 17)) !== 0) ? StarsRating::deserialize($__payload, $__offset) : null;
         $starsMyPendingRating = (($flags2 & (1 << 18)) !== 0) ? StarsRating::deserialize($__payload, $__offset) : null;
         $starsMyPendingRatingDate = (($flags2 & (1 << 18)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
+        $mainTab = (($flags2 & (1 << 20)) !== 0) ? ProfileTab::deserialize($__payload, $__offset) : null;
+        $savedMusic = (($flags2 & (1 << 21)) !== 0) ? AbstractDocument::deserialize($__payload, $__offset) : null;
+        $note = (($flags2 & (1 << 22)) !== 0) ? TextWithEntities::deserialize($__payload, $__offset) : null;
 
         return new self(
             $id,
@@ -456,7 +483,7 @@ final class UserFull extends TlObject
             $pinnedMsgId,
             $folderId,
             $ttlPeriod,
-            $themeEmoticon,
+            $theme,
             $privateForwardName,
             $botGroupAdminRights,
             $botBroadcastAdminRights,
@@ -477,7 +504,10 @@ final class UserFull extends TlObject
             $disallowedGifts,
             $starsRating,
             $starsMyPendingRating,
-            $starsMyPendingRatingDate
+            $starsMyPendingRatingDate,
+            $mainTab,
+            $savedMusic,
+            $note
         );
     }
 }

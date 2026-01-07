@@ -11,7 +11,7 @@ use RuntimeException;
  */
 final class GroupCallParticipant extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xeba636fe;
+    public const CONSTRUCTOR_ID = 0x2a3dc7ac;
     
     public string $predicate = 'groupCallParticipant';
     
@@ -35,6 +35,7 @@ final class GroupCallParticipant extends TlObject
      * @param int|null $raiseHandRating
      * @param GroupCallParticipantVideo|null $video
      * @param GroupCallParticipantVideo|null $presentation
+     * @param int|null $paidStarsTotal
      */
     public function __construct(
         public readonly AbstractPeer $peer,
@@ -55,7 +56,8 @@ final class GroupCallParticipant extends TlObject
         public readonly ?string $about = null,
         public readonly ?int $raiseHandRating = null,
         public readonly ?GroupCallParticipantVideo $video = null,
-        public readonly ?GroupCallParticipantVideo $presentation = null
+        public readonly ?GroupCallParticipantVideo $presentation = null,
+        public readonly ?int $paidStarsTotal = null
     ) {}
     
     public function serialize(): string
@@ -110,6 +112,9 @@ final class GroupCallParticipant extends TlObject
         if ($this->presentation !== null) {
             $flags |= (1 << 14);
         }
+        if ($this->paidStarsTotal !== null) {
+            $flags |= (1 << 16);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();
         $buffer .= Serializer::int32($this->date);
@@ -131,6 +136,9 @@ final class GroupCallParticipant extends TlObject
         }
         if ($flags & (1 << 14)) {
             $buffer .= $this->presentation->serialize();
+        }
+        if ($flags & (1 << 16)) {
+            $buffer .= Serializer::int64($this->paidStarsTotal);
         }
         return $buffer;
     }
@@ -160,6 +168,7 @@ final class GroupCallParticipant extends TlObject
         $raiseHandRating = (($flags & (1 << 13)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
         $video = (($flags & (1 << 6)) !== 0) ? GroupCallParticipantVideo::deserialize($__payload, $__offset) : null;
         $presentation = (($flags & (1 << 14)) !== 0) ? GroupCallParticipantVideo::deserialize($__payload, $__offset) : null;
+        $paidStarsTotal = (($flags & (1 << 16)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
 
         return new self(
             $peer,
@@ -180,7 +189,8 @@ final class GroupCallParticipant extends TlObject
             $about,
             $raiseHandRating,
             $video,
-            $presentation
+            $presentation,
+            $paidStarsTotal
         );
     }
 }

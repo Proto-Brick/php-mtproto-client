@@ -2,6 +2,7 @@
 namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractForumTopic;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessage;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
 use ProtoBrick\MTProtoClient\TL\Deserializer;
@@ -12,17 +13,19 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class Messages extends AbstractMessages
 {
-    public const CONSTRUCTOR_ID = 0x8c718e87;
+    public const CONSTRUCTOR_ID = 0x1d73e7ea;
     
     public string $predicate = 'messages.messages';
     
     /**
      * @param list<AbstractMessage> $messages
+     * @param list<AbstractForumTopic> $topics
      * @param list<AbstractChat> $chats
      * @param list<AbstractUser> $users
      */
     public function __construct(
         public readonly array $messages,
+        public readonly array $topics,
         public readonly array $chats,
         public readonly array $users
     ) {}
@@ -31,6 +34,7 @@ final class Messages extends AbstractMessages
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= Serializer::vectorOfObjects($this->messages);
+        $buffer .= Serializer::vectorOfObjects($this->topics);
         $buffer .= Serializer::vectorOfObjects($this->chats);
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
@@ -39,11 +43,13 @@ final class Messages extends AbstractMessages
     {
         $__offset += 4; // Constructor ID
         $messages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);
+        $topics = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractForumTopic::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $messages,
+            $topics,
             $chats,
             $users
         );

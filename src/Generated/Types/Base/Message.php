@@ -9,7 +9,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class Message extends AbstractMessage
 {
-    public const CONSTRUCTOR_ID = 0x9815cec8;
+    public const CONSTRUCTOR_ID = 0xb92f76cf;
     
     public string $predicate = 'message';
     
@@ -58,6 +58,7 @@ final class Message extends AbstractMessage
      * @param int|null $reportDeliveryUntilDate
      * @param int|null $paidMessageStars
      * @param SuggestedPost|null $suggestedPost
+     * @param int|null $scheduleRepeatPeriod
      */
     public function __construct(
         public readonly int $id,
@@ -103,7 +104,8 @@ final class Message extends AbstractMessage
         public readonly ?FactCheck $factcheck = null,
         public readonly ?int $reportDeliveryUntilDate = null,
         public readonly ?int $paidMessageStars = null,
-        public readonly ?SuggestedPost $suggestedPost = null
+        public readonly ?SuggestedPost $suggestedPost = null,
+        public readonly ?int $scheduleRepeatPeriod = null
     ) {}
     
     public function serialize(): string
@@ -231,6 +233,9 @@ final class Message extends AbstractMessage
         if ($this->suggestedPost !== null) {
             $flags2 |= (1 << 7);
         }
+        if ($this->scheduleRepeatPeriod !== null) {
+            $flags2 |= (1 << 10);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int32($flags2);
         $buffer .= Serializer::int32($this->id);
@@ -312,6 +317,9 @@ final class Message extends AbstractMessage
         if ($flags2 & (1 << 7)) {
             $buffer .= $this->suggestedPost->serialize();
         }
+        if ($flags2 & (1 << 10)) {
+            $buffer .= Serializer::int32($this->scheduleRepeatPeriod);
+        }
         return $buffer;
     }
     public static function deserialize(string $__payload, &$__offset): static
@@ -363,6 +371,7 @@ final class Message extends AbstractMessage
         $reportDeliveryUntilDate = (($flags2 & (1 << 5)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $paidMessageStars = (($flags2 & (1 << 6)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
         $suggestedPost = (($flags2 & (1 << 7)) !== 0) ? SuggestedPost::deserialize($__payload, $__offset) : null;
+        $scheduleRepeatPeriod = (($flags2 & (1 << 10)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $id,
@@ -408,7 +417,8 @@ final class Message extends AbstractMessage
             $factcheck,
             $reportDeliveryUntilDate,
             $paidMessageStars,
-            $suggestedPost
+            $suggestedPost,
+            $scheduleRepeatPeriod
         );
     }
 }

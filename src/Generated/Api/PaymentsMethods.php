@@ -8,6 +8,7 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Payments\AssignPlayMarketTransact
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\BotCancelStarsSubscriptionRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\CanPurchaseStoreRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\ChangeStarsSubscriptionRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Payments\CheckCanSendGiftRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\CheckGiftCodeRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\ClearSavedInfoRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\ConnectStarRefBotRequest;
@@ -28,7 +29,11 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetResaleStarGiftsReques
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetSavedInfoRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetSavedStarGiftRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetSavedStarGiftsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarGiftActiveAuctionsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarGiftAuctionAcquiredGiftsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarGiftAuctionStateRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarGiftCollectionsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarGiftUpgradeAttributesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarGiftUpgradePreviewRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarGiftWithdrawalUrlRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarGiftsRequest;
@@ -44,11 +49,14 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarsTransactionsByID
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetStarsTransactionsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetSuggestedStarRefBotsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetUniqueStarGiftRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Payments\GetUniqueStarGiftValueInfoRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\LaunchPrepaidGiveawayRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\RefundStarsChargeRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\ReorderStarGiftCollectionsRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Payments\ResolveStarGiftOfferRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\SaveStarGiftRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\SendPaymentFormRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Payments\SendStarGiftOfferRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\SendStarsFormRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\ToggleChatStarGiftNotificationsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\ToggleStarGiftsPinnedToTopRequest;
@@ -63,6 +71,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputMedia;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPaymentCredentials;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputSavedStarGift;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputStarGiftAuction;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputStorePaymentPurpose;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractStarGiftAttributeId;
@@ -73,10 +82,14 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\InputCheckPasswordSRP;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceBusinessBotTransferStars;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceChatInviteSubscription;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceMessage;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoicePremiumAuthCode;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoicePremiumGiftCode;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoicePremiumGiftStars;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceSlug;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceStarGift;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceStarGiftAuctionBid;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceStarGiftDropOriginalDetails;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceStarGiftPrepaidUpgrade;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceStarGiftResale;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceStarGiftTransfer;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputInvoiceStarGiftUpgrade;
@@ -114,6 +127,8 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPeerUserFromMessage;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputSavedStarGiftChat;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputSavedStarGiftSlug;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputSavedStarGiftUser;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputStarGiftAuction;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputStarGiftAuctionSlug;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputStarsTransaction;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputStorePaymentAuthCode;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputStorePaymentGiftPremium;
@@ -145,13 +160,17 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShortSentMessage;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\Updates;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdatesCombined;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdatesTooLong;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractCheckCanSendGiftResult;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractGiveawayInfo;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractPaymentForm;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractPaymentReceipt;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractPaymentResult;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractStarGiftActiveAuctions;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractStarGiftCollections;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\AbstractStarGifts;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\BankCardData;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\CheckCanSendGiftResultFail;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\CheckCanSendGiftResultOk;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\CheckedGiftCode;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\ConnectedStarRefBots;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\ExportedInvoice;
@@ -167,8 +186,13 @@ use ProtoBrick\MTProtoClient\Generated\Types\Payments\PaymentVerificationNeeded;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\ResaleStarGifts;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\SavedInfo;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\SavedStarGifts;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftActiveAuctions;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftActiveAuctionsNotModified;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftAuctionAcquiredGifts;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftAuctionState;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftCollections;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftCollectionsNotModified;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftUpgradeAttributes;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftUpgradePreview;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftWithdrawalUrl;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGifts;
@@ -179,6 +203,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarsRevenueWithdrawalUrl;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\StarsStatus;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\SuggestedStarRefBots;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\UniqueStarGift;
+use ProtoBrick\MTProtoClient\Generated\Types\Payments\UniqueStarGiftValueInfo;
 use ProtoBrick\MTProtoClient\Generated\Types\Payments\ValidatedRequestedInfo;
 
 
@@ -192,7 +217,7 @@ final readonly class PaymentsMethods
     public function __construct(private Client $client) {}
 
     /**
-     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale $invoice
+     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale|InputInvoiceStarGiftPrepaidUpgrade|InputInvoicePremiumAuthCode|InputInvoiceStarGiftDropOriginalDetails|InputInvoiceStarGiftAuctionBid $invoice
      * @param array|null $themeParams
      * @return PaymentForm|PaymentFormStars|PaymentFormStarGift|null
      * @see https://core.telegram.org/method/payments.getPaymentForm
@@ -219,7 +244,7 @@ final readonly class PaymentsMethods
     }
 
     /**
-     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale $invoice
+     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale|InputInvoiceStarGiftPrepaidUpgrade|InputInvoicePremiumAuthCode|InputInvoiceStarGiftDropOriginalDetails|InputInvoiceStarGiftAuctionBid $invoice
      * @param PaymentRequestedInfo $info
      * @param bool|null $save
      * @return ValidatedRequestedInfo|null
@@ -233,7 +258,7 @@ final readonly class PaymentsMethods
 
     /**
      * @param int $formId
-     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale $invoice
+     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale|InputInvoiceStarGiftPrepaidUpgrade|InputInvoicePremiumAuthCode|InputInvoiceStarGiftDropOriginalDetails|InputInvoiceStarGiftAuctionBid $invoice
      * @param InputPaymentCredentialsSaved|InputPaymentCredentials|InputPaymentCredentialsApplePay|InputPaymentCredentialsGooglePay $credentials
      * @param string|null $requestedInfoId
      * @param string|null $shippingOptionId
@@ -430,7 +455,7 @@ final readonly class PaymentsMethods
 
     /**
      * @param int $formId
-     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale $invoice
+     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale|InputInvoiceStarGiftPrepaidUpgrade|InputInvoicePremiumAuthCode|InputInvoiceStarGiftDropOriginalDetails|InputInvoiceStarGiftAuctionBid $invoice
      * @return PaymentResult|PaymentVerificationNeeded|null
      * @see https://core.telegram.org/method/payments.sendStarsForm
      * @api
@@ -807,20 +832,23 @@ final readonly class PaymentsMethods
      * @param bool|null $excludeUnsaved
      * @param bool|null $excludeSaved
      * @param bool|null $excludeUnlimited
-     * @param bool|null $excludeLimited
      * @param bool|null $excludeUnique
      * @param bool|null $sortByValue
+     * @param bool|null $excludeUpgradable
+     * @param bool|null $excludeUnupgradable
+     * @param bool|null $peerColorAvailable
+     * @param bool|null $excludeHosted
      * @param int|null $collectionId
      * @return SavedStarGifts|null
      * @see https://core.telegram.org/method/payments.getSavedStarGifts
      * @api
      */
-    public function getSavedStarGifts(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $excludeUnsaved = null, ?bool $excludeSaved = null, ?bool $excludeUnlimited = null, ?bool $excludeLimited = null, ?bool $excludeUnique = null, ?bool $sortByValue = null, ?int $collectionId = null): ?SavedStarGifts
+    public function getSavedStarGifts(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $excludeUnsaved = null, ?bool $excludeSaved = null, ?bool $excludeUnlimited = null, ?bool $excludeUnique = null, ?bool $sortByValue = null, ?bool $excludeUpgradable = null, ?bool $excludeUnupgradable = null, ?bool $peerColorAvailable = null, ?bool $excludeHosted = null, ?int $collectionId = null): ?SavedStarGifts
     {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetSavedStarGiftsRequest(peer: $peer, offset: $offset, limit: $limit, excludeUnsaved: $excludeUnsaved, excludeSaved: $excludeSaved, excludeUnlimited: $excludeUnlimited, excludeLimited: $excludeLimited, excludeUnique: $excludeUnique, sortByValue: $sortByValue, collectionId: $collectionId));
+        return $this->client->callSync(new GetSavedStarGiftsRequest(peer: $peer, offset: $offset, limit: $limit, excludeUnsaved: $excludeUnsaved, excludeSaved: $excludeSaved, excludeUnlimited: $excludeUnlimited, excludeUnique: $excludeUnique, sortByValue: $sortByValue, excludeUpgradable: $excludeUpgradable, excludeUnupgradable: $excludeUnupgradable, peerColorAvailable: $peerColorAvailable, excludeHosted: $excludeHosted, collectionId: $collectionId));
     }
 
     /**
@@ -994,5 +1022,106 @@ final readonly class PaymentsMethods
             $peer = $this->client->peerManager->resolve($peer);
         }
         return $this->client->callSync(new GetStarGiftCollectionsRequest(peer: $peer, hash: $hash));
+    }
+
+    /**
+     * @param string $slug
+     * @return UniqueStarGiftValueInfo|null
+     * @see https://core.telegram.org/method/payments.getUniqueStarGiftValueInfo
+     * @api
+     */
+    public function getUniqueStarGiftValueInfo(string $slug): ?UniqueStarGiftValueInfo
+    {
+        return $this->client->callSync(new GetUniqueStarGiftValueInfoRequest(slug: $slug));
+    }
+
+    /**
+     * @param int $giftId
+     * @return CheckCanSendGiftResultOk|CheckCanSendGiftResultFail|null
+     * @see https://core.telegram.org/method/payments.checkCanSendGift
+     * @api
+     */
+    public function checkCanSendGift(int $giftId): ?AbstractCheckCanSendGiftResult
+    {
+        return $this->client->callSync(new CheckCanSendGiftRequest(giftId: $giftId));
+    }
+
+    /**
+     * @param InputStarGiftAuction|InputStarGiftAuctionSlug $auction
+     * @param int $version
+     * @return StarGiftAuctionState|null
+     * @see https://core.telegram.org/method/payments.getStarGiftAuctionState
+     * @api
+     */
+    public function getStarGiftAuctionState(AbstractInputStarGiftAuction $auction, int $version): ?StarGiftAuctionState
+    {
+        return $this->client->callSync(new GetStarGiftAuctionStateRequest(auction: $auction, version: $version));
+    }
+
+    /**
+     * @param int $giftId
+     * @return StarGiftAuctionAcquiredGifts|null
+     * @see https://core.telegram.org/method/payments.getStarGiftAuctionAcquiredGifts
+     * @api
+     */
+    public function getStarGiftAuctionAcquiredGifts(int $giftId): ?StarGiftAuctionAcquiredGifts
+    {
+        return $this->client->callSync(new GetStarGiftAuctionAcquiredGiftsRequest(giftId: $giftId));
+    }
+
+    /**
+     * @param int $hash
+     * @return StarGiftActiveAuctionsNotModified|StarGiftActiveAuctions|null
+     * @see https://core.telegram.org/method/payments.getStarGiftActiveAuctions
+     * @api
+     */
+    public function getStarGiftActiveAuctions(int $hash): ?AbstractStarGiftActiveAuctions
+    {
+        return $this->client->callSync(new GetStarGiftActiveAuctionsRequest(hash: $hash));
+    }
+
+    /**
+     * @param int $offerMsgId
+     * @param bool|null $decline
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/payments.resolveStarGiftOffer
+     * @api
+     */
+    public function resolveStarGiftOffer(int $offerMsgId, ?bool $decline = null): ?AbstractUpdates
+    {
+        return $this->client->callSync(new ResolveStarGiftOfferRequest(offerMsgId: $offerMsgId, decline: $decline));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $slug
+     * @param StarsAmount|StarsTonAmount $price
+     * @param int $duration
+     * @param int|null $randomId
+     * @param int|null $allowPaidStars
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/payments.sendStarGiftOffer
+     * @api
+     */
+    public function sendStarGiftOffer(AbstractInputPeer|string|int $peer, string $slug, AbstractStarsAmount $price, int $duration, ?int $randomId = null, ?int $allowPaidStars = null): ?AbstractUpdates
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->callSync(new SendStarGiftOfferRequest(peer: $peer, slug: $slug, price: $price, duration: $duration, randomId: $randomId, allowPaidStars: $allowPaidStars));
+    }
+
+    /**
+     * @param int $giftId
+     * @return StarGiftUpgradeAttributes|null
+     * @see https://core.telegram.org/method/payments.getStarGiftUpgradeAttributes
+     * @api
+     */
+    public function getStarGiftUpgradeAttributes(int $giftId): ?StarGiftUpgradeAttributes
+    {
+        return $this->client->callSync(new GetStarGiftUpgradeAttributesRequest(giftId: $giftId));
     }
 }

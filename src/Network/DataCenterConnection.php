@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace ProtoBrick\MTProtoClient\Network;
 
 use Amp\Future;
-use Amp\DeferredFuture;
 use Amp\Sync\LocalMutex;
 use ProtoBrick\MTProtoClient\Logger\LogChannel;
 use ProtoBrick\MTProtoClient\Peer\PeerManager;
-use ProtoBrick\MTProtoClient\TL\MTProto\PingRequest;
 use ProtoBrick\MTProtoClient\TL\RpcRequest;
 use Psr\Log\LoggerInterface;
 use Revolt\EventLoop;
@@ -70,9 +68,9 @@ class DataCenterConnection
 
             if (!$isPing && !$this->sessionState->isInitialized()) {
                 $payload = Serializer::wrapWithInitConnection(
-                    $payload,
-                    211,
-                    $this->settings->api_id
+                    query: $payload,
+                    layer: 220,
+                    apiId: $this->settings->api_id
                 );
                 $this->sessionState->setInitialized(true);
             }

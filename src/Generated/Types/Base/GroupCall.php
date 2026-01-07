@@ -9,7 +9,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class GroupCall extends AbstractGroupCall
 {
-    public const CONSTRUCTOR_ID = 0x553b0ba1;
+    public const CONSTRUCTOR_ID = 0xefb2b617;
     
     public string $predicate = 'groupCall';
     
@@ -29,12 +29,17 @@ final class GroupCall extends AbstractGroupCall
      * @param true|null $listenersHidden
      * @param true|null $conference
      * @param true|null $creator
+     * @param true|null $messagesEnabled
+     * @param true|null $canChangeMessagesEnabled
+     * @param true|null $min
      * @param string|null $title
      * @param int|null $streamDcId
      * @param int|null $recordStartDate
      * @param int|null $scheduleDate
      * @param int|null $unmutedVideoCount
      * @param string|null $inviteLink
+     * @param int|null $sendPaidMessagesStars
+     * @param AbstractPeer|null $defaultSendAs
      */
     public function __construct(
         public readonly int $id,
@@ -52,12 +57,17 @@ final class GroupCall extends AbstractGroupCall
         public readonly ?true $listenersHidden = null,
         public readonly ?true $conference = null,
         public readonly ?true $creator = null,
+        public readonly ?true $messagesEnabled = null,
+        public readonly ?true $canChangeMessagesEnabled = null,
+        public readonly ?true $min = null,
         public readonly ?string $title = null,
         public readonly ?int $streamDcId = null,
         public readonly ?int $recordStartDate = null,
         public readonly ?int $scheduleDate = null,
         public readonly ?int $unmutedVideoCount = null,
-        public readonly ?string $inviteLink = null
+        public readonly ?string $inviteLink = null,
+        public readonly ?int $sendPaidMessagesStars = null,
+        public readonly ?AbstractPeer $defaultSendAs = null
     ) {}
     
     public function serialize(): string
@@ -94,6 +104,15 @@ final class GroupCall extends AbstractGroupCall
         if ($this->creator) {
             $flags |= (1 << 15);
         }
+        if ($this->messagesEnabled) {
+            $flags |= (1 << 17);
+        }
+        if ($this->canChangeMessagesEnabled) {
+            $flags |= (1 << 18);
+        }
+        if ($this->min) {
+            $flags |= (1 << 19);
+        }
         if ($this->title !== null) {
             $flags |= (1 << 3);
         }
@@ -111,6 +130,12 @@ final class GroupCall extends AbstractGroupCall
         }
         if ($this->inviteLink !== null) {
             $flags |= (1 << 16);
+        }
+        if ($this->sendPaidMessagesStars !== null) {
+            $flags |= (1 << 20);
+        }
+        if ($this->defaultSendAs !== null) {
+            $flags |= (1 << 21);
         }
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::int64($this->id);
@@ -136,6 +161,12 @@ final class GroupCall extends AbstractGroupCall
         if ($flags & (1 << 16)) {
             $buffer .= Serializer::bytes($this->inviteLink);
         }
+        if ($flags & (1 << 20)) {
+            $buffer .= Serializer::int64($this->sendPaidMessagesStars);
+        }
+        if ($flags & (1 << 21)) {
+            $buffer .= $this->defaultSendAs->serialize();
+        }
         return $buffer;
     }
     public static function deserialize(string $__payload, &$__offset): static
@@ -152,6 +183,9 @@ final class GroupCall extends AbstractGroupCall
         $listenersHidden = (($flags & (1 << 13)) !== 0) ? true : null;
         $conference = (($flags & (1 << 14)) !== 0) ? true : null;
         $creator = (($flags & (1 << 15)) !== 0) ? true : null;
+        $messagesEnabled = (($flags & (1 << 17)) !== 0) ? true : null;
+        $canChangeMessagesEnabled = (($flags & (1 << 18)) !== 0) ? true : null;
+        $min = (($flags & (1 << 19)) !== 0) ? true : null;
         $id = Deserializer::int64($__payload, $__offset);
         $accessHash = Deserializer::int64($__payload, $__offset);
         $participantsCount = Deserializer::int32($__payload, $__offset);
@@ -163,6 +197,8 @@ final class GroupCall extends AbstractGroupCall
         $unmutedVideoLimit = Deserializer::int32($__payload, $__offset);
         $version = Deserializer::int32($__payload, $__offset);
         $inviteLink = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $sendPaidMessagesStars = (($flags & (1 << 20)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $defaultSendAs = (($flags & (1 << 21)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
 
         return new self(
             $id,
@@ -180,12 +216,17 @@ final class GroupCall extends AbstractGroupCall
             $listenersHidden,
             $conference,
             $creator,
+            $messagesEnabled,
+            $canChangeMessagesEnabled,
+            $min,
             $title,
             $streamDcId,
             $recordStartDate,
             $scheduleDate,
             $unmutedVideoCount,
-            $inviteLink
+            $inviteLink,
+            $sendPaidMessagesStars,
+            $defaultSendAs
         );
     }
 }

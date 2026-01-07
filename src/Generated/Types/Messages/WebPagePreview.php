@@ -1,6 +1,7 @@
 <?php declare(strict_types=1);
 namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChat;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessageMedia;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
 use ProtoBrick\MTProtoClient\TL\Deserializer;
@@ -13,16 +14,18 @@ use RuntimeException;
  */
 final class WebPagePreview extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0xb53e8b21;
+    public const CONSTRUCTOR_ID = 0x8c9a88ac;
     
     public string $predicate = 'messages.webPagePreview';
     
     /**
      * @param AbstractMessageMedia $media
+     * @param list<AbstractChat> $chats
      * @param list<AbstractUser> $users
      */
     public function __construct(
         public readonly AbstractMessageMedia $media,
+        public readonly array $chats,
         public readonly array $users
     ) {}
     
@@ -30,6 +33,7 @@ final class WebPagePreview extends TlObject
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $buffer .= $this->media->serialize();
+        $buffer .= Serializer::vectorOfObjects($this->chats);
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
     }
@@ -40,10 +44,12 @@ final class WebPagePreview extends TlObject
             throw new RuntimeException('Invalid constructor ID for ' . self::class);
         }
         $media = AbstractMessageMedia::deserialize($__payload, $__offset);
+        $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $media,
+            $chats,
             $users
         );
     }

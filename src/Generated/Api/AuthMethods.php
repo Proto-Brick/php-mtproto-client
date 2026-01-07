@@ -5,15 +5,18 @@ use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\AcceptLoginTokenRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\BindTempAuthKeyRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\CancelCodeRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Auth\CheckPaidAuthRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\CheckPasswordRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\CheckRecoveryPasswordRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\DropTempAuthKeysRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\ExportAuthorizationRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\ExportLoginTokenRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Auth\FinishPasskeyLoginRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\ImportAuthorizationRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\ImportBotAuthorizationRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\ImportLoginTokenRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\ImportWebTokenAuthorizationRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Auth\InitPasskeyLoginRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\LogOutRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\RecoverPasswordRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\ReportMissingCodeRequest;
@@ -36,6 +39,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Auth\LoggedOut;
 use ProtoBrick\MTProtoClient\Generated\Types\Auth\LoginToken;
 use ProtoBrick\MTProtoClient\Generated\Types\Auth\LoginTokenMigrateTo;
 use ProtoBrick\MTProtoClient\Generated\Types\Auth\LoginTokenSuccess;
+use ProtoBrick\MTProtoClient\Generated\Types\Auth\PasskeyLoginOptions;
 use ProtoBrick\MTProtoClient\Generated\Types\Auth\PasswordRecovery;
 use ProtoBrick\MTProtoClient\Generated\Types\Auth\SentCode;
 use ProtoBrick\MTProtoClient\Generated\Types\Auth\SentCodePaymentRequired;
@@ -49,6 +53,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\EmailVerificationCode;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\EmailVerificationGoogle;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputCheckPasswordEmpty;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputCheckPasswordSRP;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\InputPasskeyCredential;
 
 
 /**
@@ -340,5 +345,43 @@ final readonly class AuthMethods
     public function reportMissingCode(string $phoneNumber, string $phoneCodeHash, string $mnc): bool
     {
         return (bool) $this->client->callSync(new ReportMissingCodeRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, mnc: $mnc));
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param int $formId
+     * @return SentCode|SentCodeSuccess|SentCodePaymentRequired|null
+     * @see https://core.telegram.org/method/auth.checkPaidAuth
+     * @api
+     */
+    public function checkPaidAuth(string $phoneNumber, string $phoneCodeHash, int $formId): ?AbstractSentCode
+    {
+        return $this->client->callSync(new CheckPaidAuthRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, formId: $formId));
+    }
+
+    /**
+     * @param int $apiId
+     * @param string $apiHash
+     * @return PasskeyLoginOptions|null
+     * @see https://core.telegram.org/method/auth.initPasskeyLogin
+     * @api
+     */
+    public function initPasskeyLogin(int $apiId, string $apiHash): ?PasskeyLoginOptions
+    {
+        return $this->client->callSync(new InitPasskeyLoginRequest(apiId: $apiId, apiHash: $apiHash));
+    }
+
+    /**
+     * @param InputPasskeyCredential $credential
+     * @param int|null $fromDcId
+     * @param int|null $fromAuthKeyId
+     * @return Authorization|AuthorizationSignUpRequired|null
+     * @see https://core.telegram.org/method/auth.finishPasskeyLogin
+     * @api
+     */
+    public function finishPasskeyLogin(InputPasskeyCredential $credential, ?int $fromDcId = null, ?int $fromAuthKeyId = null): ?AbstractAuthorization
+    {
+        return $this->client->callSync(new FinishPasskeyLoginRequest(credential: $credential, fromDcId: $fromDcId, fromAuthKeyId: $fromAuthKeyId));
     }
 }

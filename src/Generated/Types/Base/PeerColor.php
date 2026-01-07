@@ -3,13 +3,11 @@ namespace ProtoBrick\MTProtoClient\Generated\Types\Base;
 
 use ProtoBrick\MTProtoClient\TL\Deserializer;
 use ProtoBrick\MTProtoClient\TL\Serializer;
-use ProtoBrick\MTProtoClient\TL\TlObject;
-use RuntimeException;
 
 /**
  * @see https://core.telegram.org/type/peerColor
  */
-final class PeerColor extends TlObject
+final class PeerColor extends AbstractPeerColor
 {
     public const CONSTRUCTOR_ID = 0xb54b5acf;
     
@@ -45,10 +43,7 @@ final class PeerColor extends TlObject
     }
     public static function deserialize(string $__payload, &$__offset): static
     {
-        $constructorId = Deserializer::int32($__payload, $__offset);
-        if ($constructorId !== self::CONSTRUCTOR_ID) {
-            throw new RuntimeException('Invalid constructor ID for ' . self::class);
-        }
+        $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
         $color = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $backgroundEmojiId = (($flags & (1 << 1)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;

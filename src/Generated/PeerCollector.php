@@ -515,6 +515,11 @@ final class PeerCollector
                 if ($object->users !== null) { foreach ($object->users as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
                 return;
 
+            case \ProtoBrick\MTProtoClient\Generated\Types\Account\ChatThemes::class:
+                if ($object->chats !== null) { foreach ($object->chats as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                if ($object->users !== null) { foreach ($object->users as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                return;
+
             case \ProtoBrick\MTProtoClient\Generated\Types\Base\SponsoredMessage::class:
                 if ($object->media !== null) { $this->collect($object->media, $manager); }
                 return;
@@ -801,11 +806,13 @@ final class PeerCollector
                 return;
 
             case \ProtoBrick\MTProtoClient\Generated\Types\Payments\UniqueStarGift::class:
+                if ($object->chats !== null) { foreach ($object->chats as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
                 if ($object->users !== null) { foreach ($object->users as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
                 return;
 
             case \ProtoBrick\MTProtoClient\Generated\Types\Messages\WebPagePreview::class:
                 if ($object->media !== null) { $this->collect($object->media, $manager); }
+                if ($object->chats !== null) { foreach ($object->chats as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
                 if ($object->users !== null) { foreach ($object->users as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
                 return;
 
@@ -822,6 +829,26 @@ final class PeerCollector
             case \ProtoBrick\MTProtoClient\Generated\Types\Payments\ResaleStarGifts::class:
                 if ($object->chats !== null) { foreach ($object->chats as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
                 if ($object->users !== null) { foreach ($object->users as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                return;
+
+            case \ProtoBrick\MTProtoClient\Generated\Types\Phone\GroupCallStars::class:
+                if ($object->chats !== null) { foreach ($object->chats as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                if ($object->users !== null) { foreach ($object->users as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                return;
+
+            case \ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftAuctionState::class:
+                if ($object->users !== null) { foreach ($object->users as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                if ($object->chats !== null) { foreach ($object->chats as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                return;
+
+            case \ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftAuctionAcquiredGifts::class:
+                if ($object->users !== null) { foreach ($object->users as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                if ($object->chats !== null) { foreach ($object->chats as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                return;
+
+            case \ProtoBrick\MTProtoClient\Generated\Types\Payments\StarGiftActiveAuctions::class:
+                if ($object->users !== null) { foreach ($object->users as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
+                if ($object->chats !== null) { foreach ($object->chats as $item) { if ($item instanceof \ProtoBrick\MTProtoClient\TL\Contracts\PeerEntity) { $manager->savePeerEntity($item); } } }
                 return;
 
 

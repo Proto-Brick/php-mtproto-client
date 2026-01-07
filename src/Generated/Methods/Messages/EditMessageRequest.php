@@ -14,7 +14,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class EditMessageRequest extends RpcRequest
 {
-    public const CONSTRUCTOR_ID = 0xdfd14005;
+    public const CONSTRUCTOR_ID = 0x51e842e1;
     
     public string $predicate = 'messages.editMessage';
     
@@ -37,6 +37,7 @@ final class EditMessageRequest extends RpcRequest
      * @param AbstractReplyMarkup|null $replyMarkup
      * @param list<AbstractMessageEntity>|null $entities
      * @param int|null $scheduleDate
+     * @param int|null $scheduleRepeatPeriod
      * @param int|null $quickReplyShortcutId
      */
     public function __construct(
@@ -49,6 +50,7 @@ final class EditMessageRequest extends RpcRequest
         public readonly ?AbstractReplyMarkup $replyMarkup = null,
         public readonly ?array $entities = null,
         public readonly ?int $scheduleDate = null,
+        public readonly ?int $scheduleRepeatPeriod = null,
         public readonly ?int $quickReplyShortcutId = null
     ) {}
     
@@ -77,6 +79,9 @@ final class EditMessageRequest extends RpcRequest
         if ($this->scheduleDate !== null) {
             $flags |= (1 << 15);
         }
+        if ($this->scheduleRepeatPeriod !== null) {
+            $flags |= (1 << 18);
+        }
         if ($this->quickReplyShortcutId !== null) {
             $flags |= (1 << 17);
         }
@@ -97,6 +102,9 @@ final class EditMessageRequest extends RpcRequest
         }
         if ($flags & (1 << 15)) {
             $buffer .= Serializer::int32($this->scheduleDate);
+        }
+        if ($flags & (1 << 18)) {
+            $buffer .= Serializer::int32($this->scheduleRepeatPeriod);
         }
         if ($flags & (1 << 17)) {
             $buffer .= Serializer::int32($this->quickReplyShortcutId);

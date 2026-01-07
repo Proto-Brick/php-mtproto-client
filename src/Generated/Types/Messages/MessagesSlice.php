@@ -2,6 +2,7 @@
 namespace ProtoBrick\MTProtoClient\Generated\Types\Messages;
 
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChat;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractForumTopic;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractMessage;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUser;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\SearchPostsFlood;
@@ -13,13 +14,14 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class MessagesSlice extends AbstractMessages
 {
-    public const CONSTRUCTOR_ID = 0x762b263d;
+    public const CONSTRUCTOR_ID = 0x5f206716;
     
     public string $predicate = 'messages.messagesSlice';
     
     /**
      * @param int $count
      * @param list<AbstractMessage> $messages
+     * @param list<AbstractForumTopic> $topics
      * @param list<AbstractChat> $chats
      * @param list<AbstractUser> $users
      * @param true|null $inexact
@@ -30,6 +32,7 @@ final class MessagesSlice extends AbstractMessages
     public function __construct(
         public readonly int $count,
         public readonly array $messages,
+        public readonly array $topics,
         public readonly array $chats,
         public readonly array $users,
         public readonly ?true $inexact = null,
@@ -66,6 +69,7 @@ final class MessagesSlice extends AbstractMessages
             $buffer .= $this->searchFlood->serialize();
         }
         $buffer .= Serializer::vectorOfObjects($this->messages);
+        $buffer .= Serializer::vectorOfObjects($this->topics);
         $buffer .= Serializer::vectorOfObjects($this->chats);
         $buffer .= Serializer::vectorOfObjects($this->users);
         return $buffer;
@@ -80,12 +84,14 @@ final class MessagesSlice extends AbstractMessages
         $offsetIdOffset = (($flags & (1 << 2)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $searchFlood = (($flags & (1 << 3)) !== 0) ? SearchPostsFlood::deserialize($__payload, $__offset) : null;
         $messages = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractMessage::class, 'deserialize']);
+        $topics = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractForumTopic::class, 'deserialize']);
         $chats = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractChat::class, 'deserialize']);
         $users = Deserializer::vectorOfObjects($__payload, $__offset, [AbstractUser::class, 'deserialize']);
 
         return new self(
             $count,
             $messages,
+            $topics,
             $chats,
             $users,
             $inexact,

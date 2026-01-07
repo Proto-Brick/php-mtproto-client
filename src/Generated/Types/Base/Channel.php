@@ -10,7 +10,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class Channel extends AbstractChat implements PeerEntity
 {
-    public const CONSTRUCTOR_ID = 0xfe685355;
+    public const CONSTRUCTOR_ID = 0x1c32b11c;
     
     public string $predicate = 'channel';
     
@@ -59,9 +59,9 @@ final class Channel extends AbstractChat implements PeerEntity
      * @param ChatBannedRights|null $defaultBannedRights
      * @param int|null $participantsCount
      * @param list<Username>|null $usernames
-     * @param int|null $storiesMaxId
-     * @param PeerColor|null $color
-     * @param PeerColor|null $profileColor
+     * @param RecentStory|null $storiesMaxId
+     * @param AbstractPeerColor|null $color
+     * @param AbstractPeerColor|null $profileColor
      * @param AbstractEmojiStatus|null $emojiStatus
      * @param int|null $level
      * @param int|null $subscriptionUntilDate
@@ -110,9 +110,9 @@ final class Channel extends AbstractChat implements PeerEntity
         public readonly ?ChatBannedRights $defaultBannedRights = null,
         public readonly ?int $participantsCount = null,
         public readonly ?array $usernames = null,
-        public readonly ?int $storiesMaxId = null,
-        public readonly ?PeerColor $color = null,
-        public readonly ?PeerColor $profileColor = null,
+        public readonly ?RecentStory $storiesMaxId = null,
+        public readonly ?AbstractPeerColor $color = null,
+        public readonly ?AbstractPeerColor $profileColor = null,
         public readonly ?AbstractEmojiStatus $emojiStatus = null,
         public readonly ?int $level = null,
         public readonly ?int $subscriptionUntilDate = null,
@@ -292,7 +292,7 @@ final class Channel extends AbstractChat implements PeerEntity
             $buffer .= Serializer::vectorOfObjects($this->usernames);
         }
         if ($flags2 & (1 << 4)) {
-            $buffer .= Serializer::int32($this->storiesMaxId);
+            $buffer .= $this->storiesMaxId->serialize();
         }
         if ($flags2 & (1 << 7)) {
             $buffer .= $this->color->serialize();
@@ -365,9 +365,9 @@ final class Channel extends AbstractChat implements PeerEntity
         $defaultBannedRights = (($flags & (1 << 18)) !== 0) ? ChatBannedRights::deserialize($__payload, $__offset) : null;
         $participantsCount = (($flags & (1 << 17)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $usernames = (($flags2 & (1 << 0)) !== 0) ? Deserializer::vectorOfObjects($__payload, $__offset, [Username::class, 'deserialize']) : null;
-        $storiesMaxId = (($flags2 & (1 << 4)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
-        $color = (($flags2 & (1 << 7)) !== 0) ? PeerColor::deserialize($__payload, $__offset) : null;
-        $profileColor = (($flags2 & (1 << 8)) !== 0) ? PeerColor::deserialize($__payload, $__offset) : null;
+        $storiesMaxId = (($flags2 & (1 << 4)) !== 0) ? RecentStory::deserialize($__payload, $__offset) : null;
+        $color = (($flags2 & (1 << 7)) !== 0) ? AbstractPeerColor::deserialize($__payload, $__offset) : null;
+        $profileColor = (($flags2 & (1 << 8)) !== 0) ? AbstractPeerColor::deserialize($__payload, $__offset) : null;
         $emojiStatus = (($flags2 & (1 << 9)) !== 0) ? AbstractEmojiStatus::deserialize($__payload, $__offset) : null;
         $level = (($flags2 & (1 << 10)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $subscriptionUntilDate = (($flags2 & (1 << 11)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;

@@ -21,7 +21,7 @@ abstract class AbstractInputStorePaymentPurpose extends TlObject
             0x616f7fe8 => InputStorePaymentGiftPremium::deserialize($__payload, $__offset),
             0xfb790393 => InputStorePaymentPremiumGiftCode::deserialize($__payload, $__offset),
             0x160544ca => InputStorePaymentPremiumGiveaway::deserialize($__payload, $__offset),
-            0xdddd0f56 => InputStorePaymentStarsTopup::deserialize($__payload, $__offset),
+            0xf9a2a6cb => InputStorePaymentStarsTopup::deserialize($__payload, $__offset),
             0x1d741ef7 => InputStorePaymentStarsGift::deserialize($__payload, $__offset),
             0x751f08fa => InputStorePaymentStarsGiveaway::deserialize($__payload, $__offset),
             0x9bb2636d => InputStorePaymentAuthCode::deserialize($__payload, $__offset),

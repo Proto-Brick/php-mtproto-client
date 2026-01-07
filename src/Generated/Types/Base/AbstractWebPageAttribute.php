@@ -22,6 +22,7 @@ abstract class AbstractWebPageAttribute extends TlObject
             0x50cc03d3 => WebPageAttributeStickerSet::deserialize($__payload, $__offset),
             0xcf6f6db8 => WebPageAttributeUniqueStarGift::deserialize($__payload, $__offset),
             0x31cad303 => WebPageAttributeStarGiftCollection::deserialize($__payload, $__offset),
+            0x1c641c2 => WebPageAttributeStarGiftAuction::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type WebPageAttribute. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

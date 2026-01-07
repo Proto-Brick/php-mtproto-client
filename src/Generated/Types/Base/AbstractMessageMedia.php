@@ -35,6 +35,7 @@ abstract class AbstractMessageMedia extends TlObject
             0xceaa3ea1 => MessageMediaGiveawayResults::deserialize($__payload, $__offset),
             0xa8852491 => MessageMediaPaidMedia::deserialize($__payload, $__offset),
             0x8a53b014 => MessageMediaToDo::deserialize($__payload, $__offset),
+            0xca5cab89 => MessageMediaVideoStream::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type MessageMedia. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

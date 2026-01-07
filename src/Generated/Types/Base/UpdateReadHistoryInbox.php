@@ -9,7 +9,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class UpdateReadHistoryInbox extends AbstractUpdate
 {
-    public const CONSTRUCTOR_ID = 0x9c974fdf;
+    public const CONSTRUCTOR_ID = 0x9e84bc99;
     
     public string $predicate = 'updateReadHistoryInbox';
     
@@ -20,6 +20,7 @@ final class UpdateReadHistoryInbox extends AbstractUpdate
      * @param int $pts
      * @param int $ptsCount
      * @param int|null $folderId
+     * @param int|null $topMsgId
      */
     public function __construct(
         public readonly AbstractPeer $peer,
@@ -27,7 +28,8 @@ final class UpdateReadHistoryInbox extends AbstractUpdate
         public readonly int $stillUnreadCount,
         public readonly int $pts,
         public readonly int $ptsCount,
-        public readonly ?int $folderId = null
+        public readonly ?int $folderId = null,
+        public readonly ?int $topMsgId = null
     ) {}
     
     public function serialize(): string
@@ -37,11 +39,17 @@ final class UpdateReadHistoryInbox extends AbstractUpdate
         if ($this->folderId !== null) {
             $flags |= (1 << 0);
         }
+        if ($this->topMsgId !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::int32($this->folderId);
         }
         $buffer .= $this->peer->serialize();
+        if ($flags & (1 << 1)) {
+            $buffer .= Serializer::int32($this->topMsgId);
+        }
         $buffer .= Serializer::int32($this->maxId);
         $buffer .= Serializer::int32($this->stillUnreadCount);
         $buffer .= Serializer::int32($this->pts);
@@ -54,6 +62,7 @@ final class UpdateReadHistoryInbox extends AbstractUpdate
         $flags = Deserializer::int32($__payload, $__offset);
         $folderId = (($flags & (1 << 0)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $peer = AbstractPeer::deserialize($__payload, $__offset);
+        $topMsgId = (($flags & (1 << 1)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $maxId = Deserializer::int32($__payload, $__offset);
         $stillUnreadCount = Deserializer::int32($__payload, $__offset);
         $pts = Deserializer::int32($__payload, $__offset);
@@ -65,7 +74,8 @@ final class UpdateReadHistoryInbox extends AbstractUpdate
             $stillUnreadCount,
             $pts,
             $ptsCount,
-            $folderId
+            $folderId,
+            $topMsgId
         );
     }
 }

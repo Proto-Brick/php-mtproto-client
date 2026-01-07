@@ -5,7 +5,7 @@
 <p align="center">
 <a href="https://packagist.org/packages/protobrick/mtproto-client"><img src="https://img.shields.io/packagist/v/protobrick/mtproto-client?style=flat-square" alt="Latest Stable Version"></a>
 <a href="https://php.net/"><img src="https://img.shields.io/badge/php-%3E%3D8.2-777bb4?style=flat-square" alt="PHP Version"></a>
-<a href="https://core.telegram.org/schema"><img src="https://img.shields.io/badge/API%20Layer-195+-blueviolet?style=flat-square" alt="API Layer"></a>
+<a href="https://core.telegram.org/schema"><img src="https://img.shields.io/badge/API%20Layer-220+-blueviolet?style=flat-square" alt="API Layer"></a>
 <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License"></a>
 </p>
 <h1 align="center">Proto Brick</h1>

@@ -3,6 +3,7 @@ namespace ProtoBrick\MTProtoClient\Generated\Methods\Contacts;
 
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\TextWithEntities;
 use ProtoBrick\MTProtoClient\TL\RpcRequest;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 
@@ -11,7 +12,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class AddContactRequest extends RpcRequest
 {
-    public const CONSTRUCTOR_ID = 0xe8f463d0;
+    public const CONSTRUCTOR_ID = 0xd9ba2e54;
     
     public string $predicate = 'contacts.addContact';
     
@@ -30,13 +31,15 @@ final class AddContactRequest extends RpcRequest
      * @param string $lastName
      * @param string $phone
      * @param true|null $addPhonePrivacyException
+     * @param TextWithEntities|null $note
      */
     public function __construct(
         public readonly AbstractInputUser $id,
         public readonly string $firstName,
         public readonly string $lastName,
         public readonly string $phone,
-        public readonly ?true $addPhonePrivacyException = null
+        public readonly ?true $addPhonePrivacyException = null,
+        public readonly ?TextWithEntities $note = null
     ) {}
     
     public function serialize(): string
@@ -46,11 +49,17 @@ final class AddContactRequest extends RpcRequest
         if ($this->addPhonePrivacyException) {
             $flags |= (1 << 0);
         }
+        if ($this->note !== null) {
+            $flags |= (1 << 1);
+        }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->id->serialize();
         $buffer .= Serializer::bytes($this->firstName);
         $buffer .= Serializer::bytes($this->lastName);
         $buffer .= Serializer::bytes($this->phone);
+        if ($flags & (1 << 1)) {
+            $buffer .= $this->note->serialize();
+        }
         return $buffer;
     }
 }

@@ -11,7 +11,7 @@ use RuntimeException;
  */
 final class SavedStarGift extends TlObject
 {
-    public const CONSTRUCTOR_ID = 0x1ea646df;
+    public const CONSTRUCTOR_ID = 0xead6805e;
     
     public string $predicate = 'savedStarGift';
     
@@ -23,6 +23,7 @@ final class SavedStarGift extends TlObject
      * @param true|null $refunded
      * @param true|null $canUpgrade
      * @param true|null $pinnedToTop
+     * @param true|null $upgradeSeparate
      * @param AbstractPeer|null $fromId
      * @param TextWithEntities|null $message
      * @param int|null $msgId
@@ -34,6 +35,9 @@ final class SavedStarGift extends TlObject
      * @param int|null $canTransferAt
      * @param int|null $canResellAt
      * @param list<int>|null $collectionId
+     * @param string|null $prepaidUpgradeHash
+     * @param int|null $dropOriginalDetailsStars
+     * @param int|null $giftNum
      */
     public function __construct(
         public readonly int $date,
@@ -43,6 +47,7 @@ final class SavedStarGift extends TlObject
         public readonly ?true $refunded = null,
         public readonly ?true $canUpgrade = null,
         public readonly ?true $pinnedToTop = null,
+        public readonly ?true $upgradeSeparate = null,
         public readonly ?AbstractPeer $fromId = null,
         public readonly ?TextWithEntities $message = null,
         public readonly ?int $msgId = null,
@@ -53,7 +58,10 @@ final class SavedStarGift extends TlObject
         public readonly ?int $transferStars = null,
         public readonly ?int $canTransferAt = null,
         public readonly ?int $canResellAt = null,
-        public readonly ?array $collectionId = null
+        public readonly ?array $collectionId = null,
+        public readonly ?string $prepaidUpgradeHash = null,
+        public readonly ?int $dropOriginalDetailsStars = null,
+        public readonly ?int $giftNum = null
     ) {}
     
     public function serialize(): string
@@ -74,6 +82,9 @@ final class SavedStarGift extends TlObject
         }
         if ($this->pinnedToTop) {
             $flags |= (1 << 12);
+        }
+        if ($this->upgradeSeparate) {
+            $flags |= (1 << 17);
         }
         if ($this->fromId !== null) {
             $flags |= (1 << 1);
@@ -107,6 +118,15 @@ final class SavedStarGift extends TlObject
         }
         if ($this->collectionId !== null) {
             $flags |= (1 << 15);
+        }
+        if ($this->prepaidUpgradeHash !== null) {
+            $flags |= (1 << 16);
+        }
+        if ($this->dropOriginalDetailsStars !== null) {
+            $flags |= (1 << 18);
+        }
+        if ($this->giftNum !== null) {
+            $flags |= (1 << 19);
         }
         $buffer .= Serializer::int32($flags);
         if ($flags & (1 << 1)) {
@@ -144,6 +164,15 @@ final class SavedStarGift extends TlObject
         if ($flags & (1 << 15)) {
             $buffer .= Serializer::vectorOfInts($this->collectionId);
         }
+        if ($flags & (1 << 16)) {
+            $buffer .= Serializer::bytes($this->prepaidUpgradeHash);
+        }
+        if ($flags & (1 << 18)) {
+            $buffer .= Serializer::int64($this->dropOriginalDetailsStars);
+        }
+        if ($flags & (1 << 19)) {
+            $buffer .= Serializer::int32($this->giftNum);
+        }
         return $buffer;
     }
     public static function deserialize(string $__payload, &$__offset): static
@@ -158,6 +187,7 @@ final class SavedStarGift extends TlObject
         $refunded = (($flags & (1 << 9)) !== 0) ? true : null;
         $canUpgrade = (($flags & (1 << 10)) !== 0) ? true : null;
         $pinnedToTop = (($flags & (1 << 12)) !== 0) ? true : null;
+        $upgradeSeparate = (($flags & (1 << 17)) !== 0) ? true : null;
         $fromId = (($flags & (1 << 1)) !== 0) ? AbstractPeer::deserialize($__payload, $__offset) : null;
         $date = Deserializer::int32($__payload, $__offset);
         $gift = AbstractStarGift::deserialize($__payload, $__offset);
@@ -171,6 +201,9 @@ final class SavedStarGift extends TlObject
         $canTransferAt = (($flags & (1 << 13)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $canResellAt = (($flags & (1 << 14)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
         $collectionId = (($flags & (1 << 15)) !== 0) ? Deserializer::vectorOfInts($__payload, $__offset) : null;
+        $prepaidUpgradeHash = (($flags & (1 << 16)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
+        $dropOriginalDetailsStars = (($flags & (1 << 18)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
+        $giftNum = (($flags & (1 << 19)) !== 0) ? Deserializer::int32($__payload, $__offset) : null;
 
         return new self(
             $date,
@@ -180,6 +213,7 @@ final class SavedStarGift extends TlObject
             $refunded,
             $canUpgrade,
             $pinnedToTop,
+            $upgradeSeparate,
             $fromId,
             $message,
             $msgId,
@@ -190,7 +224,10 @@ final class SavedStarGift extends TlObject
             $transferStars,
             $canTransferAt,
             $canResellAt,
-            $collectionId
+            $collectionId,
+            $prepaidUpgradeHash,
+            $dropOriginalDetailsStars,
+            $giftNum
         );
     }
 }

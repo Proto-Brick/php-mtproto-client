@@ -10,7 +10,7 @@ class ApiGenerator
 {
     use GeneratorHelpers;
 
-    private const API_SCHEMA_PATH = __DIR__ . '/../schema/TL_telegram_v211.json';
+    private const API_SCHEMA_PATH = __DIR__ . '/../schema/TL_telegram_v220.json';
     private const OUTPUT_DIR = __DIR__ . '/../src/Generated/Api';
     private const BASE_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Api';
     private const GENERATED_METHODS_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Methods';

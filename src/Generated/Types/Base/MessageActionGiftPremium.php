@@ -9,14 +9,14 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class MessageActionGiftPremium extends AbstractMessageAction
 {
-    public const CONSTRUCTOR_ID = 0x6c6274fa;
+    public const CONSTRUCTOR_ID = 0x48e91302;
     
     public string $predicate = 'messageActionGiftPremium';
     
     /**
      * @param string $currency
      * @param int $amount
-     * @param int $months
+     * @param int $days
      * @param string|null $cryptoCurrency
      * @param int|null $cryptoAmount
      * @param TextWithEntities|null $message
@@ -24,7 +24,7 @@ final class MessageActionGiftPremium extends AbstractMessageAction
     public function __construct(
         public readonly string $currency,
         public readonly int $amount,
-        public readonly int $months,
+        public readonly int $days,
         public readonly ?string $cryptoCurrency = null,
         public readonly ?int $cryptoAmount = null,
         public readonly ?TextWithEntities $message = null
@@ -46,7 +46,7 @@ final class MessageActionGiftPremium extends AbstractMessageAction
         $buffer .= Serializer::int32($flags);
         $buffer .= Serializer::bytes($this->currency);
         $buffer .= Serializer::int64($this->amount);
-        $buffer .= Serializer::int32($this->months);
+        $buffer .= Serializer::int32($this->days);
         if ($flags & (1 << 0)) {
             $buffer .= Serializer::bytes($this->cryptoCurrency);
         }
@@ -64,7 +64,7 @@ final class MessageActionGiftPremium extends AbstractMessageAction
         $flags = Deserializer::int32($__payload, $__offset);
         $currency = Deserializer::bytes($__payload, $__offset);
         $amount = Deserializer::int64($__payload, $__offset);
-        $months = Deserializer::int32($__payload, $__offset);
+        $days = Deserializer::int32($__payload, $__offset);
         $cryptoCurrency = (($flags & (1 << 0)) !== 0) ? Deserializer::bytes($__payload, $__offset) : null;
         $cryptoAmount = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
         $message = (($flags & (1 << 1)) !== 0) ? TextWithEntities::deserialize($__payload, $__offset) : null;
@@ -72,7 +72,7 @@ final class MessageActionGiftPremium extends AbstractMessageAction
         return new self(
             $currency,
             $amount,
-            $months,
+            $days,
             $cryptoCurrency,
             $cryptoAmount,
             $message

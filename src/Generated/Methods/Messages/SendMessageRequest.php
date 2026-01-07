@@ -16,7 +16,7 @@ use ProtoBrick\MTProtoClient\TL\Serializer;
  */
 final class SendMessageRequest extends RpcRequest
 {
-    public const CONSTRUCTOR_ID = 0xfe05dc9a;
+    public const CONSTRUCTOR_ID = 0x545cd15a;
     
     public string $predicate = 'messages.sendMessage';
     
@@ -45,6 +45,7 @@ final class SendMessageRequest extends RpcRequest
      * @param AbstractReplyMarkup|null $replyMarkup
      * @param list<AbstractMessageEntity>|null $entities
      * @param int|null $scheduleDate
+     * @param int|null $scheduleRepeatPeriod
      * @param AbstractInputPeer|null $sendAs
      * @param AbstractInputQuickReplyShortcut|null $quickReplyShortcut
      * @param int|null $effect
@@ -67,6 +68,7 @@ final class SendMessageRequest extends RpcRequest
         public readonly ?AbstractReplyMarkup $replyMarkup = null,
         public readonly ?array $entities = null,
         public readonly ?int $scheduleDate = null,
+        public readonly ?int $scheduleRepeatPeriod = null,
         public readonly ?AbstractInputPeer $sendAs = null,
         public readonly ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null,
         public readonly ?int $effect = null,
@@ -114,6 +116,9 @@ final class SendMessageRequest extends RpcRequest
         if ($this->scheduleDate !== null) {
             $flags |= (1 << 10);
         }
+        if ($this->scheduleRepeatPeriod !== null) {
+            $flags |= (1 << 24);
+        }
         if ($this->sendAs !== null) {
             $flags |= (1 << 13);
         }
@@ -144,6 +149,9 @@ final class SendMessageRequest extends RpcRequest
         }
         if ($flags & (1 << 10)) {
             $buffer .= Serializer::int32($this->scheduleDate);
+        }
+        if ($flags & (1 << 24)) {
+            $buffer .= Serializer::int32($this->scheduleRepeatPeriod);
         }
         if ($flags & (1 << 13)) {
             $buffer .= $this->sendAs->serialize();

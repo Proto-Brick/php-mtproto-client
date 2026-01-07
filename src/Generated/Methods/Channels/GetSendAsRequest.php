@@ -27,10 +27,12 @@ final class GetSendAsRequest extends RpcRequest
     /**
      * @param AbstractInputPeer $peer
      * @param true|null $forPaidReactions
+     * @param true|null $forLiveStories
      */
     public function __construct(
         public readonly AbstractInputPeer $peer,
-        public readonly ?true $forPaidReactions = null
+        public readonly ?true $forPaidReactions = null,
+        public readonly ?true $forLiveStories = null
     ) {}
     
     public function serialize(): string
@@ -39,6 +41,9 @@ final class GetSendAsRequest extends RpcRequest
         $flags = 0;
         if ($this->forPaidReactions) {
             $flags |= (1 << 0);
+        }
+        if ($this->forLiveStories) {
+            $flags |= (1 << 1);
         }
         $buffer .= Serializer::int32($flags);
         $buffer .= $this->peer->serialize();

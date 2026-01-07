@@ -35,6 +35,7 @@ abstract class AbstractSendMessageAction extends TlObject
             0xb05ac6b1 => SendMessageChooseStickerAction::deserialize($__payload, $__offset),
             0x25972bcb => SendMessageEmojiInteraction::deserialize($__payload, $__offset),
             0xb665902e => SendMessageEmojiInteractionSeen::deserialize($__payload, $__offset),
+            0x376d975c => SendMessageTextDraftAction::deserialize($__payload, $__offset),
             default => throw new RuntimeException(sprintf('Unknown constructor ID for type SendMessageAction. Received ID: 0x%s (signed: %d, unsigned: %u)', dechex($constructorId), unpack('l', pack('V', $constructorId))[1], $constructorId)),
         };
     }

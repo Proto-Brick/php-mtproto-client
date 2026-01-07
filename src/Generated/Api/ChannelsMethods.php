@@ -6,17 +6,14 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Channels\CheckSearchPostsFloodReq
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\CheckUsernameRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ConvertToGigagroupRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\CreateChannelRequest;
-use ProtoBrick\MTProtoClient\Generated\Methods\Channels\CreateForumTopicRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\DeactivateAllUsernamesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\DeleteChannelRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\DeleteHistoryRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\DeleteMessagesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\DeleteParticipantHistoryRequest;
-use ProtoBrick\MTProtoClient\Generated\Methods\Channels\DeleteTopicHistoryRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\EditAdminRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\EditBannedRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\EditCreatorRequest;
-use ProtoBrick\MTProtoClient\Generated\Methods\Channels\EditForumTopicRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\EditLocationRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\EditPhotoRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\EditTitleRequest;
@@ -25,8 +22,6 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Channels\GetAdminLogRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\GetAdminedPublicChannelsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\GetChannelRecommendationsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\GetChannelsRequest;
-use ProtoBrick\MTProtoClient\Generated\Methods\Channels\GetForumTopicsByIDRequest;
-use ProtoBrick\MTProtoClient\Generated\Methods\Channels\GetForumTopicsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\GetFullChannelRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\GetGroupsForDiscussionRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\GetInactiveChannelsRequest;
@@ -41,7 +36,6 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Channels\JoinChannelRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\LeaveChannelRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ReadHistoryRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ReadMessageContentsRequest;
-use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ReorderPinnedForumTopicsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ReorderUsernamesRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ReportAntiSpamFalsePositiveRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ReportSpamRequest;
@@ -50,6 +44,7 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Channels\SearchPostsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\SetBoostsToUnblockRestrictionsRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\SetDiscussionGroupRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\SetEmojiStickersRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Channels\SetMainProfileTabRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\SetStickersRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ToggleAntiSpamRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ToggleAutotranslationRequest;
@@ -65,7 +60,6 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Channels\ToggleViewForumAsMessage
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\UpdateColorRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\UpdateEmojiStatusRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\UpdatePaidMessagesPriceRequest;
-use ProtoBrick\MTProtoClient\Generated\Methods\Channels\UpdatePinnedForumTopicRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\UpdateUsernameRequest;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractChannelParticipantsFilter;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractEmojiStatus;
@@ -132,6 +126,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUser;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserEmpty;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserFromMessage;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserSelf;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\ProfileTab;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\SearchPostsFlood;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShort;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShortChatMessage;
@@ -156,7 +151,6 @@ use ProtoBrick\MTProtoClient\Generated\Types\Messages\ChannelMessages;
 use ProtoBrick\MTProtoClient\Generated\Types\Messages\ChatFull;
 use ProtoBrick\MTProtoClient\Generated\Types\Messages\Chats;
 use ProtoBrick\MTProtoClient\Generated\Types\Messages\ChatsSlice;
-use ProtoBrick\MTProtoClient\Generated\Types\Messages\ForumTopics;
 use ProtoBrick\MTProtoClient\Generated\Types\Messages\InactiveChats;
 use ProtoBrick\MTProtoClient\Generated\Types\Messages\InvitedUsers;
 use ProtoBrick\MTProtoClient\Generated\Types\Messages\Messages;
@@ -876,16 +870,17 @@ final readonly class ChannelsMethods
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param bool|null $forPaidReactions
+     * @param bool|null $forLiveStories
      * @return SendAsPeers|null
      * @see https://core.telegram.org/method/channels.getSendAs
      * @api
      */
-    public function getSendAs(AbstractInputPeer|string|int $peer, ?bool $forPaidReactions = null): ?SendAsPeers
+    public function getSendAs(AbstractInputPeer|string|int $peer, ?bool $forPaidReactions = null, ?bool $forLiveStories = null): ?SendAsPeers
     {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetSendAsRequest(peer: $peer, forPaidReactions: $forPaidReactions));
+        return $this->client->callSync(new GetSendAsRequest(peer: $peer, forPaidReactions: $forPaidReactions, forLiveStories: $forLiveStories));
     }
 
     /**
@@ -1030,166 +1025,6 @@ final readonly class ChannelsMethods
             }
         }
         return $this->client->callSync(new ToggleForumRequest(channel: $channel, enabled: $enabled, tabs: $tabs));
-    }
-
-    /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
-     * @param string $title
-     * @param int|null $iconColor
-     * @param int|null $iconEmojiId
-     * @param int|null $randomId
-     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
-     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
-     * @see https://core.telegram.org/method/channels.createForumTopic
-     * @api
-     */
-    public function createForumTopic(AbstractInputChannel|string|int $channel, string $title, ?int $iconColor = null, ?int $iconEmojiId = null, ?int $randomId = null, AbstractInputPeer|string|int|null $sendAs = null): ?AbstractUpdates
-    {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        if (is_string($sendAs) || is_int($sendAs)) {
-            $sendAs = $this->client->peerManager->resolve($sendAs);
-        }
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new CreateForumTopicRequest(channel: $channel, title: $title, iconColor: $iconColor, iconEmojiId: $iconEmojiId, randomId: $randomId, sendAs: $sendAs));
-    }
-
-    /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
-     * @param int $offsetDate
-     * @param int $offsetId
-     * @param int $offsetTopic
-     * @param int $limit
-     * @param string|null $q
-     * @return ForumTopics|null
-     * @see https://core.telegram.org/method/channels.getForumTopics
-     * @api
-     */
-    public function getForumTopics(AbstractInputChannel|string|int $channel, int $offsetDate, int $offsetId, int $offsetTopic, int $limit, ?string $q = null): ?ForumTopics
-    {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetForumTopicsRequest(channel: $channel, offsetDate: $offsetDate, offsetId: $offsetId, offsetTopic: $offsetTopic, limit: $limit, q: $q));
-    }
-
-    /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
-     * @param list<int> $topics
-     * @return ForumTopics|null
-     * @see https://core.telegram.org/method/channels.getForumTopicsByID
-     * @api
-     */
-    public function getForumTopicsByID(AbstractInputChannel|string|int $channel, array $topics): ?ForumTopics
-    {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetForumTopicsByIDRequest(channel: $channel, topics: $topics));
-    }
-
-    /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
-     * @param int $topicId
-     * @param string|null $title
-     * @param int|null $iconEmojiId
-     * @param bool|null $closed
-     * @param bool|null $hidden
-     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
-     * @see https://core.telegram.org/method/channels.editForumTopic
-     * @api
-     */
-    public function editForumTopic(AbstractInputChannel|string|int $channel, int $topicId, ?string $title = null, ?int $iconEmojiId = null, ?bool $closed = null, ?bool $hidden = null): ?AbstractUpdates
-    {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new EditForumTopicRequest(channel: $channel, topicId: $topicId, title: $title, iconEmojiId: $iconEmojiId, closed: $closed, hidden: $hidden));
-    }
-
-    /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
-     * @param int $topicId
-     * @param bool $pinned
-     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
-     * @see https://core.telegram.org/method/channels.updatePinnedForumTopic
-     * @api
-     */
-    public function updatePinnedForumTopic(AbstractInputChannel|string|int $channel, int $topicId, bool $pinned): ?AbstractUpdates
-    {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new UpdatePinnedForumTopicRequest(channel: $channel, topicId: $topicId, pinned: $pinned));
-    }
-
-    /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
-     * @param int $topMsgId
-     * @return AffectedHistory|null
-     * @see https://core.telegram.org/method/channels.deleteTopicHistory
-     * @api
-     */
-    public function deleteTopicHistory(AbstractInputChannel|string|int $channel, int $topMsgId): ?AffectedHistory
-    {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new DeleteTopicHistoryRequest(channel: $channel, topMsgId: $topMsgId));
-    }
-
-    /**
-     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
-     * @param list<int> $order
-     * @param bool|null $force
-     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
-     * @see https://core.telegram.org/method/channels.reorderPinnedForumTopics
-     * @api
-     */
-    public function reorderPinnedForumTopics(AbstractInputChannel|string|int $channel, array $order, ?bool $force = null): ?AbstractUpdates
-    {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new ReorderPinnedForumTopicsRequest(channel: $channel, order: $order, force: $force));
     }
 
     /**
@@ -1483,5 +1318,25 @@ final readonly class ChannelsMethods
     public function checkSearchPostsFlood(?string $query = null): ?SearchPostsFlood
     {
         return $this->client->callSync(new CheckSearchPostsFloodRequest(query: $query));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param ProfileTab $tab
+     * @return bool
+     * @see https://core.telegram.org/method/channels.setMainProfileTab
+     * @api
+     */
+    public function setMainProfileTab(AbstractInputChannel|string|int $channel, ProfileTab $tab): bool
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return (bool) $this->client->callSync(new SetMainProfileTabRequest(channel: $channel, tab: $tab));
     }
 }

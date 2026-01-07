@@ -26,6 +26,7 @@ enum InputPrivacyKey: int implements TlObjectInterface
     case InputPrivacyKeyBirthday = 0xd65a11cc;
     case InputPrivacyKeyStarGiftsAutoSave = 0xe1732341;
     case InputPrivacyKeyNoPaidMessages = 0xbdc597b4;
+    case InputPrivacyKeySavedMusic = 0x4dbe9226;
 
     public function serialize(): string
     {
@@ -68,6 +69,7 @@ enum InputPrivacyKey: int implements TlObjectInterface
             self::InputPrivacyKeyBirthday => 'inputPrivacyKeyBirthday',
             self::InputPrivacyKeyStarGiftsAutoSave => 'inputPrivacyKeyStarGiftsAutoSave',
             self::InputPrivacyKeyNoPaidMessages => 'inputPrivacyKeyNoPaidMessages',
+            self::InputPrivacyKeySavedMusic => 'inputPrivacyKeySavedMusic',
         };
     }
 }

@@ -16,11 +16,13 @@ final class MessageActionTopicCreate extends AbstractMessageAction
     /**
      * @param string $title
      * @param int $iconColor
+     * @param true|null $titleMissing
      * @param int|null $iconEmojiId
      */
     public function __construct(
         public readonly string $title,
         public readonly int $iconColor,
+        public readonly ?true $titleMissing = null,
         public readonly ?int $iconEmojiId = null
     ) {}
     
@@ -28,6 +30,9 @@ final class MessageActionTopicCreate extends AbstractMessageAction
     {
         $buffer = Serializer::int32(self::CONSTRUCTOR_ID);
         $flags = 0;
+        if ($this->titleMissing) {
+            $flags |= (1 << 1);
+        }
         if ($this->iconEmojiId !== null) {
             $flags |= (1 << 0);
         }
@@ -43,6 +48,7 @@ final class MessageActionTopicCreate extends AbstractMessageAction
     {
         $__offset += 4; // Constructor ID
         $flags = Deserializer::int32($__payload, $__offset);
+        $titleMissing = (($flags & (1 << 1)) !== 0) ? true : null;
         $title = Deserializer::bytes($__payload, $__offset);
         $iconColor = Deserializer::int32($__payload, $__offset);
         $iconEmojiId = (($flags & (1 << 0)) !== 0) ? Deserializer::int64($__payload, $__offset) : null;
@@ -50,6 +56,7 @@ final class MessageActionTopicCreate extends AbstractMessageAction
         return new self(
             $title,
             $iconColor,
+            $titleMissing,
             $iconEmojiId
         );
     }

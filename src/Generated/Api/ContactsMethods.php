@@ -29,6 +29,7 @@ use ProtoBrick\MTProtoClient\Generated\Methods\Contacts\SearchRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Contacts\SetBlockedRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Contacts\ToggleTopPeersRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Contacts\UnblockRequest;
+use ProtoBrick\MTProtoClient\Generated\Methods\Contacts\UpdateContactNoteRequest;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputGeoPoint;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputPeer;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputUser;
@@ -51,6 +52,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserEmpty;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserFromMessage;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\InputUserSelf;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\SavedContact;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\TextWithEntities;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\TopPeerCategory;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShort;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateShortChatMessage;
@@ -295,11 +297,12 @@ final readonly class ContactsMethods
      * @param string $lastName
      * @param string $phone
      * @param bool|null $addPhonePrivacyException
+     * @param TextWithEntities|null $note
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/contacts.addContact
      * @api
      */
-    public function addContact(AbstractInputUser|string|int $id, string $firstName, string $lastName, string $phone, ?bool $addPhonePrivacyException = null): ?AbstractUpdates
+    public function addContact(AbstractInputUser|string|int $id, string $firstName, string $lastName, string $phone, ?bool $addPhonePrivacyException = null, ?TextWithEntities $note = null): ?AbstractUpdates
     {
         if (is_string($id) || is_int($id)) {
             $__tmpPeer = $this->client->peerManager->resolve($id);
@@ -309,7 +312,7 @@ final readonly class ContactsMethods
                 $id = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new AddContactRequest(id: $id, firstName: $firstName, lastName: $lastName, phone: $phone, addPhonePrivacyException: $addPhonePrivacyException));
+        return $this->client->callSync(new AddContactRequest(id: $id, firstName: $firstName, lastName: $lastName, phone: $phone, addPhonePrivacyException: $addPhonePrivacyException, note: $note));
     }
 
     /**
@@ -433,5 +436,25 @@ final readonly class ContactsMethods
     public function getSponsoredPeers(string $q): ?AbstractSponsoredPeers
     {
         return $this->client->callSync(new GetSponsoredPeersRequest(q: $q));
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
+     * @param TextWithEntities $note
+     * @return bool
+     * @see https://core.telegram.org/method/contacts.updateContactNote
+     * @api
+     */
+    public function updateContactNote(AbstractInputUser|string|int $id, TextWithEntities $note): bool
+    {
+        if (is_string($id) || is_int($id)) {
+            $__tmpPeer = $this->client->peerManager->resolve($id);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $id = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $id = $__tmpPeer;
+            }
+        }
+        return (bool) $this->client->callSync(new UpdateContactNoteRequest(id: $id, note: $note));
     }
 }
