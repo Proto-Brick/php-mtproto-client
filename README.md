@@ -5,22 +5,23 @@
 <p align="center">
 <a href="https://packagist.org/packages/protobrick/mtproto-client"><img src="https://img.shields.io/packagist/v/protobrick/mtproto-client?style=flat-square" alt="Latest Stable Version"></a>
 <a href="https://php.net/"><img src="https://img.shields.io/badge/php-%3E%3D8.2-777bb4?style=flat-square" alt="PHP Version"></a>
-<a href="https://core.telegram.org/schema"><img src="https://img.shields.io/badge/API%20Layer-220+-blueviolet?style=flat-square" alt="API Layer"></a>
+<a href="https://core.telegram.org/schema"><img src="https://img.shields.io/badge/API%20Layer-220-blueviolet?style=flat-square" alt="API Layer"></a>
 <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License"></a>
 </p>
 <h1 align="center">Proto Brick</h1>
 <p>
   <strong>An async pure PHP client library for the Telegram MTProto 2.0 API, providing a solid foundation to:</strong><br><br>  
   - Build userbots with phone authentication and direct API access.<br>
-  - Develop your own custom, high-level frameworks and libraries.
 </p>
 
 
 ## 🚀Features
 *   **Full Async:** Built on top of [AMPHP](https://amphp.org/) and [Revolt](https://revolt.run/) for high-performance non-blocking I/O.
+*   **Pure PHP Implementation:** No requirement for the official `tdlib` binary extension. Works anywhere PHP runs.
 *   **Strictly Typed:** 100% of the API is auto-generated from the official [TL-Schema](https://core.telegram.org/schema).
 *   **Direct API Access:** 1:1 mapping of Telegram API methods (e.g., `$client->messages->sendMessage`).
-*   **Pure PHP Implementation:** No requirement for the official `tdlib` binary extension. Works anywhere PHP runs.
+*   **Smart Peer Management:** Automatically handles `access_hash` and resolves `@usernames` or `IDs` via local cache.
+*   **Advanced Logging:** Native colorized console output with channel filtering, fully compatible with PSR-3
 
 ## 📋Requirements
 
@@ -41,7 +42,7 @@ composer require protobrick/mtproto-client
 
 ### 1. One-time Authentication (`auth.php`)
 
-Run this script **once** in your terminal to log in. It will interactively ask for your phone code and password, then save the session keys to the `./session` folder.
+Run this script **once** in your terminal to log in. It will interactively ask for your phone code and password, then save the session keys to the `./session_name` folder.
 
 ```php
 <?php
@@ -58,6 +59,7 @@ $settings = new Settings(
 );
 
 $client = Client::create($settings, __DIR__ . '/session_name');
+// Interactive account login (CLI)
 $auth = $client->login();
 
 echo "Logged in as {$auth->user->firstName}\n";
@@ -139,6 +141,9 @@ $settings = new Settings(
     connect_timeout_seconds: 10
 );
 ```
+
+## ⚠️ Disclaimer
+This library is for educational purposes. Using userbots may violate Telegram's Terms of Service. Use responsibly.
 
 ## Contributing & Support
 If you find this library useful, please consider giving it a ⭐️ star! It helps the project's visibility and motivates me to keep working on it.
