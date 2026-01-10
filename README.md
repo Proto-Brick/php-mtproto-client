@@ -40,12 +40,11 @@ composer require protobrick/mtproto-client
 
 ## Authentication
 
-### Interactive Login (CLI) (`auth.php`)
+### Interactive Login (CLI)
 
-Run this **once** to log in. It will prompt for your phone number, code, and password (if 2FA is on), then save the session keys locally.
-
+Run **once** to log in. It prompts for credentials (phone, code, 2FA) and saves the session locally.
 ```php
-<?php
+<?php //auth.php
 require __DIR__ . '/vendor/autoload.php';
 
 use ProtoBrick\MTProtoClient\Client;
@@ -106,26 +105,66 @@ require __DIR__ . '/vendor/autoload.php';
 
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Settings;
+use ProtoBrick\MTProtoClient\Event\MessageContext;
+use ProtoBrick\MTProtoClient\Event\ServiceMessageContext;
+// Import specific TL types if you need raw checks
+use ProtoBrick\MTProtoClient\Generated\Types\Base\MessageActionChatCreate;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\MessageMediaPhoto;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\UpdateUserTyping;
+use ProtoBrick\MTProtoClient\TL\TlObject;
 
 $settings = new Settings(api_id: 12345, api_hash: 'hash');
 $client = Client::create($settings, __DIR__. '/session_name');
 
-// 1. Handle new incoming messages
+// Handle New Messages
 $client->onMessage(function (MessageContext $ctx) {
-    echo "New message: {$ctx->getText()}\n";
-    
+    // Ignore own messages
+    if ($ctx->isOutgoing()) return;
+
+    // High-level helpers
+    // (See src/Event/MessageContext.php & AbstractMessageContext.php)
     if ($ctx->getText() === '/ping') {
-        $ctx->reply('Pong!');
+        $ctx->reply("Pong! 🏓");
+        $ctx->react('👍');
+        return;
+    }
+
+    // Low-level access
+    // Check for media types, via_bot_id, reply_markup, etc. directly
+    if ($ctx->message->media instanceof MessageMediaPhoto) {
+        echo "Received a photo with caption: " . $ctx->getText();
     }
 });
 
-// 2. Handle message edits
-$client->onMessageEdit(fn($ctx) => echo "Edited: {$ctx->message->id}\n");
+// Handle Edited Messages
+$client->onMessageEdit(function (MessageContext $ctx) {
+    echo "EDIT in chat {$ctx->getChatId()}: {$ctx->getText()}\n";
+});
 
-// 3. Handle service messages (e.g. user joined, title changed)
-$client->onServiceMessage(fn($ctx) => var_dump($ctx->message->action));
+// Handle Service Messages (Joins, Leaves, Title Changes)
+$client->onServiceMessage(function (ServiceMessageContext $ctx) {
+    // High-level helpers
+    // (See src/Event/ServiceMessageContext.php & AbstractMessageContext.php)
+    if ($ctx->isTitleChanged()) {
+        echo "Chat {$ctx->getChatId()} renamed to: {$ctx->getNewTitle()}\n";
+    }
+    
+    // Low-level access
+    // Handle specific actions that don't have wrappers yet
+    if ($ctx->message->action instanceof MessageActionChatCreate) {
+        echo "Group created with title: " . $ctx->message->action->title;
+    }
+});
 
-// 4. Start the Event Loop (blocks execution)
+// Handle Raw Updates (Typing, Status, Read Receipts)
+$client->onUpdate(function (TlObject $update) {
+    // Catches ALL updates flowing from the server
+    if ($update instanceof UpdateUserTyping) {
+        echo "User {$update->userId} is typing...\n";
+    }
+});
+
+// Start the Event Loop (Blocks execution)
 $client->start();
 ```
 
