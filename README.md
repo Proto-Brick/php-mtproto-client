@@ -26,7 +26,7 @@
 ## 📋Requirements
 
 *   PHP 8.2+ (64-bit)
-*   Extensions: `ext-zlib`, `ext-json` 
+*   Required Extensions: `ext-zlib`, `ext-json` 
 *   **Highly Recommended Extensions:**
     *   `ext-gmp` (Speeds up crypto/auth operations).
     *   `ext-openssl` (Speeds up crypto operations).
@@ -38,11 +38,11 @@
 composer require protobrick/mtproto-client
 ```
 
-## Quick Start
+## Authentication
 
-### 1. One-time Authentication (`auth.php`)
+### Interactive Login (CLI) (`auth.php`)
 
-Run this script **once** in your terminal to log in. It will interactively ask for your phone code and password, then save the session keys to the `./session_name` folder.
+Run this **once** to log in. It will prompt for your phone number, code, and password (if 2FA is on), then save the session keys locally.
 
 ```php
 <?php
@@ -51,45 +51,33 @@ require __DIR__ . '/vendor/autoload.php';
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Settings;
 
-// These example values won't work. You must get your own api_id and
-// api_hash from https://my.telegram.org, under API Development.
+// Get your api_id and api_hash from https://my.telegram.org
 $settings = new Settings(
     api_id: 12345,
     api_hash: 'your_api_hash'
 );
 
+// Session files will be stored in 'session_name' folder
 $client = Client::create($settings, __DIR__ . '/session_name');
-// Interactive account login (CLI)
 $auth = $client->login();
 
 echo "Logged in as {$auth->user->firstName}\n";
 ```
 
-### Advanced Authentication
-If you need to handle login programmatically (e.g., via a web form or custom logic), you can pass callables to the login method:
+### Custom Flow
+If you need to handle login programmatically (e.g., from database, API, or custom input), pass callables
 ```php
 $auth = $client->login(
     phoneNumber: '+1234567890',
-    codeProvider: function () {
-        // Logic to get code (e.g., from database, API, or custom input)
-        return readline("Enter code: ");
-    },
-    passwordProvider: function () {
-        return readline("Enter 2FA Password: ");
-    },
-    signupProvider: function () {
-        echo "Account not found. Registration required.\n";
-        return [
-            readline("First Name: "),
-            readline("Last Name: ")
-        ];
-    }
+    codeProvider: fn() => readline("Code: "),      // Or fetch from DB/API
+    passwordProvider: fn() => readline("2FA: "),   // Or fetch from DB/API
+    signupProvider: fn() => [readline("Name: "), readline("Last Name: ")]
 );
 ```
 
-### 2. Regular Usage (`bot.php`)
+## Calling API Methods
 
-Now that the session is saved, you can use the client. The client will automatically load the keys from the folder.
+Use this for simple scripts (e.g., cron jobs) where you need to perform an action and exit.
 
 ```php
 <?php
@@ -98,11 +86,7 @@ require __DIR__ . '/vendor/autoload.php';
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Settings;
 
-$settings = new Settings(
-    api_id: 12345,
-    api_hash: 'your_api_hash'
-);
-
+$settings = new Settings(api_id: 12345, api_hash: 'hash');
 $client = Client::create($settings, __DIR__. '/session_name');
 
 $client->channels->joinChannel(channel: "@ProtoBrickChat");
@@ -110,6 +94,39 @@ $client->messages->sendMessage(
     peer: "@ProtoBrickChat",
     message: 'Hello from ProtoBrick!'
 );
+```
+
+## Handling Updates
+
+Use the Event Loop to build bots or tools that react to events in real-time.
+
+```php
+<?php
+require __DIR__ . '/vendor/autoload.php';
+
+use ProtoBrick\MTProtoClient\Client;
+use ProtoBrick\MTProtoClient\Settings;
+
+$settings = new Settings(api_id: 12345, api_hash: 'hash');
+$client = Client::create($settings, __DIR__. '/session_name');
+
+// 1. Handle new incoming messages
+$client->onMessage(function (MessageContext $ctx) {
+    echo "New message: {$ctx->getText()}\n";
+    
+    if ($ctx->getText() === '/ping') {
+        $ctx->reply('Pong!');
+    }
+});
+
+// 2. Handle message edits
+$client->onMessageEdit(fn($ctx) => echo "Edited: {$ctx->message->id}\n");
+
+// 3. Handle service messages (e.g. user joined, title changed)
+$client->onServiceMessage(fn($ctx) => var_dump($ctx->message->action));
+
+// 4. Start the Event Loop (blocks execution)
+$client->start();
 ```
 
 ## Architecture
