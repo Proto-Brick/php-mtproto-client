@@ -1,6 +1,6 @@
 {
   "name": "protobrick/mtproto-client",
-  "description": "Async low-level pure PHP client library for Telegram MTProto API. Build userbots with user phone authentication",
+  "description": "Modern async pure PHP client library for Telegram MTProto API",
   "license": "MIT",
   "type": "library",
   "minimum-stability": "dev",
