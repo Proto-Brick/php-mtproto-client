@@ -177,7 +177,7 @@ The core of this library is generated automatically:
 
 This ensures that if Telegram updates their API Layer, we can simply regenerate the code to support new features immediately.
 
-## ⏳ Async vs Sync Execution
+## Async vs Sync Execution
 The client provides generated `*Async` methods for every API call.
 
 ### 1. Synchronous & Concurrent
@@ -232,6 +232,23 @@ $settings = new Settings(
     transport: TransportProtocol::PaddedIntermediate, // Obfuscation
     connect_timeout_seconds: 10
 );
+```
+
+### API Layer Updates (Schema)
+You can regenerate the library API for a newer or older API layer yourself, without waiting for a release.
+
+1. Download the new `.json` schema file (e.g., from [here](https://github.com/danog/schemas/tree/master)).
+2. Ensure the filename contains the version number (e.g., `TL_telegram_v220.json`).
+3. Place the file in the `schema/` directory (you can keep the old ones; the builder automatically picks the highest version).
+4. Run the builder:
+   ```bash
+   php bin/build.php
+   ```
+
+**Downgrading:**
+To build using a specific schema file, pass the path as an argument:
+```bash
+php bin/build.php schema/TL_old_v199.json
 ```
 
 ## ⚠️ Disclaimer
