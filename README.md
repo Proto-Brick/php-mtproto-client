@@ -70,8 +70,7 @@ $settings = new Settings(
 // Session files will be stored in 'session_name' folder
 $client = Client::create($settings, __DIR__ . '/session_name');
 $auth = $client->login();
-
-echo "Logged in as {$auth->user->firstName}\n";
+$client->logger->info("Logged in as {$auth->user->firstName}\n");
 ```
 
 ### Custom Flow
@@ -143,6 +142,7 @@ $client->onMessage(function (MessageContext $ctx) {
     // Low-level access
     // Check for media types, via_bot_id, reply_markup, etc. directly
     if ($ctx->message->media instanceof MessageMediaPhoto) {
+    
         echo "Received a photo with caption: " . $ctx->getText();
     }
 });
