@@ -29,7 +29,9 @@ use ProtoBrick\MTProtoClient\Generated\Api\UploadMethods;
 use ProtoBrick\MTProtoClient\Generated\Api\UsersMethods;
 // #-- API_HANDLERS_USE_END --#
 
+use ProtoBrick\MTProtoClient\Event\ServiceMessageContext;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\Message;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\MessageService;
 use ProtoBrick\MTProtoClient\Logger\ConsoleLogger;
 use ProtoBrick\MTProtoClient\Logger\InternalLogger;
 use ProtoBrick\MTProtoClient\Peer\Storage\FilePeerStorage;
@@ -125,7 +127,7 @@ class Client
     private ?Closure $messageCallback = null;
     /** @var Closure(MessageContext):void|null */
     private ?Closure $messageEditCallback = null;
-    /** @var Closure(MessageServiceContext):void|null */
+    /** @var Closure(ServiceMessageContext):void|null */
     private ?Closure $serviceMessageCallback = null;
     private ?DeferredFuture $stopSignal = null;
     private ?string $saveTimerId = null;
@@ -363,23 +365,21 @@ class Client
 
     private function dispatchMessageEvent(object $update): void
     {
-        // 1. Проверяем, реализует ли апдейт наш контракт "MessageUpdate"
         if ($update instanceof MessageUpdateInterface) {
             $abstractMessage = $update->toFullMessage($this->me?->id ?? 0);
 
             if ($abstractMessage instanceof MessageService) {
                 if ($this->serviceMessageCallback) {
-                    ($this->serviceMessageCallback)($abstractMessage);
+                    $ctx = new ServiceMessageContext($this, $abstractMessage);
+                    ($this->serviceMessageCallback)($ctx);
                 }
+                return;
             }
-            // 3. Отсекаем сервисные сообщения (вступление в группу, пин сообщения и т.д.)
-            // Нам нужны только обычные (текст/медиа).
-            // Если тебе нужны и сервисные, убери эту проверку или сделай отдельный коллбэк.
+
             if (!($abstractMessage instanceof Message)) {
                 return;
             }
 
-            // 4. Маршрутизация (Новое или Правка)
             $ctx = new MessageContext($this, $abstractMessage);
 
             if ($update->isEdit()) {
@@ -422,8 +422,9 @@ class Client
     /**
      * Sends an asynchronous RPC request.
      *
-     * @param RpcRequest $request The request object
-     * @return Future Resolves with the response object or fails with RpcErrorException
+     * @template T
+     * @param RpcRequest<T> $request The request object
+     * @return Future<T> Resolves with the response object or fails with RpcErrorException
      */
     public function call(RpcRequest $request): Future
     {
@@ -434,9 +435,10 @@ class Client
     /**
      * Sends a synchronous RPC request (blocks execution).
      *
-     * @param RpcRequest $request The request object
+     * @template TResponse
+     * @param RpcRequest<TResponse> $request The request object
      * @param int $timeout Timeout in seconds
-     * @return mixed The response object
+     * @return TResponse The response object
      */
     public function callSync(RpcRequest $request, int $timeout = 30): mixed
     {
