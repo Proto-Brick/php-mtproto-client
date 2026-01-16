@@ -15,16 +15,16 @@
 <a href="https://t.me/ProtoBrickChat"><img src="https://img.shields.io/badge/-Telegram_Chat-26A5E4?style=flat-square&logo=telegram&logoColor=white" alt="Telegram Chat"></a>
 </p>
 
-<p align="center">
-    <b>Proto Brick is just starting its journey. Your stars ⭐️ are crucial for the project's visibility!</b>
-</p>
+> <b>Proto Brick is just starting its journey. Your stars ⭐️ are crucial for the project's visibility!</b>
+
 
 <h1 align="center">Proto Brick</h1>
 <p>
-  <strong>An async pure PHP client library for the Telegram MTProto 2.0 API, providing a solid foundation to:</strong><br><br>  
-  - Build userbots with phone authentication and direct API access.<br>
+  <strong>Modern async pure PHP client library for Telegram MTProto. Build userbots with direct API access — no TDLib dependencies.</strong>
 </p>
 
+> [!NOTE]
+> 🚧 **Work in Progress:** This library is currently under active development. Features are being added rapidly, and breaking changes may occur before the v1.0 release.
 
 ## 🚀Features
 *   **Full Async:** Built on top of [AMPHP](https://amphp.org/) and [Revolt](https://revolt.run/) for high-performance non-blocking I/O.
@@ -265,7 +265,7 @@ This library is intended for personal automation and educational use. We are not
 
 ## 💬 Community & Support
 
-Proto Brick is a young library, and we are building a community of developers interested in async PHP & MTProto.
+ProtoBrick is a young library, and we are building a community of developers interested in MTProto.
 
 *   **Telegram Chat:** [Join the Discussion](https://t.me/ProtoBrickChat) — Ask questions, suggest features, or share your projects.
 *   **GitHub Issues:** Found a bug? Open an issue here.
