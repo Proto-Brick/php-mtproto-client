@@ -3,11 +3,22 @@
 </p>
 
 <p align="center">
+<!-- Packagist -->
 <a href="https://packagist.org/packages/protobrick/mtproto-client"><img src="https://img.shields.io/packagist/v/protobrick/mtproto-client?style=flat-square" alt="Latest Stable Version"></a>
+<!-- PHP Version -->
 <a href="https://php.net/"><img src="https://img.shields.io/badge/php-%3E%3D8.2-777bb4?style=flat-square" alt="PHP Version"></a>
+<!-- API Layer -->
 <a href="https://core.telegram.org/schema"><img src="https://img.shields.io/badge/API%20Layer-220-blueviolet?style=flat-square" alt="API Layer"></a>
+<!-- License -->
 <a href="./LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License"></a>
+<!-- Telegram Chat -->
+<a href="https://t.me/ProtoBrickChat"><img src="https://img.shields.io/badge/-Telegram_Chat-26A5E4?style=flat-square&logo=telegram&logoColor=white" alt="Telegram Chat"></a>
 </p>
+
+<p align="center">
+    <b>Proto Brick is just starting its journey. Your stars ⭐️ are crucial for the project's visibility!</b>
+</p>
+
 <h1 align="center">Proto Brick</h1>
 <p>
   <strong>An async pure PHP client library for the Telegram MTProto 2.0 API, providing a solid foundation to:</strong><br><br>  
@@ -250,13 +261,17 @@ php bin/build.php schema/TL_old_v199.json
 ```
 
 ## ⚠️ Disclaimer
-This library is for educational purposes. Using userbots may violate Telegram's Terms of Service. Use responsibly.
+This library is intended for personal automation and educational use. We are not responsible for any account limitations caused by misuse, spamming, or violating Telegram's [Terms of Service](https://core.telegram.org/api/terms). Please automate responsibly.
 
-## Contributing & Support
-If you find this library useful, please consider giving it a ⭐️ star! It helps the project's visibility and motivates me to keep working on it.
+## 💬 Community & Support
 
-Contributions are welcome!
-*   **Bug Reports:** Open an issue if you encounter crashes or protocol errors.
+Proto Brick is a young library, and we are building a community of developers interested in async PHP & MTProto.
+
+*   **Telegram Chat:** [Join the Discussion](https://t.me/ProtoBrickChat) — Ask questions, suggest features, or share your projects.
+*   **GitHub Issues:** Found a bug? Open an issue here.
+*   **Stars:** If you find this library useful, please **give it a star ⭐️**! It helps us grow and keeps the updates coming.
+
+Contributions (PRs) are always welcome!
 
 ## License
 
