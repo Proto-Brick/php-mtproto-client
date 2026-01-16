@@ -177,10 +177,46 @@ The core of this library is generated automatically:
 
 This ensures that if Telegram updates their API Layer, we can simply regenerate the code to support new features immediately.
 
-### Async vs Sync
-The library runs on an Event Loop (Revolt).
-*   **`$client->callSync($request)`**: Blocks execution until the response arrives. Best for simple scripts.
-*   **`$client->call($request)`**: Returns an `Amp\Future`. Best for high-concurrency applications.
+## ⏳ Async vs Sync Execution
+The client provides generated `*Async` methods for every API call.
+
+### 1. Synchronous & Concurrent
+Use synchronous calls for simple logic, and concurrent execution for performance.
+
+```php
+use function Amp\Future\await;
+
+// 🐢 Synchronous (Blocking)
+// Execution stops here until the channel is joined.
+$client->channels->joinChannel('@ProtoBrickChat');
+
+// 🚀 Concurrent (Parallel)
+// Send multiple requests at once. Total time = time of the slowest request.
+$futures = [];
+foreach (['@Chat1', '@Chat2', '@Chat3'] as $chat) {
+    // Returns Amp\Future immediately without waiting
+    $futures[] = $client->channels->joinChannelAsync($chat);
+}
+
+// Wait for ALL requests to complete
+await($futures);
+echo "Joined all chats!";
+```
+
+### 2. Fire & Forget
+Use `ignore()` for tasks where you don't care about the result or errors.
+
+```php
+// The code continues immediately, the request is sent in the background
+$client->messages->sendMessageAsync(
+    peer: 'me', message: 'Background log entry', 
+)->ignore();
+```
+
+> [!WARNING] 
+> `ignore()` pushes the task to the Event Loop.
+> *   **Short Scripts:** If your script ends immediately (reaches the end of the file), the Event Loop stops, and the request **will not be sent**.
+> *   **Daemons/Bots:** This works perfectly inside `$client->start()` or long-running processes, as the loop keeps turning.
 
 ## Advanced Configuration
 
