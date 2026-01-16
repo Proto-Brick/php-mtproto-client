@@ -74,8 +74,6 @@ class Rsa
      */
     public function encryptPqInnerData(string $data, string $publicKeyPem): string
     {
-        $start = hrtime(true);
-
         try {
             // phpseclib automatically detects key format (PKCS#1 or PKCS#8)
             /** @var PhpseclibRSA $key */
@@ -116,12 +114,7 @@ class Rsa
             // Check m < n
             if ((new BigInteger($key_aes_encrypted, 256))->compare($modulus) < 0) {
                 // phpseclib automatically uses OpenSSL/GMP/BCMath or Native PHP engine
-                $encryptedData = $key->encrypt($key_aes_encrypted);
-
-                $time = (hrtime(true) - $start) / 1e+6;
-                echo sprintf("[Crypto] RSA Encryption: %.2fms\n", $time);
-
-                return $encryptedData;
+                return $key->encrypt($key_aes_encrypted);
             }
         }
 

@@ -306,7 +306,7 @@ class ResponseDispatcher
         if (isset($update->ptsCount)) $logContext['pts_cnt'] = $update->ptsCount;
         if (isset($update->seq)) $logContext['seq'] = $update->seq;
         if ($peerInfo) $logContext['peer'] = $peerInfo;
-        if ($decTime > 0) $logContext['t_dec'] = number_format($decTime, 2) . 'ms';
+        if ($decTime > 0) $logContext['t_dec'] = number_format($decTime, 2, '.', '') . 'ms';
 
         if (is_string($text)) {
             $cleanText = str_replace(["\r", "\n"], ' ', $text);
@@ -370,12 +370,6 @@ class ResponseDispatcher
             Deserializer::int32($body, $offset);
             $code = Deserializer::int32($body, $offset);
             $message = Deserializer::bytes($body, $offset);
-
-            $this->logger->warning("RPC Error: {$message}", [
-                'channel' => LogChannel::RPC,
-                'code' => $code,
-                'req_msg_id' => $reqMsgId
-            ]);
 
             $this->client->failRequest($reqMsgId, new RpcErrorException($code, $message));
             return;

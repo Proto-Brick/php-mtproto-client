@@ -10,10 +10,12 @@ use ProtoBrick\MTProtoClient\Crypto\Ige;
 use ProtoBrick\MTProtoClient\Crypto\Rsa;
 use ProtoBrick\MTProtoClient\Exception\DhGenRetryException;
 use ProtoBrick\MTProtoClient\Exception\TransportException;
+use ProtoBrick\MTProtoClient\Logger\LogChannel;
 use ProtoBrick\MTProtoClient\TL\Deserializer;
 use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
 use ProtoBrick\MTProtoClient\TL\Serializer;
 use ProtoBrick\MTProtoClient\Transport\TransportInterface;
+use Psr\Log\LoggerInterface;
 use Random\RandomException;
 
 /**
@@ -32,6 +34,7 @@ class AuthKeyCreator
 {
     public function __construct(
         private readonly TransportInterface $transport,
+        private readonly LoggerInterface $logger,
         private readonly Rsa $rsa = new Rsa()
     ) {}
 
@@ -42,13 +45,13 @@ class AuthKeyCreator
     {
         $maxRetries = 5;
 
+        $this->logger->info("Creating new AuthKey for DC...", ['channel' => LogChannel::AUTH]);
+
         for ($attempt = 1; $attempt <= $maxRetries; $attempt++) {
             try {
                 // Шаг 1: req_pq_multi
                 $start = hrtime(true);
                 $resPQData = $this->sendReqPq();
-
-                // echo "Step 1 (req_pq): OK (Attempt $attempt)\n";
 
                 // Шаг 2: Факторизация pq
                 $fStart = hrtime(true);
@@ -56,27 +59,29 @@ class AuthKeyCreator
                 [$pInt, $qInt] = Factorizer::factorize($pqBig->toString());
                 $fTime = (hrtime(true) - $fStart) / 1e+6;
 
-                echo sprintf("[Crypto] PQ Factorized in %.2fms\n", $fTime);
+                $this->logger->debug("PQ Factorized", [
+                    'channel' => LogChannel::CRYPTO,
+                    'time' => number_format($fTime, 2, '.', '') . 'ms'
+                ]);
 
                 $pBytes = Serializer::intToBinary($pInt);
                 $qBytes = Serializer::intToBinary($qInt);
 
-                // echo "Step 2 (factorization): OK\n";
-
                 // Шаг 3: req_DH_params
                 $serverDhParams = $this->sendReqDhParams($resPQData, $pBytes, $qBytes);
-                // echo "Step 3 (req_DH_params): OK\n";
 
                 // Шаг 4: set_client_DH_params
-
-                $totalTime = (hrtime(true) - $start) / 1e+6;
                 $authResult = $this->sendSetClientDhParams($resPQData, $serverDhParams);
-                echo sprintf("[Auth] AuthKey created in %.2fms (ID: %s)\n", $totalTime, bin2hex($authResult->authKey->id));
-                echo "AuthKey created!\n";
+
+                $this->logger->info("AuthKey created!", [
+                    'channel' => LogChannel::AUTH,
+                    'id' => bin2hex($authResult->authKey->id),
+                    'total_time' => number_format((hrtime(true) - $start) / 1e+6, 2, '.', '') . 'ms'
+                ]);
 
                 return $authResult;
             } catch (DhGenRetryException) {
-                echo "Server asked for retry (dh_gen_retry). Attempt $attempt/$maxRetries...\n";
+                $this->logger->notice("Server asked for retry (dh_gen_retry). Attempt $attempt/$maxRetries...", ['channel' => LogChannel::AUTH]);
                 continue;
             }
         }
@@ -142,6 +147,8 @@ class AuthKeyCreator
         // Структура контейнера: [auth_key_id (8 байт) = 0] [msg_id (8 байт)] [message_length (4 байта)] [payload]
         $request = $this->packUnencrypted($payload);
 
+        $this->logger->debug("→ Handshake Step 1: Sending req_pq_multi", ['channel' => LogChannel::AUTH]);
+
         // 4. Отправляем полный пакет через транспорт.
         $this->transport->send($request)->await();
 
@@ -160,6 +167,8 @@ class AuthKeyCreator
         // 9. Десериализуем TL-объект `resPQ` в PHP-массив.
         $offset = 0;
         $deserialized = Deserializer::deserializeResPQ($responsePayload, $offset);
+
+        $this->logger->debug("← Received resPQ", ['channel' => LogChannel::AUTH]);
 
         // 10. Финальная проверка безопасности: nonce в ответе должен совпадать с тем, что мы отправили.
         // Это защищает от атак повторного воспроизведения (replay attacks).
@@ -211,7 +220,13 @@ class AuthKeyCreator
             . Serializer::int32(2);
 
         // Шифрование inner_data
+        $rsaStart = hrtime(true);
         $encryptedInnerData = $this->rsa->encryptPqInnerData($innerDataPayload, $publicKeyPem);
+
+        $this->logger->debug("DH Math (modPow)", [
+            'channel' => LogChannel::CRYPTO,
+            'time' => number_format((hrtime(true) - $rsaStart) / 1e+6, 2, '.', '') . 'ms'
+        ]);
 
         // Сборка и отправка req_DH_params
         $payload =
@@ -224,6 +239,9 @@ class AuthKeyCreator
             . Serializer::bytes($encryptedInnerData);
 
         $request = $this->packUnencrypted($payload);
+
+        $this->logger->debug("→ Handshake Step 3: Sending req_DH_params", ['channel' => LogChannel::AUTH]);
+
         $this->transport->send($request)->await();
 
         $prefixBytes = $this->transport->receive(4)->await();
@@ -241,6 +259,8 @@ class AuthKeyCreator
         if ($serverDhData['server_nonce'] !== $resPQData['server_nonce']) {
             throw new \RuntimeException("Invalid server_nonce in Server_DH_Params response.");
         }
+
+        $this->logger->debug("← Received server_DH_params_ok", ['channel' => LogChannel::AUTH]);
 
         return [
             'encrypted_answer' => $serverDhData['encrypted_answer'],
@@ -272,24 +292,16 @@ class AuthKeyCreator
         $local_time = time();
         $time_offset = $server_time - $local_time;
 
-        print 'step 4.1 (decryptDhInnerData): OK' . PHP_EOL;
-
         // Этап 4.2: Выполняем вычисления Диффи-Хеллмана на стороне клиента
         $clientDhResult = $this->_generateClientDhData($dhInnerData);
         $authKey = $clientDhResult['authKey'];
         $gb_bytes = $clientDhResult['gb_bytes'];
 
-        print 'step 4.2 (generateClientDhData): OK' . PHP_EOL;
-
         // Этап 4.3: Формируем, шифруем и отправляем наш финальный запрос
         $rawFinalResponse = $this->_encryptAndSendFinalRequest($gb_bytes, $resPQData, $tempKeys);
 
-        print 'step 4.3 (encryptAndSendFinalRequest): OK' . PHP_EOL;
-
         // Этап 4.4: Парсим и валидируем финальный ответ от сервера
         $this->_parseAndValidateFinalResponse($rawFinalResponse, $authKey, $resPQData, $serverDhParams['new_nonce']);
-
-        print 'step 4.4 (parseAndValidateFinalResponse): OK' . PHP_EOL;
 
         // Вычисляем Initial Salt
         $new_nonce_part_le = substr($serverDhParams['new_nonce'], 0, 8);
@@ -297,8 +309,6 @@ class AuthKeyCreator
         $new_nonce_int = unpack('q', $new_nonce_part_le)[1];
         $server_nonce_int = unpack('q', $server_nonce_part_le)[1];
         $initialSalt_int = $new_nonce_int ^ $server_nonce_int;
-
-        echo "Initial server_salt calculated and set.\n";
 
         return new AuthResult($authKey, $initialSalt_int, $time_offset);
     }
@@ -388,7 +398,10 @@ class AuthKeyCreator
         $authKeyBytes = str_pad($authKey_bi->toBytes(false), 256, "\0", STR_PAD_LEFT);
 
         $time = (hrtime(true) - $start) / 1e+6;
-        echo sprintf("[Crypto] DH Math (modPow): %.2fms\n", $time);
+        $this->logger->debug("DH Math (modPow)", [
+            'channel' => LogChannel::CRYPTO,
+            'time' => number_format($time, 2, '.', '') . 'ms'
+        ]);
 
         return [
             'authKey' => new AuthKey($authKeyBytes),
@@ -427,6 +440,8 @@ class AuthKeyCreator
             . Serializer::raw128($resPQData['nonce'])
             . Serializer::raw128($resPQData['server_nonce'])
             . Serializer::bytes($encryptedClientInnerData);
+
+        $this->logger->debug("→ Handshake Step 4: Sending set_client_DH_params", ['channel' => LogChannel::AUTH]);
 
         $request = $this->packUnencrypted($finalPayload);
         $this->transport->send($request)->await();

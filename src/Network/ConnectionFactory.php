@@ -36,8 +36,6 @@ class ConnectionFactory
         $sessionState = new SessionState();
 
         if (!$authKey) {
-            echo "Creating new AuthKey for DC $dcId...\n";
-
             // 1. Создаем временный транспорт для handshake
             // Важно: здесь мы используем настройки из Settings, но для Multi-DC
             // в будущем нужно будет подставлять IP конкретного дата-центра.
@@ -47,7 +45,7 @@ class ConnectionFactory
             $transport->connect()->await();
 
             // 2. Генерируем ключ
-            $creator = new AuthKeyCreator($transport);
+            $creator = new AuthKeyCreator($transport, $this->logger);
             $result = $creator->create(); // Возвращает AuthResult
 
             $authKey = $result->authKey;
@@ -64,7 +62,7 @@ class ConnectionFactory
             // 5. Закрываем временный транспорт
             $transport->close();
 
-            echo "AuthKey registered successfully.\n";
+            $this->logger->debug("AuthKey saved to storage.", ['channel' => LogChannel::AUTH]);
         } else {
             // Ключ уже был на диске
             $savedData = $this->sessionStorage->getFor($authKey->id);

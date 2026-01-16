@@ -29,6 +29,7 @@ use ProtoBrick\MTProtoClient\Generated\Api\UploadMethods;
 use ProtoBrick\MTProtoClient\Generated\Api\UsersMethods;
 // #-- API_HANDLERS_USE_END --#
 
+use ProtoBrick\MTProtoClient\Exception\TransportException;
 use ProtoBrick\MTProtoClient\Event\ServiceMessageContext;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\Message;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\MessageService;
@@ -139,7 +140,7 @@ class Client
         AuthKeyStorage $authKeyStorage,
         public readonly PeerManager $peerManager,
         private readonly SessionStorage $sessionStorage,
-        private readonly LoggerInterface $logger
+        public readonly LoggerInterface $logger
     ) {
         $this->peerManager->setClient($this);
 
@@ -439,6 +440,8 @@ class Client
      * @param RpcRequest<TResponse> $request The request object
      * @param int $timeout Timeout in seconds
      * @return TResponse The response object
+     * @throws RpcErrorException If the server returns an RPC error (e.g. FLOOD_WAIT, USERNAME_INVALID).
+     * @throws TransportException If the connection fails.
      */
     public function callSync(RpcRequest $request, int $timeout = 30): mixed
     {
@@ -487,19 +490,10 @@ class Client
                 throw new \RuntimeException("Failed to read input");
             }
             $phoneNumber = trim($input);
-            if ($phoneNumber === '') {
-                throw new \InvalidArgumentException("Phone number cannot be empty");
-            }
         }
 
         $codeProvider ??= static function (): string {
             echo "Enter code: ";
-            $line = fgets(STDIN);
-            return $line ? trim($line) : '';
-        };
-
-        $passwordProvider ??= static function (): string {
-            echo "Enter 2FA password: ";
             $line = fgets(STDIN);
             return $line ? trim($line) : '';
         };
