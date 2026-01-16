@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Chatlists\CheckChatlistInviteRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Chatlists\DeleteExportedInviteRequest;
@@ -56,13 +58,38 @@ final readonly class ChatlistsMethods
      * @param InputChatlist $chatlist
      * @param string $title
      * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $peers
+     * @return Future<ExportedChatlistInvite|null>
+     * @see https://core.telegram.org/method/chatlists.exportChatlistInvite
+     * @api
+     */
+    public function exportChatlistInviteAsync(InputChatlist $chatlist, string $title, array $peers): Future
+    {
+        return $this->client->call(new ExportChatlistInviteRequest(chatlist: $chatlist, title: $title, peers: $peers));
+    }
+
+    /**
+     * @param InputChatlist $chatlist
+     * @param string $title
+     * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $peers
      * @return ExportedChatlistInvite|null
      * @see https://core.telegram.org/method/chatlists.exportChatlistInvite
      * @api
      */
     public function exportChatlistInvite(InputChatlist $chatlist, string $title, array $peers): ?ExportedChatlistInvite
     {
-        return $this->client->callSync(new ExportChatlistInviteRequest(chatlist: $chatlist, title: $title, peers: $peers));
+        return $this->exportChatlistInviteAsync(chatlist: $chatlist, title: $title, peers: $peers)->await();
+    }
+
+    /**
+     * @param InputChatlist $chatlist
+     * @param string $slug
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/chatlists.deleteExportedInvite
+     * @api
+     */
+    public function deleteExportedInviteAsync(InputChatlist $chatlist, string $slug): Future
+    {
+        return $this->client->call(new DeleteExportedInviteRequest(chatlist: $chatlist, slug: $slug));
     }
 
     /**
@@ -74,7 +101,21 @@ final readonly class ChatlistsMethods
      */
     public function deleteExportedInvite(InputChatlist $chatlist, string $slug): bool
     {
-        return (bool) $this->client->callSync(new DeleteExportedInviteRequest(chatlist: $chatlist, slug: $slug));
+        return (bool) $this->deleteExportedInviteAsync(chatlist: $chatlist, slug: $slug)->await();
+    }
+
+    /**
+     * @param InputChatlist $chatlist
+     * @param string $slug
+     * @param string|null $title
+     * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage>|null $peers
+     * @return Future<BaseExportedChatlistInvite|null>
+     * @see https://core.telegram.org/method/chatlists.editExportedInvite
+     * @api
+     */
+    public function editExportedInviteAsync(InputChatlist $chatlist, string $slug, ?string $title = null, ?array $peers = null): Future
+    {
+        return $this->client->call(new EditExportedInviteRequest(chatlist: $chatlist, slug: $slug, title: $title, peers: $peers));
     }
 
     /**
@@ -88,7 +129,18 @@ final readonly class ChatlistsMethods
      */
     public function editExportedInvite(InputChatlist $chatlist, string $slug, ?string $title = null, ?array $peers = null): ?BaseExportedChatlistInvite
     {
-        return $this->client->callSync(new EditExportedInviteRequest(chatlist: $chatlist, slug: $slug, title: $title, peers: $peers));
+        return $this->editExportedInviteAsync(chatlist: $chatlist, slug: $slug, title: $title, peers: $peers)->await();
+    }
+
+    /**
+     * @param InputChatlist $chatlist
+     * @return Future<ExportedInvites|null>
+     * @see https://core.telegram.org/method/chatlists.getExportedInvites
+     * @api
+     */
+    public function getExportedInvitesAsync(InputChatlist $chatlist): Future
+    {
+        return $this->client->call(new GetExportedInvitesRequest(chatlist: $chatlist));
     }
 
     /**
@@ -99,7 +151,18 @@ final readonly class ChatlistsMethods
      */
     public function getExportedInvites(InputChatlist $chatlist): ?ExportedInvites
     {
-        return $this->client->callSync(new GetExportedInvitesRequest(chatlist: $chatlist));
+        return $this->getExportedInvitesAsync(chatlist: $chatlist)->await();
+    }
+
+    /**
+     * @param string $slug
+     * @return Future<ChatlistInviteAlready|ChatlistInvite|null>
+     * @see https://core.telegram.org/method/chatlists.checkChatlistInvite
+     * @api
+     */
+    public function checkChatlistInviteAsync(string $slug): Future
+    {
+        return $this->client->call(new CheckChatlistInviteRequest(slug: $slug));
     }
 
     /**
@@ -110,7 +173,19 @@ final readonly class ChatlistsMethods
      */
     public function checkChatlistInvite(string $slug): ?AbstractChatlistInvite
     {
-        return $this->client->callSync(new CheckChatlistInviteRequest(slug: $slug));
+        return $this->checkChatlistInviteAsync(slug: $slug)->await();
+    }
+
+    /**
+     * @param string $slug
+     * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $peers
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/chatlists.joinChatlistInvite
+     * @api
+     */
+    public function joinChatlistInviteAsync(string $slug, array $peers): Future
+    {
+        return $this->client->call(new JoinChatlistInviteRequest(slug: $slug, peers: $peers));
     }
 
     /**
@@ -122,7 +197,18 @@ final readonly class ChatlistsMethods
      */
     public function joinChatlistInvite(string $slug, array $peers): ?AbstractUpdates
     {
-        return $this->client->callSync(new JoinChatlistInviteRequest(slug: $slug, peers: $peers));
+        return $this->joinChatlistInviteAsync(slug: $slug, peers: $peers)->await();
+    }
+
+    /**
+     * @param InputChatlist $chatlist
+     * @return Future<ChatlistUpdates|null>
+     * @see https://core.telegram.org/method/chatlists.getChatlistUpdates
+     * @api
+     */
+    public function getChatlistUpdatesAsync(InputChatlist $chatlist): Future
+    {
+        return $this->client->call(new GetChatlistUpdatesRequest(chatlist: $chatlist));
     }
 
     /**
@@ -133,7 +219,19 @@ final readonly class ChatlistsMethods
      */
     public function getChatlistUpdates(InputChatlist $chatlist): ?ChatlistUpdates
     {
-        return $this->client->callSync(new GetChatlistUpdatesRequest(chatlist: $chatlist));
+        return $this->getChatlistUpdatesAsync(chatlist: $chatlist)->await();
+    }
+
+    /**
+     * @param InputChatlist $chatlist
+     * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $peers
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/chatlists.joinChatlistUpdates
+     * @api
+     */
+    public function joinChatlistUpdatesAsync(InputChatlist $chatlist, array $peers): Future
+    {
+        return $this->client->call(new JoinChatlistUpdatesRequest(chatlist: $chatlist, peers: $peers));
     }
 
     /**
@@ -145,7 +243,18 @@ final readonly class ChatlistsMethods
      */
     public function joinChatlistUpdates(InputChatlist $chatlist, array $peers): ?AbstractUpdates
     {
-        return $this->client->callSync(new JoinChatlistUpdatesRequest(chatlist: $chatlist, peers: $peers));
+        return $this->joinChatlistUpdatesAsync(chatlist: $chatlist, peers: $peers)->await();
+    }
+
+    /**
+     * @param InputChatlist $chatlist
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/chatlists.hideChatlistUpdates
+     * @api
+     */
+    public function hideChatlistUpdatesAsync(InputChatlist $chatlist): Future
+    {
+        return $this->client->call(new HideChatlistUpdatesRequest(chatlist: $chatlist));
     }
 
     /**
@@ -156,7 +265,18 @@ final readonly class ChatlistsMethods
      */
     public function hideChatlistUpdates(InputChatlist $chatlist): bool
     {
-        return (bool) $this->client->callSync(new HideChatlistUpdatesRequest(chatlist: $chatlist));
+        return (bool) $this->hideChatlistUpdatesAsync(chatlist: $chatlist)->await();
+    }
+
+    /**
+     * @param InputChatlist $chatlist
+     * @return Future<list<PeerUser|PeerChat|PeerChannel>>
+     * @see https://core.telegram.org/method/chatlists.getLeaveChatlistSuggestions
+     * @api
+     */
+    public function getLeaveChatlistSuggestionsAsync(InputChatlist $chatlist): Future
+    {
+        return $this->client->call(new GetLeaveChatlistSuggestionsRequest(chatlist: $chatlist));
     }
 
     /**
@@ -167,7 +287,19 @@ final readonly class ChatlistsMethods
      */
     public function getLeaveChatlistSuggestions(InputChatlist $chatlist): array
     {
-        return $this->client->callSync(new GetLeaveChatlistSuggestionsRequest(chatlist: $chatlist));
+        return $this->getLeaveChatlistSuggestionsAsync(chatlist: $chatlist)->await();
+    }
+
+    /**
+     * @param InputChatlist $chatlist
+     * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $peers
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/chatlists.leaveChatlist
+     * @api
+     */
+    public function leaveChatlistAsync(InputChatlist $chatlist, array $peers): Future
+    {
+        return $this->client->call(new LeaveChatlistRequest(chatlist: $chatlist, peers: $peers));
     }
 
     /**
@@ -179,6 +311,6 @@ final readonly class ChatlistsMethods
      */
     public function leaveChatlist(InputChatlist $chatlist, array $peers): ?AbstractUpdates
     {
-        return $this->client->callSync(new LeaveChatlistRequest(chatlist: $chatlist, peers: $peers));
+        return $this->leaveChatlistAsync(chatlist: $chatlist, peers: $peers)->await();
     }
 }

@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Updates\GetChannelDifferenceRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Updates\GetDifferenceRequest;
@@ -35,13 +37,39 @@ final readonly class UpdatesMethods
     public function __construct(private Client $client) {}
 
     /**
+     * @return Future<State|null>
+     * @see https://core.telegram.org/method/updates.getState
+     * @api
+     */
+    public function getStateAsync(): Future
+    {
+        return $this->client->call(new GetStateRequest());
+    }
+
+    /**
      * @return State|null
      * @see https://core.telegram.org/method/updates.getState
      * @api
      */
     public function getState(): ?State
     {
-        return $this->client->callSync(new GetStateRequest());
+        return $this->getStateAsync()->await();
+    }
+
+    /**
+     * @param int $pts
+     * @param int $date
+     * @param int $qts
+     * @param int|null $ptsLimit
+     * @param int|null $ptsTotalLimit
+     * @param int|null $qtsLimit
+     * @return Future<DifferenceEmpty|Difference|DifferenceSlice|DifferenceTooLong|null>
+     * @see https://core.telegram.org/method/updates.getDifference
+     * @api
+     */
+    public function getDifferenceAsync(int $pts, int $date, int $qts, ?int $ptsLimit = null, ?int $ptsTotalLimit = null, ?int $qtsLimit = null): Future
+    {
+        return $this->client->call(new GetDifferenceRequest(pts: $pts, date: $date, qts: $qts, ptsLimit: $ptsLimit, ptsTotalLimit: $ptsTotalLimit, qtsLimit: $qtsLimit));
     }
 
     /**
@@ -57,7 +85,30 @@ final readonly class UpdatesMethods
      */
     public function getDifference(int $pts, int $date, int $qts, ?int $ptsLimit = null, ?int $ptsTotalLimit = null, ?int $qtsLimit = null): ?AbstractDifference
     {
-        return $this->client->callSync(new GetDifferenceRequest(pts: $pts, date: $date, qts: $qts, ptsLimit: $ptsLimit, ptsTotalLimit: $ptsTotalLimit, qtsLimit: $qtsLimit));
+        return $this->getDifferenceAsync(pts: $pts, date: $date, qts: $qts, ptsLimit: $ptsLimit, ptsTotalLimit: $ptsTotalLimit, qtsLimit: $qtsLimit)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param ChannelMessagesFilterEmpty|ChannelMessagesFilter $filter
+     * @param int $pts
+     * @param int $limit
+     * @param bool|null $force
+     * @return Future<ChannelDifferenceEmpty|ChannelDifferenceTooLong|ChannelDifference|null>
+     * @see https://core.telegram.org/method/updates.getChannelDifference
+     * @api
+     */
+    public function getChannelDifferenceAsync(AbstractInputChannel|string|int $channel, AbstractChannelMessagesFilter $filter, int $pts, int $limit, ?bool $force = null): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetChannelDifferenceRequest(channel: $channel, filter: $filter, pts: $pts, limit: $limit, force: $force));
     }
 
     /**
@@ -72,14 +123,6 @@ final readonly class UpdatesMethods
      */
     public function getChannelDifference(AbstractInputChannel|string|int $channel, AbstractChannelMessagesFilter $filter, int $pts, int $limit, ?bool $force = null): ?AbstractChannelDifference
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetChannelDifferenceRequest(channel: $channel, filter: $filter, pts: $pts, limit: $limit, force: $force));
+        return $this->getChannelDifferenceAsync(channel: $channel, filter: $filter, pts: $pts, limit: $limit, force: $force)->await();
     }
 }

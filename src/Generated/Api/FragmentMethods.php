@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Fragment\GetCollectibleInfoRequest;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractInputCollectible;
@@ -20,12 +22,23 @@ final readonly class FragmentMethods
 
     /**
      * @param InputCollectibleUsername|InputCollectiblePhone $collectible
+     * @return Future<CollectibleInfo|null>
+     * @see https://core.telegram.org/method/fragment.getCollectibleInfo
+     * @api
+     */
+    public function getCollectibleInfoAsync(AbstractInputCollectible $collectible): Future
+    {
+        return $this->client->call(new GetCollectibleInfoRequest(collectible: $collectible));
+    }
+
+    /**
+     * @param InputCollectibleUsername|InputCollectiblePhone $collectible
      * @return CollectibleInfo|null
      * @see https://core.telegram.org/method/fragment.getCollectibleInfo
      * @api
      */
     public function getCollectibleInfo(AbstractInputCollectible $collectible): ?CollectibleInfo
     {
-        return $this->client->callSync(new GetCollectibleInfoRequest(collectible: $collectible));
+        return $this->getCollectibleInfoAsync(collectible: $collectible)->await();
     }
 }

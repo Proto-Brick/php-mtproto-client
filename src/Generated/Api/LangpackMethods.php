@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Langpack\GetDifferenceRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Langpack\GetLangPackRequest;
@@ -27,13 +29,38 @@ final readonly class LangpackMethods
     /**
      * @param string $langPack
      * @param string $langCode
+     * @return Future<LangPackDifference|null>
+     * @see https://core.telegram.org/method/langpack.getLangPack
+     * @api
+     */
+    public function getLangPackAsync(string $langPack, string $langCode): Future
+    {
+        return $this->client->call(new GetLangPackRequest(langPack: $langPack, langCode: $langCode));
+    }
+
+    /**
+     * @param string $langPack
+     * @param string $langCode
      * @return LangPackDifference|null
      * @see https://core.telegram.org/method/langpack.getLangPack
      * @api
      */
     public function getLangPack(string $langPack, string $langCode): ?LangPackDifference
     {
-        return $this->client->callSync(new GetLangPackRequest(langPack: $langPack, langCode: $langCode));
+        return $this->getLangPackAsync(langPack: $langPack, langCode: $langCode)->await();
+    }
+
+    /**
+     * @param string $langPack
+     * @param string $langCode
+     * @param list<string> $keys
+     * @return Future<list<LangPackString|LangPackStringPluralized|LangPackStringDeleted>>
+     * @see https://core.telegram.org/method/langpack.getStrings
+     * @api
+     */
+    public function getStringsAsync(string $langPack, string $langCode, array $keys): Future
+    {
+        return $this->client->call(new GetStringsRequest(langPack: $langPack, langCode: $langCode, keys: $keys));
     }
 
     /**
@@ -46,7 +73,20 @@ final readonly class LangpackMethods
      */
     public function getStrings(string $langPack, string $langCode, array $keys): array
     {
-        return $this->client->callSync(new GetStringsRequest(langPack: $langPack, langCode: $langCode, keys: $keys));
+        return $this->getStringsAsync(langPack: $langPack, langCode: $langCode, keys: $keys)->await();
+    }
+
+    /**
+     * @param string $langPack
+     * @param string $langCode
+     * @param int $fromVersion
+     * @return Future<LangPackDifference|null>
+     * @see https://core.telegram.org/method/langpack.getDifference
+     * @api
+     */
+    public function getDifferenceAsync(string $langPack, string $langCode, int $fromVersion): Future
+    {
+        return $this->client->call(new GetDifferenceRequest(langPack: $langPack, langCode: $langCode, fromVersion: $fromVersion));
     }
 
     /**
@@ -59,7 +99,18 @@ final readonly class LangpackMethods
      */
     public function getDifference(string $langPack, string $langCode, int $fromVersion): ?LangPackDifference
     {
-        return $this->client->callSync(new GetDifferenceRequest(langPack: $langPack, langCode: $langCode, fromVersion: $fromVersion));
+        return $this->getDifferenceAsync(langPack: $langPack, langCode: $langCode, fromVersion: $fromVersion)->await();
+    }
+
+    /**
+     * @param string $langPack
+     * @return Future<list<LangPackLanguage>>
+     * @see https://core.telegram.org/method/langpack.getLanguages
+     * @api
+     */
+    public function getLanguagesAsync(string $langPack): Future
+    {
+        return $this->client->call(new GetLanguagesRequest(langPack: $langPack));
     }
 
     /**
@@ -70,7 +121,19 @@ final readonly class LangpackMethods
      */
     public function getLanguages(string $langPack): array
     {
-        return $this->client->callSync(new GetLanguagesRequest(langPack: $langPack));
+        return $this->getLanguagesAsync(langPack: $langPack)->await();
+    }
+
+    /**
+     * @param string $langPack
+     * @param string $langCode
+     * @return Future<LangPackLanguage|null>
+     * @see https://core.telegram.org/method/langpack.getLanguage
+     * @api
+     */
+    public function getLanguageAsync(string $langPack, string $langCode): Future
+    {
+        return $this->client->call(new GetLanguageRequest(langPack: $langPack, langCode: $langCode));
     }
 
     /**
@@ -82,6 +145,6 @@ final readonly class LangpackMethods
      */
     public function getLanguage(string $langPack, string $langCode): ?LangPackLanguage
     {
-        return $this->client->callSync(new GetLanguageRequest(langPack: $langPack, langCode: $langCode));
+        return $this->getLanguageAsync(langPack: $langPack, langCode: $langCode)->await();
     }
 }

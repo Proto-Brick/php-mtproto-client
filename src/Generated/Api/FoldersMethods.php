@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Folders\EditPeerFoldersRequest;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\AbstractUpdates;
@@ -25,12 +27,23 @@ final readonly class FoldersMethods
 
     /**
      * @param list<InputFolderPeer> $folderPeers
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/folders.editPeerFolders
+     * @api
+     */
+    public function editPeerFoldersAsync(array $folderPeers): Future
+    {
+        return $this->client->call(new EditPeerFoldersRequest(folderPeers: $folderPeers));
+    }
+
+    /**
+     * @param list<InputFolderPeer> $folderPeers
      * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
      * @see https://core.telegram.org/method/folders.editPeerFolders
      * @api
      */
     public function editPeerFolders(array $folderPeers): ?AbstractUpdates
     {
-        return $this->client->callSync(new EditPeerFoldersRequest(folderPeers: $folderPeers));
+        return $this->editPeerFoldersAsync(folderPeers: $folderPeers)->await();
     }
 }

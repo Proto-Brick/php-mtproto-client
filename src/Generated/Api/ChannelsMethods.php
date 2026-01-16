@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\CheckSearchPostsFloodRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Channels\CheckUsernameRequest;
@@ -170,11 +172,11 @@ final readonly class ChannelsMethods
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param int $maxId
-     * @return bool
+     * @return Future<bool>
      * @see https://core.telegram.org/method/channels.readHistory
      * @api
      */
-    public function readHistory(AbstractInputChannel|string|int $channel, int $maxId): bool
+    public function readHistoryAsync(AbstractInputChannel|string|int $channel, int $maxId): Future
     {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
@@ -184,7 +186,39 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ReadHistoryRequest(channel: $channel, maxId: $maxId));
+        return $this->client->call(new ReadHistoryRequest(channel: $channel, maxId: $maxId));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param int $maxId
+     * @return bool
+     * @see https://core.telegram.org/method/channels.readHistory
+     * @api
+     */
+    public function readHistory(AbstractInputChannel|string|int $channel, int $maxId): bool
+    {
+        return (bool) $this->readHistoryAsync(channel: $channel, maxId: $maxId)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param list<int> $id
+     * @return Future<AffectedMessages|null>
+     * @see https://core.telegram.org/method/channels.deleteMessages
+     * @api
+     */
+    public function deleteMessagesAsync(AbstractInputChannel|string|int $channel, array $id): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new DeleteMessagesRequest(channel: $channel, id: $id));
     }
 
     /**
@@ -196,26 +230,18 @@ final readonly class ChannelsMethods
      */
     public function deleteMessages(AbstractInputChannel|string|int $channel, array $id): ?AffectedMessages
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new DeleteMessagesRequest(channel: $channel, id: $id));
+        return $this->deleteMessagesAsync(channel: $channel, id: $id)->await();
     }
 
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
      * @param list<int> $id
-     * @return bool
+     * @return Future<bool>
      * @see https://core.telegram.org/method/channels.reportSpam
      * @api
      */
-    public function reportSpam(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant, array $id): bool
+    public function reportSpamAsync(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant, array $id): Future
     {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
@@ -228,7 +254,40 @@ final readonly class ChannelsMethods
         if (is_string($participant) || is_int($participant)) {
             $participant = $this->client->peerManager->resolve($participant);
         }
-        return (bool) $this->client->callSync(new ReportSpamRequest(channel: $channel, participant: $participant, id: $id));
+        return $this->client->call(new ReportSpamRequest(channel: $channel, participant: $participant, id: $id));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
+     * @param list<int> $id
+     * @return bool
+     * @see https://core.telegram.org/method/channels.reportSpam
+     * @api
+     */
+    public function reportSpam(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant, array $id): bool
+    {
+        return (bool) $this->reportSpamAsync(channel: $channel, participant: $participant, id: $id)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param list<InputMessageID|InputMessageReplyTo|InputMessagePinned|InputMessageCallbackQuery> $id
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/channels.getMessages
+     * @api
+     */
+    public function getMessagesAsync(AbstractInputChannel|string|int $channel, array $id): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetMessagesRequest(channel: $channel, id: $id));
     }
 
     /**
@@ -240,6 +299,21 @@ final readonly class ChannelsMethods
      */
     public function getMessages(AbstractInputChannel|string|int $channel, array $id): ?AbstractMessages
     {
+        return $this->getMessagesAsync(channel: $channel, id: $id)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param ChannelParticipantsRecent|ChannelParticipantsAdmins|ChannelParticipantsKicked|ChannelParticipantsBots|ChannelParticipantsBanned|ChannelParticipantsSearch|ChannelParticipantsContacts|ChannelParticipantsMentions $filter
+     * @param int $offset
+     * @param int $limit
+     * @param int $hash
+     * @return Future<ChannelParticipants|ChannelParticipantsNotModified|null>
+     * @see https://core.telegram.org/method/channels.getParticipants
+     * @api
+     */
+    public function getParticipantsAsync(AbstractInputChannel|string|int $channel, AbstractChannelParticipantsFilter $filter, int $offset, int $limit, int $hash): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -248,7 +322,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetMessagesRequest(channel: $channel, id: $id));
+        return $this->client->call(new GetParticipantsRequest(channel: $channel, filter: $filter, offset: $offset, limit: $limit, hash: $hash));
     }
 
     /**
@@ -263,25 +337,17 @@ final readonly class ChannelsMethods
      */
     public function getParticipants(AbstractInputChannel|string|int $channel, AbstractChannelParticipantsFilter $filter, int $offset, int $limit, int $hash): ?AbstractChannelParticipants
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetParticipantsRequest(channel: $channel, filter: $filter, offset: $offset, limit: $limit, hash: $hash));
+        return $this->getParticipantsAsync(channel: $channel, filter: $filter, offset: $offset, limit: $limit, hash: $hash)->await();
     }
 
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
-     * @return ChannelParticipant|null
+     * @return Future<ChannelParticipant|null>
      * @see https://core.telegram.org/method/channels.getParticipant
      * @api
      */
-    public function getParticipant(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant): ?ChannelParticipant
+    public function getParticipantAsync(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant): Future
     {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
@@ -294,7 +360,30 @@ final readonly class ChannelsMethods
         if (is_string($participant) || is_int($participant)) {
             $participant = $this->client->peerManager->resolve($participant);
         }
-        return $this->client->callSync(new GetParticipantRequest(channel: $channel, participant: $participant));
+        return $this->client->call(new GetParticipantRequest(channel: $channel, participant: $participant));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
+     * @return ChannelParticipant|null
+     * @see https://core.telegram.org/method/channels.getParticipant
+     * @api
+     */
+    public function getParticipant(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant): ?ChannelParticipant
+    {
+        return $this->getParticipantAsync(channel: $channel, participant: $participant)->await();
+    }
+
+    /**
+     * @param list<InputChannelEmpty|InputChannel|InputChannelFromMessage> $id
+     * @return Future<Chats|ChatsSlice|null>
+     * @see https://core.telegram.org/method/channels.getChannels
+     * @api
+     */
+    public function getChannelsAsync(array $id): Future
+    {
+        return $this->client->call(new GetChannelsRequest(id: $id));
     }
 
     /**
@@ -305,7 +394,26 @@ final readonly class ChannelsMethods
      */
     public function getChannels(array $id): ?AbstractChats
     {
-        return $this->client->callSync(new GetChannelsRequest(id: $id));
+        return $this->getChannelsAsync(id: $id)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @return Future<ChatFull|null>
+     * @see https://core.telegram.org/method/channels.getFullChannel
+     * @api
+     */
+    public function getFullChannelAsync(AbstractInputChannel|string|int $channel): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetFullChannelRequest(channel: $channel));
     }
 
     /**
@@ -316,15 +424,26 @@ final readonly class ChannelsMethods
      */
     public function getFullChannel(AbstractInputChannel|string|int $channel): ?ChatFull
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetFullChannelRequest(channel: $channel));
+        return $this->getFullChannelAsync(channel: $channel)->await();
+    }
+
+    /**
+     * @param string $title
+     * @param string $about
+     * @param bool|null $broadcast
+     * @param bool|null $megagroup
+     * @param bool|null $forImport
+     * @param bool|null $forum
+     * @param InputGeoPointEmpty|InputGeoPoint|null $geoPoint
+     * @param string|null $address
+     * @param int|null $ttlPeriod
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.createChannel
+     * @api
+     */
+    public function createChannelAsync(string $title, string $about, ?bool $broadcast = null, ?bool $megagroup = null, ?bool $forImport = null, ?bool $forum = null, ?AbstractInputGeoPoint $geoPoint = null, ?string $address = null, ?int $ttlPeriod = null): Future
+    {
+        return $this->client->call(new CreateChannelRequest(title: $title, about: $about, broadcast: $broadcast, megagroup: $megagroup, forImport: $forImport, forum: $forum, geoPoint: $geoPoint, address: $address, ttlPeriod: $ttlPeriod));
     }
 
     /**
@@ -343,7 +462,7 @@ final readonly class ChannelsMethods
      */
     public function createChannel(string $title, string $about, ?bool $broadcast = null, ?bool $megagroup = null, ?bool $forImport = null, ?bool $forum = null, ?AbstractInputGeoPoint $geoPoint = null, ?string $address = null, ?int $ttlPeriod = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new CreateChannelRequest(title: $title, about: $about, broadcast: $broadcast, megagroup: $megagroup, forImport: $forImport, forum: $forum, geoPoint: $geoPoint, address: $address, ttlPeriod: $ttlPeriod));
+        return $this->createChannelAsync(title: $title, about: $about, broadcast: $broadcast, megagroup: $megagroup, forImport: $forImport, forum: $forum, geoPoint: $geoPoint, address: $address, ttlPeriod: $ttlPeriod)->await();
     }
 
     /**
@@ -351,11 +470,11 @@ final readonly class ChannelsMethods
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param ChatAdminRights $adminRights
      * @param string $rank
-     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
      * @see https://core.telegram.org/method/channels.editAdmin
      * @api
      */
-    public function editAdmin(AbstractInputChannel|string|int $channel, AbstractInputUser|string|int $userId, ChatAdminRights $adminRights, string $rank): ?AbstractUpdates
+    public function editAdminAsync(AbstractInputChannel|string|int $channel, AbstractInputUser|string|int $userId, ChatAdminRights $adminRights, string $rank): Future
     {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
@@ -373,7 +492,41 @@ final readonly class ChannelsMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new EditAdminRequest(channel: $channel, userId: $userId, adminRights: $adminRights, rank: $rank));
+        return $this->client->call(new EditAdminRequest(channel: $channel, userId: $userId, adminRights: $adminRights, rank: $rank));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param ChatAdminRights $adminRights
+     * @param string $rank
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/channels.editAdmin
+     * @api
+     */
+    public function editAdmin(AbstractInputChannel|string|int $channel, AbstractInputUser|string|int $userId, ChatAdminRights $adminRights, string $rank): ?AbstractUpdates
+    {
+        return $this->editAdminAsync(channel: $channel, userId: $userId, adminRights: $adminRights, rank: $rank)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param string $title
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.editTitle
+     * @api
+     */
+    public function editTitleAsync(AbstractInputChannel|string|int $channel, string $title): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new EditTitleRequest(channel: $channel, title: $title));
     }
 
     /**
@@ -385,6 +538,18 @@ final readonly class ChannelsMethods
      */
     public function editTitle(AbstractInputChannel|string|int $channel, string $title): ?AbstractUpdates
     {
+        return $this->editTitleAsync(channel: $channel, title: $title)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputChatPhotoEmpty|InputChatUploadedPhoto|InputChatPhoto $photo
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.editPhoto
+     * @api
+     */
+    public function editPhotoAsync(AbstractInputChannel|string|int $channel, AbstractInputChatPhoto $photo): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -393,7 +558,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new EditTitleRequest(channel: $channel, title: $title));
+        return $this->client->call(new EditPhotoRequest(channel: $channel, photo: $photo));
     }
 
     /**
@@ -405,6 +570,18 @@ final readonly class ChannelsMethods
      */
     public function editPhoto(AbstractInputChannel|string|int $channel, AbstractInputChatPhoto $photo): ?AbstractUpdates
     {
+        return $this->editPhotoAsync(channel: $channel, photo: $photo)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param string $username
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.checkUsername
+     * @api
+     */
+    public function checkUsernameAsync(AbstractInputChannel|string|int $channel, string $username): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -413,7 +590,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new EditPhotoRequest(channel: $channel, photo: $photo));
+        return $this->client->call(new CheckUsernameRequest(channel: $channel, username: $username));
     }
 
     /**
@@ -425,6 +602,18 @@ final readonly class ChannelsMethods
      */
     public function checkUsername(AbstractInputChannel|string|int $channel, string $username): bool
     {
+        return (bool) $this->checkUsernameAsync(channel: $channel, username: $username)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param string $username
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.updateUsername
+     * @api
+     */
+    public function updateUsernameAsync(AbstractInputChannel|string|int $channel, string $username): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -433,7 +622,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new CheckUsernameRequest(channel: $channel, username: $username));
+        return $this->client->call(new UpdateUsernameRequest(channel: $channel, username: $username));
     }
 
     /**
@@ -445,6 +634,17 @@ final readonly class ChannelsMethods
      */
     public function updateUsername(AbstractInputChannel|string|int $channel, string $username): bool
     {
+        return (bool) $this->updateUsernameAsync(channel: $channel, username: $username)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.joinChannel
+     * @api
+     */
+    public function joinChannelAsync(AbstractInputChannel|string|int $channel): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -453,7 +653,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new UpdateUsernameRequest(channel: $channel, username: $username));
+        return $this->client->call(new JoinChannelRequest(channel: $channel));
     }
 
     /**
@@ -464,6 +664,17 @@ final readonly class ChannelsMethods
      */
     public function joinChannel(AbstractInputChannel|string|int $channel): ?AbstractUpdates
     {
+        return $this->joinChannelAsync(channel: $channel)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.leaveChannel
+     * @api
+     */
+    public function leaveChannelAsync(AbstractInputChannel|string|int $channel): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -472,7 +683,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new JoinChannelRequest(channel: $channel));
+        return $this->client->call(new LeaveChannelRequest(channel: $channel));
     }
 
     /**
@@ -483,6 +694,18 @@ final readonly class ChannelsMethods
      */
     public function leaveChannel(AbstractInputChannel|string|int $channel): ?AbstractUpdates
     {
+        return $this->leaveChannelAsync(channel: $channel)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param list<InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage> $users
+     * @return Future<InvitedUsers|null>
+     * @see https://core.telegram.org/method/channels.inviteToChannel
+     * @api
+     */
+    public function inviteToChannelAsync(AbstractInputChannel|string|int $channel, array $users): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -491,7 +714,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new LeaveChannelRequest(channel: $channel));
+        return $this->client->call(new InviteToChannelRequest(channel: $channel, users: $users));
     }
 
     /**
@@ -503,6 +726,17 @@ final readonly class ChannelsMethods
      */
     public function inviteToChannel(AbstractInputChannel|string|int $channel, array $users): ?InvitedUsers
     {
+        return $this->inviteToChannelAsync(channel: $channel, users: $users)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.deleteChannel
+     * @api
+     */
+    public function deleteChannelAsync(AbstractInputChannel|string|int $channel): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -511,7 +745,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new InviteToChannelRequest(channel: $channel, users: $users));
+        return $this->client->call(new DeleteChannelRequest(channel: $channel));
     }
 
     /**
@@ -522,6 +756,20 @@ final readonly class ChannelsMethods
      */
     public function deleteChannel(AbstractInputChannel|string|int $channel): ?AbstractUpdates
     {
+        return $this->deleteChannelAsync(channel: $channel)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param int $id
+     * @param bool|null $grouped
+     * @param bool|null $thread
+     * @return Future<ExportedMessageLink|null>
+     * @see https://core.telegram.org/method/channels.exportMessageLink
+     * @api
+     */
+    public function exportMessageLinkAsync(AbstractInputChannel|string|int $channel, int $id, ?bool $grouped = null, ?bool $thread = null): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -530,7 +778,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new DeleteChannelRequest(channel: $channel));
+        return $this->client->call(new ExportMessageLinkRequest(channel: $channel, id: $id, grouped: $grouped, thread: $thread));
     }
 
     /**
@@ -544,6 +792,19 @@ final readonly class ChannelsMethods
      */
     public function exportMessageLink(AbstractInputChannel|string|int $channel, int $id, ?bool $grouped = null, ?bool $thread = null): ?ExportedMessageLink
     {
+        return $this->exportMessageLinkAsync(channel: $channel, id: $id, grouped: $grouped, thread: $thread)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool|null $signaturesEnabled
+     * @param bool|null $profilesEnabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.toggleSignatures
+     * @api
+     */
+    public function toggleSignaturesAsync(AbstractInputChannel|string|int $channel, ?bool $signaturesEnabled = null, ?bool $profilesEnabled = null): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -552,7 +813,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new ExportMessageLinkRequest(channel: $channel, id: $id, grouped: $grouped, thread: $thread));
+        return $this->client->call(new ToggleSignaturesRequest(channel: $channel, signaturesEnabled: $signaturesEnabled, profilesEnabled: $profilesEnabled));
     }
 
     /**
@@ -565,15 +826,20 @@ final readonly class ChannelsMethods
      */
     public function toggleSignatures(AbstractInputChannel|string|int $channel, ?bool $signaturesEnabled = null, ?bool $profilesEnabled = null): ?AbstractUpdates
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new ToggleSignaturesRequest(channel: $channel, signaturesEnabled: $signaturesEnabled, profilesEnabled: $profilesEnabled));
+        return $this->toggleSignaturesAsync(channel: $channel, signaturesEnabled: $signaturesEnabled, profilesEnabled: $profilesEnabled)->await();
+    }
+
+    /**
+     * @param bool|null $byLocation
+     * @param bool|null $checkLimit
+     * @param bool|null $forPersonal
+     * @return Future<Chats|ChatsSlice|null>
+     * @see https://core.telegram.org/method/channels.getAdminedPublicChannels
+     * @api
+     */
+    public function getAdminedPublicChannelsAsync(?bool $byLocation = null, ?bool $checkLimit = null, ?bool $forPersonal = null): Future
+    {
+        return $this->client->call(new GetAdminedPublicChannelsRequest(byLocation: $byLocation, checkLimit: $checkLimit, forPersonal: $forPersonal));
     }
 
     /**
@@ -586,18 +852,18 @@ final readonly class ChannelsMethods
      */
     public function getAdminedPublicChannels(?bool $byLocation = null, ?bool $checkLimit = null, ?bool $forPersonal = null): ?AbstractChats
     {
-        return $this->client->callSync(new GetAdminedPublicChannelsRequest(byLocation: $byLocation, checkLimit: $checkLimit, forPersonal: $forPersonal));
+        return $this->getAdminedPublicChannelsAsync(byLocation: $byLocation, checkLimit: $checkLimit, forPersonal: $forPersonal)->await();
     }
 
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
      * @param ChatBannedRights $bannedRights
-     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
      * @see https://core.telegram.org/method/channels.editBanned
      * @api
      */
-    public function editBanned(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant, ChatBannedRights $bannedRights): ?AbstractUpdates
+    public function editBannedAsync(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant, ChatBannedRights $bannedRights): Future
     {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
@@ -610,7 +876,45 @@ final readonly class ChannelsMethods
         if (is_string($participant) || is_int($participant)) {
             $participant = $this->client->peerManager->resolve($participant);
         }
-        return $this->client->callSync(new EditBannedRequest(channel: $channel, participant: $participant, bannedRights: $bannedRights));
+        return $this->client->call(new EditBannedRequest(channel: $channel, participant: $participant, bannedRights: $bannedRights));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
+     * @param ChatBannedRights $bannedRights
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/channels.editBanned
+     * @api
+     */
+    public function editBanned(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant, ChatBannedRights $bannedRights): ?AbstractUpdates
+    {
+        return $this->editBannedAsync(channel: $channel, participant: $participant, bannedRights: $bannedRights)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param string $q
+     * @param int $maxId
+     * @param int $minId
+     * @param int $limit
+     * @param ChannelAdminLogEventsFilter|null $eventsFilter
+     * @param list<InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage>|null $admins
+     * @return Future<AdminLogResults|null>
+     * @see https://core.telegram.org/method/channels.getAdminLog
+     * @api
+     */
+    public function getAdminLogAsync(AbstractInputChannel|string|int $channel, string $q, int $maxId, int $minId, int $limit, ?ChannelAdminLogEventsFilter $eventsFilter = null, ?array $admins = null): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetAdminLogRequest(channel: $channel, q: $q, maxId: $maxId, minId: $minId, limit: $limit, eventsFilter: $eventsFilter, admins: $admins));
     }
 
     /**
@@ -627,6 +931,18 @@ final readonly class ChannelsMethods
      */
     public function getAdminLog(AbstractInputChannel|string|int $channel, string $q, int $maxId, int $minId, int $limit, ?ChannelAdminLogEventsFilter $eventsFilter = null, ?array $admins = null): ?AdminLogResults
     {
+        return $this->getAdminLogAsync(channel: $channel, q: $q, maxId: $maxId, minId: $minId, limit: $limit, eventsFilter: $eventsFilter, admins: $admins)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.setStickers
+     * @api
+     */
+    public function setStickersAsync(AbstractInputChannel|string|int $channel, AbstractInputStickerSet $stickerset): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -635,7 +951,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetAdminLogRequest(channel: $channel, q: $q, maxId: $maxId, minId: $minId, limit: $limit, eventsFilter: $eventsFilter, admins: $admins));
+        return $this->client->call(new SetStickersRequest(channel: $channel, stickerset: $stickerset));
     }
 
     /**
@@ -647,6 +963,18 @@ final readonly class ChannelsMethods
      */
     public function setStickers(AbstractInputChannel|string|int $channel, AbstractInputStickerSet $stickerset): bool
     {
+        return (bool) $this->setStickersAsync(channel: $channel, stickerset: $stickerset)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param list<int> $id
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.readMessageContents
+     * @api
+     */
+    public function readMessageContentsAsync(AbstractInputChannel|string|int $channel, array $id): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -655,7 +983,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new SetStickersRequest(channel: $channel, stickerset: $stickerset));
+        return $this->client->call(new ReadMessageContentsRequest(channel: $channel, id: $id));
     }
 
     /**
@@ -667,6 +995,19 @@ final readonly class ChannelsMethods
      */
     public function readMessageContents(AbstractInputChannel|string|int $channel, array $id): bool
     {
+        return (bool) $this->readMessageContentsAsync(channel: $channel, id: $id)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param int $maxId
+     * @param bool|null $forEveryone
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.deleteHistory
+     * @api
+     */
+    public function deleteHistoryAsync(AbstractInputChannel|string|int $channel, int $maxId, ?bool $forEveryone = null): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -675,7 +1016,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ReadMessageContentsRequest(channel: $channel, id: $id));
+        return $this->client->call(new DeleteHistoryRequest(channel: $channel, maxId: $maxId, forEveryone: $forEveryone));
     }
 
     /**
@@ -688,6 +1029,18 @@ final readonly class ChannelsMethods
      */
     public function deleteHistory(AbstractInputChannel|string|int $channel, int $maxId, ?bool $forEveryone = null): ?AbstractUpdates
     {
+        return $this->deleteHistoryAsync(channel: $channel, maxId: $maxId, forEveryone: $forEveryone)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool $enabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.togglePreHistoryHidden
+     * @api
+     */
+    public function togglePreHistoryHiddenAsync(AbstractInputChannel|string|int $channel, bool $enabled): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -696,7 +1049,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new DeleteHistoryRequest(channel: $channel, maxId: $maxId, forEveryone: $forEveryone));
+        return $this->client->call(new TogglePreHistoryHiddenRequest(channel: $channel, enabled: $enabled));
     }
 
     /**
@@ -708,15 +1061,18 @@ final readonly class ChannelsMethods
      */
     public function togglePreHistoryHidden(AbstractInputChannel|string|int $channel, bool $enabled): ?AbstractUpdates
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new TogglePreHistoryHiddenRequest(channel: $channel, enabled: $enabled));
+        return $this->togglePreHistoryHiddenAsync(channel: $channel, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param int $offset
+     * @return Future<Chats|ChatsSlice|null>
+     * @see https://core.telegram.org/method/channels.getLeftChannels
+     * @api
+     */
+    public function getLeftChannelsAsync(int $offset): Future
+    {
+        return $this->client->call(new GetLeftChannelsRequest(offset: $offset));
     }
 
     /**
@@ -727,7 +1083,17 @@ final readonly class ChannelsMethods
      */
     public function getLeftChannels(int $offset): ?AbstractChats
     {
-        return $this->client->callSync(new GetLeftChannelsRequest(offset: $offset));
+        return $this->getLeftChannelsAsync(offset: $offset)->await();
+    }
+
+    /**
+     * @return Future<Chats|ChatsSlice|null>
+     * @see https://core.telegram.org/method/channels.getGroupsForDiscussion
+     * @api
+     */
+    public function getGroupsForDiscussionAsync(): Future
+    {
+        return $this->client->call(new GetGroupsForDiscussionRequest());
     }
 
     /**
@@ -737,17 +1103,17 @@ final readonly class ChannelsMethods
      */
     public function getGroupsForDiscussion(): ?AbstractChats
     {
-        return $this->client->callSync(new GetGroupsForDiscussionRequest());
+        return $this->getGroupsForDiscussionAsync()->await();
     }
 
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $broadcast
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $group
-     * @return bool
+     * @return Future<bool>
      * @see https://core.telegram.org/method/channels.setDiscussionGroup
      * @api
      */
-    public function setDiscussionGroup(AbstractInputChannel|string|int $broadcast, AbstractInputChannel|string|int $group): bool
+    public function setDiscussionGroupAsync(AbstractInputChannel|string|int $broadcast, AbstractInputChannel|string|int $group): Future
     {
         if (is_string($broadcast) || is_int($broadcast)) {
             $__tmpPeer = $this->client->peerManager->resolve($broadcast);
@@ -765,18 +1131,30 @@ final readonly class ChannelsMethods
                 $group = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new SetDiscussionGroupRequest(broadcast: $broadcast, group: $group));
+        return $this->client->call(new SetDiscussionGroupRequest(broadcast: $broadcast, group: $group));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $broadcast
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $group
+     * @return bool
+     * @see https://core.telegram.org/method/channels.setDiscussionGroup
+     * @api
+     */
+    public function setDiscussionGroup(AbstractInputChannel|string|int $broadcast, AbstractInputChannel|string|int $group): bool
+    {
+        return (bool) $this->setDiscussionGroupAsync(broadcast: $broadcast, group: $group)->await();
     }
 
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param InputCheckPasswordEmpty|InputCheckPasswordSRP $password
-     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
      * @see https://core.telegram.org/method/channels.editCreator
      * @api
      */
-    public function editCreator(AbstractInputChannel|string|int $channel, AbstractInputUser|string|int $userId, AbstractInputCheckPasswordSRP $password): ?AbstractUpdates
+    public function editCreatorAsync(AbstractInputChannel|string|int $channel, AbstractInputUser|string|int $userId, AbstractInputCheckPasswordSRP $password): Future
     {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
@@ -794,7 +1172,41 @@ final readonly class ChannelsMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new EditCreatorRequest(channel: $channel, userId: $userId, password: $password));
+        return $this->client->call(new EditCreatorRequest(channel: $channel, userId: $userId, password: $password));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP $password
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/channels.editCreator
+     * @api
+     */
+    public function editCreator(AbstractInputChannel|string|int $channel, AbstractInputUser|string|int $userId, AbstractInputCheckPasswordSRP $password): ?AbstractUpdates
+    {
+        return $this->editCreatorAsync(channel: $channel, userId: $userId, password: $password)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputGeoPointEmpty|InputGeoPoint $geoPoint
+     * @param string $address
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.editLocation
+     * @api
+     */
+    public function editLocationAsync(AbstractInputChannel|string|int $channel, AbstractInputGeoPoint $geoPoint, string $address): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new EditLocationRequest(channel: $channel, geoPoint: $geoPoint, address: $address));
     }
 
     /**
@@ -807,6 +1219,18 @@ final readonly class ChannelsMethods
      */
     public function editLocation(AbstractInputChannel|string|int $channel, AbstractInputGeoPoint $geoPoint, string $address): bool
     {
+        return (bool) $this->editLocationAsync(channel: $channel, geoPoint: $geoPoint, address: $address)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param int $seconds
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.toggleSlowMode
+     * @api
+     */
+    public function toggleSlowModeAsync(AbstractInputChannel|string|int $channel, int $seconds): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -815,7 +1239,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new EditLocationRequest(channel: $channel, geoPoint: $geoPoint, address: $address));
+        return $this->client->call(new ToggleSlowModeRequest(channel: $channel, seconds: $seconds));
     }
 
     /**
@@ -827,15 +1251,17 @@ final readonly class ChannelsMethods
      */
     public function toggleSlowMode(AbstractInputChannel|string|int $channel, int $seconds): ?AbstractUpdates
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new ToggleSlowModeRequest(channel: $channel, seconds: $seconds));
+        return $this->toggleSlowModeAsync(channel: $channel, seconds: $seconds)->await();
+    }
+
+    /**
+     * @return Future<InactiveChats|null>
+     * @see https://core.telegram.org/method/channels.getInactiveChannels
+     * @api
+     */
+    public function getInactiveChannelsAsync(): Future
+    {
+        return $this->client->call(new GetInactiveChannelsRequest());
     }
 
     /**
@@ -845,7 +1271,26 @@ final readonly class ChannelsMethods
      */
     public function getInactiveChannels(): ?InactiveChats
     {
-        return $this->client->callSync(new GetInactiveChannelsRequest());
+        return $this->getInactiveChannelsAsync()->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.convertToGigagroup
+     * @api
+     */
+    public function convertToGigagroupAsync(AbstractInputChannel|string|int $channel): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new ConvertToGigagroupRequest(channel: $channel));
     }
 
     /**
@@ -856,15 +1301,23 @@ final readonly class ChannelsMethods
      */
     public function convertToGigagroup(AbstractInputChannel|string|int $channel): ?AbstractUpdates
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
+        return $this->convertToGigagroupAsync(channel: $channel)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool|null $forPaidReactions
+     * @param bool|null $forLiveStories
+     * @return Future<SendAsPeers|null>
+     * @see https://core.telegram.org/method/channels.getSendAs
+     * @api
+     */
+    public function getSendAsAsync(AbstractInputPeer|string|int $peer, ?bool $forPaidReactions = null, ?bool $forLiveStories = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new ConvertToGigagroupRequest(channel: $channel));
+        return $this->client->call(new GetSendAsRequest(peer: $peer, forPaidReactions: $forPaidReactions, forLiveStories: $forLiveStories));
     }
 
     /**
@@ -877,20 +1330,17 @@ final readonly class ChannelsMethods
      */
     public function getSendAs(AbstractInputPeer|string|int $peer, ?bool $forPaidReactions = null, ?bool $forLiveStories = null): ?SendAsPeers
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetSendAsRequest(peer: $peer, forPaidReactions: $forPaidReactions, forLiveStories: $forLiveStories));
+        return $this->getSendAsAsync(peer: $peer, forPaidReactions: $forPaidReactions, forLiveStories: $forLiveStories)->await();
     }
 
     /**
      * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
-     * @return AffectedHistory|null
+     * @return Future<AffectedHistory|null>
      * @see https://core.telegram.org/method/channels.deleteParticipantHistory
      * @api
      */
-    public function deleteParticipantHistory(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant): ?AffectedHistory
+    public function deleteParticipantHistoryAsync(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant): Future
     {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
@@ -903,7 +1353,39 @@ final readonly class ChannelsMethods
         if (is_string($participant) || is_int($participant)) {
             $participant = $this->client->peerManager->resolve($participant);
         }
-        return $this->client->callSync(new DeleteParticipantHistoryRequest(channel: $channel, participant: $participant));
+        return $this->client->call(new DeleteParticipantHistoryRequest(channel: $channel, participant: $participant));
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $participant
+     * @return AffectedHistory|null
+     * @see https://core.telegram.org/method/channels.deleteParticipantHistory
+     * @api
+     */
+    public function deleteParticipantHistory(AbstractInputChannel|string|int $channel, AbstractInputPeer|string|int $participant): ?AffectedHistory
+    {
+        return $this->deleteParticipantHistoryAsync(channel: $channel, participant: $participant)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool $enabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.toggleJoinToSend
+     * @api
+     */
+    public function toggleJoinToSendAsync(AbstractInputChannel|string|int $channel, bool $enabled): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new ToggleJoinToSendRequest(channel: $channel, enabled: $enabled));
     }
 
     /**
@@ -915,6 +1397,18 @@ final readonly class ChannelsMethods
      */
     public function toggleJoinToSend(AbstractInputChannel|string|int $channel, bool $enabled): ?AbstractUpdates
     {
+        return $this->toggleJoinToSendAsync(channel: $channel, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool $enabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.toggleJoinRequest
+     * @api
+     */
+    public function toggleJoinRequestAsync(AbstractInputChannel|string|int $channel, bool $enabled): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -923,7 +1417,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new ToggleJoinToSendRequest(channel: $channel, enabled: $enabled));
+        return $this->client->call(new ToggleJoinRequestRequest(channel: $channel, enabled: $enabled));
     }
 
     /**
@@ -935,6 +1429,18 @@ final readonly class ChannelsMethods
      */
     public function toggleJoinRequest(AbstractInputChannel|string|int $channel, bool $enabled): ?AbstractUpdates
     {
+        return $this->toggleJoinRequestAsync(channel: $channel, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param list<string> $order
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.reorderUsernames
+     * @api
+     */
+    public function reorderUsernamesAsync(AbstractInputChannel|string|int $channel, array $order): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -943,7 +1449,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new ToggleJoinRequestRequest(channel: $channel, enabled: $enabled));
+        return $this->client->call(new ReorderUsernamesRequest(channel: $channel, order: $order));
     }
 
     /**
@@ -955,6 +1461,19 @@ final readonly class ChannelsMethods
      */
     public function reorderUsernames(AbstractInputChannel|string|int $channel, array $order): bool
     {
+        return (bool) $this->reorderUsernamesAsync(channel: $channel, order: $order)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param string $username
+     * @param bool $active
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.toggleUsername
+     * @api
+     */
+    public function toggleUsernameAsync(AbstractInputChannel|string|int $channel, string $username, bool $active): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -963,7 +1482,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ReorderUsernamesRequest(channel: $channel, order: $order));
+        return $this->client->call(new ToggleUsernameRequest(channel: $channel, username: $username, active: $active));
     }
 
     /**
@@ -976,6 +1495,17 @@ final readonly class ChannelsMethods
      */
     public function toggleUsername(AbstractInputChannel|string|int $channel, string $username, bool $active): bool
     {
+        return (bool) $this->toggleUsernameAsync(channel: $channel, username: $username, active: $active)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.deactivateAllUsernames
+     * @api
+     */
+    public function deactivateAllUsernamesAsync(AbstractInputChannel|string|int $channel): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -984,7 +1514,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ToggleUsernameRequest(channel: $channel, username: $username, active: $active));
+        return $this->client->call(new DeactivateAllUsernamesRequest(channel: $channel));
     }
 
     /**
@@ -995,6 +1525,19 @@ final readonly class ChannelsMethods
      */
     public function deactivateAllUsernames(AbstractInputChannel|string|int $channel): bool
     {
+        return (bool) $this->deactivateAllUsernamesAsync(channel: $channel)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool $enabled
+     * @param bool $tabs
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.toggleForum
+     * @api
+     */
+    public function toggleForumAsync(AbstractInputChannel|string|int $channel, bool $enabled, bool $tabs): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1003,7 +1546,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new DeactivateAllUsernamesRequest(channel: $channel));
+        return $this->client->call(new ToggleForumRequest(channel: $channel, enabled: $enabled, tabs: $tabs));
     }
 
     /**
@@ -1016,6 +1559,18 @@ final readonly class ChannelsMethods
      */
     public function toggleForum(AbstractInputChannel|string|int $channel, bool $enabled, bool $tabs): ?AbstractUpdates
     {
+        return $this->toggleForumAsync(channel: $channel, enabled: $enabled, tabs: $tabs)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool $enabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.toggleAntiSpam
+     * @api
+     */
+    public function toggleAntiSpamAsync(AbstractInputChannel|string|int $channel, bool $enabled): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1024,7 +1579,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new ToggleForumRequest(channel: $channel, enabled: $enabled, tabs: $tabs));
+        return $this->client->call(new ToggleAntiSpamRequest(channel: $channel, enabled: $enabled));
     }
 
     /**
@@ -1036,6 +1591,18 @@ final readonly class ChannelsMethods
      */
     public function toggleAntiSpam(AbstractInputChannel|string|int $channel, bool $enabled): ?AbstractUpdates
     {
+        return $this->toggleAntiSpamAsync(channel: $channel, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param int $msgId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.reportAntiSpamFalsePositive
+     * @api
+     */
+    public function reportAntiSpamFalsePositiveAsync(AbstractInputChannel|string|int $channel, int $msgId): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1044,7 +1611,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new ToggleAntiSpamRequest(channel: $channel, enabled: $enabled));
+        return $this->client->call(new ReportAntiSpamFalsePositiveRequest(channel: $channel, msgId: $msgId));
     }
 
     /**
@@ -1056,6 +1623,18 @@ final readonly class ChannelsMethods
      */
     public function reportAntiSpamFalsePositive(AbstractInputChannel|string|int $channel, int $msgId): bool
     {
+        return (bool) $this->reportAntiSpamFalsePositiveAsync(channel: $channel, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool $enabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.toggleParticipantsHidden
+     * @api
+     */
+    public function toggleParticipantsHiddenAsync(AbstractInputChannel|string|int $channel, bool $enabled): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1064,7 +1643,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ReportAntiSpamFalsePositiveRequest(channel: $channel, msgId: $msgId));
+        return $this->client->call(new ToggleParticipantsHiddenRequest(channel: $channel, enabled: $enabled));
     }
 
     /**
@@ -1076,6 +1655,20 @@ final readonly class ChannelsMethods
      */
     public function toggleParticipantsHidden(AbstractInputChannel|string|int $channel, bool $enabled): ?AbstractUpdates
     {
+        return $this->toggleParticipantsHiddenAsync(channel: $channel, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool|null $forProfile
+     * @param int|null $color
+     * @param int|null $backgroundEmojiId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.updateColor
+     * @api
+     */
+    public function updateColorAsync(AbstractInputChannel|string|int $channel, ?bool $forProfile = null, ?int $color = null, ?int $backgroundEmojiId = null): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1084,7 +1677,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new ToggleParticipantsHiddenRequest(channel: $channel, enabled: $enabled));
+        return $this->client->call(new UpdateColorRequest(channel: $channel, forProfile: $forProfile, color: $color, backgroundEmojiId: $backgroundEmojiId));
     }
 
     /**
@@ -1098,6 +1691,18 @@ final readonly class ChannelsMethods
      */
     public function updateColor(AbstractInputChannel|string|int $channel, ?bool $forProfile = null, ?int $color = null, ?int $backgroundEmojiId = null): ?AbstractUpdates
     {
+        return $this->updateColorAsync(channel: $channel, forProfile: $forProfile, color: $color, backgroundEmojiId: $backgroundEmojiId)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool $enabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.toggleViewForumAsMessages
+     * @api
+     */
+    public function toggleViewForumAsMessagesAsync(AbstractInputChannel|string|int $channel, bool $enabled): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1106,7 +1711,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new UpdateColorRequest(channel: $channel, forProfile: $forProfile, color: $color, backgroundEmojiId: $backgroundEmojiId));
+        return $this->client->call(new ToggleViewForumAsMessagesRequest(channel: $channel, enabled: $enabled));
     }
 
     /**
@@ -1118,6 +1723,17 @@ final readonly class ChannelsMethods
      */
     public function toggleViewForumAsMessages(AbstractInputChannel|string|int $channel, bool $enabled): ?AbstractUpdates
     {
+        return $this->toggleViewForumAsMessagesAsync(channel: $channel, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int|null $channel
+     * @return Future<Chats|ChatsSlice|null>
+     * @see https://core.telegram.org/method/channels.getChannelRecommendations
+     * @api
+     */
+    public function getChannelRecommendationsAsync(AbstractInputChannel|string|int|null $channel = null): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1126,7 +1742,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new ToggleViewForumAsMessagesRequest(channel: $channel, enabled: $enabled));
+        return $this->client->call(new GetChannelRecommendationsRequest(channel: $channel));
     }
 
     /**
@@ -1137,6 +1753,18 @@ final readonly class ChannelsMethods
      */
     public function getChannelRecommendations(AbstractInputChannel|string|int|null $channel = null): ?AbstractChats
     {
+        return $this->getChannelRecommendationsAsync(channel: $channel)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusCollectible|InputEmojiStatusCollectible $emojiStatus
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.updateEmojiStatus
+     * @api
+     */
+    public function updateEmojiStatusAsync(AbstractInputChannel|string|int $channel, AbstractEmojiStatus $emojiStatus): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1145,7 +1773,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetChannelRecommendationsRequest(channel: $channel));
+        return $this->client->call(new UpdateEmojiStatusRequest(channel: $channel, emojiStatus: $emojiStatus));
     }
 
     /**
@@ -1157,6 +1785,18 @@ final readonly class ChannelsMethods
      */
     public function updateEmojiStatus(AbstractInputChannel|string|int $channel, AbstractEmojiStatus $emojiStatus): ?AbstractUpdates
     {
+        return $this->updateEmojiStatusAsync(channel: $channel, emojiStatus: $emojiStatus)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param int $boosts
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.setBoostsToUnblockRestrictions
+     * @api
+     */
+    public function setBoostsToUnblockRestrictionsAsync(AbstractInputChannel|string|int $channel, int $boosts): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1165,7 +1805,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new UpdateEmojiStatusRequest(channel: $channel, emojiStatus: $emojiStatus));
+        return $this->client->call(new SetBoostsToUnblockRestrictionsRequest(channel: $channel, boosts: $boosts));
     }
 
     /**
@@ -1177,6 +1817,18 @@ final readonly class ChannelsMethods
      */
     public function setBoostsToUnblockRestrictions(AbstractInputChannel|string|int $channel, int $boosts): ?AbstractUpdates
     {
+        return $this->setBoostsToUnblockRestrictionsAsync(channel: $channel, boosts: $boosts)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.setEmojiStickers
+     * @api
+     */
+    public function setEmojiStickersAsync(AbstractInputChannel|string|int $channel, AbstractInputStickerSet $stickerset): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1185,7 +1837,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new SetBoostsToUnblockRestrictionsRequest(channel: $channel, boosts: $boosts));
+        return $this->client->call(new SetEmojiStickersRequest(channel: $channel, stickerset: $stickerset));
     }
 
     /**
@@ -1197,6 +1849,18 @@ final readonly class ChannelsMethods
      */
     public function setEmojiStickers(AbstractInputChannel|string|int $channel, AbstractInputStickerSet $stickerset): bool
     {
+        return (bool) $this->setEmojiStickersAsync(channel: $channel, stickerset: $stickerset)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool $restricted
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.restrictSponsoredMessages
+     * @api
+     */
+    public function restrictSponsoredMessagesAsync(AbstractInputChannel|string|int $channel, bool $restricted): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1205,7 +1869,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new SetEmojiStickersRequest(channel: $channel, stickerset: $stickerset));
+        return $this->client->call(new RestrictSponsoredMessagesRequest(channel: $channel, restricted: $restricted));
     }
 
     /**
@@ -1217,15 +1881,27 @@ final readonly class ChannelsMethods
      */
     public function restrictSponsoredMessages(AbstractInputChannel|string|int $channel, bool $restricted): ?AbstractUpdates
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
+        return $this->restrictSponsoredMessagesAsync(channel: $channel, restricted: $restricted)->await();
+    }
+
+    /**
+     * @param int $offsetRate
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $offsetPeer
+     * @param int $offsetId
+     * @param int $limit
+     * @param string|null $hashtag
+     * @param string|null $query
+     * @param int|null $allowPaidStars
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/channels.searchPosts
+     * @api
+     */
+    public function searchPostsAsync(int $offsetRate, AbstractInputPeer|string|int $offsetPeer, int $offsetId, int $limit, ?string $hashtag = null, ?string $query = null, ?int $allowPaidStars = null): Future
+    {
+        if (is_string($offsetPeer) || is_int($offsetPeer)) {
+            $offsetPeer = $this->client->peerManager->resolve($offsetPeer);
         }
-        return $this->client->callSync(new RestrictSponsoredMessagesRequest(channel: $channel, restricted: $restricted));
+        return $this->client->call(new SearchPostsRequest(offsetRate: $offsetRate, offsetPeer: $offsetPeer, offsetId: $offsetId, limit: $limit, hashtag: $hashtag, query: $query, allowPaidStars: $allowPaidStars));
     }
 
     /**
@@ -1242,10 +1918,28 @@ final readonly class ChannelsMethods
      */
     public function searchPosts(int $offsetRate, AbstractInputPeer|string|int $offsetPeer, int $offsetId, int $limit, ?string $hashtag = null, ?string $query = null, ?int $allowPaidStars = null): ?AbstractMessages
     {
-        if (is_string($offsetPeer) || is_int($offsetPeer)) {
-            $offsetPeer = $this->client->peerManager->resolve($offsetPeer);
+        return $this->searchPostsAsync(offsetRate: $offsetRate, offsetPeer: $offsetPeer, offsetId: $offsetId, limit: $limit, hashtag: $hashtag, query: $query, allowPaidStars: $allowPaidStars)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param int $sendPaidMessagesStars
+     * @param bool|null $broadcastMessagesAllowed
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.updatePaidMessagesPrice
+     * @api
+     */
+    public function updatePaidMessagesPriceAsync(AbstractInputChannel|string|int $channel, int $sendPaidMessagesStars, ?bool $broadcastMessagesAllowed = null): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
         }
-        return $this->client->callSync(new SearchPostsRequest(offsetRate: $offsetRate, offsetPeer: $offsetPeer, offsetId: $offsetId, limit: $limit, hashtag: $hashtag, query: $query, allowPaidStars: $allowPaidStars));
+        return $this->client->call(new UpdatePaidMessagesPriceRequest(channel: $channel, sendPaidMessagesStars: $sendPaidMessagesStars, broadcastMessagesAllowed: $broadcastMessagesAllowed));
     }
 
     /**
@@ -1258,6 +1952,18 @@ final readonly class ChannelsMethods
      */
     public function updatePaidMessagesPrice(AbstractInputChannel|string|int $channel, int $sendPaidMessagesStars, ?bool $broadcastMessagesAllowed = null): ?AbstractUpdates
     {
+        return $this->updatePaidMessagesPriceAsync(channel: $channel, sendPaidMessagesStars: $sendPaidMessagesStars, broadcastMessagesAllowed: $broadcastMessagesAllowed)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param bool $enabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/channels.toggleAutotranslation
+     * @api
+     */
+    public function toggleAutotranslationAsync(AbstractInputChannel|string|int $channel, bool $enabled): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1266,7 +1972,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new UpdatePaidMessagesPriceRequest(channel: $channel, sendPaidMessagesStars: $sendPaidMessagesStars, broadcastMessagesAllowed: $broadcastMessagesAllowed));
+        return $this->client->call(new ToggleAutotranslationRequest(channel: $channel, enabled: $enabled));
     }
 
     /**
@@ -1278,6 +1984,18 @@ final readonly class ChannelsMethods
      */
     public function toggleAutotranslation(AbstractInputChannel|string|int $channel, bool $enabled): ?AbstractUpdates
     {
+        return $this->toggleAutotranslationAsync(channel: $channel, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param int $id
+     * @return Future<UserEmpty|User|null>
+     * @see https://core.telegram.org/method/channels.getMessageAuthor
+     * @api
+     */
+    public function getMessageAuthorAsync(AbstractInputChannel|string|int $channel, int $id): Future
+    {
         if (is_string($channel) || is_int($channel)) {
             $__tmpPeer = $this->client->peerManager->resolve($channel);
             if ($__tmpPeer instanceof InputPeerChannel) {
@@ -1286,7 +2004,7 @@ final readonly class ChannelsMethods
                 $channel = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new ToggleAutotranslationRequest(channel: $channel, enabled: $enabled));
+        return $this->client->call(new GetMessageAuthorRequest(channel: $channel, id: $id));
     }
 
     /**
@@ -1298,15 +2016,18 @@ final readonly class ChannelsMethods
      */
     public function getMessageAuthor(AbstractInputChannel|string|int $channel, int $id): ?AbstractUser
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetMessageAuthorRequest(channel: $channel, id: $id));
+        return $this->getMessageAuthorAsync(channel: $channel, id: $id)->await();
+    }
+
+    /**
+     * @param string|null $query
+     * @return Future<SearchPostsFlood|null>
+     * @see https://core.telegram.org/method/channels.checkSearchPostsFlood
+     * @api
+     */
+    public function checkSearchPostsFloodAsync(?string $query = null): Future
+    {
+        return $this->client->call(new CheckSearchPostsFloodRequest(query: $query));
     }
 
     /**
@@ -1317,7 +2038,27 @@ final readonly class ChannelsMethods
      */
     public function checkSearchPostsFlood(?string $query = null): ?SearchPostsFlood
     {
-        return $this->client->callSync(new CheckSearchPostsFloodRequest(query: $query));
+        return $this->checkSearchPostsFloodAsync(query: $query)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @param ProfileTab $tab
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/channels.setMainProfileTab
+     * @api
+     */
+    public function setMainProfileTabAsync(AbstractInputChannel|string|int $channel, ProfileTab $tab): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new SetMainProfileTabRequest(channel: $channel, tab: $tab));
     }
 
     /**
@@ -1329,14 +2070,6 @@ final readonly class ChannelsMethods
      */
     public function setMainProfileTab(AbstractInputChannel|string|int $channel, ProfileTab $tab): bool
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return (bool) $this->client->callSync(new SetMainProfileTabRequest(channel: $channel, tab: $tab));
+        return (bool) $this->setMainProfileTabAsync(channel: $channel, tab: $tab)->await();
     }
 }

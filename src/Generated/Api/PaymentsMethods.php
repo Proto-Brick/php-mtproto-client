@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\ApplyGiftCodeRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Payments\AssignAppStoreTransactionRequest;
@@ -219,13 +221,40 @@ final readonly class PaymentsMethods
     /**
      * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale|InputInvoiceStarGiftPrepaidUpgrade|InputInvoicePremiumAuthCode|InputInvoiceStarGiftDropOriginalDetails|InputInvoiceStarGiftAuctionBid $invoice
      * @param array|null $themeParams
+     * @return Future<PaymentForm|PaymentFormStars|PaymentFormStarGift|null>
+     * @see https://core.telegram.org/method/payments.getPaymentForm
+     * @api
+     */
+    public function getPaymentFormAsync(AbstractInputInvoice $invoice, ?array $themeParams = null): Future
+    {
+        return $this->client->call(new GetPaymentFormRequest(invoice: $invoice, themeParams: $themeParams));
+    }
+
+    /**
+     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale|InputInvoiceStarGiftPrepaidUpgrade|InputInvoicePremiumAuthCode|InputInvoiceStarGiftDropOriginalDetails|InputInvoiceStarGiftAuctionBid $invoice
+     * @param array|null $themeParams
      * @return PaymentForm|PaymentFormStars|PaymentFormStarGift|null
      * @see https://core.telegram.org/method/payments.getPaymentForm
      * @api
      */
     public function getPaymentForm(AbstractInputInvoice $invoice, ?array $themeParams = null): ?AbstractPaymentForm
     {
-        return $this->client->callSync(new GetPaymentFormRequest(invoice: $invoice, themeParams: $themeParams));
+        return $this->getPaymentFormAsync(invoice: $invoice, themeParams: $themeParams)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @return Future<PaymentReceipt|PaymentReceiptStars|null>
+     * @see https://core.telegram.org/method/payments.getPaymentReceipt
+     * @api
+     */
+    public function getPaymentReceiptAsync(AbstractInputPeer|string|int $peer, int $msgId): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetPaymentReceiptRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -237,10 +266,20 @@ final readonly class PaymentsMethods
      */
     public function getPaymentReceipt(AbstractInputPeer|string|int $peer, int $msgId): ?AbstractPaymentReceipt
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetPaymentReceiptRequest(peer: $peer, msgId: $msgId));
+        return $this->getPaymentReceiptAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale|InputInvoiceStarGiftPrepaidUpgrade|InputInvoicePremiumAuthCode|InputInvoiceStarGiftDropOriginalDetails|InputInvoiceStarGiftAuctionBid $invoice
+     * @param PaymentRequestedInfo $info
+     * @param bool|null $save
+     * @return Future<ValidatedRequestedInfo|null>
+     * @see https://core.telegram.org/method/payments.validateRequestedInfo
+     * @api
+     */
+    public function validateRequestedInfoAsync(AbstractInputInvoice $invoice, PaymentRequestedInfo $info, ?bool $save = null): Future
+    {
+        return $this->client->call(new ValidateRequestedInfoRequest(invoice: $invoice, info: $info, save: $save));
     }
 
     /**
@@ -253,7 +292,23 @@ final readonly class PaymentsMethods
      */
     public function validateRequestedInfo(AbstractInputInvoice $invoice, PaymentRequestedInfo $info, ?bool $save = null): ?ValidatedRequestedInfo
     {
-        return $this->client->callSync(new ValidateRequestedInfoRequest(invoice: $invoice, info: $info, save: $save));
+        return $this->validateRequestedInfoAsync(invoice: $invoice, info: $info, save: $save)->await();
+    }
+
+    /**
+     * @param int $formId
+     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale|InputInvoiceStarGiftPrepaidUpgrade|InputInvoicePremiumAuthCode|InputInvoiceStarGiftDropOriginalDetails|InputInvoiceStarGiftAuctionBid $invoice
+     * @param InputPaymentCredentialsSaved|InputPaymentCredentials|InputPaymentCredentialsApplePay|InputPaymentCredentialsGooglePay $credentials
+     * @param string|null $requestedInfoId
+     * @param string|null $shippingOptionId
+     * @param int|null $tipAmount
+     * @return Future<PaymentResult|PaymentVerificationNeeded|null>
+     * @see https://core.telegram.org/method/payments.sendPaymentForm
+     * @api
+     */
+    public function sendPaymentFormAsync(int $formId, AbstractInputInvoice $invoice, AbstractInputPaymentCredentials $credentials, ?string $requestedInfoId = null, ?string $shippingOptionId = null, ?int $tipAmount = null): Future
+    {
+        return $this->client->call(new SendPaymentFormRequest(formId: $formId, invoice: $invoice, credentials: $credentials, requestedInfoId: $requestedInfoId, shippingOptionId: $shippingOptionId, tipAmount: $tipAmount));
     }
 
     /**
@@ -269,7 +324,17 @@ final readonly class PaymentsMethods
      */
     public function sendPaymentForm(int $formId, AbstractInputInvoice $invoice, AbstractInputPaymentCredentials $credentials, ?string $requestedInfoId = null, ?string $shippingOptionId = null, ?int $tipAmount = null): ?AbstractPaymentResult
     {
-        return $this->client->callSync(new SendPaymentFormRequest(formId: $formId, invoice: $invoice, credentials: $credentials, requestedInfoId: $requestedInfoId, shippingOptionId: $shippingOptionId, tipAmount: $tipAmount));
+        return $this->sendPaymentFormAsync(formId: $formId, invoice: $invoice, credentials: $credentials, requestedInfoId: $requestedInfoId, shippingOptionId: $shippingOptionId, tipAmount: $tipAmount)->await();
+    }
+
+    /**
+     * @return Future<SavedInfo|null>
+     * @see https://core.telegram.org/method/payments.getSavedInfo
+     * @api
+     */
+    public function getSavedInfoAsync(): Future
+    {
+        return $this->client->call(new GetSavedInfoRequest());
     }
 
     /**
@@ -279,7 +344,19 @@ final readonly class PaymentsMethods
      */
     public function getSavedInfo(): ?SavedInfo
     {
-        return $this->client->callSync(new GetSavedInfoRequest());
+        return $this->getSavedInfoAsync()->await();
+    }
+
+    /**
+     * @param bool|null $credentials
+     * @param bool|null $info
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.clearSavedInfo
+     * @api
+     */
+    public function clearSavedInfoAsync(?bool $credentials = null, ?bool $info = null): Future
+    {
+        return $this->client->call(new ClearSavedInfoRequest(credentials: $credentials, info: $info));
     }
 
     /**
@@ -291,7 +368,18 @@ final readonly class PaymentsMethods
      */
     public function clearSavedInfo(?bool $credentials = null, ?bool $info = null): bool
     {
-        return (bool) $this->client->callSync(new ClearSavedInfoRequest(credentials: $credentials, info: $info));
+        return (bool) $this->clearSavedInfoAsync(credentials: $credentials, info: $info)->await();
+    }
+
+    /**
+     * @param string $number
+     * @return Future<BankCardData|null>
+     * @see https://core.telegram.org/method/payments.getBankCardData
+     * @api
+     */
+    public function getBankCardDataAsync(string $number): Future
+    {
+        return $this->client->call(new GetBankCardDataRequest(number: $number));
     }
 
     /**
@@ -302,7 +390,18 @@ final readonly class PaymentsMethods
      */
     public function getBankCardData(string $number): ?BankCardData
     {
-        return $this->client->callSync(new GetBankCardDataRequest(number: $number));
+        return $this->getBankCardDataAsync(number: $number)->await();
+    }
+
+    /**
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $invoiceMedia
+     * @return Future<ExportedInvoice|null>
+     * @see https://core.telegram.org/method/payments.exportInvoice
+     * @api
+     */
+    public function exportInvoiceAsync(AbstractInputMedia $invoiceMedia): Future
+    {
+        return $this->client->call(new ExportInvoiceRequest(invoiceMedia: $invoiceMedia));
     }
 
     /**
@@ -313,7 +412,19 @@ final readonly class PaymentsMethods
      */
     public function exportInvoice(AbstractInputMedia $invoiceMedia): ?ExportedInvoice
     {
-        return $this->client->callSync(new ExportInvoiceRequest(invoiceMedia: $invoiceMedia));
+        return $this->exportInvoiceAsync(invoiceMedia: $invoiceMedia)->await();
+    }
+
+    /**
+     * @param string $receipt
+     * @param InputStorePaymentPremiumSubscription|InputStorePaymentGiftPremium|InputStorePaymentPremiumGiftCode|InputStorePaymentPremiumGiveaway|InputStorePaymentStarsTopup|InputStorePaymentStarsGift|InputStorePaymentStarsGiveaway|InputStorePaymentAuthCode $purpose
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.assignAppStoreTransaction
+     * @api
+     */
+    public function assignAppStoreTransactionAsync(string $receipt, AbstractInputStorePaymentPurpose $purpose): Future
+    {
+        return $this->client->call(new AssignAppStoreTransactionRequest(receipt: $receipt, purpose: $purpose));
     }
 
     /**
@@ -325,7 +436,19 @@ final readonly class PaymentsMethods
      */
     public function assignAppStoreTransaction(string $receipt, AbstractInputStorePaymentPurpose $purpose): ?AbstractUpdates
     {
-        return $this->client->callSync(new AssignAppStoreTransactionRequest(receipt: $receipt, purpose: $purpose));
+        return $this->assignAppStoreTransactionAsync(receipt: $receipt, purpose: $purpose)->await();
+    }
+
+    /**
+     * @param array $receipt
+     * @param InputStorePaymentPremiumSubscription|InputStorePaymentGiftPremium|InputStorePaymentPremiumGiftCode|InputStorePaymentPremiumGiveaway|InputStorePaymentStarsTopup|InputStorePaymentStarsGift|InputStorePaymentStarsGiveaway|InputStorePaymentAuthCode $purpose
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.assignPlayMarketTransaction
+     * @api
+     */
+    public function assignPlayMarketTransactionAsync(array $receipt, AbstractInputStorePaymentPurpose $purpose): Future
+    {
+        return $this->client->call(new AssignPlayMarketTransactionRequest(receipt: $receipt, purpose: $purpose));
     }
 
     /**
@@ -337,7 +460,21 @@ final readonly class PaymentsMethods
      */
     public function assignPlayMarketTransaction(array $receipt, AbstractInputStorePaymentPurpose $purpose): ?AbstractUpdates
     {
-        return $this->client->callSync(new AssignPlayMarketTransactionRequest(receipt: $receipt, purpose: $purpose));
+        return $this->assignPlayMarketTransactionAsync(receipt: $receipt, purpose: $purpose)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $boostPeer
+     * @return Future<list<PremiumGiftCodeOption>>
+     * @see https://core.telegram.org/method/payments.getPremiumGiftCodeOptions
+     * @api
+     */
+    public function getPremiumGiftCodeOptionsAsync(AbstractInputPeer|string|int|null $boostPeer = null): Future
+    {
+        if (is_string($boostPeer) || is_int($boostPeer)) {
+            $boostPeer = $this->client->peerManager->resolve($boostPeer);
+        }
+        return $this->client->call(new GetPremiumGiftCodeOptionsRequest(boostPeer: $boostPeer));
     }
 
     /**
@@ -348,10 +485,18 @@ final readonly class PaymentsMethods
      */
     public function getPremiumGiftCodeOptions(AbstractInputPeer|string|int|null $boostPeer = null): array
     {
-        if (is_string($boostPeer) || is_int($boostPeer)) {
-            $boostPeer = $this->client->peerManager->resolve($boostPeer);
-        }
-        return $this->client->callSync(new GetPremiumGiftCodeOptionsRequest(boostPeer: $boostPeer));
+        return $this->getPremiumGiftCodeOptionsAsync(boostPeer: $boostPeer)->await();
+    }
+
+    /**
+     * @param string $slug
+     * @return Future<CheckedGiftCode|null>
+     * @see https://core.telegram.org/method/payments.checkGiftCode
+     * @api
+     */
+    public function checkGiftCodeAsync(string $slug): Future
+    {
+        return $this->client->call(new CheckGiftCodeRequest(slug: $slug));
     }
 
     /**
@@ -362,7 +507,18 @@ final readonly class PaymentsMethods
      */
     public function checkGiftCode(string $slug): ?CheckedGiftCode
     {
-        return $this->client->callSync(new CheckGiftCodeRequest(slug: $slug));
+        return $this->checkGiftCodeAsync(slug: $slug)->await();
+    }
+
+    /**
+     * @param string $slug
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.applyGiftCode
+     * @api
+     */
+    public function applyGiftCodeAsync(string $slug): Future
+    {
+        return $this->client->call(new ApplyGiftCodeRequest(slug: $slug));
     }
 
     /**
@@ -373,7 +529,22 @@ final readonly class PaymentsMethods
      */
     public function applyGiftCode(string $slug): ?AbstractUpdates
     {
-        return $this->client->callSync(new ApplyGiftCodeRequest(slug: $slug));
+        return $this->applyGiftCodeAsync(slug: $slug)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @return Future<GiveawayInfo|GiveawayInfoResults|null>
+     * @see https://core.telegram.org/method/payments.getGiveawayInfo
+     * @api
+     */
+    public function getGiveawayInfoAsync(AbstractInputPeer|string|int $peer, int $msgId): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetGiveawayInfoRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -385,10 +556,23 @@ final readonly class PaymentsMethods
      */
     public function getGiveawayInfo(AbstractInputPeer|string|int $peer, int $msgId): ?AbstractGiveawayInfo
     {
+        return $this->getGiveawayInfoAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $giveawayId
+     * @param InputStorePaymentPremiumSubscription|InputStorePaymentGiftPremium|InputStorePaymentPremiumGiftCode|InputStorePaymentPremiumGiveaway|InputStorePaymentStarsTopup|InputStorePaymentStarsGift|InputStorePaymentStarsGiveaway|InputStorePaymentAuthCode $purpose
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.launchPrepaidGiveaway
+     * @api
+     */
+    public function launchPrepaidGiveawayAsync(AbstractInputPeer|string|int $peer, int $giveawayId, AbstractInputStorePaymentPurpose $purpose): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetGiveawayInfoRequest(peer: $peer, msgId: $msgId));
+        return $this->client->call(new LaunchPrepaidGiveawayRequest(peer: $peer, giveawayId: $giveawayId, purpose: $purpose));
     }
 
     /**
@@ -401,10 +585,17 @@ final readonly class PaymentsMethods
      */
     public function launchPrepaidGiveaway(AbstractInputPeer|string|int $peer, int $giveawayId, AbstractInputStorePaymentPurpose $purpose): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new LaunchPrepaidGiveawayRequest(peer: $peer, giveawayId: $giveawayId, purpose: $purpose));
+        return $this->launchPrepaidGiveawayAsync(peer: $peer, giveawayId: $giveawayId, purpose: $purpose)->await();
+    }
+
+    /**
+     * @return Future<list<StarsTopupOption>>
+     * @see https://core.telegram.org/method/payments.getStarsTopupOptions
+     * @api
+     */
+    public function getStarsTopupOptionsAsync(): Future
+    {
+        return $this->client->call(new GetStarsTopupOptionsRequest());
     }
 
     /**
@@ -414,7 +605,22 @@ final readonly class PaymentsMethods
      */
     public function getStarsTopupOptions(): array
     {
-        return $this->client->callSync(new GetStarsTopupOptionsRequest());
+        return $this->getStarsTopupOptionsAsync()->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool|null $ton
+     * @return Future<StarsStatus|null>
+     * @see https://core.telegram.org/method/payments.getStarsStatus
+     * @api
+     */
+    public function getStarsStatusAsync(AbstractInputPeer|string|int $peer, ?bool $ton = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetStarsStatusRequest(peer: $peer, ton: $ton));
     }
 
     /**
@@ -426,10 +632,28 @@ final readonly class PaymentsMethods
      */
     public function getStarsStatus(AbstractInputPeer|string|int $peer, ?bool $ton = null): ?StarsStatus
     {
+        return $this->getStarsStatusAsync(peer: $peer, ton: $ton)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $offset
+     * @param int $limit
+     * @param bool|null $inbound
+     * @param bool|null $outbound
+     * @param bool|null $ascending
+     * @param bool|null $ton
+     * @param string|null $subscriptionId
+     * @return Future<StarsStatus|null>
+     * @see https://core.telegram.org/method/payments.getStarsTransactions
+     * @api
+     */
+    public function getStarsTransactionsAsync(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $inbound = null, ?bool $outbound = null, ?bool $ascending = null, ?bool $ton = null, ?string $subscriptionId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetStarsStatusRequest(peer: $peer, ton: $ton));
+        return $this->client->call(new GetStarsTransactionsRequest(peer: $peer, offset: $offset, limit: $limit, inbound: $inbound, outbound: $outbound, ascending: $ascending, ton: $ton, subscriptionId: $subscriptionId));
     }
 
     /**
@@ -447,10 +671,19 @@ final readonly class PaymentsMethods
      */
     public function getStarsTransactions(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $inbound = null, ?bool $outbound = null, ?bool $ascending = null, ?bool $ton = null, ?string $subscriptionId = null): ?StarsStatus
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetStarsTransactionsRequest(peer: $peer, offset: $offset, limit: $limit, inbound: $inbound, outbound: $outbound, ascending: $ascending, ton: $ton, subscriptionId: $subscriptionId));
+        return $this->getStarsTransactionsAsync(peer: $peer, offset: $offset, limit: $limit, inbound: $inbound, outbound: $outbound, ascending: $ascending, ton: $ton, subscriptionId: $subscriptionId)->await();
+    }
+
+    /**
+     * @param int $formId
+     * @param InputInvoiceMessage|InputInvoiceSlug|InputInvoicePremiumGiftCode|InputInvoiceStars|InputInvoiceChatInviteSubscription|InputInvoiceStarGift|InputInvoiceStarGiftUpgrade|InputInvoiceStarGiftTransfer|InputInvoicePremiumGiftStars|InputInvoiceBusinessBotTransferStars|InputInvoiceStarGiftResale|InputInvoiceStarGiftPrepaidUpgrade|InputInvoicePremiumAuthCode|InputInvoiceStarGiftDropOriginalDetails|InputInvoiceStarGiftAuctionBid $invoice
+     * @return Future<PaymentResult|PaymentVerificationNeeded|null>
+     * @see https://core.telegram.org/method/payments.sendStarsForm
+     * @api
+     */
+    public function sendStarsFormAsync(int $formId, AbstractInputInvoice $invoice): Future
+    {
+        return $this->client->call(new SendStarsFormRequest(formId: $formId, invoice: $invoice));
     }
 
     /**
@@ -462,7 +695,27 @@ final readonly class PaymentsMethods
      */
     public function sendStarsForm(int $formId, AbstractInputInvoice $invoice): ?AbstractPaymentResult
     {
-        return $this->client->callSync(new SendStarsFormRequest(formId: $formId, invoice: $invoice));
+        return $this->sendStarsFormAsync(formId: $formId, invoice: $invoice)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param string $chargeId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.refundStarsCharge
+     * @api
+     */
+    public function refundStarsChargeAsync(AbstractInputUser|string|int $userId, string $chargeId): Future
+    {
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new RefundStarsChargeRequest(userId: $userId, chargeId: $chargeId));
     }
 
     /**
@@ -474,15 +727,23 @@ final readonly class PaymentsMethods
      */
     public function refundStarsCharge(AbstractInputUser|string|int $userId, string $chargeId): ?AbstractUpdates
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $userId = $__tmpPeer;
-            }
+        return $this->refundStarsChargeAsync(userId: $userId, chargeId: $chargeId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool|null $dark
+     * @param bool|null $ton
+     * @return Future<StarsRevenueStats|null>
+     * @see https://core.telegram.org/method/payments.getStarsRevenueStats
+     * @api
+     */
+    public function getStarsRevenueStatsAsync(AbstractInputPeer|string|int $peer, ?bool $dark = null, ?bool $ton = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new RefundStarsChargeRequest(userId: $userId, chargeId: $chargeId));
+        return $this->client->call(new GetStarsRevenueStatsRequest(peer: $peer, dark: $dark, ton: $ton));
     }
 
     /**
@@ -495,10 +756,24 @@ final readonly class PaymentsMethods
      */
     public function getStarsRevenueStats(AbstractInputPeer|string|int $peer, ?bool $dark = null, ?bool $ton = null): ?StarsRevenueStats
     {
+        return $this->getStarsRevenueStatsAsync(peer: $peer, dark: $dark, ton: $ton)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP $password
+     * @param bool|null $ton
+     * @param int|null $amount
+     * @return Future<StarsRevenueWithdrawalUrl|null>
+     * @see https://core.telegram.org/method/payments.getStarsRevenueWithdrawalUrl
+     * @api
+     */
+    public function getStarsRevenueWithdrawalUrlAsync(AbstractInputPeer|string|int $peer, AbstractInputCheckPasswordSRP $password, ?bool $ton = null, ?int $amount = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetStarsRevenueStatsRequest(peer: $peer, dark: $dark, ton: $ton));
+        return $this->client->call(new GetStarsRevenueWithdrawalUrlRequest(peer: $peer, password: $password, ton: $ton, amount: $amount));
     }
 
     /**
@@ -512,10 +787,21 @@ final readonly class PaymentsMethods
      */
     public function getStarsRevenueWithdrawalUrl(AbstractInputPeer|string|int $peer, AbstractInputCheckPasswordSRP $password, ?bool $ton = null, ?int $amount = null): ?StarsRevenueWithdrawalUrl
     {
+        return $this->getStarsRevenueWithdrawalUrlAsync(peer: $peer, password: $password, ton: $ton, amount: $amount)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<StarsRevenueAdsAccountUrl|null>
+     * @see https://core.telegram.org/method/payments.getStarsRevenueAdsAccountUrl
+     * @api
+     */
+    public function getStarsRevenueAdsAccountUrlAsync(AbstractInputPeer|string|int $peer): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetStarsRevenueWithdrawalUrlRequest(peer: $peer, password: $password, ton: $ton, amount: $amount));
+        return $this->client->call(new GetStarsRevenueAdsAccountUrlRequest(peer: $peer));
     }
 
     /**
@@ -526,10 +812,23 @@ final readonly class PaymentsMethods
      */
     public function getStarsRevenueAdsAccountUrl(AbstractInputPeer|string|int $peer): ?StarsRevenueAdsAccountUrl
     {
+        return $this->getStarsRevenueAdsAccountUrlAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<InputStarsTransaction> $id
+     * @param bool|null $ton
+     * @return Future<StarsStatus|null>
+     * @see https://core.telegram.org/method/payments.getStarsTransactionsByID
+     * @api
+     */
+    public function getStarsTransactionsByIDAsync(AbstractInputPeer|string|int $peer, array $id, ?bool $ton = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetStarsRevenueAdsAccountUrlRequest(peer: $peer));
+        return $this->client->call(new GetStarsTransactionsByIDRequest(peer: $peer, id: $id, ton: $ton));
     }
 
     /**
@@ -542,10 +841,26 @@ final readonly class PaymentsMethods
      */
     public function getStarsTransactionsByID(AbstractInputPeer|string|int $peer, array $id, ?bool $ton = null): ?StarsStatus
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
+        return $this->getStarsTransactionsByIDAsync(peer: $peer, id: $id, ton: $ton)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int|null $userId
+     * @return Future<list<StarsGiftOption>>
+     * @see https://core.telegram.org/method/payments.getStarsGiftOptions
+     * @api
+     */
+    public function getStarsGiftOptionsAsync(AbstractInputUser|string|int|null $userId = null): Future
+    {
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
         }
-        return $this->client->callSync(new GetStarsTransactionsByIDRequest(peer: $peer, id: $id, ton: $ton));
+        return $this->client->call(new GetStarsGiftOptionsRequest(userId: $userId));
     }
 
     /**
@@ -556,15 +871,23 @@ final readonly class PaymentsMethods
      */
     public function getStarsGiftOptions(AbstractInputUser|string|int|null $userId = null): array
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $userId = $__tmpPeer;
-            }
+        return $this->getStarsGiftOptionsAsync(userId: $userId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $offset
+     * @param bool|null $missingBalance
+     * @return Future<StarsStatus|null>
+     * @see https://core.telegram.org/method/payments.getStarsSubscriptions
+     * @api
+     */
+    public function getStarsSubscriptionsAsync(AbstractInputPeer|string|int $peer, string $offset, ?bool $missingBalance = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetStarsGiftOptionsRequest(userId: $userId));
+        return $this->client->call(new GetStarsSubscriptionsRequest(peer: $peer, offset: $offset, missingBalance: $missingBalance));
     }
 
     /**
@@ -577,10 +900,23 @@ final readonly class PaymentsMethods
      */
     public function getStarsSubscriptions(AbstractInputPeer|string|int $peer, string $offset, ?bool $missingBalance = null): ?StarsStatus
     {
+        return $this->getStarsSubscriptionsAsync(peer: $peer, offset: $offset, missingBalance: $missingBalance)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $subscriptionId
+     * @param bool|null $canceled
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.changeStarsSubscription
+     * @api
+     */
+    public function changeStarsSubscriptionAsync(AbstractInputPeer|string|int $peer, string $subscriptionId, ?bool $canceled = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetStarsSubscriptionsRequest(peer: $peer, offset: $offset, missingBalance: $missingBalance));
+        return $this->client->call(new ChangeStarsSubscriptionRequest(peer: $peer, subscriptionId: $subscriptionId, canceled: $canceled));
     }
 
     /**
@@ -593,10 +929,22 @@ final readonly class PaymentsMethods
      */
     public function changeStarsSubscription(AbstractInputPeer|string|int $peer, string $subscriptionId, ?bool $canceled = null): bool
     {
+        return (bool) $this->changeStarsSubscriptionAsync(peer: $peer, subscriptionId: $subscriptionId, canceled: $canceled)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $subscriptionId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.fulfillStarsSubscription
+     * @api
+     */
+    public function fulfillStarsSubscriptionAsync(AbstractInputPeer|string|int $peer, string $subscriptionId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new ChangeStarsSubscriptionRequest(peer: $peer, subscriptionId: $subscriptionId, canceled: $canceled));
+        return $this->client->call(new FulfillStarsSubscriptionRequest(peer: $peer, subscriptionId: $subscriptionId));
     }
 
     /**
@@ -608,10 +956,17 @@ final readonly class PaymentsMethods
      */
     public function fulfillStarsSubscription(AbstractInputPeer|string|int $peer, string $subscriptionId): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new FulfillStarsSubscriptionRequest(peer: $peer, subscriptionId: $subscriptionId));
+        return (bool) $this->fulfillStarsSubscriptionAsync(peer: $peer, subscriptionId: $subscriptionId)->await();
+    }
+
+    /**
+     * @return Future<list<StarsGiveawayOption>>
+     * @see https://core.telegram.org/method/payments.getStarsGiveawayOptions
+     * @api
+     */
+    public function getStarsGiveawayOptionsAsync(): Future
+    {
+        return $this->client->call(new GetStarsGiveawayOptionsRequest());
     }
 
     /**
@@ -621,7 +976,18 @@ final readonly class PaymentsMethods
      */
     public function getStarsGiveawayOptions(): array
     {
-        return $this->client->callSync(new GetStarsGiveawayOptionsRequest());
+        return $this->getStarsGiveawayOptionsAsync()->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<StarGiftsNotModified|StarGifts|null>
+     * @see https://core.telegram.org/method/payments.getStarGifts
+     * @api
+     */
+    public function getStarGiftsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetStarGiftsRequest(hash: $hash));
     }
 
     /**
@@ -632,7 +998,19 @@ final readonly class PaymentsMethods
      */
     public function getStarGifts(int $hash): ?AbstractStarGifts
     {
-        return $this->client->callSync(new GetStarGiftsRequest(hash: $hash));
+        return $this->getStarGiftsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug $stargift
+     * @param bool|null $unsave
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.saveStarGift
+     * @api
+     */
+    public function saveStarGiftAsync(AbstractInputSavedStarGift $stargift, ?bool $unsave = null): Future
+    {
+        return $this->client->call(new SaveStarGiftRequest(stargift: $stargift, unsave: $unsave));
     }
 
     /**
@@ -644,7 +1022,18 @@ final readonly class PaymentsMethods
      */
     public function saveStarGift(AbstractInputSavedStarGift $stargift, ?bool $unsave = null): bool
     {
-        return (bool) $this->client->callSync(new SaveStarGiftRequest(stargift: $stargift, unsave: $unsave));
+        return (bool) $this->saveStarGiftAsync(stargift: $stargift, unsave: $unsave)->await();
+    }
+
+    /**
+     * @param InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug $stargift
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.convertStarGift
+     * @api
+     */
+    public function convertStarGiftAsync(AbstractInputSavedStarGift $stargift): Future
+    {
+        return $this->client->call(new ConvertStarGiftRequest(stargift: $stargift));
     }
 
     /**
@@ -655,7 +1044,28 @@ final readonly class PaymentsMethods
      */
     public function convertStarGift(AbstractInputSavedStarGift $stargift): bool
     {
-        return (bool) $this->client->callSync(new ConvertStarGiftRequest(stargift: $stargift));
+        return (bool) $this->convertStarGiftAsync(stargift: $stargift)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param string $chargeId
+     * @param bool|null $restore
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.botCancelStarsSubscription
+     * @api
+     */
+    public function botCancelStarsSubscriptionAsync(AbstractInputUser|string|int $userId, string $chargeId, ?bool $restore = null): Future
+    {
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new BotCancelStarsSubscriptionRequest(userId: $userId, chargeId: $chargeId, restore: $restore));
     }
 
     /**
@@ -668,15 +1078,24 @@ final readonly class PaymentsMethods
      */
     public function botCancelStarsSubscription(AbstractInputUser|string|int $userId, string $chargeId, ?bool $restore = null): bool
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $userId = $__tmpPeer;
-            }
+        return (bool) $this->botCancelStarsSubscriptionAsync(userId: $userId, chargeId: $chargeId, restore: $restore)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $limit
+     * @param int|null $offsetDate
+     * @param string|null $offsetLink
+     * @return Future<ConnectedStarRefBots|null>
+     * @see https://core.telegram.org/method/payments.getConnectedStarRefBots
+     * @api
+     */
+    public function getConnectedStarRefBotsAsync(AbstractInputPeer|string|int $peer, int $limit, ?int $offsetDate = null, ?string $offsetLink = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new BotCancelStarsSubscriptionRequest(userId: $userId, chargeId: $chargeId, restore: $restore));
+        return $this->client->call(new GetConnectedStarRefBotsRequest(peer: $peer, limit: $limit, offsetDate: $offsetDate, offsetLink: $offsetLink));
     }
 
     /**
@@ -690,20 +1109,17 @@ final readonly class PaymentsMethods
      */
     public function getConnectedStarRefBots(AbstractInputPeer|string|int $peer, int $limit, ?int $offsetDate = null, ?string $offsetLink = null): ?ConnectedStarRefBots
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetConnectedStarRefBotsRequest(peer: $peer, limit: $limit, offsetDate: $offsetDate, offsetLink: $offsetLink));
+        return $this->getConnectedStarRefBotsAsync(peer: $peer, limit: $limit, offsetDate: $offsetDate, offsetLink: $offsetLink)->await();
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
-     * @return ConnectedStarRefBots|null
+     * @return Future<ConnectedStarRefBots|null>
      * @see https://core.telegram.org/method/payments.getConnectedStarRefBot
      * @api
      */
-    public function getConnectedStarRefBot(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot): ?ConnectedStarRefBots
+    public function getConnectedStarRefBotAsync(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot): Future
     {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
@@ -716,7 +1132,37 @@ final readonly class PaymentsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetConnectedStarRefBotRequest(peer: $peer, bot: $bot));
+        return $this->client->call(new GetConnectedStarRefBotRequest(peer: $peer, bot: $bot));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @return ConnectedStarRefBots|null
+     * @see https://core.telegram.org/method/payments.getConnectedStarRefBot
+     * @api
+     */
+    public function getConnectedStarRefBot(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot): ?ConnectedStarRefBots
+    {
+        return $this->getConnectedStarRefBotAsync(peer: $peer, bot: $bot)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $offset
+     * @param int $limit
+     * @param bool|null $orderByRevenue
+     * @param bool|null $orderByDate
+     * @return Future<SuggestedStarRefBots|null>
+     * @see https://core.telegram.org/method/payments.getSuggestedStarRefBots
+     * @api
+     */
+    public function getSuggestedStarRefBotsAsync(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $orderByRevenue = null, ?bool $orderByDate = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetSuggestedStarRefBotsRequest(peer: $peer, offset: $offset, limit: $limit, orderByRevenue: $orderByRevenue, orderByDate: $orderByDate));
     }
 
     /**
@@ -731,20 +1177,17 @@ final readonly class PaymentsMethods
      */
     public function getSuggestedStarRefBots(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $orderByRevenue = null, ?bool $orderByDate = null): ?SuggestedStarRefBots
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetSuggestedStarRefBotsRequest(peer: $peer, offset: $offset, limit: $limit, orderByRevenue: $orderByRevenue, orderByDate: $orderByDate));
+        return $this->getSuggestedStarRefBotsAsync(peer: $peer, offset: $offset, limit: $limit, orderByRevenue: $orderByRevenue, orderByDate: $orderByDate)->await();
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
-     * @return ConnectedStarRefBots|null
+     * @return Future<ConnectedStarRefBots|null>
      * @see https://core.telegram.org/method/payments.connectStarRefBot
      * @api
      */
-    public function connectStarRefBot(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot): ?ConnectedStarRefBots
+    public function connectStarRefBotAsync(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot): Future
     {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
@@ -757,7 +1200,35 @@ final readonly class PaymentsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new ConnectStarRefBotRequest(peer: $peer, bot: $bot));
+        return $this->client->call(new ConnectStarRefBotRequest(peer: $peer, bot: $bot));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @return ConnectedStarRefBots|null
+     * @see https://core.telegram.org/method/payments.connectStarRefBot
+     * @api
+     */
+    public function connectStarRefBot(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot): ?ConnectedStarRefBots
+    {
+        return $this->connectStarRefBotAsync(peer: $peer, bot: $bot)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $link
+     * @param bool|null $revoked
+     * @return Future<ConnectedStarRefBots|null>
+     * @see https://core.telegram.org/method/payments.editConnectedStarRefBot
+     * @api
+     */
+    public function editConnectedStarRefBotAsync(AbstractInputPeer|string|int $peer, string $link, ?bool $revoked = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new EditConnectedStarRefBotRequest(peer: $peer, link: $link, revoked: $revoked));
     }
 
     /**
@@ -770,10 +1241,18 @@ final readonly class PaymentsMethods
      */
     public function editConnectedStarRefBot(AbstractInputPeer|string|int $peer, string $link, ?bool $revoked = null): ?ConnectedStarRefBots
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new EditConnectedStarRefBotRequest(peer: $peer, link: $link, revoked: $revoked));
+        return $this->editConnectedStarRefBotAsync(peer: $peer, link: $link, revoked: $revoked)->await();
+    }
+
+    /**
+     * @param int $giftId
+     * @return Future<StarGiftUpgradePreview|null>
+     * @see https://core.telegram.org/method/payments.getStarGiftUpgradePreview
+     * @api
+     */
+    public function getStarGiftUpgradePreviewAsync(int $giftId): Future
+    {
+        return $this->client->call(new GetStarGiftUpgradePreviewRequest(giftId: $giftId));
     }
 
     /**
@@ -784,7 +1263,19 @@ final readonly class PaymentsMethods
      */
     public function getStarGiftUpgradePreview(int $giftId): ?StarGiftUpgradePreview
     {
-        return $this->client->callSync(new GetStarGiftUpgradePreviewRequest(giftId: $giftId));
+        return $this->getStarGiftUpgradePreviewAsync(giftId: $giftId)->await();
+    }
+
+    /**
+     * @param InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug $stargift
+     * @param bool|null $keepOriginalDetails
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.upgradeStarGift
+     * @api
+     */
+    public function upgradeStarGiftAsync(AbstractInputSavedStarGift $stargift, ?bool $keepOriginalDetails = null): Future
+    {
+        return $this->client->call(new UpgradeStarGiftRequest(stargift: $stargift, keepOriginalDetails: $keepOriginalDetails));
     }
 
     /**
@@ -796,7 +1287,22 @@ final readonly class PaymentsMethods
      */
     public function upgradeStarGift(AbstractInputSavedStarGift $stargift, ?bool $keepOriginalDetails = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new UpgradeStarGiftRequest(stargift: $stargift, keepOriginalDetails: $keepOriginalDetails));
+        return $this->upgradeStarGiftAsync(stargift: $stargift, keepOriginalDetails: $keepOriginalDetails)->await();
+    }
+
+    /**
+     * @param InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug $stargift
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $toId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.transferStarGift
+     * @api
+     */
+    public function transferStarGiftAsync(AbstractInputSavedStarGift $stargift, AbstractInputPeer|string|int $toId): Future
+    {
+        if (is_string($toId) || is_int($toId)) {
+            $toId = $this->client->peerManager->resolve($toId);
+        }
+        return $this->client->call(new TransferStarGiftRequest(stargift: $stargift, toId: $toId));
     }
 
     /**
@@ -808,10 +1314,18 @@ final readonly class PaymentsMethods
      */
     public function transferStarGift(AbstractInputSavedStarGift $stargift, AbstractInputPeer|string|int $toId): ?AbstractUpdates
     {
-        if (is_string($toId) || is_int($toId)) {
-            $toId = $this->client->peerManager->resolve($toId);
-        }
-        return $this->client->callSync(new TransferStarGiftRequest(stargift: $stargift, toId: $toId));
+        return $this->transferStarGiftAsync(stargift: $stargift, toId: $toId)->await();
+    }
+
+    /**
+     * @param string $slug
+     * @return Future<UniqueStarGift|null>
+     * @see https://core.telegram.org/method/payments.getUniqueStarGift
+     * @api
+     */
+    public function getUniqueStarGiftAsync(string $slug): Future
+    {
+        return $this->client->call(new GetUniqueStarGiftRequest(slug: $slug));
     }
 
     /**
@@ -822,7 +1336,33 @@ final readonly class PaymentsMethods
      */
     public function getUniqueStarGift(string $slug): ?UniqueStarGift
     {
-        return $this->client->callSync(new GetUniqueStarGiftRequest(slug: $slug));
+        return $this->getUniqueStarGiftAsync(slug: $slug)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $offset
+     * @param int $limit
+     * @param bool|null $excludeUnsaved
+     * @param bool|null $excludeSaved
+     * @param bool|null $excludeUnlimited
+     * @param bool|null $excludeUnique
+     * @param bool|null $sortByValue
+     * @param bool|null $excludeUpgradable
+     * @param bool|null $excludeUnupgradable
+     * @param bool|null $peerColorAvailable
+     * @param bool|null $excludeHosted
+     * @param int|null $collectionId
+     * @return Future<SavedStarGifts|null>
+     * @see https://core.telegram.org/method/payments.getSavedStarGifts
+     * @api
+     */
+    public function getSavedStarGiftsAsync(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $excludeUnsaved = null, ?bool $excludeSaved = null, ?bool $excludeUnlimited = null, ?bool $excludeUnique = null, ?bool $sortByValue = null, ?bool $excludeUpgradable = null, ?bool $excludeUnupgradable = null, ?bool $peerColorAvailable = null, ?bool $excludeHosted = null, ?int $collectionId = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetSavedStarGiftsRequest(peer: $peer, offset: $offset, limit: $limit, excludeUnsaved: $excludeUnsaved, excludeSaved: $excludeSaved, excludeUnlimited: $excludeUnlimited, excludeUnique: $excludeUnique, sortByValue: $sortByValue, excludeUpgradable: $excludeUpgradable, excludeUnupgradable: $excludeUnupgradable, peerColorAvailable: $peerColorAvailable, excludeHosted: $excludeHosted, collectionId: $collectionId));
     }
 
     /**
@@ -845,10 +1385,18 @@ final readonly class PaymentsMethods
      */
     public function getSavedStarGifts(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $excludeUnsaved = null, ?bool $excludeSaved = null, ?bool $excludeUnlimited = null, ?bool $excludeUnique = null, ?bool $sortByValue = null, ?bool $excludeUpgradable = null, ?bool $excludeUnupgradable = null, ?bool $peerColorAvailable = null, ?bool $excludeHosted = null, ?int $collectionId = null): ?SavedStarGifts
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetSavedStarGiftsRequest(peer: $peer, offset: $offset, limit: $limit, excludeUnsaved: $excludeUnsaved, excludeSaved: $excludeSaved, excludeUnlimited: $excludeUnlimited, excludeUnique: $excludeUnique, sortByValue: $sortByValue, excludeUpgradable: $excludeUpgradable, excludeUnupgradable: $excludeUnupgradable, peerColorAvailable: $peerColorAvailable, excludeHosted: $excludeHosted, collectionId: $collectionId));
+        return $this->getSavedStarGiftsAsync(peer: $peer, offset: $offset, limit: $limit, excludeUnsaved: $excludeUnsaved, excludeSaved: $excludeSaved, excludeUnlimited: $excludeUnlimited, excludeUnique: $excludeUnique, sortByValue: $sortByValue, excludeUpgradable: $excludeUpgradable, excludeUnupgradable: $excludeUnupgradable, peerColorAvailable: $peerColorAvailable, excludeHosted: $excludeHosted, collectionId: $collectionId)->await();
+    }
+
+    /**
+     * @param list<InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug> $stargift
+     * @return Future<SavedStarGifts|null>
+     * @see https://core.telegram.org/method/payments.getSavedStarGift
+     * @api
+     */
+    public function getSavedStarGiftAsync(array $stargift): Future
+    {
+        return $this->client->call(new GetSavedStarGiftRequest(stargift: $stargift));
     }
 
     /**
@@ -859,7 +1407,19 @@ final readonly class PaymentsMethods
      */
     public function getSavedStarGift(array $stargift): ?SavedStarGifts
     {
-        return $this->client->callSync(new GetSavedStarGiftRequest(stargift: $stargift));
+        return $this->getSavedStarGiftAsync(stargift: $stargift)->await();
+    }
+
+    /**
+     * @param InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug $stargift
+     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP $password
+     * @return Future<StarGiftWithdrawalUrl|null>
+     * @see https://core.telegram.org/method/payments.getStarGiftWithdrawalUrl
+     * @api
+     */
+    public function getStarGiftWithdrawalUrlAsync(AbstractInputSavedStarGift $stargift, AbstractInputCheckPasswordSRP $password): Future
+    {
+        return $this->client->call(new GetStarGiftWithdrawalUrlRequest(stargift: $stargift, password: $password));
     }
 
     /**
@@ -871,7 +1431,22 @@ final readonly class PaymentsMethods
      */
     public function getStarGiftWithdrawalUrl(AbstractInputSavedStarGift $stargift, AbstractInputCheckPasswordSRP $password): ?StarGiftWithdrawalUrl
     {
-        return $this->client->callSync(new GetStarGiftWithdrawalUrlRequest(stargift: $stargift, password: $password));
+        return $this->getStarGiftWithdrawalUrlAsync(stargift: $stargift, password: $password)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool|null $enabled
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.toggleChatStarGiftNotifications
+     * @api
+     */
+    public function toggleChatStarGiftNotificationsAsync(AbstractInputPeer|string|int $peer, ?bool $enabled = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new ToggleChatStarGiftNotificationsRequest(peer: $peer, enabled: $enabled));
     }
 
     /**
@@ -883,10 +1458,22 @@ final readonly class PaymentsMethods
      */
     public function toggleChatStarGiftNotifications(AbstractInputPeer|string|int $peer, ?bool $enabled = null): bool
     {
+        return (bool) $this->toggleChatStarGiftNotificationsAsync(peer: $peer, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug> $stargift
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.toggleStarGiftsPinnedToTop
+     * @api
+     */
+    public function toggleStarGiftsPinnedToTopAsync(AbstractInputPeer|string|int $peer, array $stargift): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new ToggleChatStarGiftNotificationsRequest(peer: $peer, enabled: $enabled));
+        return $this->client->call(new ToggleStarGiftsPinnedToTopRequest(peer: $peer, stargift: $stargift));
     }
 
     /**
@@ -898,10 +1485,18 @@ final readonly class PaymentsMethods
      */
     public function toggleStarGiftsPinnedToTop(AbstractInputPeer|string|int $peer, array $stargift): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new ToggleStarGiftsPinnedToTopRequest(peer: $peer, stargift: $stargift));
+        return (bool) $this->toggleStarGiftsPinnedToTopAsync(peer: $peer, stargift: $stargift)->await();
+    }
+
+    /**
+     * @param InputStorePaymentPremiumSubscription|InputStorePaymentGiftPremium|InputStorePaymentPremiumGiftCode|InputStorePaymentPremiumGiveaway|InputStorePaymentStarsTopup|InputStorePaymentStarsGift|InputStorePaymentStarsGiveaway|InputStorePaymentAuthCode $purpose
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.canPurchaseStore
+     * @api
+     */
+    public function canPurchaseStoreAsync(AbstractInputStorePaymentPurpose $purpose): Future
+    {
+        return $this->client->call(new CanPurchaseStoreRequest(purpose: $purpose));
     }
 
     /**
@@ -912,7 +1507,24 @@ final readonly class PaymentsMethods
      */
     public function canPurchaseStore(AbstractInputStorePaymentPurpose $purpose): bool
     {
-        return (bool) $this->client->callSync(new CanPurchaseStoreRequest(purpose: $purpose));
+        return (bool) $this->canPurchaseStoreAsync(purpose: $purpose)->await();
+    }
+
+    /**
+     * @param int $giftId
+     * @param string $offset
+     * @param int $limit
+     * @param bool|null $sortByPrice
+     * @param bool|null $sortByNum
+     * @param int|null $attributesHash
+     * @param list<StarGiftAttributeIdModel|StarGiftAttributeIdPattern|StarGiftAttributeIdBackdrop>|null $attributes
+     * @return Future<ResaleStarGifts|null>
+     * @see https://core.telegram.org/method/payments.getResaleStarGifts
+     * @api
+     */
+    public function getResaleStarGiftsAsync(int $giftId, string $offset, int $limit, ?bool $sortByPrice = null, ?bool $sortByNum = null, ?int $attributesHash = null, ?array $attributes = null): Future
+    {
+        return $this->client->call(new GetResaleStarGiftsRequest(giftId: $giftId, offset: $offset, limit: $limit, sortByPrice: $sortByPrice, sortByNum: $sortByNum, attributesHash: $attributesHash, attributes: $attributes));
     }
 
     /**
@@ -929,7 +1541,19 @@ final readonly class PaymentsMethods
      */
     public function getResaleStarGifts(int $giftId, string $offset, int $limit, ?bool $sortByPrice = null, ?bool $sortByNum = null, ?int $attributesHash = null, ?array $attributes = null): ?ResaleStarGifts
     {
-        return $this->client->callSync(new GetResaleStarGiftsRequest(giftId: $giftId, offset: $offset, limit: $limit, sortByPrice: $sortByPrice, sortByNum: $sortByNum, attributesHash: $attributesHash, attributes: $attributes));
+        return $this->getResaleStarGiftsAsync(giftId: $giftId, offset: $offset, limit: $limit, sortByPrice: $sortByPrice, sortByNum: $sortByNum, attributesHash: $attributesHash, attributes: $attributes)->await();
+    }
+
+    /**
+     * @param InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug $stargift
+     * @param StarsAmount|StarsTonAmount $resellAmount
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.updateStarGiftPrice
+     * @api
+     */
+    public function updateStarGiftPriceAsync(AbstractInputSavedStarGift $stargift, AbstractStarsAmount $resellAmount): Future
+    {
+        return $this->client->call(new UpdateStarGiftPriceRequest(stargift: $stargift, resellAmount: $resellAmount));
     }
 
     /**
@@ -941,7 +1565,23 @@ final readonly class PaymentsMethods
      */
     public function updateStarGiftPrice(AbstractInputSavedStarGift $stargift, AbstractStarsAmount $resellAmount): ?AbstractUpdates
     {
-        return $this->client->callSync(new UpdateStarGiftPriceRequest(stargift: $stargift, resellAmount: $resellAmount));
+        return $this->updateStarGiftPriceAsync(stargift: $stargift, resellAmount: $resellAmount)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $title
+     * @param list<InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug> $stargift
+     * @return Future<StarGiftCollection|null>
+     * @see https://core.telegram.org/method/payments.createStarGiftCollection
+     * @api
+     */
+    public function createStarGiftCollectionAsync(AbstractInputPeer|string|int $peer, string $title, array $stargift): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new CreateStarGiftCollectionRequest(peer: $peer, title: $title, stargift: $stargift));
     }
 
     /**
@@ -954,10 +1594,26 @@ final readonly class PaymentsMethods
      */
     public function createStarGiftCollection(AbstractInputPeer|string|int $peer, string $title, array $stargift): ?StarGiftCollection
     {
+        return $this->createStarGiftCollectionAsync(peer: $peer, title: $title, stargift: $stargift)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $collectionId
+     * @param string|null $title
+     * @param list<InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug>|null $deleteStargift
+     * @param list<InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug>|null $addStargift
+     * @param list<InputSavedStarGiftUser|InputSavedStarGiftChat|InputSavedStarGiftSlug>|null $order
+     * @return Future<StarGiftCollection|null>
+     * @see https://core.telegram.org/method/payments.updateStarGiftCollection
+     * @api
+     */
+    public function updateStarGiftCollectionAsync(AbstractInputPeer|string|int $peer, int $collectionId, ?string $title = null, ?array $deleteStargift = null, ?array $addStargift = null, ?array $order = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new CreateStarGiftCollectionRequest(peer: $peer, title: $title, stargift: $stargift));
+        return $this->client->call(new UpdateStarGiftCollectionRequest(peer: $peer, collectionId: $collectionId, title: $title, deleteStargift: $deleteStargift, addStargift: $addStargift, order: $order));
     }
 
     /**
@@ -973,10 +1629,22 @@ final readonly class PaymentsMethods
      */
     public function updateStarGiftCollection(AbstractInputPeer|string|int $peer, int $collectionId, ?string $title = null, ?array $deleteStargift = null, ?array $addStargift = null, ?array $order = null): ?StarGiftCollection
     {
+        return $this->updateStarGiftCollectionAsync(peer: $peer, collectionId: $collectionId, title: $title, deleteStargift: $deleteStargift, addStargift: $addStargift, order: $order)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $order
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.reorderStarGiftCollections
+     * @api
+     */
+    public function reorderStarGiftCollectionsAsync(AbstractInputPeer|string|int $peer, array $order): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new UpdateStarGiftCollectionRequest(peer: $peer, collectionId: $collectionId, title: $title, deleteStargift: $deleteStargift, addStargift: $addStargift, order: $order));
+        return $this->client->call(new ReorderStarGiftCollectionsRequest(peer: $peer, order: $order));
     }
 
     /**
@@ -988,10 +1656,22 @@ final readonly class PaymentsMethods
      */
     public function reorderStarGiftCollections(AbstractInputPeer|string|int $peer, array $order): bool
     {
+        return (bool) $this->reorderStarGiftCollectionsAsync(peer: $peer, order: $order)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $collectionId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/payments.deleteStarGiftCollection
+     * @api
+     */
+    public function deleteStarGiftCollectionAsync(AbstractInputPeer|string|int $peer, int $collectionId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new ReorderStarGiftCollectionsRequest(peer: $peer, order: $order));
+        return $this->client->call(new DeleteStarGiftCollectionRequest(peer: $peer, collectionId: $collectionId));
     }
 
     /**
@@ -1003,10 +1683,22 @@ final readonly class PaymentsMethods
      */
     public function deleteStarGiftCollection(AbstractInputPeer|string|int $peer, int $collectionId): bool
     {
+        return (bool) $this->deleteStarGiftCollectionAsync(peer: $peer, collectionId: $collectionId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $hash
+     * @return Future<StarGiftCollectionsNotModified|StarGiftCollections|null>
+     * @see https://core.telegram.org/method/payments.getStarGiftCollections
+     * @api
+     */
+    public function getStarGiftCollectionsAsync(AbstractInputPeer|string|int $peer, int $hash): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new DeleteStarGiftCollectionRequest(peer: $peer, collectionId: $collectionId));
+        return $this->client->call(new GetStarGiftCollectionsRequest(peer: $peer, hash: $hash));
     }
 
     /**
@@ -1018,10 +1710,18 @@ final readonly class PaymentsMethods
      */
     public function getStarGiftCollections(AbstractInputPeer|string|int $peer, int $hash): ?AbstractStarGiftCollections
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetStarGiftCollectionsRequest(peer: $peer, hash: $hash));
+        return $this->getStarGiftCollectionsAsync(peer: $peer, hash: $hash)->await();
+    }
+
+    /**
+     * @param string $slug
+     * @return Future<UniqueStarGiftValueInfo|null>
+     * @see https://core.telegram.org/method/payments.getUniqueStarGiftValueInfo
+     * @api
+     */
+    public function getUniqueStarGiftValueInfoAsync(string $slug): Future
+    {
+        return $this->client->call(new GetUniqueStarGiftValueInfoRequest(slug: $slug));
     }
 
     /**
@@ -1032,7 +1732,18 @@ final readonly class PaymentsMethods
      */
     public function getUniqueStarGiftValueInfo(string $slug): ?UniqueStarGiftValueInfo
     {
-        return $this->client->callSync(new GetUniqueStarGiftValueInfoRequest(slug: $slug));
+        return $this->getUniqueStarGiftValueInfoAsync(slug: $slug)->await();
+    }
+
+    /**
+     * @param int $giftId
+     * @return Future<CheckCanSendGiftResultOk|CheckCanSendGiftResultFail|null>
+     * @see https://core.telegram.org/method/payments.checkCanSendGift
+     * @api
+     */
+    public function checkCanSendGiftAsync(int $giftId): Future
+    {
+        return $this->client->call(new CheckCanSendGiftRequest(giftId: $giftId));
     }
 
     /**
@@ -1043,7 +1754,19 @@ final readonly class PaymentsMethods
      */
     public function checkCanSendGift(int $giftId): ?AbstractCheckCanSendGiftResult
     {
-        return $this->client->callSync(new CheckCanSendGiftRequest(giftId: $giftId));
+        return $this->checkCanSendGiftAsync(giftId: $giftId)->await();
+    }
+
+    /**
+     * @param InputStarGiftAuction|InputStarGiftAuctionSlug $auction
+     * @param int $version
+     * @return Future<StarGiftAuctionState|null>
+     * @see https://core.telegram.org/method/payments.getStarGiftAuctionState
+     * @api
+     */
+    public function getStarGiftAuctionStateAsync(AbstractInputStarGiftAuction $auction, int $version): Future
+    {
+        return $this->client->call(new GetStarGiftAuctionStateRequest(auction: $auction, version: $version));
     }
 
     /**
@@ -1055,7 +1778,18 @@ final readonly class PaymentsMethods
      */
     public function getStarGiftAuctionState(AbstractInputStarGiftAuction $auction, int $version): ?StarGiftAuctionState
     {
-        return $this->client->callSync(new GetStarGiftAuctionStateRequest(auction: $auction, version: $version));
+        return $this->getStarGiftAuctionStateAsync(auction: $auction, version: $version)->await();
+    }
+
+    /**
+     * @param int $giftId
+     * @return Future<StarGiftAuctionAcquiredGifts|null>
+     * @see https://core.telegram.org/method/payments.getStarGiftAuctionAcquiredGifts
+     * @api
+     */
+    public function getStarGiftAuctionAcquiredGiftsAsync(int $giftId): Future
+    {
+        return $this->client->call(new GetStarGiftAuctionAcquiredGiftsRequest(giftId: $giftId));
     }
 
     /**
@@ -1066,7 +1800,18 @@ final readonly class PaymentsMethods
      */
     public function getStarGiftAuctionAcquiredGifts(int $giftId): ?StarGiftAuctionAcquiredGifts
     {
-        return $this->client->callSync(new GetStarGiftAuctionAcquiredGiftsRequest(giftId: $giftId));
+        return $this->getStarGiftAuctionAcquiredGiftsAsync(giftId: $giftId)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<StarGiftActiveAuctionsNotModified|StarGiftActiveAuctions|null>
+     * @see https://core.telegram.org/method/payments.getStarGiftActiveAuctions
+     * @api
+     */
+    public function getStarGiftActiveAuctionsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetStarGiftActiveAuctionsRequest(hash: $hash));
     }
 
     /**
@@ -1077,7 +1822,19 @@ final readonly class PaymentsMethods
      */
     public function getStarGiftActiveAuctions(int $hash): ?AbstractStarGiftActiveAuctions
     {
-        return $this->client->callSync(new GetStarGiftActiveAuctionsRequest(hash: $hash));
+        return $this->getStarGiftActiveAuctionsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $offerMsgId
+     * @param bool|null $decline
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.resolveStarGiftOffer
+     * @api
+     */
+    public function resolveStarGiftOfferAsync(int $offerMsgId, ?bool $decline = null): Future
+    {
+        return $this->client->call(new ResolveStarGiftOfferRequest(offerMsgId: $offerMsgId, decline: $decline));
     }
 
     /**
@@ -1089,7 +1846,29 @@ final readonly class PaymentsMethods
      */
     public function resolveStarGiftOffer(int $offerMsgId, ?bool $decline = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new ResolveStarGiftOfferRequest(offerMsgId: $offerMsgId, decline: $decline));
+        return $this->resolveStarGiftOfferAsync(offerMsgId: $offerMsgId, decline: $decline)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $slug
+     * @param StarsAmount|StarsTonAmount $price
+     * @param int $duration
+     * @param int|null $randomId
+     * @param int|null $allowPaidStars
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/payments.sendStarGiftOffer
+     * @api
+     */
+    public function sendStarGiftOfferAsync(AbstractInputPeer|string|int $peer, string $slug, AbstractStarsAmount $price, int $duration, ?int $randomId = null, ?int $allowPaidStars = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->call(new SendStarGiftOfferRequest(peer: $peer, slug: $slug, price: $price, duration: $duration, randomId: $randomId, allowPaidStars: $allowPaidStars));
     }
 
     /**
@@ -1105,13 +1884,18 @@ final readonly class PaymentsMethods
      */
     public function sendStarGiftOffer(AbstractInputPeer|string|int $peer, string $slug, AbstractStarsAmount $price, int $duration, ?int $randomId = null, ?int $allowPaidStars = null): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new SendStarGiftOfferRequest(peer: $peer, slug: $slug, price: $price, duration: $duration, randomId: $randomId, allowPaidStars: $allowPaidStars));
+        return $this->sendStarGiftOfferAsync(peer: $peer, slug: $slug, price: $price, duration: $duration, randomId: $randomId, allowPaidStars: $allowPaidStars)->await();
+    }
+
+    /**
+     * @param int $giftId
+     * @return Future<StarGiftUpgradeAttributes|null>
+     * @see https://core.telegram.org/method/payments.getStarGiftUpgradeAttributes
+     * @api
+     */
+    public function getStarGiftUpgradeAttributesAsync(int $giftId): Future
+    {
+        return $this->client->call(new GetStarGiftUpgradeAttributesRequest(giftId: $giftId));
     }
 
     /**
@@ -1122,6 +1906,6 @@ final readonly class PaymentsMethods
      */
     public function getStarGiftUpgradeAttributes(int $giftId): ?StarGiftUpgradeAttributes
     {
-        return $this->client->callSync(new GetStarGiftUpgradeAttributesRequest(giftId: $giftId));
+        return $this->getStarGiftUpgradeAttributesAsync(giftId: $giftId)->await();
     }
 }

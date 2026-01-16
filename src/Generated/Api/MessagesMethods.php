@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Messages\AcceptEncryptionRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Messages\AcceptUrlAuthRequest;
@@ -649,13 +651,44 @@ final readonly class MessagesMethods
 
     /**
      * @param list<InputMessageID|InputMessageReplyTo|InputMessagePinned|InputMessageCallbackQuery> $id
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getMessages
+     * @api
+     */
+    public function getMessagesAsync(array $id): Future
+    {
+        return $this->client->call(new GetMessagesRequest(id: $id));
+    }
+
+    /**
+     * @param list<InputMessageID|InputMessageReplyTo|InputMessagePinned|InputMessageCallbackQuery> $id
      * @return Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null
      * @see https://core.telegram.org/method/messages.getMessages
      * @api
      */
     public function getMessages(array $id): ?AbstractMessages
     {
-        return $this->client->callSync(new GetMessagesRequest(id: $id));
+        return $this->getMessagesAsync(id: $id)->await();
+    }
+
+    /**
+     * @param int $offsetDate
+     * @param int $offsetId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $offsetPeer
+     * @param int $limit
+     * @param int $hash
+     * @param bool|null $excludePinned
+     * @param int|null $folderId
+     * @return Future<Dialogs|DialogsSlice|DialogsNotModified|null>
+     * @see https://core.telegram.org/method/messages.getDialogs
+     * @api
+     */
+    public function getDialogsAsync(int $offsetDate, int $offsetId, AbstractInputPeer|string|int $offsetPeer, int $limit, int $hash, ?bool $excludePinned = null, ?int $folderId = null): Future
+    {
+        if (is_string($offsetPeer) || is_int($offsetPeer)) {
+            $offsetPeer = $this->client->peerManager->resolve($offsetPeer);
+        }
+        return $this->client->call(new GetDialogsRequest(offsetDate: $offsetDate, offsetId: $offsetId, offsetPeer: $offsetPeer, limit: $limit, hash: $hash, excludePinned: $excludePinned, folderId: $folderId));
     }
 
     /**
@@ -672,10 +705,28 @@ final readonly class MessagesMethods
      */
     public function getDialogs(int $offsetDate, int $offsetId, AbstractInputPeer|string|int $offsetPeer, int $limit, int $hash, ?bool $excludePinned = null, ?int $folderId = null): ?AbstractDialogs
     {
-        if (is_string($offsetPeer) || is_int($offsetPeer)) {
-            $offsetPeer = $this->client->peerManager->resolve($offsetPeer);
+        return $this->getDialogsAsync(offsetDate: $offsetDate, offsetId: $offsetId, offsetPeer: $offsetPeer, limit: $limit, hash: $hash, excludePinned: $excludePinned, folderId: $folderId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $offsetId
+     * @param int $offsetDate
+     * @param int $addOffset
+     * @param int $limit
+     * @param int $maxId
+     * @param int $minId
+     * @param int $hash
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getHistory
+     * @api
+     */
+    public function getHistoryAsync(AbstractInputPeer|string|int $peer, int $offsetId, int $offsetDate, int $addOffset, int $limit, int $maxId, int $minId, int $hash): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetDialogsRequest(offsetDate: $offsetDate, offsetId: $offsetId, offsetPeer: $offsetPeer, limit: $limit, hash: $hash, excludePinned: $excludePinned, folderId: $folderId));
+        return $this->client->call(new GetHistoryRequest(peer: $peer, offsetId: $offsetId, offsetDate: $offsetDate, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash));
     }
 
     /**
@@ -693,10 +744,41 @@ final readonly class MessagesMethods
      */
     public function getHistory(AbstractInputPeer|string|int $peer, int $offsetId, int $offsetDate, int $addOffset, int $limit, int $maxId, int $minId, int $hash): ?AbstractMessages
     {
+        return $this->getHistoryAsync(peer: $peer, offsetId: $offsetId, offsetDate: $offsetDate, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $q
+     * @param InputMessagesFilterEmpty|InputMessagesFilterPhotos|InputMessagesFilterVideo|InputMessagesFilterPhotoVideo|InputMessagesFilterDocument|InputMessagesFilterUrl|InputMessagesFilterGif|InputMessagesFilterVoice|InputMessagesFilterMusic|InputMessagesFilterChatPhotos|InputMessagesFilterPhoneCalls|InputMessagesFilterRoundVoice|InputMessagesFilterRoundVideo|InputMessagesFilterMyMentions|InputMessagesFilterGeo|InputMessagesFilterContacts|InputMessagesFilterPinned $filter
+     * @param int $minDate
+     * @param int $maxDate
+     * @param int $offsetId
+     * @param int $addOffset
+     * @param int $limit
+     * @param int $maxId
+     * @param int $minId
+     * @param int $hash
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $fromId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $savedPeerId
+     * @param list<ReactionEmpty|ReactionEmoji|ReactionCustomEmoji|ReactionPaid>|null $savedReaction
+     * @param int|null $topMsgId
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.search
+     * @api
+     */
+    public function searchAsync(AbstractInputPeer|string|int $peer, string $q, AbstractMessagesFilter $filter, int $minDate, int $maxDate, int $offsetId, int $addOffset, int $limit, int $maxId, int $minId, int $hash, AbstractInputPeer|string|int|null $fromId = null, AbstractInputPeer|string|int|null $savedPeerId = null, ?array $savedReaction = null, ?int $topMsgId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetHistoryRequest(peer: $peer, offsetId: $offsetId, offsetDate: $offsetDate, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash));
+        if (is_string($fromId) || is_int($fromId)) {
+            $fromId = $this->client->peerManager->resolve($fromId);
+        }
+        if (is_string($savedPeerId) || is_int($savedPeerId)) {
+            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
+        }
+        return $this->client->call(new SearchRequest(peer: $peer, q: $q, filter: $filter, minDate: $minDate, maxDate: $maxDate, offsetId: $offsetId, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash, fromId: $fromId, savedPeerId: $savedPeerId, savedReaction: $savedReaction, topMsgId: $topMsgId));
     }
 
     /**
@@ -721,16 +803,22 @@ final readonly class MessagesMethods
      */
     public function search(AbstractInputPeer|string|int $peer, string $q, AbstractMessagesFilter $filter, int $minDate, int $maxDate, int $offsetId, int $addOffset, int $limit, int $maxId, int $minId, int $hash, AbstractInputPeer|string|int|null $fromId = null, AbstractInputPeer|string|int|null $savedPeerId = null, ?array $savedReaction = null, ?int $topMsgId = null): ?AbstractMessages
     {
+        return $this->searchAsync(peer: $peer, q: $q, filter: $filter, minDate: $minDate, maxDate: $maxDate, offsetId: $offsetId, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash, fromId: $fromId, savedPeerId: $savedPeerId, savedReaction: $savedReaction, topMsgId: $topMsgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $maxId
+     * @return Future<AffectedMessages|null>
+     * @see https://core.telegram.org/method/messages.readHistory
+     * @api
+     */
+    public function readHistoryAsync(AbstractInputPeer|string|int $peer, int $maxId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        if (is_string($fromId) || is_int($fromId)) {
-            $fromId = $this->client->peerManager->resolve($fromId);
-        }
-        if (is_string($savedPeerId) || is_int($savedPeerId)) {
-            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
-        }
-        return $this->client->callSync(new SearchRequest(peer: $peer, q: $q, filter: $filter, minDate: $minDate, maxDate: $maxDate, offsetId: $offsetId, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash, fromId: $fromId, savedPeerId: $savedPeerId, savedReaction: $savedReaction, topMsgId: $topMsgId));
+        return $this->client->call(new ReadHistoryRequest(peer: $peer, maxId: $maxId));
     }
 
     /**
@@ -742,10 +830,26 @@ final readonly class MessagesMethods
      */
     public function readHistory(AbstractInputPeer|string|int $peer, int $maxId): ?AffectedMessages
     {
+        return $this->readHistoryAsync(peer: $peer, maxId: $maxId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $maxId
+     * @param bool|null $justClear
+     * @param bool|null $revoke
+     * @param int|null $minDate
+     * @param int|null $maxDate
+     * @return Future<AffectedHistory|null>
+     * @see https://core.telegram.org/method/messages.deleteHistory
+     * @api
+     */
+    public function deleteHistoryAsync(AbstractInputPeer|string|int $peer, int $maxId, ?bool $justClear = null, ?bool $revoke = null, ?int $minDate = null, ?int $maxDate = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new ReadHistoryRequest(peer: $peer, maxId: $maxId));
+        return $this->client->call(new DeleteHistoryRequest(peer: $peer, maxId: $maxId, justClear: $justClear, revoke: $revoke, minDate: $minDate, maxDate: $maxDate));
     }
 
     /**
@@ -761,10 +865,19 @@ final readonly class MessagesMethods
      */
     public function deleteHistory(AbstractInputPeer|string|int $peer, int $maxId, ?bool $justClear = null, ?bool $revoke = null, ?int $minDate = null, ?int $maxDate = null): ?AffectedHistory
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new DeleteHistoryRequest(peer: $peer, maxId: $maxId, justClear: $justClear, revoke: $revoke, minDate: $minDate, maxDate: $maxDate));
+        return $this->deleteHistoryAsync(peer: $peer, maxId: $maxId, justClear: $justClear, revoke: $revoke, minDate: $minDate, maxDate: $maxDate)->await();
+    }
+
+    /**
+     * @param list<int> $id
+     * @param bool|null $revoke
+     * @return Future<AffectedMessages|null>
+     * @see https://core.telegram.org/method/messages.deleteMessages
+     * @api
+     */
+    public function deleteMessagesAsync(array $id, ?bool $revoke = null): Future
+    {
+        return $this->client->call(new DeleteMessagesRequest(id: $id, revoke: $revoke));
     }
 
     /**
@@ -776,7 +889,18 @@ final readonly class MessagesMethods
      */
     public function deleteMessages(array $id, ?bool $revoke = null): ?AffectedMessages
     {
-        return $this->client->callSync(new DeleteMessagesRequest(id: $id, revoke: $revoke));
+        return $this->deleteMessagesAsync(id: $id, revoke: $revoke)->await();
+    }
+
+    /**
+     * @param int $maxId
+     * @return Future<list<ReceivedNotifyMessage>>
+     * @see https://core.telegram.org/method/messages.receivedMessages
+     * @api
+     */
+    public function receivedMessagesAsync(int $maxId): Future
+    {
+        return $this->client->call(new ReceivedMessagesRequest(maxId: $maxId));
     }
 
     /**
@@ -787,7 +911,23 @@ final readonly class MessagesMethods
      */
     public function receivedMessages(int $maxId): array
     {
-        return $this->client->callSync(new ReceivedMessagesRequest(maxId: $maxId));
+        return $this->receivedMessagesAsync(maxId: $maxId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param SendMessageTypingAction|SendMessageCancelAction|SendMessageRecordVideoAction|SendMessageUploadVideoAction|SendMessageRecordAudioAction|SendMessageUploadAudioAction|SendMessageUploadPhotoAction|SendMessageUploadDocumentAction|SendMessageGeoLocationAction|SendMessageChooseContactAction|SendMessageGamePlayAction|SendMessageRecordRoundAction|SendMessageUploadRoundAction|SpeakingInGroupCallAction|SendMessageHistoryImportAction|SendMessageChooseStickerAction|SendMessageEmojiInteraction|SendMessageEmojiInteractionSeen|SendMessageTextDraftAction $action
+     * @param int|null $topMsgId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.setTyping
+     * @api
+     */
+    public function setTypingAsync(AbstractInputPeer|string|int $peer, AbstractSendMessageAction $action, ?int $topMsgId = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new SetTypingRequest(peer: $peer, action: $action, topMsgId: $topMsgId));
     }
 
     /**
@@ -800,10 +940,47 @@ final readonly class MessagesMethods
      */
     public function setTyping(AbstractInputPeer|string|int $peer, AbstractSendMessageAction $action, ?int $topMsgId = null): bool
     {
+        return (bool) $this->setTypingAsync(peer: $peer, action: $action, topMsgId: $topMsgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $message
+     * @param bool|null $noWebpage
+     * @param bool|null $silent
+     * @param bool|null $background
+     * @param bool|null $clearDraft
+     * @param bool|null $noforwards
+     * @param bool|null $updateStickersetsOrder
+     * @param bool|null $invertMedia
+     * @param bool|null $allowPaidFloodskip
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
+     * @param int|null $randomId
+     * @param ReplyKeyboardHide|ReplyKeyboardForceReply|ReplyKeyboardMarkup|ReplyInlineMarkup|null $replyMarkup
+     * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
+     * @param int|null $scheduleDate
+     * @param int|null $scheduleRepeatPeriod
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
+     * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
+     * @param int|null $effect
+     * @param int|null $allowPaidStars
+     * @param SuggestedPost|null $suggestedPost
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendMessage
+     * @api
+     */
+    public function sendMessageAsync(AbstractInputPeer|string|int $peer, string $message, ?bool $noWebpage = null, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?int $randomId = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?int $scheduleRepeatPeriod = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $allowPaidStars = null, ?SuggestedPost $suggestedPost = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new SetTypingRequest(peer: $peer, action: $action, topMsgId: $topMsgId));
+        if (is_string($sendAs) || is_int($sendAs)) {
+            $sendAs = $this->client->peerManager->resolve($sendAs);
+        }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->call(new SendMessageRequest(peer: $peer, message: $message, noWebpage: $noWebpage, silent: $silent, background: $background, clearDraft: $clearDraft, noforwards: $noforwards, updateStickersetsOrder: $updateStickersetsOrder, invertMedia: $invertMedia, allowPaidFloodskip: $allowPaidFloodskip, replyTo: $replyTo, randomId: $randomId, replyMarkup: $replyMarkup, entities: $entities, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, allowPaidStars: $allowPaidStars, suggestedPost: $suggestedPost));
     }
 
     /**
@@ -834,6 +1011,37 @@ final readonly class MessagesMethods
      */
     public function sendMessage(AbstractInputPeer|string|int $peer, string $message, ?bool $noWebpage = null, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?int $randomId = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?int $scheduleRepeatPeriod = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $allowPaidStars = null, ?SuggestedPost $suggestedPost = null): ?AbstractUpdates
     {
+        return $this->sendMessageAsync(peer: $peer, message: $message, noWebpage: $noWebpage, silent: $silent, background: $background, clearDraft: $clearDraft, noforwards: $noforwards, updateStickersetsOrder: $updateStickersetsOrder, invertMedia: $invertMedia, allowPaidFloodskip: $allowPaidFloodskip, replyTo: $replyTo, randomId: $randomId, replyMarkup: $replyMarkup, entities: $entities, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, allowPaidStars: $allowPaidStars, suggestedPost: $suggestedPost)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
+     * @param string $message
+     * @param bool|null $silent
+     * @param bool|null $background
+     * @param bool|null $clearDraft
+     * @param bool|null $noforwards
+     * @param bool|null $updateStickersetsOrder
+     * @param bool|null $invertMedia
+     * @param bool|null $allowPaidFloodskip
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
+     * @param int|null $randomId
+     * @param ReplyKeyboardHide|ReplyKeyboardForceReply|ReplyKeyboardMarkup|ReplyInlineMarkup|null $replyMarkup
+     * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
+     * @param int|null $scheduleDate
+     * @param int|null $scheduleRepeatPeriod
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
+     * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
+     * @param int|null $effect
+     * @param int|null $allowPaidStars
+     * @param SuggestedPost|null $suggestedPost
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendMedia
+     * @api
+     */
+    public function sendMediaAsync(AbstractInputPeer|string|int $peer, AbstractInputMedia $media, string $message, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?int $randomId = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?int $scheduleRepeatPeriod = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $allowPaidStars = null, ?SuggestedPost $suggestedPost = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
@@ -843,7 +1051,7 @@ final readonly class MessagesMethods
         if ($randomId === null) {
             $randomId = random_int(0, 9223372036854775807);
         }
-        return $this->client->callSync(new SendMessageRequest(peer: $peer, message: $message, noWebpage: $noWebpage, silent: $silent, background: $background, clearDraft: $clearDraft, noforwards: $noforwards, updateStickersetsOrder: $updateStickersetsOrder, invertMedia: $invertMedia, allowPaidFloodskip: $allowPaidFloodskip, replyTo: $replyTo, randomId: $randomId, replyMarkup: $replyMarkup, entities: $entities, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, allowPaidStars: $allowPaidStars, suggestedPost: $suggestedPost));
+        return $this->client->call(new SendMediaRequest(peer: $peer, media: $media, message: $message, silent: $silent, background: $background, clearDraft: $clearDraft, noforwards: $noforwards, updateStickersetsOrder: $updateStickersetsOrder, invertMedia: $invertMedia, allowPaidFloodskip: $allowPaidFloodskip, replyTo: $replyTo, randomId: $randomId, replyMarkup: $replyMarkup, entities: $entities, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, allowPaidStars: $allowPaidStars, suggestedPost: $suggestedPost));
     }
 
     /**
@@ -874,8 +1082,42 @@ final readonly class MessagesMethods
      */
     public function sendMedia(AbstractInputPeer|string|int $peer, AbstractInputMedia $media, string $message, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?int $randomId = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?int $scheduleRepeatPeriod = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $allowPaidStars = null, ?SuggestedPost $suggestedPost = null): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
+        return $this->sendMediaAsync(peer: $peer, media: $media, message: $message, silent: $silent, background: $background, clearDraft: $clearDraft, noforwards: $noforwards, updateStickersetsOrder: $updateStickersetsOrder, invertMedia: $invertMedia, allowPaidFloodskip: $allowPaidFloodskip, replyTo: $replyTo, randomId: $randomId, replyMarkup: $replyMarkup, entities: $entities, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, allowPaidStars: $allowPaidStars, suggestedPost: $suggestedPost)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $fromPeer
+     * @param list<int> $id
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $toPeer
+     * @param bool|null $silent
+     * @param bool|null $background
+     * @param bool|null $withMyScore
+     * @param bool|null $dropAuthor
+     * @param bool|null $dropMediaCaptions
+     * @param bool|null $noforwards
+     * @param bool|null $allowPaidFloodskip
+     * @param list<int>|null $randomId
+     * @param int|null $topMsgId
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
+     * @param int|null $scheduleDate
+     * @param int|null $scheduleRepeatPeriod
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
+     * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
+     * @param int|null $effect
+     * @param int|null $videoTimestamp
+     * @param int|null $allowPaidStars
+     * @param SuggestedPost|null $suggestedPost
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.forwardMessages
+     * @api
+     */
+    public function forwardMessagesAsync(AbstractInputPeer|string|int $fromPeer, array $id, AbstractInputPeer|string|int $toPeer, ?bool $silent = null, ?bool $background = null, ?bool $withMyScore = null, ?bool $dropAuthor = null, ?bool $dropMediaCaptions = null, ?bool $noforwards = null, ?bool $allowPaidFloodskip = null, ?array $randomId = null, ?int $topMsgId = null, ?AbstractInputReplyTo $replyTo = null, ?int $scheduleDate = null, ?int $scheduleRepeatPeriod = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $videoTimestamp = null, ?int $allowPaidStars = null, ?SuggestedPost $suggestedPost = null): Future
+    {
+        if (is_string($fromPeer) || is_int($fromPeer)) {
+            $fromPeer = $this->client->peerManager->resolve($fromPeer);
+        }
+        if (is_string($toPeer) || is_int($toPeer)) {
+            $toPeer = $this->client->peerManager->resolve($toPeer);
         }
         if (is_string($sendAs) || is_int($sendAs)) {
             $sendAs = $this->client->peerManager->resolve($sendAs);
@@ -883,7 +1125,7 @@ final readonly class MessagesMethods
         if ($randomId === null) {
             $randomId = random_int(0, 9223372036854775807);
         }
-        return $this->client->callSync(new SendMediaRequest(peer: $peer, media: $media, message: $message, silent: $silent, background: $background, clearDraft: $clearDraft, noforwards: $noforwards, updateStickersetsOrder: $updateStickersetsOrder, invertMedia: $invertMedia, allowPaidFloodskip: $allowPaidFloodskip, replyTo: $replyTo, randomId: $randomId, replyMarkup: $replyMarkup, entities: $entities, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, allowPaidStars: $allowPaidStars, suggestedPost: $suggestedPost));
+        return $this->client->call(new ForwardMessagesRequest(fromPeer: $fromPeer, id: $id, toPeer: $toPeer, silent: $silent, background: $background, withMyScore: $withMyScore, dropAuthor: $dropAuthor, dropMediaCaptions: $dropMediaCaptions, noforwards: $noforwards, allowPaidFloodskip: $allowPaidFloodskip, randomId: $randomId, topMsgId: $topMsgId, replyTo: $replyTo, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, videoTimestamp: $videoTimestamp, allowPaidStars: $allowPaidStars, suggestedPost: $suggestedPost));
     }
 
     /**
@@ -914,19 +1156,21 @@ final readonly class MessagesMethods
      */
     public function forwardMessages(AbstractInputPeer|string|int $fromPeer, array $id, AbstractInputPeer|string|int $toPeer, ?bool $silent = null, ?bool $background = null, ?bool $withMyScore = null, ?bool $dropAuthor = null, ?bool $dropMediaCaptions = null, ?bool $noforwards = null, ?bool $allowPaidFloodskip = null, ?array $randomId = null, ?int $topMsgId = null, ?AbstractInputReplyTo $replyTo = null, ?int $scheduleDate = null, ?int $scheduleRepeatPeriod = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $videoTimestamp = null, ?int $allowPaidStars = null, ?SuggestedPost $suggestedPost = null): ?AbstractUpdates
     {
-        if (is_string($fromPeer) || is_int($fromPeer)) {
-            $fromPeer = $this->client->peerManager->resolve($fromPeer);
+        return $this->forwardMessagesAsync(fromPeer: $fromPeer, id: $id, toPeer: $toPeer, silent: $silent, background: $background, withMyScore: $withMyScore, dropAuthor: $dropAuthor, dropMediaCaptions: $dropMediaCaptions, noforwards: $noforwards, allowPaidFloodskip: $allowPaidFloodskip, randomId: $randomId, topMsgId: $topMsgId, replyTo: $replyTo, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, videoTimestamp: $videoTimestamp, allowPaidStars: $allowPaidStars, suggestedPost: $suggestedPost)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.reportSpam
+     * @api
+     */
+    public function reportSpamAsync(AbstractInputPeer|string|int $peer): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
         }
-        if (is_string($toPeer) || is_int($toPeer)) {
-            $toPeer = $this->client->peerManager->resolve($toPeer);
-        }
-        if (is_string($sendAs) || is_int($sendAs)) {
-            $sendAs = $this->client->peerManager->resolve($sendAs);
-        }
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new ForwardMessagesRequest(fromPeer: $fromPeer, id: $id, toPeer: $toPeer, silent: $silent, background: $background, withMyScore: $withMyScore, dropAuthor: $dropAuthor, dropMediaCaptions: $dropMediaCaptions, noforwards: $noforwards, allowPaidFloodskip: $allowPaidFloodskip, randomId: $randomId, topMsgId: $topMsgId, replyTo: $replyTo, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, videoTimestamp: $videoTimestamp, allowPaidStars: $allowPaidStars, suggestedPost: $suggestedPost));
+        return $this->client->call(new ReportSpamRequest(peer: $peer));
     }
 
     /**
@@ -937,10 +1181,21 @@ final readonly class MessagesMethods
      */
     public function reportSpam(AbstractInputPeer|string|int $peer): bool
     {
+        return (bool) $this->reportSpamAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<PeerSettings|null>
+     * @see https://core.telegram.org/method/messages.getPeerSettings
+     * @api
+     */
+    public function getPeerSettingsAsync(AbstractInputPeer|string|int $peer): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new ReportSpamRequest(peer: $peer));
+        return $this->client->call(new GetPeerSettingsRequest(peer: $peer));
     }
 
     /**
@@ -951,10 +1206,24 @@ final readonly class MessagesMethods
      */
     public function getPeerSettings(AbstractInputPeer|string|int $peer): ?PeerSettings
     {
+        return $this->getPeerSettingsAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $id
+     * @param string $option
+     * @param string $message
+     * @return Future<ReportResultChooseOption|ReportResultAddComment|ReportResultReported|null>
+     * @see https://core.telegram.org/method/messages.report
+     * @api
+     */
+    public function reportAsync(AbstractInputPeer|string|int $peer, array $id, string $option, string $message): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetPeerSettingsRequest(peer: $peer));
+        return $this->client->call(new ReportRequest(peer: $peer, id: $id, option: $option, message: $message));
     }
 
     /**
@@ -968,10 +1237,18 @@ final readonly class MessagesMethods
      */
     public function report(AbstractInputPeer|string|int $peer, array $id, string $option, string $message): ?AbstractReportResult
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new ReportRequest(peer: $peer, id: $id, option: $option, message: $message));
+        return $this->reportAsync(peer: $peer, id: $id, option: $option, message: $message)->await();
+    }
+
+    /**
+     * @param list<int> $id
+     * @return Future<Chats|ChatsSlice|null>
+     * @see https://core.telegram.org/method/messages.getChats
+     * @api
+     */
+    public function getChatsAsync(array $id): Future
+    {
+        return $this->client->call(new GetChatsRequest(id: $id));
     }
 
     /**
@@ -982,7 +1259,18 @@ final readonly class MessagesMethods
      */
     public function getChats(array $id): ?AbstractChats
     {
-        return $this->client->callSync(new GetChatsRequest(id: $id));
+        return $this->getChatsAsync(id: $id)->await();
+    }
+
+    /**
+     * @param int $chatId
+     * @return Future<ChatFull|null>
+     * @see https://core.telegram.org/method/messages.getFullChat
+     * @api
+     */
+    public function getFullChatAsync(int $chatId): Future
+    {
+        return $this->client->call(new GetFullChatRequest(chatId: $chatId));
     }
 
     /**
@@ -993,7 +1281,19 @@ final readonly class MessagesMethods
      */
     public function getFullChat(int $chatId): ?ChatFull
     {
-        return $this->client->callSync(new GetFullChatRequest(chatId: $chatId));
+        return $this->getFullChatAsync(chatId: $chatId)->await();
+    }
+
+    /**
+     * @param int $chatId
+     * @param string $title
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.editChatTitle
+     * @api
+     */
+    public function editChatTitleAsync(int $chatId, string $title): Future
+    {
+        return $this->client->call(new EditChatTitleRequest(chatId: $chatId, title: $title));
     }
 
     /**
@@ -1005,7 +1305,19 @@ final readonly class MessagesMethods
      */
     public function editChatTitle(int $chatId, string $title): ?AbstractUpdates
     {
-        return $this->client->callSync(new EditChatTitleRequest(chatId: $chatId, title: $title));
+        return $this->editChatTitleAsync(chatId: $chatId, title: $title)->await();
+    }
+
+    /**
+     * @param int $chatId
+     * @param InputChatPhotoEmpty|InputChatUploadedPhoto|InputChatPhoto $photo
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.editChatPhoto
+     * @api
+     */
+    public function editChatPhotoAsync(int $chatId, AbstractInputChatPhoto $photo): Future
+    {
+        return $this->client->call(new EditChatPhotoRequest(chatId: $chatId, photo: $photo));
     }
 
     /**
@@ -1017,7 +1329,28 @@ final readonly class MessagesMethods
      */
     public function editChatPhoto(int $chatId, AbstractInputChatPhoto $photo): ?AbstractUpdates
     {
-        return $this->client->callSync(new EditChatPhotoRequest(chatId: $chatId, photo: $photo));
+        return $this->editChatPhotoAsync(chatId: $chatId, photo: $photo)->await();
+    }
+
+    /**
+     * @param int $chatId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param int $fwdLimit
+     * @return Future<InvitedUsers|null>
+     * @see https://core.telegram.org/method/messages.addChatUser
+     * @api
+     */
+    public function addChatUserAsync(int $chatId, AbstractInputUser|string|int $userId, int $fwdLimit): Future
+    {
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new AddChatUserRequest(chatId: $chatId, userId: $userId, fwdLimit: $fwdLimit));
     }
 
     /**
@@ -1030,6 +1363,19 @@ final readonly class MessagesMethods
      */
     public function addChatUser(int $chatId, AbstractInputUser|string|int $userId, int $fwdLimit): ?InvitedUsers
     {
+        return $this->addChatUserAsync(chatId: $chatId, userId: $userId, fwdLimit: $fwdLimit)->await();
+    }
+
+    /**
+     * @param int $chatId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param bool|null $revokeHistory
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.deleteChatUser
+     * @api
+     */
+    public function deleteChatUserAsync(int $chatId, AbstractInputUser|string|int $userId, ?bool $revokeHistory = null): Future
+    {
         if (is_string($userId) || is_int($userId)) {
             $__tmpPeer = $this->client->peerManager->resolve($userId);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -1038,7 +1384,7 @@ final readonly class MessagesMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new AddChatUserRequest(chatId: $chatId, userId: $userId, fwdLimit: $fwdLimit));
+        return $this->client->call(new DeleteChatUserRequest(chatId: $chatId, userId: $userId, revokeHistory: $revokeHistory));
     }
 
     /**
@@ -1051,15 +1397,20 @@ final readonly class MessagesMethods
      */
     public function deleteChatUser(int $chatId, AbstractInputUser|string|int $userId, ?bool $revokeHistory = null): ?AbstractUpdates
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $userId = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new DeleteChatUserRequest(chatId: $chatId, userId: $userId, revokeHistory: $revokeHistory));
+        return $this->deleteChatUserAsync(chatId: $chatId, userId: $userId, revokeHistory: $revokeHistory)->await();
+    }
+
+    /**
+     * @param list<InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage> $users
+     * @param string $title
+     * @param int|null $ttlPeriod
+     * @return Future<InvitedUsers|null>
+     * @see https://core.telegram.org/method/messages.createChat
+     * @api
+     */
+    public function createChatAsync(array $users, string $title, ?int $ttlPeriod = null): Future
+    {
+        return $this->client->call(new CreateChatRequest(users: $users, title: $title, ttlPeriod: $ttlPeriod));
     }
 
     /**
@@ -1072,7 +1423,19 @@ final readonly class MessagesMethods
      */
     public function createChat(array $users, string $title, ?int $ttlPeriod = null): ?InvitedUsers
     {
-        return $this->client->callSync(new CreateChatRequest(users: $users, title: $title, ttlPeriod: $ttlPeriod));
+        return $this->createChatAsync(users: $users, title: $title, ttlPeriod: $ttlPeriod)->await();
+    }
+
+    /**
+     * @param int $version
+     * @param int $randomLength
+     * @return Future<DhConfigNotModified|DhConfig|null>
+     * @see https://core.telegram.org/method/messages.getDhConfig
+     * @api
+     */
+    public function getDhConfigAsync(int $version, int $randomLength): Future
+    {
+        return $this->client->call(new GetDhConfigRequest(version: $version, randomLength: $randomLength));
     }
 
     /**
@@ -1084,18 +1447,18 @@ final readonly class MessagesMethods
      */
     public function getDhConfig(int $version, int $randomLength): ?AbstractDhConfig
     {
-        return $this->client->callSync(new GetDhConfigRequest(version: $version, randomLength: $randomLength));
+        return $this->getDhConfigAsync(version: $version, randomLength: $randomLength)->await();
     }
 
     /**
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param string $gA
      * @param int|null $randomId
-     * @return EncryptedChatEmpty|EncryptedChatWaiting|EncryptedChatRequested|EncryptedChat|EncryptedChatDiscarded|null
+     * @return Future<EncryptedChatEmpty|EncryptedChatWaiting|EncryptedChatRequested|EncryptedChat|EncryptedChatDiscarded|null>
      * @see https://core.telegram.org/method/messages.requestEncryption
      * @api
      */
-    public function requestEncryption(AbstractInputUser|string|int $userId, string $gA, ?int $randomId = null): ?AbstractEncryptedChat
+    public function requestEncryptionAsync(AbstractInputUser|string|int $userId, string $gA, ?int $randomId = null): Future
     {
         if (is_string($userId) || is_int($userId)) {
             $__tmpPeer = $this->client->peerManager->resolve($userId);
@@ -1108,7 +1471,33 @@ final readonly class MessagesMethods
         if ($randomId === null) {
             $randomId = random_int(0, 9223372036854775807);
         }
-        return $this->client->callSync(new RequestEncryptionRequest(userId: $userId, gA: $gA, randomId: $randomId));
+        return $this->client->call(new RequestEncryptionRequest(userId: $userId, gA: $gA, randomId: $randomId));
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param string $gA
+     * @param int|null $randomId
+     * @return EncryptedChatEmpty|EncryptedChatWaiting|EncryptedChatRequested|EncryptedChat|EncryptedChatDiscarded|null
+     * @see https://core.telegram.org/method/messages.requestEncryption
+     * @api
+     */
+    public function requestEncryption(AbstractInputUser|string|int $userId, string $gA, ?int $randomId = null): ?AbstractEncryptedChat
+    {
+        return $this->requestEncryptionAsync(userId: $userId, gA: $gA, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param InputEncryptedChat $peer
+     * @param string $gB
+     * @param int $keyFingerprint
+     * @return Future<EncryptedChatEmpty|EncryptedChatWaiting|EncryptedChatRequested|EncryptedChat|EncryptedChatDiscarded|null>
+     * @see https://core.telegram.org/method/messages.acceptEncryption
+     * @api
+     */
+    public function acceptEncryptionAsync(InputEncryptedChat $peer, string $gB, int $keyFingerprint): Future
+    {
+        return $this->client->call(new AcceptEncryptionRequest(peer: $peer, gB: $gB, keyFingerprint: $keyFingerprint));
     }
 
     /**
@@ -1121,7 +1510,19 @@ final readonly class MessagesMethods
      */
     public function acceptEncryption(InputEncryptedChat $peer, string $gB, int $keyFingerprint): ?AbstractEncryptedChat
     {
-        return $this->client->callSync(new AcceptEncryptionRequest(peer: $peer, gB: $gB, keyFingerprint: $keyFingerprint));
+        return $this->acceptEncryptionAsync(peer: $peer, gB: $gB, keyFingerprint: $keyFingerprint)->await();
+    }
+
+    /**
+     * @param int $chatId
+     * @param bool|null $deleteHistory
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.discardEncryption
+     * @api
+     */
+    public function discardEncryptionAsync(int $chatId, ?bool $deleteHistory = null): Future
+    {
+        return $this->client->call(new DiscardEncryptionRequest(chatId: $chatId, deleteHistory: $deleteHistory));
     }
 
     /**
@@ -1133,7 +1534,19 @@ final readonly class MessagesMethods
      */
     public function discardEncryption(int $chatId, ?bool $deleteHistory = null): bool
     {
-        return (bool) $this->client->callSync(new DiscardEncryptionRequest(chatId: $chatId, deleteHistory: $deleteHistory));
+        return (bool) $this->discardEncryptionAsync(chatId: $chatId, deleteHistory: $deleteHistory)->await();
+    }
+
+    /**
+     * @param InputEncryptedChat $peer
+     * @param bool $typing
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.setEncryptedTyping
+     * @api
+     */
+    public function setEncryptedTypingAsync(InputEncryptedChat $peer, bool $typing): Future
+    {
+        return $this->client->call(new SetEncryptedTypingRequest(peer: $peer, typing: $typing));
     }
 
     /**
@@ -1145,7 +1558,19 @@ final readonly class MessagesMethods
      */
     public function setEncryptedTyping(InputEncryptedChat $peer, bool $typing): bool
     {
-        return (bool) $this->client->callSync(new SetEncryptedTypingRequest(peer: $peer, typing: $typing));
+        return (bool) $this->setEncryptedTypingAsync(peer: $peer, typing: $typing)->await();
+    }
+
+    /**
+     * @param InputEncryptedChat $peer
+     * @param int $maxDate
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.readEncryptedHistory
+     * @api
+     */
+    public function readEncryptedHistoryAsync(InputEncryptedChat $peer, int $maxDate): Future
+    {
+        return $this->client->call(new ReadEncryptedHistoryRequest(peer: $peer, maxDate: $maxDate));
     }
 
     /**
@@ -1157,7 +1582,24 @@ final readonly class MessagesMethods
      */
     public function readEncryptedHistory(InputEncryptedChat $peer, int $maxDate): bool
     {
-        return (bool) $this->client->callSync(new ReadEncryptedHistoryRequest(peer: $peer, maxDate: $maxDate));
+        return (bool) $this->readEncryptedHistoryAsync(peer: $peer, maxDate: $maxDate)->await();
+    }
+
+    /**
+     * @param InputEncryptedChat $peer
+     * @param string $data
+     * @param bool|null $silent
+     * @param int|null $randomId
+     * @return Future<SentEncryptedMessage|SentEncryptedFile|null>
+     * @see https://core.telegram.org/method/messages.sendEncrypted
+     * @api
+     */
+    public function sendEncryptedAsync(InputEncryptedChat $peer, string $data, ?bool $silent = null, ?int $randomId = null): Future
+    {
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->call(new SendEncryptedRequest(peer: $peer, data: $data, silent: $silent, randomId: $randomId));
     }
 
     /**
@@ -1171,10 +1613,25 @@ final readonly class MessagesMethods
      */
     public function sendEncrypted(InputEncryptedChat $peer, string $data, ?bool $silent = null, ?int $randomId = null): ?AbstractSentEncryptedMessage
     {
+        return $this->sendEncryptedAsync(peer: $peer, data: $data, silent: $silent, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param InputEncryptedChat $peer
+     * @param string $data
+     * @param InputEncryptedFileEmpty|InputEncryptedFileUploaded|InputEncryptedFile|InputEncryptedFileBigUploaded $file
+     * @param bool|null $silent
+     * @param int|null $randomId
+     * @return Future<SentEncryptedMessage|SentEncryptedFile|null>
+     * @see https://core.telegram.org/method/messages.sendEncryptedFile
+     * @api
+     */
+    public function sendEncryptedFileAsync(InputEncryptedChat $peer, string $data, AbstractInputEncryptedFile $file, ?bool $silent = null, ?int $randomId = null): Future
+    {
         if ($randomId === null) {
             $randomId = random_int(0, 9223372036854775807);
         }
-        return $this->client->callSync(new SendEncryptedRequest(peer: $peer, data: $data, silent: $silent, randomId: $randomId));
+        return $this->client->call(new SendEncryptedFileRequest(peer: $peer, data: $data, file: $file, silent: $silent, randomId: $randomId));
     }
 
     /**
@@ -1189,10 +1646,23 @@ final readonly class MessagesMethods
      */
     public function sendEncryptedFile(InputEncryptedChat $peer, string $data, AbstractInputEncryptedFile $file, ?bool $silent = null, ?int $randomId = null): ?AbstractSentEncryptedMessage
     {
+        return $this->sendEncryptedFileAsync(peer: $peer, data: $data, file: $file, silent: $silent, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param InputEncryptedChat $peer
+     * @param string $data
+     * @param int|null $randomId
+     * @return Future<SentEncryptedMessage|SentEncryptedFile|null>
+     * @see https://core.telegram.org/method/messages.sendEncryptedService
+     * @api
+     */
+    public function sendEncryptedServiceAsync(InputEncryptedChat $peer, string $data, ?int $randomId = null): Future
+    {
         if ($randomId === null) {
             $randomId = random_int(0, 9223372036854775807);
         }
-        return $this->client->callSync(new SendEncryptedFileRequest(peer: $peer, data: $data, file: $file, silent: $silent, randomId: $randomId));
+        return $this->client->call(new SendEncryptedServiceRequest(peer: $peer, data: $data, randomId: $randomId));
     }
 
     /**
@@ -1205,10 +1675,18 @@ final readonly class MessagesMethods
      */
     public function sendEncryptedService(InputEncryptedChat $peer, string $data, ?int $randomId = null): ?AbstractSentEncryptedMessage
     {
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new SendEncryptedServiceRequest(peer: $peer, data: $data, randomId: $randomId));
+        return $this->sendEncryptedServiceAsync(peer: $peer, data: $data, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param int $maxQts
+     * @return Future<list<int>>
+     * @see https://core.telegram.org/method/messages.receivedQueue
+     * @api
+     */
+    public function receivedQueueAsync(int $maxQts): Future
+    {
+        return $this->client->call(new ReceivedQueueRequest(maxQts: $maxQts));
     }
 
     /**
@@ -1219,7 +1697,18 @@ final readonly class MessagesMethods
      */
     public function receivedQueue(int $maxQts): array
     {
-        return $this->client->callSync(new ReceivedQueueRequest(maxQts: $maxQts));
+        return $this->receivedQueueAsync(maxQts: $maxQts)->await();
+    }
+
+    /**
+     * @param InputEncryptedChat $peer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.reportEncryptedSpam
+     * @api
+     */
+    public function reportEncryptedSpamAsync(InputEncryptedChat $peer): Future
+    {
+        return $this->client->call(new ReportEncryptedSpamRequest(peer: $peer));
     }
 
     /**
@@ -1230,7 +1719,18 @@ final readonly class MessagesMethods
      */
     public function reportEncryptedSpam(InputEncryptedChat $peer): bool
     {
-        return (bool) $this->client->callSync(new ReportEncryptedSpamRequest(peer: $peer));
+        return (bool) $this->reportEncryptedSpamAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param list<int> $id
+     * @return Future<AffectedMessages|null>
+     * @see https://core.telegram.org/method/messages.readMessageContents
+     * @api
+     */
+    public function readMessageContentsAsync(array $id): Future
+    {
+        return $this->client->call(new ReadMessageContentsRequest(id: $id));
     }
 
     /**
@@ -1241,7 +1741,19 @@ final readonly class MessagesMethods
      */
     public function readMessageContents(array $id): ?AffectedMessages
     {
-        return $this->client->callSync(new ReadMessageContentsRequest(id: $id));
+        return $this->readMessageContentsAsync(id: $id)->await();
+    }
+
+    /**
+     * @param string $emoticon
+     * @param int $hash
+     * @return Future<StickersNotModified|Stickers|null>
+     * @see https://core.telegram.org/method/messages.getStickers
+     * @api
+     */
+    public function getStickersAsync(string $emoticon, int $hash): Future
+    {
+        return $this->client->call(new GetStickersRequest(emoticon: $emoticon, hash: $hash));
     }
 
     /**
@@ -1253,7 +1765,18 @@ final readonly class MessagesMethods
      */
     public function getStickers(string $emoticon, int $hash): ?AbstractStickers
     {
-        return $this->client->callSync(new GetStickersRequest(emoticon: $emoticon, hash: $hash));
+        return $this->getStickersAsync(emoticon: $emoticon, hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<AllStickersNotModified|AllStickers|null>
+     * @see https://core.telegram.org/method/messages.getAllStickers
+     * @api
+     */
+    public function getAllStickersAsync(int $hash): Future
+    {
+        return $this->client->call(new GetAllStickersRequest(hash: $hash));
     }
 
     /**
@@ -1264,7 +1787,19 @@ final readonly class MessagesMethods
      */
     public function getAllStickers(int $hash): ?AbstractAllStickers
     {
-        return $this->client->callSync(new GetAllStickersRequest(hash: $hash));
+        return $this->getAllStickersAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param string $message
+     * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
+     * @return Future<WebPagePreview|null>
+     * @see https://core.telegram.org/method/messages.getWebPagePreview
+     * @api
+     */
+    public function getWebPagePreviewAsync(string $message, ?array $entities = null): Future
+    {
+        return $this->client->call(new GetWebPagePreviewRequest(message: $message, entities: $entities));
     }
 
     /**
@@ -1276,7 +1811,27 @@ final readonly class MessagesMethods
      */
     public function getWebPagePreview(string $message, ?array $entities = null): ?WebPagePreview
     {
-        return $this->client->callSync(new GetWebPagePreviewRequest(message: $message, entities: $entities));
+        return $this->getWebPagePreviewAsync(message: $message, entities: $entities)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool|null $legacyRevokePermanent
+     * @param bool|null $requestNeeded
+     * @param int|null $expireDate
+     * @param int|null $usageLimit
+     * @param string|null $title
+     * @param StarsSubscriptionPricing|null $subscriptionPricing
+     * @return Future<ChatInviteExported|ChatInvitePublicJoinRequests|null>
+     * @see https://core.telegram.org/method/messages.exportChatInvite
+     * @api
+     */
+    public function exportChatInviteAsync(AbstractInputPeer|string|int $peer, ?bool $legacyRevokePermanent = null, ?bool $requestNeeded = null, ?int $expireDate = null, ?int $usageLimit = null, ?string $title = null, ?StarsSubscriptionPricing $subscriptionPricing = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new ExportChatInviteRequest(peer: $peer, legacyRevokePermanent: $legacyRevokePermanent, requestNeeded: $requestNeeded, expireDate: $expireDate, usageLimit: $usageLimit, title: $title, subscriptionPricing: $subscriptionPricing));
     }
 
     /**
@@ -1293,10 +1848,18 @@ final readonly class MessagesMethods
      */
     public function exportChatInvite(AbstractInputPeer|string|int $peer, ?bool $legacyRevokePermanent = null, ?bool $requestNeeded = null, ?int $expireDate = null, ?int $usageLimit = null, ?string $title = null, ?StarsSubscriptionPricing $subscriptionPricing = null): ?AbstractExportedChatInvite
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new ExportChatInviteRequest(peer: $peer, legacyRevokePermanent: $legacyRevokePermanent, requestNeeded: $requestNeeded, expireDate: $expireDate, usageLimit: $usageLimit, title: $title, subscriptionPricing: $subscriptionPricing));
+        return $this->exportChatInviteAsync(peer: $peer, legacyRevokePermanent: $legacyRevokePermanent, requestNeeded: $requestNeeded, expireDate: $expireDate, usageLimit: $usageLimit, title: $title, subscriptionPricing: $subscriptionPricing)->await();
+    }
+
+    /**
+     * @param string $hash
+     * @return Future<ChatInviteAlready|ChatInvite|ChatInvitePeek|null>
+     * @see https://core.telegram.org/method/messages.checkChatInvite
+     * @api
+     */
+    public function checkChatInviteAsync(string $hash): Future
+    {
+        return $this->client->call(new CheckChatInviteRequest(hash: $hash));
     }
 
     /**
@@ -1307,7 +1870,18 @@ final readonly class MessagesMethods
      */
     public function checkChatInvite(string $hash): ?AbstractChatInvite
     {
-        return $this->client->callSync(new CheckChatInviteRequest(hash: $hash));
+        return $this->checkChatInviteAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param string $hash
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.importChatInvite
+     * @api
+     */
+    public function importChatInviteAsync(string $hash): Future
+    {
+        return $this->client->call(new ImportChatInviteRequest(hash: $hash));
     }
 
     /**
@@ -1318,7 +1892,19 @@ final readonly class MessagesMethods
      */
     public function importChatInvite(string $hash): ?AbstractUpdates
     {
-        return $this->client->callSync(new ImportChatInviteRequest(hash: $hash));
+        return $this->importChatInviteAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
+     * @param int $hash
+     * @return Future<StickerSet|StickerSetNotModified|null>
+     * @see https://core.telegram.org/method/messages.getStickerSet
+     * @api
+     */
+    public function getStickerSetAsync(AbstractInputStickerSet $stickerset, int $hash): Future
+    {
+        return $this->client->call(new GetStickerSetRequest(stickerset: $stickerset, hash: $hash));
     }
 
     /**
@@ -1330,7 +1916,19 @@ final readonly class MessagesMethods
      */
     public function getStickerSet(AbstractInputStickerSet $stickerset, int $hash): ?AbstractStickerSet
     {
-        return $this->client->callSync(new GetStickerSetRequest(stickerset: $stickerset, hash: $hash));
+        return $this->getStickerSetAsync(stickerset: $stickerset, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
+     * @param bool $archived
+     * @return Future<StickerSetInstallResultSuccess|StickerSetInstallResultArchive|null>
+     * @see https://core.telegram.org/method/messages.installStickerSet
+     * @api
+     */
+    public function installStickerSetAsync(AbstractInputStickerSet $stickerset, bool $archived): Future
+    {
+        return $this->client->call(new InstallStickerSetRequest(stickerset: $stickerset, archived: $archived));
     }
 
     /**
@@ -1342,7 +1940,18 @@ final readonly class MessagesMethods
      */
     public function installStickerSet(AbstractInputStickerSet $stickerset, bool $archived): ?AbstractStickerSetInstallResult
     {
-        return $this->client->callSync(new InstallStickerSetRequest(stickerset: $stickerset, archived: $archived));
+        return $this->installStickerSetAsync(stickerset: $stickerset, archived: $archived)->await();
+    }
+
+    /**
+     * @param InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts $stickerset
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.uninstallStickerSet
+     * @api
+     */
+    public function uninstallStickerSetAsync(AbstractInputStickerSet $stickerset): Future
+    {
+        return $this->client->call(new UninstallStickerSetRequest(stickerset: $stickerset));
     }
 
     /**
@@ -1353,7 +1962,7 @@ final readonly class MessagesMethods
      */
     public function uninstallStickerSet(AbstractInputStickerSet $stickerset): bool
     {
-        return (bool) $this->client->callSync(new UninstallStickerSetRequest(stickerset: $stickerset));
+        return (bool) $this->uninstallStickerSetAsync(stickerset: $stickerset)->await();
     }
 
     /**
@@ -1361,11 +1970,11 @@ final readonly class MessagesMethods
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param string $startParam
      * @param int|null $randomId
-     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
      * @see https://core.telegram.org/method/messages.startBot
      * @api
      */
-    public function startBot(AbstractInputUser|string|int $bot, AbstractInputPeer|string|int $peer, string $startParam, ?int $randomId = null): ?AbstractUpdates
+    public function startBotAsync(AbstractInputUser|string|int $bot, AbstractInputPeer|string|int $peer, string $startParam, ?int $randomId = null): Future
     {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
@@ -1381,7 +1990,37 @@ final readonly class MessagesMethods
         if ($randomId === null) {
             $randomId = random_int(0, 9223372036854775807);
         }
-        return $this->client->callSync(new StartBotRequest(bot: $bot, peer: $peer, startParam: $startParam, randomId: $randomId));
+        return $this->client->call(new StartBotRequest(bot: $bot, peer: $peer, startParam: $startParam, randomId: $randomId));
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $startParam
+     * @param int|null $randomId
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/messages.startBot
+     * @api
+     */
+    public function startBot(AbstractInputUser|string|int $bot, AbstractInputPeer|string|int $peer, string $startParam, ?int $randomId = null): ?AbstractUpdates
+    {
+        return $this->startBotAsync(bot: $bot, peer: $peer, startParam: $startParam, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $id
+     * @param bool $increment
+     * @return Future<MessageViews|null>
+     * @see https://core.telegram.org/method/messages.getMessagesViews
+     * @api
+     */
+    public function getMessagesViewsAsync(AbstractInputPeer|string|int $peer, array $id, bool $increment): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetMessagesViewsRequest(peer: $peer, id: $id, increment: $increment));
     }
 
     /**
@@ -1394,10 +2033,28 @@ final readonly class MessagesMethods
      */
     public function getMessagesViews(AbstractInputPeer|string|int $peer, array $id, bool $increment): ?MessageViews
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
+        return $this->getMessagesViewsAsync(peer: $peer, id: $id, increment: $increment)->await();
+    }
+
+    /**
+     * @param int $chatId
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param bool $isAdmin
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.editChatAdmin
+     * @api
+     */
+    public function editChatAdminAsync(int $chatId, AbstractInputUser|string|int $userId, bool $isAdmin): Future
+    {
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
         }
-        return $this->client->callSync(new GetMessagesViewsRequest(peer: $peer, id: $id, increment: $increment));
+        return $this->client->call(new EditChatAdminRequest(chatId: $chatId, userId: $userId, isAdmin: $isAdmin));
     }
 
     /**
@@ -1410,15 +2067,18 @@ final readonly class MessagesMethods
      */
     public function editChatAdmin(int $chatId, AbstractInputUser|string|int $userId, bool $isAdmin): bool
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $userId = $__tmpPeer;
-            }
-        }
-        return (bool) $this->client->callSync(new EditChatAdminRequest(chatId: $chatId, userId: $userId, isAdmin: $isAdmin));
+        return (bool) $this->editChatAdminAsync(chatId: $chatId, userId: $userId, isAdmin: $isAdmin)->await();
+    }
+
+    /**
+     * @param int $chatId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.migrateChat
+     * @api
+     */
+    public function migrateChatAsync(int $chatId): Future
+    {
+        return $this->client->call(new MigrateChatRequest(chatId: $chatId));
     }
 
     /**
@@ -1429,7 +2089,32 @@ final readonly class MessagesMethods
      */
     public function migrateChat(int $chatId): ?AbstractUpdates
     {
-        return $this->client->callSync(new MigrateChatRequest(chatId: $chatId));
+        return $this->migrateChatAsync(chatId: $chatId)->await();
+    }
+
+    /**
+     * @param string $q
+     * @param InputMessagesFilterEmpty|InputMessagesFilterPhotos|InputMessagesFilterVideo|InputMessagesFilterPhotoVideo|InputMessagesFilterDocument|InputMessagesFilterUrl|InputMessagesFilterGif|InputMessagesFilterVoice|InputMessagesFilterMusic|InputMessagesFilterChatPhotos|InputMessagesFilterPhoneCalls|InputMessagesFilterRoundVoice|InputMessagesFilterRoundVideo|InputMessagesFilterMyMentions|InputMessagesFilterGeo|InputMessagesFilterContacts|InputMessagesFilterPinned $filter
+     * @param int $minDate
+     * @param int $maxDate
+     * @param int $offsetRate
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $offsetPeer
+     * @param int $offsetId
+     * @param int $limit
+     * @param bool|null $broadcastsOnly
+     * @param bool|null $groupsOnly
+     * @param bool|null $usersOnly
+     * @param int|null $folderId
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.searchGlobal
+     * @api
+     */
+    public function searchGlobalAsync(string $q, AbstractMessagesFilter $filter, int $minDate, int $maxDate, int $offsetRate, AbstractInputPeer|string|int $offsetPeer, int $offsetId, int $limit, ?bool $broadcastsOnly = null, ?bool $groupsOnly = null, ?bool $usersOnly = null, ?int $folderId = null): Future
+    {
+        if (is_string($offsetPeer) || is_int($offsetPeer)) {
+            $offsetPeer = $this->client->peerManager->resolve($offsetPeer);
+        }
+        return $this->client->call(new SearchGlobalRequest(q: $q, filter: $filter, minDate: $minDate, maxDate: $maxDate, offsetRate: $offsetRate, offsetPeer: $offsetPeer, offsetId: $offsetId, limit: $limit, broadcastsOnly: $broadcastsOnly, groupsOnly: $groupsOnly, usersOnly: $usersOnly, folderId: $folderId));
     }
 
     /**
@@ -1451,10 +2136,20 @@ final readonly class MessagesMethods
      */
     public function searchGlobal(string $q, AbstractMessagesFilter $filter, int $minDate, int $maxDate, int $offsetRate, AbstractInputPeer|string|int $offsetPeer, int $offsetId, int $limit, ?bool $broadcastsOnly = null, ?bool $groupsOnly = null, ?bool $usersOnly = null, ?int $folderId = null): ?AbstractMessages
     {
-        if (is_string($offsetPeer) || is_int($offsetPeer)) {
-            $offsetPeer = $this->client->peerManager->resolve($offsetPeer);
-        }
-        return $this->client->callSync(new SearchGlobalRequest(q: $q, filter: $filter, minDate: $minDate, maxDate: $maxDate, offsetRate: $offsetRate, offsetPeer: $offsetPeer, offsetId: $offsetId, limit: $limit, broadcastsOnly: $broadcastsOnly, groupsOnly: $groupsOnly, usersOnly: $usersOnly, folderId: $folderId));
+        return $this->searchGlobalAsync(q: $q, filter: $filter, minDate: $minDate, maxDate: $maxDate, offsetRate: $offsetRate, offsetPeer: $offsetPeer, offsetId: $offsetId, limit: $limit, broadcastsOnly: $broadcastsOnly, groupsOnly: $groupsOnly, usersOnly: $usersOnly, folderId: $folderId)->await();
+    }
+
+    /**
+     * @param list<int> $order
+     * @param bool|null $masks
+     * @param bool|null $emojis
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.reorderStickerSets
+     * @api
+     */
+    public function reorderStickerSetsAsync(array $order, ?bool $masks = null, ?bool $emojis = null): Future
+    {
+        return $this->client->call(new ReorderStickerSetsRequest(order: $order, masks: $masks, emojis: $emojis));
     }
 
     /**
@@ -1467,7 +2162,20 @@ final readonly class MessagesMethods
      */
     public function reorderStickerSets(array $order, ?bool $masks = null, ?bool $emojis = null): bool
     {
-        return (bool) $this->client->callSync(new ReorderStickerSetsRequest(order: $order, masks: $masks, emojis: $emojis));
+        return (bool) $this->reorderStickerSetsAsync(order: $order, masks: $masks, emojis: $emojis)->await();
+    }
+
+    /**
+     * @param string $sha256
+     * @param int $size
+     * @param string $mimeType
+     * @return Future<DocumentEmpty|Document|null>
+     * @see https://core.telegram.org/method/messages.getDocumentByHash
+     * @api
+     */
+    public function getDocumentByHashAsync(string $sha256, int $size, string $mimeType): Future
+    {
+        return $this->client->call(new GetDocumentByHashRequest(sha256: $sha256, size: $size, mimeType: $mimeType));
     }
 
     /**
@@ -1480,7 +2188,18 @@ final readonly class MessagesMethods
      */
     public function getDocumentByHash(string $sha256, int $size, string $mimeType): ?AbstractDocument
     {
-        return $this->client->callSync(new GetDocumentByHashRequest(sha256: $sha256, size: $size, mimeType: $mimeType));
+        return $this->getDocumentByHashAsync(sha256: $sha256, size: $size, mimeType: $mimeType)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<SavedGifsNotModified|SavedGifs|null>
+     * @see https://core.telegram.org/method/messages.getSavedGifs
+     * @api
+     */
+    public function getSavedGifsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetSavedGifsRequest(hash: $hash));
     }
 
     /**
@@ -1491,7 +2210,19 @@ final readonly class MessagesMethods
      */
     public function getSavedGifs(int $hash): ?AbstractSavedGifs
     {
-        return $this->client->callSync(new GetSavedGifsRequest(hash: $hash));
+        return $this->getSavedGifsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputDocumentEmpty|InputDocument $id
+     * @param bool $unsave
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.saveGif
+     * @api
+     */
+    public function saveGifAsync(AbstractInputDocument $id, bool $unsave): Future
+    {
+        return $this->client->call(new SaveGifRequest(id: $id, unsave: $unsave));
     }
 
     /**
@@ -1503,7 +2234,33 @@ final readonly class MessagesMethods
      */
     public function saveGif(AbstractInputDocument $id, bool $unsave): bool
     {
-        return (bool) $this->client->callSync(new SaveGifRequest(id: $id, unsave: $unsave));
+        return (bool) $this->saveGifAsync(id: $id, unsave: $unsave)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $query
+     * @param string $offset
+     * @param InputGeoPointEmpty|InputGeoPoint|null $geoPoint
+     * @return Future<BotResults|null>
+     * @see https://core.telegram.org/method/messages.getInlineBotResults
+     * @api
+     */
+    public function getInlineBotResultsAsync(AbstractInputUser|string|int $bot, AbstractInputPeer|string|int $peer, string $query, string $offset, ?AbstractInputGeoPoint $geoPoint = null): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $bot = $__tmpPeer;
+            }
+        }
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetInlineBotResultsRequest(bot: $bot, peer: $peer, query: $query, offset: $offset, geoPoint: $geoPoint));
     }
 
     /**
@@ -1518,18 +2275,25 @@ final readonly class MessagesMethods
      */
     public function getInlineBotResults(AbstractInputUser|string|int $bot, AbstractInputPeer|string|int $peer, string $query, string $offset, ?AbstractInputGeoPoint $geoPoint = null): ?BotResults
     {
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
-        }
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetInlineBotResultsRequest(bot: $bot, peer: $peer, query: $query, offset: $offset, geoPoint: $geoPoint));
+        return $this->getInlineBotResultsAsync(bot: $bot, peer: $peer, query: $query, offset: $offset, geoPoint: $geoPoint)->await();
+    }
+
+    /**
+     * @param int $queryId
+     * @param list<InputBotInlineResult|InputBotInlineResultPhoto|InputBotInlineResultDocument|InputBotInlineResultGame> $results
+     * @param int $cacheTime
+     * @param bool|null $gallery
+     * @param bool|null $private
+     * @param string|null $nextOffset
+     * @param InlineBotSwitchPM|null $switchPm
+     * @param InlineBotWebView|null $switchWebview
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.setInlineBotResults
+     * @api
+     */
+    public function setInlineBotResultsAsync(int $queryId, array $results, int $cacheTime, ?bool $gallery = null, ?bool $private = null, ?string $nextOffset = null, ?InlineBotSwitchPM $switchPm = null, ?InlineBotWebView $switchWebview = null): Future
+    {
+        return $this->client->call(new SetInlineBotResultsRequest(queryId: $queryId, results: $results, cacheTime: $cacheTime, gallery: $gallery, private: $private, nextOffset: $nextOffset, switchPm: $switchPm, switchWebview: $switchWebview));
     }
 
     /**
@@ -1547,7 +2311,39 @@ final readonly class MessagesMethods
      */
     public function setInlineBotResults(int $queryId, array $results, int $cacheTime, ?bool $gallery = null, ?bool $private = null, ?string $nextOffset = null, ?InlineBotSwitchPM $switchPm = null, ?InlineBotWebView $switchWebview = null): bool
     {
-        return (bool) $this->client->callSync(new SetInlineBotResultsRequest(queryId: $queryId, results: $results, cacheTime: $cacheTime, gallery: $gallery, private: $private, nextOffset: $nextOffset, switchPm: $switchPm, switchWebview: $switchWebview));
+        return (bool) $this->setInlineBotResultsAsync(queryId: $queryId, results: $results, cacheTime: $cacheTime, gallery: $gallery, private: $private, nextOffset: $nextOffset, switchPm: $switchPm, switchWebview: $switchWebview)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $queryId
+     * @param string $id
+     * @param bool|null $silent
+     * @param bool|null $background
+     * @param bool|null $clearDraft
+     * @param bool|null $hideVia
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
+     * @param int|null $randomId
+     * @param int|null $scheduleDate
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
+     * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
+     * @param int|null $allowPaidStars
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendInlineBotResult
+     * @api
+     */
+    public function sendInlineBotResultAsync(AbstractInputPeer|string|int $peer, int $queryId, string $id, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $hideVia = null, ?AbstractInputReplyTo $replyTo = null, ?int $randomId = null, ?int $scheduleDate = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $allowPaidStars = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if (is_string($sendAs) || is_int($sendAs)) {
+            $sendAs = $this->client->peerManager->resolve($sendAs);
+        }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->call(new SendInlineBotResultRequest(peer: $peer, queryId: $queryId, id: $id, silent: $silent, background: $background, clearDraft: $clearDraft, hideVia: $hideVia, replyTo: $replyTo, randomId: $randomId, scheduleDate: $scheduleDate, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, allowPaidStars: $allowPaidStars));
     }
 
     /**
@@ -1570,16 +2366,22 @@ final readonly class MessagesMethods
      */
     public function sendInlineBotResult(AbstractInputPeer|string|int $peer, int $queryId, string $id, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $hideVia = null, ?AbstractInputReplyTo $replyTo = null, ?int $randomId = null, ?int $scheduleDate = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $allowPaidStars = null): ?AbstractUpdates
     {
+        return $this->sendInlineBotResultAsync(peer: $peer, queryId: $queryId, id: $id, silent: $silent, background: $background, clearDraft: $clearDraft, hideVia: $hideVia, replyTo: $replyTo, randomId: $randomId, scheduleDate: $scheduleDate, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, allowPaidStars: $allowPaidStars)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $id
+     * @return Future<MessageEditData|null>
+     * @see https://core.telegram.org/method/messages.getMessageEditData
+     * @api
+     */
+    public function getMessageEditDataAsync(AbstractInputPeer|string|int $peer, int $id): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        if (is_string($sendAs) || is_int($sendAs)) {
-            $sendAs = $this->client->peerManager->resolve($sendAs);
-        }
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new SendInlineBotResultRequest(peer: $peer, queryId: $queryId, id: $id, silent: $silent, background: $background, clearDraft: $clearDraft, hideVia: $hideVia, replyTo: $replyTo, randomId: $randomId, scheduleDate: $scheduleDate, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, allowPaidStars: $allowPaidStars));
+        return $this->client->call(new GetMessageEditDataRequest(peer: $peer, id: $id));
     }
 
     /**
@@ -1591,10 +2393,31 @@ final readonly class MessagesMethods
      */
     public function getMessageEditData(AbstractInputPeer|string|int $peer, int $id): ?MessageEditData
     {
+        return $this->getMessageEditDataAsync(peer: $peer, id: $id)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $id
+     * @param bool|null $noWebpage
+     * @param bool|null $invertMedia
+     * @param string|null $message
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo|null $media
+     * @param ReplyKeyboardHide|ReplyKeyboardForceReply|ReplyKeyboardMarkup|ReplyInlineMarkup|null $replyMarkup
+     * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
+     * @param int|null $scheduleDate
+     * @param int|null $scheduleRepeatPeriod
+     * @param int|null $quickReplyShortcutId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.editMessage
+     * @api
+     */
+    public function editMessageAsync(AbstractInputPeer|string|int $peer, int $id, ?bool $noWebpage = null, ?bool $invertMedia = null, ?string $message = null, ?AbstractInputMedia $media = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?int $scheduleRepeatPeriod = null, ?int $quickReplyShortcutId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetMessageEditDataRequest(peer: $peer, id: $id));
+        return $this->client->call(new EditMessageRequest(peer: $peer, id: $id, noWebpage: $noWebpage, invertMedia: $invertMedia, message: $message, media: $media, replyMarkup: $replyMarkup, entities: $entities, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, quickReplyShortcutId: $quickReplyShortcutId));
     }
 
     /**
@@ -1615,10 +2438,24 @@ final readonly class MessagesMethods
      */
     public function editMessage(AbstractInputPeer|string|int $peer, int $id, ?bool $noWebpage = null, ?bool $invertMedia = null, ?string $message = null, ?AbstractInputMedia $media = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null, ?int $scheduleDate = null, ?int $scheduleRepeatPeriod = null, ?int $quickReplyShortcutId = null): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new EditMessageRequest(peer: $peer, id: $id, noWebpage: $noWebpage, invertMedia: $invertMedia, message: $message, media: $media, replyMarkup: $replyMarkup, entities: $entities, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, quickReplyShortcutId: $quickReplyShortcutId));
+        return $this->editMessageAsync(peer: $peer, id: $id, noWebpage: $noWebpage, invertMedia: $invertMedia, message: $message, media: $media, replyMarkup: $replyMarkup, entities: $entities, scheduleDate: $scheduleDate, scheduleRepeatPeriod: $scheduleRepeatPeriod, quickReplyShortcutId: $quickReplyShortcutId)->await();
+    }
+
+    /**
+     * @param InputBotInlineMessageID|InputBotInlineMessageID64 $id
+     * @param bool|null $noWebpage
+     * @param bool|null $invertMedia
+     * @param string|null $message
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo|null $media
+     * @param ReplyKeyboardHide|ReplyKeyboardForceReply|ReplyKeyboardMarkup|ReplyInlineMarkup|null $replyMarkup
+     * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.editInlineBotMessage
+     * @api
+     */
+    public function editInlineBotMessageAsync(AbstractInputBotInlineMessageID $id, ?bool $noWebpage = null, ?bool $invertMedia = null, ?string $message = null, ?AbstractInputMedia $media = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null): Future
+    {
+        return $this->client->call(new EditInlineBotMessageRequest(id: $id, noWebpage: $noWebpage, invertMedia: $invertMedia, message: $message, media: $media, replyMarkup: $replyMarkup, entities: $entities));
     }
 
     /**
@@ -1635,7 +2472,25 @@ final readonly class MessagesMethods
      */
     public function editInlineBotMessage(AbstractInputBotInlineMessageID $id, ?bool $noWebpage = null, ?bool $invertMedia = null, ?string $message = null, ?AbstractInputMedia $media = null, ?AbstractReplyMarkup $replyMarkup = null, ?array $entities = null): bool
     {
-        return (bool) $this->client->callSync(new EditInlineBotMessageRequest(id: $id, noWebpage: $noWebpage, invertMedia: $invertMedia, message: $message, media: $media, replyMarkup: $replyMarkup, entities: $entities));
+        return (bool) $this->editInlineBotMessageAsync(id: $id, noWebpage: $noWebpage, invertMedia: $invertMedia, message: $message, media: $media, replyMarkup: $replyMarkup, entities: $entities)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param bool|null $game
+     * @param string|null $data
+     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP|null $password
+     * @return Future<BotCallbackAnswer|null>
+     * @see https://core.telegram.org/method/messages.getBotCallbackAnswer
+     * @api
+     */
+    public function getBotCallbackAnswerAsync(AbstractInputPeer|string|int $peer, int $msgId, ?bool $game = null, ?string $data = null, ?AbstractInputCheckPasswordSRP $password = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetBotCallbackAnswerRequest(peer: $peer, msgId: $msgId, game: $game, data: $data, password: $password));
     }
 
     /**
@@ -1650,10 +2505,22 @@ final readonly class MessagesMethods
      */
     public function getBotCallbackAnswer(AbstractInputPeer|string|int $peer, int $msgId, ?bool $game = null, ?string $data = null, ?AbstractInputCheckPasswordSRP $password = null): ?BotCallbackAnswer
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetBotCallbackAnswerRequest(peer: $peer, msgId: $msgId, game: $game, data: $data, password: $password));
+        return $this->getBotCallbackAnswerAsync(peer: $peer, msgId: $msgId, game: $game, data: $data, password: $password)->await();
+    }
+
+    /**
+     * @param int $queryId
+     * @param int $cacheTime
+     * @param bool|null $alert
+     * @param string|null $message
+     * @param string|null $url
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.setBotCallbackAnswer
+     * @api
+     */
+    public function setBotCallbackAnswerAsync(int $queryId, int $cacheTime, ?bool $alert = null, ?string $message = null, ?string $url = null): Future
+    {
+        return $this->client->call(new SetBotCallbackAnswerRequest(queryId: $queryId, cacheTime: $cacheTime, alert: $alert, message: $message, url: $url));
     }
 
     /**
@@ -1668,7 +2535,18 @@ final readonly class MessagesMethods
      */
     public function setBotCallbackAnswer(int $queryId, int $cacheTime, ?bool $alert = null, ?string $message = null, ?string $url = null): bool
     {
-        return (bool) $this->client->callSync(new SetBotCallbackAnswerRequest(queryId: $queryId, cacheTime: $cacheTime, alert: $alert, message: $message, url: $url));
+        return (bool) $this->setBotCallbackAnswerAsync(queryId: $queryId, cacheTime: $cacheTime, alert: $alert, message: $message, url: $url)->await();
+    }
+
+    /**
+     * @param list<InputDialogPeer|InputDialogPeerFolder> $peers
+     * @return Future<PeerDialogs|null>
+     * @see https://core.telegram.org/method/messages.getPeerDialogs
+     * @api
+     */
+    public function getPeerDialogsAsync(array $peers): Future
+    {
+        return $this->client->call(new GetPeerDialogsRequest(peers: $peers));
     }
 
     /**
@@ -1679,7 +2557,29 @@ final readonly class MessagesMethods
      */
     public function getPeerDialogs(array $peers): ?PeerDialogs
     {
-        return $this->client->callSync(new GetPeerDialogsRequest(peers: $peers));
+        return $this->getPeerDialogsAsync(peers: $peers)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $message
+     * @param bool|null $noWebpage
+     * @param bool|null $invertMedia
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
+     * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote>|null $entities
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo|null $media
+     * @param int|null $effect
+     * @param SuggestedPost|null $suggestedPost
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.saveDraft
+     * @api
+     */
+    public function saveDraftAsync(AbstractInputPeer|string|int $peer, string $message, ?bool $noWebpage = null, ?bool $invertMedia = null, ?AbstractInputReplyTo $replyTo = null, ?array $entities = null, ?AbstractInputMedia $media = null, ?int $effect = null, ?SuggestedPost $suggestedPost = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new SaveDraftRequest(peer: $peer, message: $message, noWebpage: $noWebpage, invertMedia: $invertMedia, replyTo: $replyTo, entities: $entities, media: $media, effect: $effect, suggestedPost: $suggestedPost));
     }
 
     /**
@@ -1698,10 +2598,17 @@ final readonly class MessagesMethods
      */
     public function saveDraft(AbstractInputPeer|string|int $peer, string $message, ?bool $noWebpage = null, ?bool $invertMedia = null, ?AbstractInputReplyTo $replyTo = null, ?array $entities = null, ?AbstractInputMedia $media = null, ?int $effect = null, ?SuggestedPost $suggestedPost = null): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new SaveDraftRequest(peer: $peer, message: $message, noWebpage: $noWebpage, invertMedia: $invertMedia, replyTo: $replyTo, entities: $entities, media: $media, effect: $effect, suggestedPost: $suggestedPost));
+        return (bool) $this->saveDraftAsync(peer: $peer, message: $message, noWebpage: $noWebpage, invertMedia: $invertMedia, replyTo: $replyTo, entities: $entities, media: $media, effect: $effect, suggestedPost: $suggestedPost)->await();
+    }
+
+    /**
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.getAllDrafts
+     * @api
+     */
+    public function getAllDraftsAsync(): Future
+    {
+        return $this->client->call(new GetAllDraftsRequest());
     }
 
     /**
@@ -1711,7 +2618,18 @@ final readonly class MessagesMethods
      */
     public function getAllDrafts(): ?AbstractUpdates
     {
-        return $this->client->callSync(new GetAllDraftsRequest());
+        return $this->getAllDraftsAsync()->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<FeaturedStickersNotModified|FeaturedStickers|null>
+     * @see https://core.telegram.org/method/messages.getFeaturedStickers
+     * @api
+     */
+    public function getFeaturedStickersAsync(int $hash): Future
+    {
+        return $this->client->call(new GetFeaturedStickersRequest(hash: $hash));
     }
 
     /**
@@ -1722,7 +2640,18 @@ final readonly class MessagesMethods
      */
     public function getFeaturedStickers(int $hash): ?AbstractFeaturedStickers
     {
-        return $this->client->callSync(new GetFeaturedStickersRequest(hash: $hash));
+        return $this->getFeaturedStickersAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param list<int> $id
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.readFeaturedStickers
+     * @api
+     */
+    public function readFeaturedStickersAsync(array $id): Future
+    {
+        return $this->client->call(new ReadFeaturedStickersRequest(id: $id));
     }
 
     /**
@@ -1733,7 +2662,19 @@ final readonly class MessagesMethods
      */
     public function readFeaturedStickers(array $id): bool
     {
-        return (bool) $this->client->callSync(new ReadFeaturedStickersRequest(id: $id));
+        return (bool) $this->readFeaturedStickersAsync(id: $id)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @param bool|null $attached
+     * @return Future<RecentStickersNotModified|RecentStickers|null>
+     * @see https://core.telegram.org/method/messages.getRecentStickers
+     * @api
+     */
+    public function getRecentStickersAsync(int $hash, ?bool $attached = null): Future
+    {
+        return $this->client->call(new GetRecentStickersRequest(hash: $hash, attached: $attached));
     }
 
     /**
@@ -1745,7 +2686,20 @@ final readonly class MessagesMethods
      */
     public function getRecentStickers(int $hash, ?bool $attached = null): ?AbstractRecentStickers
     {
-        return $this->client->callSync(new GetRecentStickersRequest(hash: $hash, attached: $attached));
+        return $this->getRecentStickersAsync(hash: $hash, attached: $attached)->await();
+    }
+
+    /**
+     * @param InputDocumentEmpty|InputDocument $id
+     * @param bool $unsave
+     * @param bool|null $attached
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.saveRecentSticker
+     * @api
+     */
+    public function saveRecentStickerAsync(AbstractInputDocument $id, bool $unsave, ?bool $attached = null): Future
+    {
+        return $this->client->call(new SaveRecentStickerRequest(id: $id, unsave: $unsave, attached: $attached));
     }
 
     /**
@@ -1758,7 +2712,18 @@ final readonly class MessagesMethods
      */
     public function saveRecentSticker(AbstractInputDocument $id, bool $unsave, ?bool $attached = null): bool
     {
-        return (bool) $this->client->callSync(new SaveRecentStickerRequest(id: $id, unsave: $unsave, attached: $attached));
+        return (bool) $this->saveRecentStickerAsync(id: $id, unsave: $unsave, attached: $attached)->await();
+    }
+
+    /**
+     * @param bool|null $attached
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.clearRecentStickers
+     * @api
+     */
+    public function clearRecentStickersAsync(?bool $attached = null): Future
+    {
+        return $this->client->call(new ClearRecentStickersRequest(attached: $attached));
     }
 
     /**
@@ -1769,7 +2734,21 @@ final readonly class MessagesMethods
      */
     public function clearRecentStickers(?bool $attached = null): bool
     {
-        return (bool) $this->client->callSync(new ClearRecentStickersRequest(attached: $attached));
+        return (bool) $this->clearRecentStickersAsync(attached: $attached)->await();
+    }
+
+    /**
+     * @param int $offsetId
+     * @param int $limit
+     * @param bool|null $masks
+     * @param bool|null $emojis
+     * @return Future<ArchivedStickers|null>
+     * @see https://core.telegram.org/method/messages.getArchivedStickers
+     * @api
+     */
+    public function getArchivedStickersAsync(int $offsetId, int $limit, ?bool $masks = null, ?bool $emojis = null): Future
+    {
+        return $this->client->call(new GetArchivedStickersRequest(offsetId: $offsetId, limit: $limit, masks: $masks, emojis: $emojis));
     }
 
     /**
@@ -1783,7 +2762,18 @@ final readonly class MessagesMethods
      */
     public function getArchivedStickers(int $offsetId, int $limit, ?bool $masks = null, ?bool $emojis = null): ?ArchivedStickers
     {
-        return $this->client->callSync(new GetArchivedStickersRequest(offsetId: $offsetId, limit: $limit, masks: $masks, emojis: $emojis));
+        return $this->getArchivedStickersAsync(offsetId: $offsetId, limit: $limit, masks: $masks, emojis: $emojis)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<AllStickersNotModified|AllStickers|null>
+     * @see https://core.telegram.org/method/messages.getMaskStickers
+     * @api
+     */
+    public function getMaskStickersAsync(int $hash): Future
+    {
+        return $this->client->call(new GetMaskStickersRequest(hash: $hash));
     }
 
     /**
@@ -1794,7 +2784,18 @@ final readonly class MessagesMethods
      */
     public function getMaskStickers(int $hash): ?AbstractAllStickers
     {
-        return $this->client->callSync(new GetMaskStickersRequest(hash: $hash));
+        return $this->getMaskStickersAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputStickeredMediaPhoto|InputStickeredMediaDocument $media
+     * @return Future<list<StickerSetCovered|StickerSetMultiCovered|StickerSetFullCovered|StickerSetNoCovered>>
+     * @see https://core.telegram.org/method/messages.getAttachedStickers
+     * @api
+     */
+    public function getAttachedStickersAsync(AbstractInputStickeredMedia $media): Future
+    {
+        return $this->client->call(new GetAttachedStickersRequest(media: $media));
     }
 
     /**
@@ -1805,7 +2806,34 @@ final readonly class MessagesMethods
      */
     public function getAttachedStickers(AbstractInputStickeredMedia $media): array
     {
-        return $this->client->callSync(new GetAttachedStickersRequest(media: $media));
+        return $this->getAttachedStickersAsync(media: $media)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $id
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param int $score
+     * @param bool|null $editMessage
+     * @param bool|null $force
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.setGameScore
+     * @api
+     */
+    public function setGameScoreAsync(AbstractInputPeer|string|int $peer, int $id, AbstractInputUser|string|int $userId, int $score, ?bool $editMessage = null, ?bool $force = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new SetGameScoreRequest(peer: $peer, id: $id, userId: $userId, score: $score, editMessage: $editMessage, force: $force));
     }
 
     /**
@@ -1821,9 +2849,21 @@ final readonly class MessagesMethods
      */
     public function setGameScore(AbstractInputPeer|string|int $peer, int $id, AbstractInputUser|string|int $userId, int $score, ?bool $editMessage = null, ?bool $force = null): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
+        return $this->setGameScoreAsync(peer: $peer, id: $id, userId: $userId, score: $score, editMessage: $editMessage, force: $force)->await();
+    }
+
+    /**
+     * @param InputBotInlineMessageID|InputBotInlineMessageID64 $id
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param int $score
+     * @param bool|null $editMessage
+     * @param bool|null $force
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.setInlineGameScore
+     * @api
+     */
+    public function setInlineGameScoreAsync(AbstractInputBotInlineMessageID $id, AbstractInputUser|string|int $userId, int $score, ?bool $editMessage = null, ?bool $force = null): Future
+    {
         if (is_string($userId) || is_int($userId)) {
             $__tmpPeer = $this->client->peerManager->resolve($userId);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -1832,7 +2872,7 @@ final readonly class MessagesMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new SetGameScoreRequest(peer: $peer, id: $id, userId: $userId, score: $score, editMessage: $editMessage, force: $force));
+        return $this->client->call(new SetInlineGameScoreRequest(id: $id, userId: $userId, score: $score, editMessage: $editMessage, force: $force));
     }
 
     /**
@@ -1847,6 +2887,22 @@ final readonly class MessagesMethods
      */
     public function setInlineGameScore(AbstractInputBotInlineMessageID $id, AbstractInputUser|string|int $userId, int $score, ?bool $editMessage = null, ?bool $force = null): bool
     {
+        return (bool) $this->setInlineGameScoreAsync(id: $id, userId: $userId, score: $score, editMessage: $editMessage, force: $force)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $id
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @return Future<HighScores|null>
+     * @see https://core.telegram.org/method/messages.getGameHighScores
+     * @api
+     */
+    public function getGameHighScoresAsync(AbstractInputPeer|string|int $peer, int $id, AbstractInputUser|string|int $userId): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         if (is_string($userId) || is_int($userId)) {
             $__tmpPeer = $this->client->peerManager->resolve($userId);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -1855,7 +2911,7 @@ final readonly class MessagesMethods
                 $userId = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new SetInlineGameScoreRequest(id: $id, userId: $userId, score: $score, editMessage: $editMessage, force: $force));
+        return $this->client->call(new GetGameHighScoresRequest(peer: $peer, id: $id, userId: $userId));
     }
 
     /**
@@ -1868,9 +2924,18 @@ final readonly class MessagesMethods
      */
     public function getGameHighScores(AbstractInputPeer|string|int $peer, int $id, AbstractInputUser|string|int $userId): ?HighScores
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
+        return $this->getGameHighScoresAsync(peer: $peer, id: $id, userId: $userId)->await();
+    }
+
+    /**
+     * @param InputBotInlineMessageID|InputBotInlineMessageID64 $id
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @return Future<HighScores|null>
+     * @see https://core.telegram.org/method/messages.getInlineGameHighScores
+     * @api
+     */
+    public function getInlineGameHighScoresAsync(AbstractInputBotInlineMessageID $id, AbstractInputUser|string|int $userId): Future
+    {
         if (is_string($userId) || is_int($userId)) {
             $__tmpPeer = $this->client->peerManager->resolve($userId);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -1879,7 +2944,7 @@ final readonly class MessagesMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetGameHighScoresRequest(peer: $peer, id: $id, userId: $userId));
+        return $this->client->call(new GetInlineGameHighScoresRequest(id: $id, userId: $userId));
     }
 
     /**
@@ -1891,6 +2956,19 @@ final readonly class MessagesMethods
      */
     public function getInlineGameHighScores(AbstractInputBotInlineMessageID $id, AbstractInputUser|string|int $userId): ?HighScores
     {
+        return $this->getInlineGameHighScoresAsync(id: $id, userId: $userId)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param int $maxId
+     * @param int $limit
+     * @return Future<Chats|ChatsSlice|null>
+     * @see https://core.telegram.org/method/messages.getCommonChats
+     * @api
+     */
+    public function getCommonChatsAsync(AbstractInputUser|string|int $userId, int $maxId, int $limit): Future
+    {
         if (is_string($userId) || is_int($userId)) {
             $__tmpPeer = $this->client->peerManager->resolve($userId);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -1899,7 +2977,7 @@ final readonly class MessagesMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetInlineGameHighScoresRequest(id: $id, userId: $userId));
+        return $this->client->call(new GetCommonChatsRequest(userId: $userId, maxId: $maxId, limit: $limit));
     }
 
     /**
@@ -1912,15 +2990,19 @@ final readonly class MessagesMethods
      */
     public function getCommonChats(AbstractInputUser|string|int $userId, int $maxId, int $limit): ?AbstractChats
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $userId = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetCommonChatsRequest(userId: $userId, maxId: $maxId, limit: $limit));
+        return $this->getCommonChatsAsync(userId: $userId, maxId: $maxId, limit: $limit)->await();
+    }
+
+    /**
+     * @param string $url
+     * @param int $hash
+     * @return Future<WebPage|null>
+     * @see https://core.telegram.org/method/messages.getWebPage
+     * @api
+     */
+    public function getWebPageAsync(string $url, int $hash): Future
+    {
+        return $this->client->call(new GetWebPageRequest(url: $url, hash: $hash));
     }
 
     /**
@@ -1932,7 +3014,19 @@ final readonly class MessagesMethods
      */
     public function getWebPage(string $url, int $hash): ?WebPage
     {
-        return $this->client->callSync(new GetWebPageRequest(url: $url, hash: $hash));
+        return $this->getWebPageAsync(url: $url, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputDialogPeer|InputDialogPeerFolder $peer
+     * @param bool|null $pinned
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.toggleDialogPin
+     * @api
+     */
+    public function toggleDialogPinAsync(AbstractInputDialogPeer $peer, ?bool $pinned = null): Future
+    {
+        return $this->client->call(new ToggleDialogPinRequest(peer: $peer, pinned: $pinned));
     }
 
     /**
@@ -1944,7 +3038,20 @@ final readonly class MessagesMethods
      */
     public function toggleDialogPin(AbstractInputDialogPeer $peer, ?bool $pinned = null): bool
     {
-        return (bool) $this->client->callSync(new ToggleDialogPinRequest(peer: $peer, pinned: $pinned));
+        return (bool) $this->toggleDialogPinAsync(peer: $peer, pinned: $pinned)->await();
+    }
+
+    /**
+     * @param int $folderId
+     * @param list<InputDialogPeer|InputDialogPeerFolder> $order
+     * @param bool|null $force
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.reorderPinnedDialogs
+     * @api
+     */
+    public function reorderPinnedDialogsAsync(int $folderId, array $order, ?bool $force = null): Future
+    {
+        return $this->client->call(new ReorderPinnedDialogsRequest(folderId: $folderId, order: $order, force: $force));
     }
 
     /**
@@ -1957,7 +3064,18 @@ final readonly class MessagesMethods
      */
     public function reorderPinnedDialogs(int $folderId, array $order, ?bool $force = null): bool
     {
-        return (bool) $this->client->callSync(new ReorderPinnedDialogsRequest(folderId: $folderId, order: $order, force: $force));
+        return (bool) $this->reorderPinnedDialogsAsync(folderId: $folderId, order: $order, force: $force)->await();
+    }
+
+    /**
+     * @param int $folderId
+     * @return Future<PeerDialogs|null>
+     * @see https://core.telegram.org/method/messages.getPinnedDialogs
+     * @api
+     */
+    public function getPinnedDialogsAsync(int $folderId): Future
+    {
+        return $this->client->call(new GetPinnedDialogsRequest(folderId: $folderId));
     }
 
     /**
@@ -1968,7 +3086,20 @@ final readonly class MessagesMethods
      */
     public function getPinnedDialogs(int $folderId): ?PeerDialogs
     {
-        return $this->client->callSync(new GetPinnedDialogsRequest(folderId: $folderId));
+        return $this->getPinnedDialogsAsync(folderId: $folderId)->await();
+    }
+
+    /**
+     * @param int $queryId
+     * @param string|null $error
+     * @param list<ShippingOption>|null $shippingOptions
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.setBotShippingResults
+     * @api
+     */
+    public function setBotShippingResultsAsync(int $queryId, ?string $error = null, ?array $shippingOptions = null): Future
+    {
+        return $this->client->call(new SetBotShippingResultsRequest(queryId: $queryId, error: $error, shippingOptions: $shippingOptions));
     }
 
     /**
@@ -1981,7 +3112,20 @@ final readonly class MessagesMethods
      */
     public function setBotShippingResults(int $queryId, ?string $error = null, ?array $shippingOptions = null): bool
     {
-        return (bool) $this->client->callSync(new SetBotShippingResultsRequest(queryId: $queryId, error: $error, shippingOptions: $shippingOptions));
+        return (bool) $this->setBotShippingResultsAsync(queryId: $queryId, error: $error, shippingOptions: $shippingOptions)->await();
+    }
+
+    /**
+     * @param int $queryId
+     * @param bool|null $success
+     * @param string|null $error
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.setBotPrecheckoutResults
+     * @api
+     */
+    public function setBotPrecheckoutResultsAsync(int $queryId, ?bool $success = null, ?string $error = null): Future
+    {
+        return $this->client->call(new SetBotPrecheckoutResultsRequest(queryId: $queryId, success: $success, error: $error));
     }
 
     /**
@@ -1994,7 +3138,23 @@ final readonly class MessagesMethods
      */
     public function setBotPrecheckoutResults(int $queryId, ?bool $success = null, ?string $error = null): bool
     {
-        return (bool) $this->client->callSync(new SetBotPrecheckoutResultsRequest(queryId: $queryId, success: $success, error: $error));
+        return (bool) $this->setBotPrecheckoutResultsAsync(queryId: $queryId, success: $success, error: $error)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
+     * @param string|null $businessConnectionId
+     * @return Future<MessageMediaEmpty|MessageMediaPhoto|MessageMediaGeo|MessageMediaContact|MessageMediaUnsupported|MessageMediaDocument|MessageMediaWebPage|MessageMediaVenue|MessageMediaGame|MessageMediaInvoice|MessageMediaGeoLive|MessageMediaPoll|MessageMediaDice|MessageMediaStory|MessageMediaGiveaway|MessageMediaGiveawayResults|MessageMediaPaidMedia|MessageMediaToDo|MessageMediaVideoStream|null>
+     * @see https://core.telegram.org/method/messages.uploadMedia
+     * @api
+     */
+    public function uploadMediaAsync(AbstractInputPeer|string|int $peer, AbstractInputMedia $media, ?string $businessConnectionId = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new UploadMediaRequest(peer: $peer, media: $media, businessConnectionId: $businessConnectionId));
     }
 
     /**
@@ -2007,10 +3167,26 @@ final readonly class MessagesMethods
      */
     public function uploadMedia(AbstractInputPeer|string|int $peer, AbstractInputMedia $media, ?string $businessConnectionId = null): ?AbstractMessageMedia
     {
+        return $this->uploadMediaAsync(peer: $peer, media: $media, businessConnectionId: $businessConnectionId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum $replyTo
+     * @param int|null $randomId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendScreenshotNotification
+     * @api
+     */
+    public function sendScreenshotNotificationAsync(AbstractInputPeer|string|int $peer, AbstractInputReplyTo $replyTo, ?int $randomId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new UploadMediaRequest(peer: $peer, media: $media, businessConnectionId: $businessConnectionId));
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->call(new SendScreenshotNotificationRequest(peer: $peer, replyTo: $replyTo, randomId: $randomId));
     }
 
     /**
@@ -2023,13 +3199,18 @@ final readonly class MessagesMethods
      */
     public function sendScreenshotNotification(AbstractInputPeer|string|int $peer, AbstractInputReplyTo $replyTo, ?int $randomId = null): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new SendScreenshotNotificationRequest(peer: $peer, replyTo: $replyTo, randomId: $randomId));
+        return $this->sendScreenshotNotificationAsync(peer: $peer, replyTo: $replyTo, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<FavedStickersNotModified|FavedStickers|null>
+     * @see https://core.telegram.org/method/messages.getFavedStickers
+     * @api
+     */
+    public function getFavedStickersAsync(int $hash): Future
+    {
+        return $this->client->call(new GetFavedStickersRequest(hash: $hash));
     }
 
     /**
@@ -2040,7 +3221,19 @@ final readonly class MessagesMethods
      */
     public function getFavedStickers(int $hash): ?AbstractFavedStickers
     {
-        return $this->client->callSync(new GetFavedStickersRequest(hash: $hash));
+        return $this->getFavedStickersAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputDocumentEmpty|InputDocument $id
+     * @param bool $unfave
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.faveSticker
+     * @api
+     */
+    public function faveStickerAsync(AbstractInputDocument $id, bool $unfave): Future
+    {
+        return $this->client->call(new FaveStickerRequest(id: $id, unfave: $unfave));
     }
 
     /**
@@ -2052,7 +3245,27 @@ final readonly class MessagesMethods
      */
     public function faveSticker(AbstractInputDocument $id, bool $unfave): bool
     {
-        return (bool) $this->client->callSync(new FaveStickerRequest(id: $id, unfave: $unfave));
+        return (bool) $this->faveStickerAsync(id: $id, unfave: $unfave)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $offsetId
+     * @param int $addOffset
+     * @param int $limit
+     * @param int $maxId
+     * @param int $minId
+     * @param int|null $topMsgId
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getUnreadMentions
+     * @api
+     */
+    public function getUnreadMentionsAsync(AbstractInputPeer|string|int $peer, int $offsetId, int $addOffset, int $limit, int $maxId, int $minId, ?int $topMsgId = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetUnreadMentionsRequest(peer: $peer, offsetId: $offsetId, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, topMsgId: $topMsgId));
     }
 
     /**
@@ -2069,10 +3282,22 @@ final readonly class MessagesMethods
      */
     public function getUnreadMentions(AbstractInputPeer|string|int $peer, int $offsetId, int $addOffset, int $limit, int $maxId, int $minId, ?int $topMsgId = null): ?AbstractMessages
     {
+        return $this->getUnreadMentionsAsync(peer: $peer, offsetId: $offsetId, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, topMsgId: $topMsgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int|null $topMsgId
+     * @return Future<AffectedHistory|null>
+     * @see https://core.telegram.org/method/messages.readMentions
+     * @api
+     */
+    public function readMentionsAsync(AbstractInputPeer|string|int $peer, ?int $topMsgId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetUnreadMentionsRequest(peer: $peer, offsetId: $offsetId, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, topMsgId: $topMsgId));
+        return $this->client->call(new ReadMentionsRequest(peer: $peer, topMsgId: $topMsgId));
     }
 
     /**
@@ -2084,10 +3309,23 @@ final readonly class MessagesMethods
      */
     public function readMentions(AbstractInputPeer|string|int $peer, ?int $topMsgId = null): ?AffectedHistory
     {
+        return $this->readMentionsAsync(peer: $peer, topMsgId: $topMsgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $limit
+     * @param int $hash
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getRecentLocations
+     * @api
+     */
+    public function getRecentLocationsAsync(AbstractInputPeer|string|int $peer, int $limit, int $hash): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new ReadMentionsRequest(peer: $peer, topMsgId: $topMsgId));
+        return $this->client->call(new GetRecentLocationsRequest(peer: $peer, limit: $limit, hash: $hash));
     }
 
     /**
@@ -2100,10 +3338,38 @@ final readonly class MessagesMethods
      */
     public function getRecentLocations(AbstractInputPeer|string|int $peer, int $limit, int $hash): ?AbstractMessages
     {
+        return $this->getRecentLocationsAsync(peer: $peer, limit: $limit, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<InputSingleMedia> $multiMedia
+     * @param bool|null $silent
+     * @param bool|null $background
+     * @param bool|null $clearDraft
+     * @param bool|null $noforwards
+     * @param bool|null $updateStickersetsOrder
+     * @param bool|null $invertMedia
+     * @param bool|null $allowPaidFloodskip
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
+     * @param int|null $scheduleDate
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
+     * @param InputQuickReplyShortcut|InputQuickReplyShortcutId|null $quickReplyShortcut
+     * @param int|null $effect
+     * @param int|null $allowPaidStars
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendMultiMedia
+     * @api
+     */
+    public function sendMultiMediaAsync(AbstractInputPeer|string|int $peer, array $multiMedia, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?int $scheduleDate = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $allowPaidStars = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetRecentLocationsRequest(peer: $peer, limit: $limit, hash: $hash));
+        if (is_string($sendAs) || is_int($sendAs)) {
+            $sendAs = $this->client->peerManager->resolve($sendAs);
+        }
+        return $this->client->call(new SendMultiMediaRequest(peer: $peer, multiMedia: $multiMedia, silent: $silent, background: $background, clearDraft: $clearDraft, noforwards: $noforwards, updateStickersetsOrder: $updateStickersetsOrder, invertMedia: $invertMedia, allowPaidFloodskip: $allowPaidFloodskip, replyTo: $replyTo, scheduleDate: $scheduleDate, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, allowPaidStars: $allowPaidStars));
     }
 
     /**
@@ -2128,13 +3394,19 @@ final readonly class MessagesMethods
      */
     public function sendMultiMedia(AbstractInputPeer|string|int $peer, array $multiMedia, ?bool $silent = null, ?bool $background = null, ?bool $clearDraft = null, ?bool $noforwards = null, ?bool $updateStickersetsOrder = null, ?bool $invertMedia = null, ?bool $allowPaidFloodskip = null, ?AbstractInputReplyTo $replyTo = null, ?int $scheduleDate = null, AbstractInputPeer|string|int|null $sendAs = null, ?AbstractInputQuickReplyShortcut $quickReplyShortcut = null, ?int $effect = null, ?int $allowPaidStars = null): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        if (is_string($sendAs) || is_int($sendAs)) {
-            $sendAs = $this->client->peerManager->resolve($sendAs);
-        }
-        return $this->client->callSync(new SendMultiMediaRequest(peer: $peer, multiMedia: $multiMedia, silent: $silent, background: $background, clearDraft: $clearDraft, noforwards: $noforwards, updateStickersetsOrder: $updateStickersetsOrder, invertMedia: $invertMedia, allowPaidFloodskip: $allowPaidFloodskip, replyTo: $replyTo, scheduleDate: $scheduleDate, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, allowPaidStars: $allowPaidStars));
+        return $this->sendMultiMediaAsync(peer: $peer, multiMedia: $multiMedia, silent: $silent, background: $background, clearDraft: $clearDraft, noforwards: $noforwards, updateStickersetsOrder: $updateStickersetsOrder, invertMedia: $invertMedia, allowPaidFloodskip: $allowPaidFloodskip, replyTo: $replyTo, scheduleDate: $scheduleDate, sendAs: $sendAs, quickReplyShortcut: $quickReplyShortcut, effect: $effect, allowPaidStars: $allowPaidStars)->await();
+    }
+
+    /**
+     * @param InputEncryptedChat $peer
+     * @param InputEncryptedFileEmpty|InputEncryptedFileUploaded|InputEncryptedFile|InputEncryptedFileBigUploaded $file
+     * @return Future<EncryptedFileEmpty|EncryptedFile|null>
+     * @see https://core.telegram.org/method/messages.uploadEncryptedFile
+     * @api
+     */
+    public function uploadEncryptedFileAsync(InputEncryptedChat $peer, AbstractInputEncryptedFile $file): Future
+    {
+        return $this->client->call(new UploadEncryptedFileRequest(peer: $peer, file: $file));
     }
 
     /**
@@ -2146,7 +3418,20 @@ final readonly class MessagesMethods
      */
     public function uploadEncryptedFile(InputEncryptedChat $peer, AbstractInputEncryptedFile $file): ?AbstractEncryptedFile
     {
-        return $this->client->callSync(new UploadEncryptedFileRequest(peer: $peer, file: $file));
+        return $this->uploadEncryptedFileAsync(peer: $peer, file: $file)->await();
+    }
+
+    /**
+     * @param string $q
+     * @param int $hash
+     * @param bool|null $excludeFeatured
+     * @return Future<FoundStickerSetsNotModified|FoundStickerSets|null>
+     * @see https://core.telegram.org/method/messages.searchStickerSets
+     * @api
+     */
+    public function searchStickerSetsAsync(string $q, int $hash, ?bool $excludeFeatured = null): Future
+    {
+        return $this->client->call(new SearchStickerSetsRequest(q: $q, hash: $hash, excludeFeatured: $excludeFeatured));
     }
 
     /**
@@ -2159,7 +3444,17 @@ final readonly class MessagesMethods
      */
     public function searchStickerSets(string $q, int $hash, ?bool $excludeFeatured = null): ?AbstractFoundStickerSets
     {
-        return $this->client->callSync(new SearchStickerSetsRequest(q: $q, hash: $hash, excludeFeatured: $excludeFeatured));
+        return $this->searchStickerSetsAsync(q: $q, hash: $hash, excludeFeatured: $excludeFeatured)->await();
+    }
+
+    /**
+     * @return Future<list<MessageRange>>
+     * @see https://core.telegram.org/method/messages.getSplitRanges
+     * @api
+     */
+    public function getSplitRangesAsync(): Future
+    {
+        return $this->client->call(new GetSplitRangesRequest());
     }
 
     /**
@@ -2169,7 +3464,23 @@ final readonly class MessagesMethods
      */
     public function getSplitRanges(): array
     {
-        return $this->client->callSync(new GetSplitRangesRequest());
+        return $this->getSplitRangesAsync()->await();
+    }
+
+    /**
+     * @param InputDialogPeer|InputDialogPeerFolder $peer
+     * @param bool|null $unread
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.markDialogUnread
+     * @api
+     */
+    public function markDialogUnreadAsync(AbstractInputDialogPeer $peer, ?bool $unread = null, AbstractInputPeer|string|int|null $parentPeer = null): Future
+    {
+        if (is_string($parentPeer) || is_int($parentPeer)) {
+            $parentPeer = $this->client->peerManager->resolve($parentPeer);
+        }
+        return $this->client->call(new MarkDialogUnreadRequest(peer: $peer, unread: $unread, parentPeer: $parentPeer));
     }
 
     /**
@@ -2182,10 +3493,21 @@ final readonly class MessagesMethods
      */
     public function markDialogUnread(AbstractInputDialogPeer $peer, ?bool $unread = null, AbstractInputPeer|string|int|null $parentPeer = null): bool
     {
+        return (bool) $this->markDialogUnreadAsync(peer: $peer, unread: $unread, parentPeer: $parentPeer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
+     * @return Future<list<DialogPeer|DialogPeerFolder>>
+     * @see https://core.telegram.org/method/messages.getDialogUnreadMarks
+     * @api
+     */
+    public function getDialogUnreadMarksAsync(AbstractInputPeer|string|int|null $parentPeer = null): Future
+    {
         if (is_string($parentPeer) || is_int($parentPeer)) {
             $parentPeer = $this->client->peerManager->resolve($parentPeer);
         }
-        return (bool) $this->client->callSync(new MarkDialogUnreadRequest(peer: $peer, unread: $unread, parentPeer: $parentPeer));
+        return $this->client->call(new GetDialogUnreadMarksRequest(parentPeer: $parentPeer));
     }
 
     /**
@@ -2196,10 +3518,17 @@ final readonly class MessagesMethods
      */
     public function getDialogUnreadMarks(AbstractInputPeer|string|int|null $parentPeer = null): array
     {
-        if (is_string($parentPeer) || is_int($parentPeer)) {
-            $parentPeer = $this->client->peerManager->resolve($parentPeer);
-        }
-        return $this->client->callSync(new GetDialogUnreadMarksRequest(parentPeer: $parentPeer));
+        return $this->getDialogUnreadMarksAsync(parentPeer: $parentPeer)->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.clearAllDrafts
+     * @api
+     */
+    public function clearAllDraftsAsync(): Future
+    {
+        return $this->client->call(new ClearAllDraftsRequest());
     }
 
     /**
@@ -2209,7 +3538,25 @@ final readonly class MessagesMethods
      */
     public function clearAllDrafts(): bool
     {
-        return (bool) $this->client->callSync(new ClearAllDraftsRequest());
+        return (bool) $this->clearAllDraftsAsync()->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $id
+     * @param bool|null $silent
+     * @param bool|null $unpin
+     * @param bool|null $pmOneside
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.updatePinnedMessage
+     * @api
+     */
+    public function updatePinnedMessageAsync(AbstractInputPeer|string|int $peer, int $id, ?bool $silent = null, ?bool $unpin = null, ?bool $pmOneside = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new UpdatePinnedMessageRequest(peer: $peer, id: $id, silent: $silent, unpin: $unpin, pmOneside: $pmOneside));
     }
 
     /**
@@ -2224,10 +3571,23 @@ final readonly class MessagesMethods
      */
     public function updatePinnedMessage(AbstractInputPeer|string|int $peer, int $id, ?bool $silent = null, ?bool $unpin = null, ?bool $pmOneside = null): ?AbstractUpdates
     {
+        return $this->updatePinnedMessageAsync(peer: $peer, id: $id, silent: $silent, unpin: $unpin, pmOneside: $pmOneside)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param list<string> $options
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendVote
+     * @api
+     */
+    public function sendVoteAsync(AbstractInputPeer|string|int $peer, int $msgId, array $options): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new UpdatePinnedMessageRequest(peer: $peer, id: $id, silent: $silent, unpin: $unpin, pmOneside: $pmOneside));
+        return $this->client->call(new SendVoteRequest(peer: $peer, msgId: $msgId, options: $options));
     }
 
     /**
@@ -2240,10 +3600,22 @@ final readonly class MessagesMethods
      */
     public function sendVote(AbstractInputPeer|string|int $peer, int $msgId, array $options): ?AbstractUpdates
     {
+        return $this->sendVoteAsync(peer: $peer, msgId: $msgId, options: $options)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.getPollResults
+     * @api
+     */
+    public function getPollResultsAsync(AbstractInputPeer|string|int $peer, int $msgId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new SendVoteRequest(peer: $peer, msgId: $msgId, options: $options));
+        return $this->client->call(new GetPollResultsRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -2255,10 +3627,21 @@ final readonly class MessagesMethods
      */
     public function getPollResults(AbstractInputPeer|string|int $peer, int $msgId): ?AbstractUpdates
     {
+        return $this->getPollResultsAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<ChatOnlines|null>
+     * @see https://core.telegram.org/method/messages.getOnlines
+     * @api
+     */
+    public function getOnlinesAsync(AbstractInputPeer|string|int $peer): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetPollResultsRequest(peer: $peer, msgId: $msgId));
+        return $this->client->call(new GetOnlinesRequest(peer: $peer));
     }
 
     /**
@@ -2269,10 +3652,22 @@ final readonly class MessagesMethods
      */
     public function getOnlines(AbstractInputPeer|string|int $peer): ?ChatOnlines
     {
+        return $this->getOnlinesAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $about
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.editChatAbout
+     * @api
+     */
+    public function editChatAboutAsync(AbstractInputPeer|string|int $peer, string $about): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetOnlinesRequest(peer: $peer));
+        return $this->client->call(new EditChatAboutRequest(peer: $peer, about: $about));
     }
 
     /**
@@ -2284,10 +3679,22 @@ final readonly class MessagesMethods
      */
     public function editChatAbout(AbstractInputPeer|string|int $peer, string $about): bool
     {
+        return (bool) $this->editChatAboutAsync(peer: $peer, about: $about)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param ChatBannedRights $bannedRights
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.editChatDefaultBannedRights
+     * @api
+     */
+    public function editChatDefaultBannedRightsAsync(AbstractInputPeer|string|int $peer, ChatBannedRights $bannedRights): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new EditChatAboutRequest(peer: $peer, about: $about));
+        return $this->client->call(new EditChatDefaultBannedRightsRequest(peer: $peer, bannedRights: $bannedRights));
     }
 
     /**
@@ -2299,10 +3706,18 @@ final readonly class MessagesMethods
      */
     public function editChatDefaultBannedRights(AbstractInputPeer|string|int $peer, ChatBannedRights $bannedRights): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new EditChatDefaultBannedRightsRequest(peer: $peer, bannedRights: $bannedRights));
+        return $this->editChatDefaultBannedRightsAsync(peer: $peer, bannedRights: $bannedRights)->await();
+    }
+
+    /**
+     * @param string $langCode
+     * @return Future<EmojiKeywordsDifference|null>
+     * @see https://core.telegram.org/method/messages.getEmojiKeywords
+     * @api
+     */
+    public function getEmojiKeywordsAsync(string $langCode): Future
+    {
+        return $this->client->call(new GetEmojiKeywordsRequest(langCode: $langCode));
     }
 
     /**
@@ -2313,7 +3728,19 @@ final readonly class MessagesMethods
      */
     public function getEmojiKeywords(string $langCode): ?EmojiKeywordsDifference
     {
-        return $this->client->callSync(new GetEmojiKeywordsRequest(langCode: $langCode));
+        return $this->getEmojiKeywordsAsync(langCode: $langCode)->await();
+    }
+
+    /**
+     * @param string $langCode
+     * @param int $fromVersion
+     * @return Future<EmojiKeywordsDifference|null>
+     * @see https://core.telegram.org/method/messages.getEmojiKeywordsDifference
+     * @api
+     */
+    public function getEmojiKeywordsDifferenceAsync(string $langCode, int $fromVersion): Future
+    {
+        return $this->client->call(new GetEmojiKeywordsDifferenceRequest(langCode: $langCode, fromVersion: $fromVersion));
     }
 
     /**
@@ -2325,7 +3752,18 @@ final readonly class MessagesMethods
      */
     public function getEmojiKeywordsDifference(string $langCode, int $fromVersion): ?EmojiKeywordsDifference
     {
-        return $this->client->callSync(new GetEmojiKeywordsDifferenceRequest(langCode: $langCode, fromVersion: $fromVersion));
+        return $this->getEmojiKeywordsDifferenceAsync(langCode: $langCode, fromVersion: $fromVersion)->await();
+    }
+
+    /**
+     * @param list<string> $langCodes
+     * @return Future<list<EmojiLanguage>>
+     * @see https://core.telegram.org/method/messages.getEmojiKeywordsLanguages
+     * @api
+     */
+    public function getEmojiKeywordsLanguagesAsync(array $langCodes): Future
+    {
+        return $this->client->call(new GetEmojiKeywordsLanguagesRequest(langCodes: $langCodes));
     }
 
     /**
@@ -2336,7 +3774,18 @@ final readonly class MessagesMethods
      */
     public function getEmojiKeywordsLanguages(array $langCodes): array
     {
-        return $this->client->callSync(new GetEmojiKeywordsLanguagesRequest(langCodes: $langCodes));
+        return $this->getEmojiKeywordsLanguagesAsync(langCodes: $langCodes)->await();
+    }
+
+    /**
+     * @param string $langCode
+     * @return Future<EmojiURL|null>
+     * @see https://core.telegram.org/method/messages.getEmojiURL
+     * @api
+     */
+    public function getEmojiURLAsync(string $langCode): Future
+    {
+        return $this->client->call(new GetEmojiURLRequest(langCode: $langCode));
     }
 
     /**
@@ -2347,7 +3796,27 @@ final readonly class MessagesMethods
      */
     public function getEmojiURL(string $langCode): ?EmojiURL
     {
-        return $this->client->callSync(new GetEmojiURLRequest(langCode: $langCode));
+        return $this->getEmojiURLAsync(langCode: $langCode)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<InputMessagesFilterEmpty|InputMessagesFilterPhotos|InputMessagesFilterVideo|InputMessagesFilterPhotoVideo|InputMessagesFilterDocument|InputMessagesFilterUrl|InputMessagesFilterGif|InputMessagesFilterVoice|InputMessagesFilterMusic|InputMessagesFilterChatPhotos|InputMessagesFilterPhoneCalls|InputMessagesFilterRoundVoice|InputMessagesFilterRoundVideo|InputMessagesFilterMyMentions|InputMessagesFilterGeo|InputMessagesFilterContacts|InputMessagesFilterPinned> $filters
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $savedPeerId
+     * @param int|null $topMsgId
+     * @return Future<list<SearchCounter>>
+     * @see https://core.telegram.org/method/messages.getSearchCounters
+     * @api
+     */
+    public function getSearchCountersAsync(AbstractInputPeer|string|int $peer, array $filters, AbstractInputPeer|string|int|null $savedPeerId = null, ?int $topMsgId = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if (is_string($savedPeerId) || is_int($savedPeerId)) {
+            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
+        }
+        return $this->client->call(new GetSearchCountersRequest(peer: $peer, filters: $filters, savedPeerId: $savedPeerId, topMsgId: $topMsgId));
     }
 
     /**
@@ -2361,13 +3830,24 @@ final readonly class MessagesMethods
      */
     public function getSearchCounters(AbstractInputPeer|string|int $peer, array $filters, AbstractInputPeer|string|int|null $savedPeerId = null, ?int $topMsgId = null): array
     {
+        return $this->getSearchCountersAsync(peer: $peer, filters: $filters, savedPeerId: $savedPeerId, topMsgId: $topMsgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $peer
+     * @param int|null $msgId
+     * @param int|null $buttonId
+     * @param string|null $url
+     * @return Future<UrlAuthResultRequest|UrlAuthResultAccepted|UrlAuthResultDefault|null>
+     * @see https://core.telegram.org/method/messages.requestUrlAuth
+     * @api
+     */
+    public function requestUrlAuthAsync(AbstractInputPeer|string|int|null $peer = null, ?int $msgId = null, ?int $buttonId = null, ?string $url = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        if (is_string($savedPeerId) || is_int($savedPeerId)) {
-            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
-        }
-        return $this->client->callSync(new GetSearchCountersRequest(peer: $peer, filters: $filters, savedPeerId: $savedPeerId, topMsgId: $topMsgId));
+        return $this->client->call(new RequestUrlAuthRequest(peer: $peer, msgId: $msgId, buttonId: $buttonId, url: $url));
     }
 
     /**
@@ -2381,10 +3861,25 @@ final readonly class MessagesMethods
      */
     public function requestUrlAuth(AbstractInputPeer|string|int|null $peer = null, ?int $msgId = null, ?int $buttonId = null, ?string $url = null): ?AbstractUrlAuthResult
     {
+        return $this->requestUrlAuthAsync(peer: $peer, msgId: $msgId, buttonId: $buttonId, url: $url)->await();
+    }
+
+    /**
+     * @param bool|null $writeAllowed
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $peer
+     * @param int|null $msgId
+     * @param int|null $buttonId
+     * @param string|null $url
+     * @return Future<UrlAuthResultRequest|UrlAuthResultAccepted|UrlAuthResultDefault|null>
+     * @see https://core.telegram.org/method/messages.acceptUrlAuth
+     * @api
+     */
+    public function acceptUrlAuthAsync(?bool $writeAllowed = null, AbstractInputPeer|string|int|null $peer = null, ?int $msgId = null, ?int $buttonId = null, ?string $url = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new RequestUrlAuthRequest(peer: $peer, msgId: $msgId, buttonId: $buttonId, url: $url));
+        return $this->client->call(new AcceptUrlAuthRequest(writeAllowed: $writeAllowed, peer: $peer, msgId: $msgId, buttonId: $buttonId, url: $url));
     }
 
     /**
@@ -2399,10 +3894,21 @@ final readonly class MessagesMethods
      */
     public function acceptUrlAuth(?bool $writeAllowed = null, AbstractInputPeer|string|int|null $peer = null, ?int $msgId = null, ?int $buttonId = null, ?string $url = null): ?AbstractUrlAuthResult
     {
+        return $this->acceptUrlAuthAsync(writeAllowed: $writeAllowed, peer: $peer, msgId: $msgId, buttonId: $buttonId, url: $url)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.hidePeerSettingsBar
+     * @api
+     */
+    public function hidePeerSettingsBarAsync(AbstractInputPeer|string|int $peer): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new AcceptUrlAuthRequest(writeAllowed: $writeAllowed, peer: $peer, msgId: $msgId, buttonId: $buttonId, url: $url));
+        return $this->client->call(new HidePeerSettingsBarRequest(peer: $peer));
     }
 
     /**
@@ -2413,10 +3919,22 @@ final readonly class MessagesMethods
      */
     public function hidePeerSettingsBar(AbstractInputPeer|string|int $peer): bool
     {
+        return (bool) $this->hidePeerSettingsBarAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $hash
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getScheduledHistory
+     * @api
+     */
+    public function getScheduledHistoryAsync(AbstractInputPeer|string|int $peer, int $hash): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new HidePeerSettingsBarRequest(peer: $peer));
+        return $this->client->call(new GetScheduledHistoryRequest(peer: $peer, hash: $hash));
     }
 
     /**
@@ -2428,10 +3946,22 @@ final readonly class MessagesMethods
      */
     public function getScheduledHistory(AbstractInputPeer|string|int $peer, int $hash): ?AbstractMessages
     {
+        return $this->getScheduledHistoryAsync(peer: $peer, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $id
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getScheduledMessages
+     * @api
+     */
+    public function getScheduledMessagesAsync(AbstractInputPeer|string|int $peer, array $id): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetScheduledHistoryRequest(peer: $peer, hash: $hash));
+        return $this->client->call(new GetScheduledMessagesRequest(peer: $peer, id: $id));
     }
 
     /**
@@ -2443,10 +3973,22 @@ final readonly class MessagesMethods
      */
     public function getScheduledMessages(AbstractInputPeer|string|int $peer, array $id): ?AbstractMessages
     {
+        return $this->getScheduledMessagesAsync(peer: $peer, id: $id)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $id
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendScheduledMessages
+     * @api
+     */
+    public function sendScheduledMessagesAsync(AbstractInputPeer|string|int $peer, array $id): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetScheduledMessagesRequest(peer: $peer, id: $id));
+        return $this->client->call(new SendScheduledMessagesRequest(peer: $peer, id: $id));
     }
 
     /**
@@ -2458,10 +4000,22 @@ final readonly class MessagesMethods
      */
     public function sendScheduledMessages(AbstractInputPeer|string|int $peer, array $id): ?AbstractUpdates
     {
+        return $this->sendScheduledMessagesAsync(peer: $peer, id: $id)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $id
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.deleteScheduledMessages
+     * @api
+     */
+    public function deleteScheduledMessagesAsync(AbstractInputPeer|string|int $peer, array $id): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new SendScheduledMessagesRequest(peer: $peer, id: $id));
+        return $this->client->call(new DeleteScheduledMessagesRequest(peer: $peer, id: $id));
     }
 
     /**
@@ -2473,10 +4027,25 @@ final readonly class MessagesMethods
      */
     public function deleteScheduledMessages(AbstractInputPeer|string|int $peer, array $id): ?AbstractUpdates
     {
+        return $this->deleteScheduledMessagesAsync(peer: $peer, id: $id)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $id
+     * @param int $limit
+     * @param string|null $option
+     * @param string|null $offset
+     * @return Future<VotesList|null>
+     * @see https://core.telegram.org/method/messages.getPollVotes
+     * @api
+     */
+    public function getPollVotesAsync(AbstractInputPeer|string|int $peer, int $id, int $limit, ?string $option = null, ?string $offset = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new DeleteScheduledMessagesRequest(peer: $peer, id: $id));
+        return $this->client->call(new GetPollVotesRequest(peer: $peer, id: $id, limit: $limit, option: $option, offset: $offset));
     }
 
     /**
@@ -2491,10 +4060,21 @@ final readonly class MessagesMethods
      */
     public function getPollVotes(AbstractInputPeer|string|int $peer, int $id, int $limit, ?string $option = null, ?string $offset = null): ?VotesList
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetPollVotesRequest(peer: $peer, id: $id, limit: $limit, option: $option, offset: $offset));
+        return $this->getPollVotesAsync(peer: $peer, id: $id, limit: $limit, option: $option, offset: $offset)->await();
+    }
+
+    /**
+     * @param list<InputStickerSetEmpty|InputStickerSetID|InputStickerSetShortName|InputStickerSetAnimatedEmoji|InputStickerSetDice|InputStickerSetAnimatedEmojiAnimations|InputStickerSetPremiumGifts|InputStickerSetEmojiGenericAnimations|InputStickerSetEmojiDefaultStatuses|InputStickerSetEmojiDefaultTopicIcons|InputStickerSetEmojiChannelDefaultStatuses|InputStickerSetTonGifts> $stickersets
+     * @param bool|null $uninstall
+     * @param bool|null $archive
+     * @param bool|null $unarchive
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.toggleStickerSets
+     * @api
+     */
+    public function toggleStickerSetsAsync(array $stickersets, ?bool $uninstall = null, ?bool $archive = null, ?bool $unarchive = null): Future
+    {
+        return $this->client->call(new ToggleStickerSetsRequest(stickersets: $stickersets, uninstall: $uninstall, archive: $archive, unarchive: $unarchive));
     }
 
     /**
@@ -2508,7 +4088,17 @@ final readonly class MessagesMethods
      */
     public function toggleStickerSets(array $stickersets, ?bool $uninstall = null, ?bool $archive = null, ?bool $unarchive = null): bool
     {
-        return (bool) $this->client->callSync(new ToggleStickerSetsRequest(stickersets: $stickersets, uninstall: $uninstall, archive: $archive, unarchive: $unarchive));
+        return (bool) $this->toggleStickerSetsAsync(stickersets: $stickersets, uninstall: $uninstall, archive: $archive, unarchive: $unarchive)->await();
+    }
+
+    /**
+     * @return Future<DialogFilters|null>
+     * @see https://core.telegram.org/method/messages.getDialogFilters
+     * @api
+     */
+    public function getDialogFiltersAsync(): Future
+    {
+        return $this->client->call(new GetDialogFiltersRequest());
     }
 
     /**
@@ -2518,7 +4108,17 @@ final readonly class MessagesMethods
      */
     public function getDialogFilters(): ?DialogFilters
     {
-        return $this->client->callSync(new GetDialogFiltersRequest());
+        return $this->getDialogFiltersAsync()->await();
+    }
+
+    /**
+     * @return Future<list<DialogFilterSuggested>>
+     * @see https://core.telegram.org/method/messages.getSuggestedDialogFilters
+     * @api
+     */
+    public function getSuggestedDialogFiltersAsync(): Future
+    {
+        return $this->client->call(new GetSuggestedDialogFiltersRequest());
     }
 
     /**
@@ -2528,7 +4128,19 @@ final readonly class MessagesMethods
      */
     public function getSuggestedDialogFilters(): array
     {
-        return $this->client->callSync(new GetSuggestedDialogFiltersRequest());
+        return $this->getSuggestedDialogFiltersAsync()->await();
+    }
+
+    /**
+     * @param int $id
+     * @param DialogFilter|DialogFilterDefault|DialogFilterChatlist|null $filter
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.updateDialogFilter
+     * @api
+     */
+    public function updateDialogFilterAsync(int $id, ?AbstractDialogFilter $filter = null): Future
+    {
+        return $this->client->call(new UpdateDialogFilterRequest(id: $id, filter: $filter));
     }
 
     /**
@@ -2540,7 +4152,18 @@ final readonly class MessagesMethods
      */
     public function updateDialogFilter(int $id, ?AbstractDialogFilter $filter = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateDialogFilterRequest(id: $id, filter: $filter));
+        return (bool) $this->updateDialogFilterAsync(id: $id, filter: $filter)->await();
+    }
+
+    /**
+     * @param list<int> $order
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.updateDialogFiltersOrder
+     * @api
+     */
+    public function updateDialogFiltersOrderAsync(array $order): Future
+    {
+        return $this->client->call(new UpdateDialogFiltersOrderRequest(order: $order));
     }
 
     /**
@@ -2551,7 +4174,20 @@ final readonly class MessagesMethods
      */
     public function updateDialogFiltersOrder(array $order): bool
     {
-        return (bool) $this->client->callSync(new UpdateDialogFiltersOrderRequest(order: $order));
+        return (bool) $this->updateDialogFiltersOrderAsync(order: $order)->await();
+    }
+
+    /**
+     * @param int $offset
+     * @param int $limit
+     * @param int $hash
+     * @return Future<FeaturedStickersNotModified|FeaturedStickers|null>
+     * @see https://core.telegram.org/method/messages.getOldFeaturedStickers
+     * @api
+     */
+    public function getOldFeaturedStickersAsync(int $offset, int $limit, int $hash): Future
+    {
+        return $this->client->call(new GetOldFeaturedStickersRequest(offset: $offset, limit: $limit, hash: $hash));
     }
 
     /**
@@ -2564,7 +4200,29 @@ final readonly class MessagesMethods
      */
     public function getOldFeaturedStickers(int $offset, int $limit, int $hash): ?AbstractFeaturedStickers
     {
-        return $this->client->callSync(new GetOldFeaturedStickersRequest(offset: $offset, limit: $limit, hash: $hash));
+        return $this->getOldFeaturedStickersAsync(offset: $offset, limit: $limit, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param int $offsetId
+     * @param int $offsetDate
+     * @param int $addOffset
+     * @param int $limit
+     * @param int $maxId
+     * @param int $minId
+     * @param int $hash
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getReplies
+     * @api
+     */
+    public function getRepliesAsync(AbstractInputPeer|string|int $peer, int $msgId, int $offsetId, int $offsetDate, int $addOffset, int $limit, int $maxId, int $minId, int $hash): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetRepliesRequest(peer: $peer, msgId: $msgId, offsetId: $offsetId, offsetDate: $offsetDate, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash));
     }
 
     /**
@@ -2583,10 +4241,22 @@ final readonly class MessagesMethods
      */
     public function getReplies(AbstractInputPeer|string|int $peer, int $msgId, int $offsetId, int $offsetDate, int $addOffset, int $limit, int $maxId, int $minId, int $hash): ?AbstractMessages
     {
+        return $this->getRepliesAsync(peer: $peer, msgId: $msgId, offsetId: $offsetId, offsetDate: $offsetDate, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @return Future<DiscussionMessage|null>
+     * @see https://core.telegram.org/method/messages.getDiscussionMessage
+     * @api
+     */
+    public function getDiscussionMessageAsync(AbstractInputPeer|string|int $peer, int $msgId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetRepliesRequest(peer: $peer, msgId: $msgId, offsetId: $offsetId, offsetDate: $offsetDate, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash));
+        return $this->client->call(new GetDiscussionMessageRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -2598,10 +4268,23 @@ final readonly class MessagesMethods
      */
     public function getDiscussionMessage(AbstractInputPeer|string|int $peer, int $msgId): ?DiscussionMessage
     {
+        return $this->getDiscussionMessageAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param int $readMaxId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.readDiscussion
+     * @api
+     */
+    public function readDiscussionAsync(AbstractInputPeer|string|int $peer, int $msgId, int $readMaxId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetDiscussionMessageRequest(peer: $peer, msgId: $msgId));
+        return $this->client->call(new ReadDiscussionRequest(peer: $peer, msgId: $msgId, readMaxId: $readMaxId));
     }
 
     /**
@@ -2614,10 +4297,26 @@ final readonly class MessagesMethods
      */
     public function readDiscussion(AbstractInputPeer|string|int $peer, int $msgId, int $readMaxId): bool
     {
+        return (bool) $this->readDiscussionAsync(peer: $peer, msgId: $msgId, readMaxId: $readMaxId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int|null $topMsgId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $savedPeerId
+     * @return Future<AffectedHistory|null>
+     * @see https://core.telegram.org/method/messages.unpinAllMessages
+     * @api
+     */
+    public function unpinAllMessagesAsync(AbstractInputPeer|string|int $peer, ?int $topMsgId = null, AbstractInputPeer|string|int|null $savedPeerId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new ReadDiscussionRequest(peer: $peer, msgId: $msgId, readMaxId: $readMaxId));
+        if (is_string($savedPeerId) || is_int($savedPeerId)) {
+            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
+        }
+        return $this->client->call(new UnpinAllMessagesRequest(peer: $peer, topMsgId: $topMsgId, savedPeerId: $savedPeerId));
     }
 
     /**
@@ -2630,13 +4329,18 @@ final readonly class MessagesMethods
      */
     public function unpinAllMessages(AbstractInputPeer|string|int $peer, ?int $topMsgId = null, AbstractInputPeer|string|int|null $savedPeerId = null): ?AffectedHistory
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        if (is_string($savedPeerId) || is_int($savedPeerId)) {
-            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
-        }
-        return $this->client->callSync(new UnpinAllMessagesRequest(peer: $peer, topMsgId: $topMsgId, savedPeerId: $savedPeerId));
+        return $this->unpinAllMessagesAsync(peer: $peer, topMsgId: $topMsgId, savedPeerId: $savedPeerId)->await();
+    }
+
+    /**
+     * @param int $chatId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.deleteChat
+     * @api
+     */
+    public function deleteChatAsync(int $chatId): Future
+    {
+        return $this->client->call(new DeleteChatRequest(chatId: $chatId));
     }
 
     /**
@@ -2647,7 +4351,18 @@ final readonly class MessagesMethods
      */
     public function deleteChat(int $chatId): bool
     {
-        return (bool) $this->client->callSync(new DeleteChatRequest(chatId: $chatId));
+        return (bool) $this->deleteChatAsync(chatId: $chatId)->await();
+    }
+
+    /**
+     * @param bool|null $revoke
+     * @return Future<AffectedFoundMessages|null>
+     * @see https://core.telegram.org/method/messages.deletePhoneCallHistory
+     * @api
+     */
+    public function deletePhoneCallHistoryAsync(?bool $revoke = null): Future
+    {
+        return $this->client->call(new DeletePhoneCallHistoryRequest(revoke: $revoke));
     }
 
     /**
@@ -2658,7 +4373,18 @@ final readonly class MessagesMethods
      */
     public function deletePhoneCallHistory(?bool $revoke = null): ?AffectedFoundMessages
     {
-        return $this->client->callSync(new DeletePhoneCallHistoryRequest(revoke: $revoke));
+        return $this->deletePhoneCallHistoryAsync(revoke: $revoke)->await();
+    }
+
+    /**
+     * @param string $importHead
+     * @return Future<HistoryImportParsed|null>
+     * @see https://core.telegram.org/method/messages.checkHistoryImport
+     * @api
+     */
+    public function checkHistoryImportAsync(string $importHead): Future
+    {
+        return $this->client->call(new CheckHistoryImportRequest(importHead: $importHead));
     }
 
     /**
@@ -2669,7 +4395,23 @@ final readonly class MessagesMethods
      */
     public function checkHistoryImport(string $importHead): ?HistoryImportParsed
     {
-        return $this->client->callSync(new CheckHistoryImportRequest(importHead: $importHead));
+        return $this->checkHistoryImportAsync(importHead: $importHead)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputFile|InputFileBig|InputFileStoryDocument $file
+     * @param int $mediaCount
+     * @return Future<HistoryImport|null>
+     * @see https://core.telegram.org/method/messages.initHistoryImport
+     * @api
+     */
+    public function initHistoryImportAsync(AbstractInputPeer|string|int $peer, AbstractInputFile $file, int $mediaCount): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new InitHistoryImportRequest(peer: $peer, file: $file, mediaCount: $mediaCount));
     }
 
     /**
@@ -2682,10 +4424,24 @@ final readonly class MessagesMethods
      */
     public function initHistoryImport(AbstractInputPeer|string|int $peer, AbstractInputFile $file, int $mediaCount): ?HistoryImport
     {
+        return $this->initHistoryImportAsync(peer: $peer, file: $file, mediaCount: $mediaCount)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $importId
+     * @param string $fileName
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
+     * @return Future<MessageMediaEmpty|MessageMediaPhoto|MessageMediaGeo|MessageMediaContact|MessageMediaUnsupported|MessageMediaDocument|MessageMediaWebPage|MessageMediaVenue|MessageMediaGame|MessageMediaInvoice|MessageMediaGeoLive|MessageMediaPoll|MessageMediaDice|MessageMediaStory|MessageMediaGiveaway|MessageMediaGiveawayResults|MessageMediaPaidMedia|MessageMediaToDo|MessageMediaVideoStream|null>
+     * @see https://core.telegram.org/method/messages.uploadImportedMedia
+     * @api
+     */
+    public function uploadImportedMediaAsync(AbstractInputPeer|string|int $peer, int $importId, string $fileName, AbstractInputMedia $media): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new InitHistoryImportRequest(peer: $peer, file: $file, mediaCount: $mediaCount));
+        return $this->client->call(new UploadImportedMediaRequest(peer: $peer, importId: $importId, fileName: $fileName, media: $media));
     }
 
     /**
@@ -2699,10 +4455,22 @@ final readonly class MessagesMethods
      */
     public function uploadImportedMedia(AbstractInputPeer|string|int $peer, int $importId, string $fileName, AbstractInputMedia $media): ?AbstractMessageMedia
     {
+        return $this->uploadImportedMediaAsync(peer: $peer, importId: $importId, fileName: $fileName, media: $media)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $importId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.startHistoryImport
+     * @api
+     */
+    public function startHistoryImportAsync(AbstractInputPeer|string|int $peer, int $importId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new UploadImportedMediaRequest(peer: $peer, importId: $importId, fileName: $fileName, media: $media));
+        return $this->client->call(new StartHistoryImportRequest(peer: $peer, importId: $importId));
     }
 
     /**
@@ -2714,10 +4482,34 @@ final readonly class MessagesMethods
      */
     public function startHistoryImport(AbstractInputPeer|string|int $peer, int $importId): bool
     {
+        return (bool) $this->startHistoryImportAsync(peer: $peer, importId: $importId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $adminId
+     * @param int $limit
+     * @param bool|null $revoked
+     * @param int|null $offsetDate
+     * @param string|null $offsetLink
+     * @return Future<ExportedChatInvites|null>
+     * @see https://core.telegram.org/method/messages.getExportedChatInvites
+     * @api
+     */
+    public function getExportedChatInvitesAsync(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $adminId, int $limit, ?bool $revoked = null, ?int $offsetDate = null, ?string $offsetLink = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new StartHistoryImportRequest(peer: $peer, importId: $importId));
+        if (is_string($adminId) || is_int($adminId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($adminId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $adminId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $adminId = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetExportedChatInvitesRequest(peer: $peer, adminId: $adminId, limit: $limit, revoked: $revoked, offsetDate: $offsetDate, offsetLink: $offsetLink));
     }
 
     /**
@@ -2733,18 +4525,22 @@ final readonly class MessagesMethods
      */
     public function getExportedChatInvites(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $adminId, int $limit, ?bool $revoked = null, ?int $offsetDate = null, ?string $offsetLink = null): ?ExportedChatInvites
     {
+        return $this->getExportedChatInvitesAsync(peer: $peer, adminId: $adminId, limit: $limit, revoked: $revoked, offsetDate: $offsetDate, offsetLink: $offsetLink)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $link
+     * @return Future<ExportedChatInvite|ExportedChatInviteReplaced|null>
+     * @see https://core.telegram.org/method/messages.getExportedChatInvite
+     * @api
+     */
+    public function getExportedChatInviteAsync(AbstractInputPeer|string|int $peer, string $link): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        if (is_string($adminId) || is_int($adminId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($adminId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $adminId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $adminId = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetExportedChatInvitesRequest(peer: $peer, adminId: $adminId, limit: $limit, revoked: $revoked, offsetDate: $offsetDate, offsetLink: $offsetLink));
+        return $this->client->call(new GetExportedChatInviteRequest(peer: $peer, link: $link));
     }
 
     /**
@@ -2756,10 +4552,27 @@ final readonly class MessagesMethods
      */
     public function getExportedChatInvite(AbstractInputPeer|string|int $peer, string $link): ?MessagesAbstractExportedChatInvite
     {
+        return $this->getExportedChatInviteAsync(peer: $peer, link: $link)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $link
+     * @param bool|null $revoked
+     * @param int|null $expireDate
+     * @param int|null $usageLimit
+     * @param bool|null $requestNeeded
+     * @param string|null $title
+     * @return Future<ExportedChatInvite|ExportedChatInviteReplaced|null>
+     * @see https://core.telegram.org/method/messages.editExportedChatInvite
+     * @api
+     */
+    public function editExportedChatInviteAsync(AbstractInputPeer|string|int $peer, string $link, ?bool $revoked = null, ?int $expireDate = null, ?int $usageLimit = null, ?bool $requestNeeded = null, ?string $title = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetExportedChatInviteRequest(peer: $peer, link: $link));
+        return $this->client->call(new EditExportedChatInviteRequest(peer: $peer, link: $link, revoked: $revoked, expireDate: $expireDate, usageLimit: $usageLimit, requestNeeded: $requestNeeded, title: $title));
     }
 
     /**
@@ -2776,20 +4589,17 @@ final readonly class MessagesMethods
      */
     public function editExportedChatInvite(AbstractInputPeer|string|int $peer, string $link, ?bool $revoked = null, ?int $expireDate = null, ?int $usageLimit = null, ?bool $requestNeeded = null, ?string $title = null): ?MessagesAbstractExportedChatInvite
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new EditExportedChatInviteRequest(peer: $peer, link: $link, revoked: $revoked, expireDate: $expireDate, usageLimit: $usageLimit, requestNeeded: $requestNeeded, title: $title));
+        return $this->editExportedChatInviteAsync(peer: $peer, link: $link, revoked: $revoked, expireDate: $expireDate, usageLimit: $usageLimit, requestNeeded: $requestNeeded, title: $title)->await();
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $adminId
-     * @return bool
+     * @return Future<bool>
      * @see https://core.telegram.org/method/messages.deleteRevokedExportedChatInvites
      * @api
      */
-    public function deleteRevokedExportedChatInvites(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $adminId): bool
+    public function deleteRevokedExportedChatInvitesAsync(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $adminId): Future
     {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
@@ -2802,7 +4612,34 @@ final readonly class MessagesMethods
                 $adminId = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new DeleteRevokedExportedChatInvitesRequest(peer: $peer, adminId: $adminId));
+        return $this->client->call(new DeleteRevokedExportedChatInvitesRequest(peer: $peer, adminId: $adminId));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $adminId
+     * @return bool
+     * @see https://core.telegram.org/method/messages.deleteRevokedExportedChatInvites
+     * @api
+     */
+    public function deleteRevokedExportedChatInvites(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $adminId): bool
+    {
+        return (bool) $this->deleteRevokedExportedChatInvitesAsync(peer: $peer, adminId: $adminId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $link
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.deleteExportedChatInvite
+     * @api
+     */
+    public function deleteExportedChatInviteAsync(AbstractInputPeer|string|int $peer, string $link): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new DeleteExportedChatInviteRequest(peer: $peer, link: $link));
     }
 
     /**
@@ -2814,10 +4651,21 @@ final readonly class MessagesMethods
      */
     public function deleteExportedChatInvite(AbstractInputPeer|string|int $peer, string $link): bool
     {
+        return (bool) $this->deleteExportedChatInviteAsync(peer: $peer, link: $link)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<ChatAdminsWithInvites|null>
+     * @see https://core.telegram.org/method/messages.getAdminsWithInvites
+     * @api
+     */
+    public function getAdminsWithInvitesAsync(AbstractInputPeer|string|int $peer): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new DeleteExportedChatInviteRequest(peer: $peer, link: $link));
+        return $this->client->call(new GetAdminsWithInvitesRequest(peer: $peer));
     }
 
     /**
@@ -2828,10 +4676,36 @@ final readonly class MessagesMethods
      */
     public function getAdminsWithInvites(AbstractInputPeer|string|int $peer): ?ChatAdminsWithInvites
     {
+        return $this->getAdminsWithInvitesAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $offsetDate
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $offsetUser
+     * @param int $limit
+     * @param bool|null $requested
+     * @param bool|null $subscriptionExpired
+     * @param string|null $link
+     * @param string|null $q
+     * @return Future<ChatInviteImporters|null>
+     * @see https://core.telegram.org/method/messages.getChatInviteImporters
+     * @api
+     */
+    public function getChatInviteImportersAsync(AbstractInputPeer|string|int $peer, int $offsetDate, AbstractInputUser|string|int $offsetUser, int $limit, ?bool $requested = null, ?bool $subscriptionExpired = null, ?string $link = null, ?string $q = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetAdminsWithInvitesRequest(peer: $peer));
+        if (is_string($offsetUser) || is_int($offsetUser)) {
+            $__tmpPeer = $this->client->peerManager->resolve($offsetUser);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $offsetUser = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $offsetUser = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetChatInviteImportersRequest(peer: $peer, offsetDate: $offsetDate, offsetUser: $offsetUser, limit: $limit, requested: $requested, subscriptionExpired: $subscriptionExpired, link: $link, q: $q));
     }
 
     /**
@@ -2849,18 +4723,22 @@ final readonly class MessagesMethods
      */
     public function getChatInviteImporters(AbstractInputPeer|string|int $peer, int $offsetDate, AbstractInputUser|string|int $offsetUser, int $limit, ?bool $requested = null, ?bool $subscriptionExpired = null, ?string $link = null, ?string $q = null): ?ChatInviteImporters
     {
+        return $this->getChatInviteImportersAsync(peer: $peer, offsetDate: $offsetDate, offsetUser: $offsetUser, limit: $limit, requested: $requested, subscriptionExpired: $subscriptionExpired, link: $link, q: $q)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $period
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.setHistoryTTL
+     * @api
+     */
+    public function setHistoryTTLAsync(AbstractInputPeer|string|int $peer, int $period): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        if (is_string($offsetUser) || is_int($offsetUser)) {
-            $__tmpPeer = $this->client->peerManager->resolve($offsetUser);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $offsetUser = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $offsetUser = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetChatInviteImportersRequest(peer: $peer, offsetDate: $offsetDate, offsetUser: $offsetUser, limit: $limit, requested: $requested, subscriptionExpired: $subscriptionExpired, link: $link, q: $q));
+        return $this->client->call(new SetHistoryTTLRequest(peer: $peer, period: $period));
     }
 
     /**
@@ -2872,10 +4750,21 @@ final readonly class MessagesMethods
      */
     public function setHistoryTTL(AbstractInputPeer|string|int $peer, int $period): ?AbstractUpdates
     {
+        return $this->setHistoryTTLAsync(peer: $peer, period: $period)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<CheckedHistoryImportPeer|null>
+     * @see https://core.telegram.org/method/messages.checkHistoryImportPeer
+     * @api
+     */
+    public function checkHistoryImportPeerAsync(AbstractInputPeer|string|int $peer): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new SetHistoryTTLRequest(peer: $peer, period: $period));
+        return $this->client->call(new CheckHistoryImportPeerRequest(peer: $peer));
     }
 
     /**
@@ -2886,10 +4775,22 @@ final readonly class MessagesMethods
      */
     public function checkHistoryImportPeer(AbstractInputPeer|string|int $peer): ?CheckedHistoryImportPeer
     {
+        return $this->checkHistoryImportPeerAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputChatThemeEmpty|InputChatTheme|InputChatThemeUniqueGift $theme
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.setChatTheme
+     * @api
+     */
+    public function setChatThemeAsync(AbstractInputPeer|string|int $peer, AbstractInputChatTheme $theme): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new CheckHistoryImportPeerRequest(peer: $peer));
+        return $this->client->call(new SetChatThemeRequest(peer: $peer, theme: $theme));
     }
 
     /**
@@ -2901,10 +4802,22 @@ final readonly class MessagesMethods
      */
     public function setChatTheme(AbstractInputPeer|string|int $peer, AbstractInputChatTheme $theme): ?AbstractUpdates
     {
+        return $this->setChatThemeAsync(peer: $peer, theme: $theme)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @return Future<list<ReadParticipantDate>>
+     * @see https://core.telegram.org/method/messages.getMessageReadParticipants
+     * @api
+     */
+    public function getMessageReadParticipantsAsync(AbstractInputPeer|string|int $peer, int $msgId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new SetChatThemeRequest(peer: $peer, theme: $theme));
+        return $this->client->call(new GetMessageReadParticipantsRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -2916,10 +4829,28 @@ final readonly class MessagesMethods
      */
     public function getMessageReadParticipants(AbstractInputPeer|string|int $peer, int $msgId): array
     {
+        return $this->getMessageReadParticipantsAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputMessagesFilterEmpty|InputMessagesFilterPhotos|InputMessagesFilterVideo|InputMessagesFilterPhotoVideo|InputMessagesFilterDocument|InputMessagesFilterUrl|InputMessagesFilterGif|InputMessagesFilterVoice|InputMessagesFilterMusic|InputMessagesFilterChatPhotos|InputMessagesFilterPhoneCalls|InputMessagesFilterRoundVoice|InputMessagesFilterRoundVideo|InputMessagesFilterMyMentions|InputMessagesFilterGeo|InputMessagesFilterContacts|InputMessagesFilterPinned $filter
+     * @param int $offsetId
+     * @param int $offsetDate
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $savedPeerId
+     * @return Future<SearchResultsCalendar|null>
+     * @see https://core.telegram.org/method/messages.getSearchResultsCalendar
+     * @api
+     */
+    public function getSearchResultsCalendarAsync(AbstractInputPeer|string|int $peer, AbstractMessagesFilter $filter, int $offsetId, int $offsetDate, AbstractInputPeer|string|int|null $savedPeerId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetMessageReadParticipantsRequest(peer: $peer, msgId: $msgId));
+        if (is_string($savedPeerId) || is_int($savedPeerId)) {
+            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
+        }
+        return $this->client->call(new GetSearchResultsCalendarRequest(peer: $peer, filter: $filter, offsetId: $offsetId, offsetDate: $offsetDate, savedPeerId: $savedPeerId));
     }
 
     /**
@@ -2934,13 +4865,28 @@ final readonly class MessagesMethods
      */
     public function getSearchResultsCalendar(AbstractInputPeer|string|int $peer, AbstractMessagesFilter $filter, int $offsetId, int $offsetDate, AbstractInputPeer|string|int|null $savedPeerId = null): ?SearchResultsCalendar
     {
+        return $this->getSearchResultsCalendarAsync(peer: $peer, filter: $filter, offsetId: $offsetId, offsetDate: $offsetDate, savedPeerId: $savedPeerId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputMessagesFilterEmpty|InputMessagesFilterPhotos|InputMessagesFilterVideo|InputMessagesFilterPhotoVideo|InputMessagesFilterDocument|InputMessagesFilterUrl|InputMessagesFilterGif|InputMessagesFilterVoice|InputMessagesFilterMusic|InputMessagesFilterChatPhotos|InputMessagesFilterPhoneCalls|InputMessagesFilterRoundVoice|InputMessagesFilterRoundVideo|InputMessagesFilterMyMentions|InputMessagesFilterGeo|InputMessagesFilterContacts|InputMessagesFilterPinned $filter
+     * @param int $offsetId
+     * @param int $limit
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $savedPeerId
+     * @return Future<SearchResultsPositions|null>
+     * @see https://core.telegram.org/method/messages.getSearchResultsPositions
+     * @api
+     */
+    public function getSearchResultsPositionsAsync(AbstractInputPeer|string|int $peer, AbstractMessagesFilter $filter, int $offsetId, int $limit, AbstractInputPeer|string|int|null $savedPeerId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
         if (is_string($savedPeerId) || is_int($savedPeerId)) {
             $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
         }
-        return $this->client->callSync(new GetSearchResultsCalendarRequest(peer: $peer, filter: $filter, offsetId: $offsetId, offsetDate: $offsetDate, savedPeerId: $savedPeerId));
+        return $this->client->call(new GetSearchResultsPositionsRequest(peer: $peer, filter: $filter, offsetId: $offsetId, limit: $limit, savedPeerId: $savedPeerId));
     }
 
     /**
@@ -2955,24 +4901,18 @@ final readonly class MessagesMethods
      */
     public function getSearchResultsPositions(AbstractInputPeer|string|int $peer, AbstractMessagesFilter $filter, int $offsetId, int $limit, AbstractInputPeer|string|int|null $savedPeerId = null): ?SearchResultsPositions
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        if (is_string($savedPeerId) || is_int($savedPeerId)) {
-            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
-        }
-        return $this->client->callSync(new GetSearchResultsPositionsRequest(peer: $peer, filter: $filter, offsetId: $offsetId, limit: $limit, savedPeerId: $savedPeerId));
+        return $this->getSearchResultsPositionsAsync(peer: $peer, filter: $filter, offsetId: $offsetId, limit: $limit, savedPeerId: $savedPeerId)->await();
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param bool|null $approved
-     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
      * @see https://core.telegram.org/method/messages.hideChatJoinRequest
      * @api
      */
-    public function hideChatJoinRequest(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $userId, ?bool $approved = null): ?AbstractUpdates
+    public function hideChatJoinRequestAsync(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $userId, ?bool $approved = null): Future
     {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
@@ -2985,7 +4925,36 @@ final readonly class MessagesMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new HideChatJoinRequestRequest(peer: $peer, userId: $userId, approved: $approved));
+        return $this->client->call(new HideChatJoinRequestRequest(peer: $peer, userId: $userId, approved: $approved));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param bool|null $approved
+     * @return UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null
+     * @see https://core.telegram.org/method/messages.hideChatJoinRequest
+     * @api
+     */
+    public function hideChatJoinRequest(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $userId, ?bool $approved = null): ?AbstractUpdates
+    {
+        return $this->hideChatJoinRequestAsync(peer: $peer, userId: $userId, approved: $approved)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool|null $approved
+     * @param string|null $link
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.hideAllChatJoinRequests
+     * @api
+     */
+    public function hideAllChatJoinRequestsAsync(AbstractInputPeer|string|int $peer, ?bool $approved = null, ?string $link = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new HideAllChatJoinRequestsRequest(peer: $peer, approved: $approved, link: $link));
     }
 
     /**
@@ -2998,10 +4967,22 @@ final readonly class MessagesMethods
      */
     public function hideAllChatJoinRequests(AbstractInputPeer|string|int $peer, ?bool $approved = null, ?string $link = null): ?AbstractUpdates
     {
+        return $this->hideAllChatJoinRequestsAsync(peer: $peer, approved: $approved, link: $link)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool $enabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.toggleNoForwards
+     * @api
+     */
+    public function toggleNoForwardsAsync(AbstractInputPeer|string|int $peer, bool $enabled): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new HideAllChatJoinRequestsRequest(peer: $peer, approved: $approved, link: $link));
+        return $this->client->call(new ToggleNoForwardsRequest(peer: $peer, enabled: $enabled));
     }
 
     /**
@@ -3013,10 +4994,25 @@ final readonly class MessagesMethods
      */
     public function toggleNoForwards(AbstractInputPeer|string|int $peer, bool $enabled): ?AbstractUpdates
     {
+        return $this->toggleNoForwardsAsync(peer: $peer, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $sendAs
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.saveDefaultSendAs
+     * @api
+     */
+    public function saveDefaultSendAsAsync(AbstractInputPeer|string|int $peer, AbstractInputPeer|string|int $sendAs): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new ToggleNoForwardsRequest(peer: $peer, enabled: $enabled));
+        if (is_string($sendAs) || is_int($sendAs)) {
+            $sendAs = $this->client->peerManager->resolve($sendAs);
+        }
+        return $this->client->call(new SaveDefaultSendAsRequest(peer: $peer, sendAs: $sendAs));
     }
 
     /**
@@ -3028,13 +5024,25 @@ final readonly class MessagesMethods
      */
     public function saveDefaultSendAs(AbstractInputPeer|string|int $peer, AbstractInputPeer|string|int $sendAs): bool
     {
+        return (bool) $this->saveDefaultSendAsAsync(peer: $peer, sendAs: $sendAs)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param bool|null $big
+     * @param bool|null $addToRecent
+     * @param list<ReactionEmpty|ReactionEmoji|ReactionCustomEmoji|ReactionPaid>|null $reaction
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendReaction
+     * @api
+     */
+    public function sendReactionAsync(AbstractInputPeer|string|int $peer, int $msgId, ?bool $big = null, ?bool $addToRecent = null, ?array $reaction = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        if (is_string($sendAs) || is_int($sendAs)) {
-            $sendAs = $this->client->peerManager->resolve($sendAs);
-        }
-        return (bool) $this->client->callSync(new SaveDefaultSendAsRequest(peer: $peer, sendAs: $sendAs));
+        return $this->client->call(new SendReactionRequest(peer: $peer, msgId: $msgId, big: $big, addToRecent: $addToRecent, reaction: $reaction));
     }
 
     /**
@@ -3049,10 +5057,22 @@ final readonly class MessagesMethods
      */
     public function sendReaction(AbstractInputPeer|string|int $peer, int $msgId, ?bool $big = null, ?bool $addToRecent = null, ?array $reaction = null): ?AbstractUpdates
     {
+        return $this->sendReactionAsync(peer: $peer, msgId: $msgId, big: $big, addToRecent: $addToRecent, reaction: $reaction)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $id
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.getMessagesReactions
+     * @api
+     */
+    public function getMessagesReactionsAsync(AbstractInputPeer|string|int $peer, array $id): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new SendReactionRequest(peer: $peer, msgId: $msgId, big: $big, addToRecent: $addToRecent, reaction: $reaction));
+        return $this->client->call(new GetMessagesReactionsRequest(peer: $peer, id: $id));
     }
 
     /**
@@ -3064,10 +5084,25 @@ final readonly class MessagesMethods
      */
     public function getMessagesReactions(AbstractInputPeer|string|int $peer, array $id): ?AbstractUpdates
     {
+        return $this->getMessagesReactionsAsync(peer: $peer, id: $id)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $id
+     * @param int $limit
+     * @param ReactionEmpty|ReactionEmoji|ReactionCustomEmoji|ReactionPaid|null $reaction
+     * @param string|null $offset
+     * @return Future<MessageReactionsList|null>
+     * @see https://core.telegram.org/method/messages.getMessageReactionsList
+     * @api
+     */
+    public function getMessageReactionsListAsync(AbstractInputPeer|string|int $peer, int $id, int $limit, ?AbstractReaction $reaction = null, ?string $offset = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetMessagesReactionsRequest(peer: $peer, id: $id));
+        return $this->client->call(new GetMessageReactionsListRequest(peer: $peer, id: $id, limit: $limit, reaction: $reaction, offset: $offset));
     }
 
     /**
@@ -3082,10 +5117,24 @@ final readonly class MessagesMethods
      */
     public function getMessageReactionsList(AbstractInputPeer|string|int $peer, int $id, int $limit, ?AbstractReaction $reaction = null, ?string $offset = null): ?MessageReactionsList
     {
+        return $this->getMessageReactionsListAsync(peer: $peer, id: $id, limit: $limit, reaction: $reaction, offset: $offset)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param ChatReactionsNone|ChatReactionsAll|ChatReactionsSome $availableReactions
+     * @param int|null $reactionsLimit
+     * @param bool|null $paidEnabled
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.setChatAvailableReactions
+     * @api
+     */
+    public function setChatAvailableReactionsAsync(AbstractInputPeer|string|int $peer, AbstractChatReactions $availableReactions, ?int $reactionsLimit = null, ?bool $paidEnabled = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetMessageReactionsListRequest(peer: $peer, id: $id, limit: $limit, reaction: $reaction, offset: $offset));
+        return $this->client->call(new SetChatAvailableReactionsRequest(peer: $peer, availableReactions: $availableReactions, reactionsLimit: $reactionsLimit, paidEnabled: $paidEnabled));
     }
 
     /**
@@ -3099,10 +5148,18 @@ final readonly class MessagesMethods
      */
     public function setChatAvailableReactions(AbstractInputPeer|string|int $peer, AbstractChatReactions $availableReactions, ?int $reactionsLimit = null, ?bool $paidEnabled = null): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new SetChatAvailableReactionsRequest(peer: $peer, availableReactions: $availableReactions, reactionsLimit: $reactionsLimit, paidEnabled: $paidEnabled));
+        return $this->setChatAvailableReactionsAsync(peer: $peer, availableReactions: $availableReactions, reactionsLimit: $reactionsLimit, paidEnabled: $paidEnabled)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<AvailableReactionsNotModified|AvailableReactions|null>
+     * @see https://core.telegram.org/method/messages.getAvailableReactions
+     * @api
+     */
+    public function getAvailableReactionsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetAvailableReactionsRequest(hash: $hash));
     }
 
     /**
@@ -3113,7 +5170,18 @@ final readonly class MessagesMethods
      */
     public function getAvailableReactions(int $hash): ?AbstractAvailableReactions
     {
-        return $this->client->callSync(new GetAvailableReactionsRequest(hash: $hash));
+        return $this->getAvailableReactionsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param ReactionEmpty|ReactionEmoji|ReactionCustomEmoji|ReactionPaid $reaction
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.setDefaultReaction
+     * @api
+     */
+    public function setDefaultReactionAsync(AbstractReaction $reaction): Future
+    {
+        return $this->client->call(new SetDefaultReactionRequest(reaction: $reaction));
     }
 
     /**
@@ -3124,7 +5192,24 @@ final readonly class MessagesMethods
      */
     public function setDefaultReaction(AbstractReaction $reaction): bool
     {
-        return (bool) $this->client->callSync(new SetDefaultReactionRequest(reaction: $reaction));
+        return (bool) $this->setDefaultReactionAsync(reaction: $reaction)->await();
+    }
+
+    /**
+     * @param string $toLang
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $peer
+     * @param list<int>|null $id
+     * @param list<TextWithEntities>|null $text
+     * @return Future<TranslatedText|null>
+     * @see https://core.telegram.org/method/messages.translateText
+     * @api
+     */
+    public function translateTextAsync(string $toLang, AbstractInputPeer|string|int|null $peer = null, ?array $id = null, ?array $text = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new TranslateTextRequest(toLang: $toLang, peer: $peer, id: $id, text: $text));
     }
 
     /**
@@ -3138,10 +5223,31 @@ final readonly class MessagesMethods
      */
     public function translateText(string $toLang, AbstractInputPeer|string|int|null $peer = null, ?array $id = null, ?array $text = null): ?TranslatedText
     {
+        return $this->translateTextAsync(toLang: $toLang, peer: $peer, id: $id, text: $text)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $offsetId
+     * @param int $addOffset
+     * @param int $limit
+     * @param int $maxId
+     * @param int $minId
+     * @param int|null $topMsgId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $savedPeerId
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getUnreadReactions
+     * @api
+     */
+    public function getUnreadReactionsAsync(AbstractInputPeer|string|int $peer, int $offsetId, int $addOffset, int $limit, int $maxId, int $minId, ?int $topMsgId = null, AbstractInputPeer|string|int|null $savedPeerId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new TranslateTextRequest(toLang: $toLang, peer: $peer, id: $id, text: $text));
+        if (is_string($savedPeerId) || is_int($savedPeerId)) {
+            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
+        }
+        return $this->client->call(new GetUnreadReactionsRequest(peer: $peer, offsetId: $offsetId, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, topMsgId: $topMsgId, savedPeerId: $savedPeerId));
     }
 
     /**
@@ -3159,13 +5265,26 @@ final readonly class MessagesMethods
      */
     public function getUnreadReactions(AbstractInputPeer|string|int $peer, int $offsetId, int $addOffset, int $limit, int $maxId, int $minId, ?int $topMsgId = null, AbstractInputPeer|string|int|null $savedPeerId = null): ?AbstractMessages
     {
+        return $this->getUnreadReactionsAsync(peer: $peer, offsetId: $offsetId, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, topMsgId: $topMsgId, savedPeerId: $savedPeerId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int|null $topMsgId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $savedPeerId
+     * @return Future<AffectedHistory|null>
+     * @see https://core.telegram.org/method/messages.readReactions
+     * @api
+     */
+    public function readReactionsAsync(AbstractInputPeer|string|int $peer, ?int $topMsgId = null, AbstractInputPeer|string|int|null $savedPeerId = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
         if (is_string($savedPeerId) || is_int($savedPeerId)) {
             $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
         }
-        return $this->client->callSync(new GetUnreadReactionsRequest(peer: $peer, offsetId: $offsetId, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, topMsgId: $topMsgId, savedPeerId: $savedPeerId));
+        return $this->client->call(new ReadReactionsRequest(peer: $peer, topMsgId: $topMsgId, savedPeerId: $savedPeerId));
     }
 
     /**
@@ -3178,13 +5297,20 @@ final readonly class MessagesMethods
      */
     public function readReactions(AbstractInputPeer|string|int $peer, ?int $topMsgId = null, AbstractInputPeer|string|int|null $savedPeerId = null): ?AffectedHistory
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        if (is_string($savedPeerId) || is_int($savedPeerId)) {
-            $savedPeerId = $this->client->peerManager->resolve($savedPeerId);
-        }
-        return $this->client->callSync(new ReadReactionsRequest(peer: $peer, topMsgId: $topMsgId, savedPeerId: $savedPeerId));
+        return $this->readReactionsAsync(peer: $peer, topMsgId: $topMsgId, savedPeerId: $savedPeerId)->await();
+    }
+
+    /**
+     * @param string $q
+     * @param InputMessagesFilterEmpty|InputMessagesFilterPhotos|InputMessagesFilterVideo|InputMessagesFilterPhotoVideo|InputMessagesFilterDocument|InputMessagesFilterUrl|InputMessagesFilterGif|InputMessagesFilterVoice|InputMessagesFilterMusic|InputMessagesFilterChatPhotos|InputMessagesFilterPhoneCalls|InputMessagesFilterRoundVoice|InputMessagesFilterRoundVideo|InputMessagesFilterMyMentions|InputMessagesFilterGeo|InputMessagesFilterContacts|InputMessagesFilterPinned $filter
+     * @param int $limit
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.searchSentMedia
+     * @api
+     */
+    public function searchSentMediaAsync(string $q, AbstractMessagesFilter $filter, int $limit): Future
+    {
+        return $this->client->call(new SearchSentMediaRequest(q: $q, filter: $filter, limit: $limit));
     }
 
     /**
@@ -3197,7 +5323,18 @@ final readonly class MessagesMethods
      */
     public function searchSentMedia(string $q, AbstractMessagesFilter $filter, int $limit): ?AbstractMessages
     {
-        return $this->client->callSync(new SearchSentMediaRequest(q: $q, filter: $filter, limit: $limit));
+        return $this->searchSentMediaAsync(q: $q, filter: $filter, limit: $limit)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<AttachMenuBotsNotModified|AttachMenuBots|null>
+     * @see https://core.telegram.org/method/messages.getAttachMenuBots
+     * @api
+     */
+    public function getAttachMenuBotsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetAttachMenuBotsRequest(hash: $hash));
     }
 
     /**
@@ -3208,7 +5345,26 @@ final readonly class MessagesMethods
      */
     public function getAttachMenuBots(int $hash): ?AbstractAttachMenuBots
     {
-        return $this->client->callSync(new GetAttachMenuBotsRequest(hash: $hash));
+        return $this->getAttachMenuBotsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @return Future<AttachMenuBotsBot|null>
+     * @see https://core.telegram.org/method/messages.getAttachMenuBot
+     * @api
+     */
+    public function getAttachMenuBotAsync(AbstractInputUser|string|int $bot): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $bot = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetAttachMenuBotRequest(bot: $bot));
     }
 
     /**
@@ -3219,6 +5375,19 @@ final readonly class MessagesMethods
      */
     public function getAttachMenuBot(AbstractInputUser|string|int $bot): ?AttachMenuBotsBot
     {
+        return $this->getAttachMenuBotAsync(bot: $bot)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param bool $enabled
+     * @param bool|null $writeAllowed
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.toggleBotInAttachMenu
+     * @api
+     */
+    public function toggleBotInAttachMenuAsync(AbstractInputUser|string|int $bot, bool $enabled, ?bool $writeAllowed = null): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -3227,7 +5396,7 @@ final readonly class MessagesMethods
                 $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetAttachMenuBotRequest(bot: $bot));
+        return $this->client->call(new ToggleBotInAttachMenuRequest(bot: $bot, enabled: $enabled, writeAllowed: $writeAllowed));
     }
 
     /**
@@ -3240,6 +5409,31 @@ final readonly class MessagesMethods
      */
     public function toggleBotInAttachMenu(AbstractInputUser|string|int $bot, bool $enabled, ?bool $writeAllowed = null): bool
     {
+        return (bool) $this->toggleBotInAttachMenuAsync(bot: $bot, enabled: $enabled, writeAllowed: $writeAllowed)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $platform
+     * @param bool|null $fromBotMenu
+     * @param bool|null $silent
+     * @param bool|null $compact
+     * @param bool|null $fullscreen
+     * @param string|null $url
+     * @param string|null $startParam
+     * @param array|null $themeParams
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
+     * @return Future<WebViewResult|null>
+     * @see https://core.telegram.org/method/messages.requestWebView
+     * @api
+     */
+    public function requestWebViewAsync(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot, string $platform, ?bool $fromBotMenu = null, ?bool $silent = null, ?bool $compact = null, ?bool $fullscreen = null, ?string $url = null, ?string $startParam = null, ?array $themeParams = null, ?AbstractInputReplyTo $replyTo = null, AbstractInputPeer|string|int|null $sendAs = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -3248,7 +5442,10 @@ final readonly class MessagesMethods
                 $bot = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ToggleBotInAttachMenuRequest(bot: $bot, enabled: $enabled, writeAllowed: $writeAllowed));
+        if (is_string($sendAs) || is_int($sendAs)) {
+            $sendAs = $this->client->peerManager->resolve($sendAs);
+        }
+        return $this->client->call(new RequestWebViewRequest(peer: $peer, bot: $bot, platform: $platform, fromBotMenu: $fromBotMenu, silent: $silent, compact: $compact, fullscreen: $fullscreen, url: $url, startParam: $startParam, themeParams: $themeParams, replyTo: $replyTo, sendAs: $sendAs));
     }
 
     /**
@@ -3270,21 +5467,7 @@ final readonly class MessagesMethods
      */
     public function requestWebView(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot, string $platform, ?bool $fromBotMenu = null, ?bool $silent = null, ?bool $compact = null, ?bool $fullscreen = null, ?string $url = null, ?string $startParam = null, ?array $themeParams = null, ?AbstractInputReplyTo $replyTo = null, AbstractInputPeer|string|int|null $sendAs = null): ?WebViewResult
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
-        }
-        if (is_string($sendAs) || is_int($sendAs)) {
-            $sendAs = $this->client->peerManager->resolve($sendAs);
-        }
-        return $this->client->callSync(new RequestWebViewRequest(peer: $peer, bot: $bot, platform: $platform, fromBotMenu: $fromBotMenu, silent: $silent, compact: $compact, fullscreen: $fullscreen, url: $url, startParam: $startParam, themeParams: $themeParams, replyTo: $replyTo, sendAs: $sendAs));
+        return $this->requestWebViewAsync(peer: $peer, bot: $bot, platform: $platform, fromBotMenu: $fromBotMenu, silent: $silent, compact: $compact, fullscreen: $fullscreen, url: $url, startParam: $startParam, themeParams: $themeParams, replyTo: $replyTo, sendAs: $sendAs)->await();
     }
 
     /**
@@ -3294,11 +5477,11 @@ final readonly class MessagesMethods
      * @param bool|null $silent
      * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
-     * @return bool
+     * @return Future<bool>
      * @see https://core.telegram.org/method/messages.prolongWebView
      * @api
      */
-    public function prolongWebView(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot, int $queryId, ?bool $silent = null, ?AbstractInputReplyTo $replyTo = null, AbstractInputPeer|string|int|null $sendAs = null): bool
+    public function prolongWebViewAsync(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot, int $queryId, ?bool $silent = null, ?AbstractInputReplyTo $replyTo = null, AbstractInputPeer|string|int|null $sendAs = null): Future
     {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
@@ -3314,7 +5497,50 @@ final readonly class MessagesMethods
         if (is_string($sendAs) || is_int($sendAs)) {
             $sendAs = $this->client->peerManager->resolve($sendAs);
         }
-        return (bool) $this->client->callSync(new ProlongWebViewRequest(peer: $peer, bot: $bot, queryId: $queryId, silent: $silent, replyTo: $replyTo, sendAs: $sendAs));
+        return $this->client->call(new ProlongWebViewRequest(peer: $peer, bot: $bot, queryId: $queryId, silent: $silent, replyTo: $replyTo, sendAs: $sendAs));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param int $queryId
+     * @param bool|null $silent
+     * @param InputReplyToMessage|InputReplyToStory|InputReplyToMonoForum|null $replyTo
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
+     * @return bool
+     * @see https://core.telegram.org/method/messages.prolongWebView
+     * @api
+     */
+    public function prolongWebView(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot, int $queryId, ?bool $silent = null, ?AbstractInputReplyTo $replyTo = null, AbstractInputPeer|string|int|null $sendAs = null): bool
+    {
+        return (bool) $this->prolongWebViewAsync(peer: $peer, bot: $bot, queryId: $queryId, silent: $silent, replyTo: $replyTo, sendAs: $sendAs)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $platform
+     * @param bool|null $fromSwitchWebview
+     * @param bool|null $fromSideMenu
+     * @param bool|null $compact
+     * @param bool|null $fullscreen
+     * @param string|null $url
+     * @param string|null $startParam
+     * @param array|null $themeParams
+     * @return Future<WebViewResult|null>
+     * @see https://core.telegram.org/method/messages.requestSimpleWebView
+     * @api
+     */
+    public function requestSimpleWebViewAsync(AbstractInputUser|string|int $bot, string $platform, ?bool $fromSwitchWebview = null, ?bool $fromSideMenu = null, ?bool $compact = null, ?bool $fullscreen = null, ?string $url = null, ?string $startParam = null, ?array $themeParams = null): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $bot = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new RequestSimpleWebViewRequest(bot: $bot, platform: $platform, fromSwitchWebview: $fromSwitchWebview, fromSideMenu: $fromSideMenu, compact: $compact, fullscreen: $fullscreen, url: $url, startParam: $startParam, themeParams: $themeParams));
     }
 
     /**
@@ -3333,15 +5559,19 @@ final readonly class MessagesMethods
      */
     public function requestSimpleWebView(AbstractInputUser|string|int $bot, string $platform, ?bool $fromSwitchWebview = null, ?bool $fromSideMenu = null, ?bool $compact = null, ?bool $fullscreen = null, ?string $url = null, ?string $startParam = null, ?array $themeParams = null): ?WebViewResult
     {
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new RequestSimpleWebViewRequest(bot: $bot, platform: $platform, fromSwitchWebview: $fromSwitchWebview, fromSideMenu: $fromSideMenu, compact: $compact, fullscreen: $fullscreen, url: $url, startParam: $startParam, themeParams: $themeParams));
+        return $this->requestSimpleWebViewAsync(bot: $bot, platform: $platform, fromSwitchWebview: $fromSwitchWebview, fromSideMenu: $fromSideMenu, compact: $compact, fullscreen: $fullscreen, url: $url, startParam: $startParam, themeParams: $themeParams)->await();
+    }
+
+    /**
+     * @param string $botQueryId
+     * @param InputBotInlineResult|InputBotInlineResultPhoto|InputBotInlineResultDocument|InputBotInlineResultGame $result
+     * @return Future<WebViewMessageSent|null>
+     * @see https://core.telegram.org/method/messages.sendWebViewResultMessage
+     * @api
+     */
+    public function sendWebViewResultMessageAsync(string $botQueryId, AbstractInputBotInlineResult $result): Future
+    {
+        return $this->client->call(new SendWebViewResultMessageRequest(botQueryId: $botQueryId, result: $result));
     }
 
     /**
@@ -3353,7 +5583,32 @@ final readonly class MessagesMethods
      */
     public function sendWebViewResultMessage(string $botQueryId, AbstractInputBotInlineResult $result): ?WebViewMessageSent
     {
-        return $this->client->callSync(new SendWebViewResultMessageRequest(botQueryId: $botQueryId, result: $result));
+        return $this->sendWebViewResultMessageAsync(botQueryId: $botQueryId, result: $result)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $buttonText
+     * @param string $data
+     * @param int|null $randomId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendWebViewData
+     * @api
+     */
+    public function sendWebViewDataAsync(AbstractInputUser|string|int $bot, string $buttonText, string $data, ?int $randomId = null): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $bot = $__tmpPeer;
+            }
+        }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->call(new SendWebViewDataRequest(bot: $bot, buttonText: $buttonText, data: $data, randomId: $randomId));
     }
 
     /**
@@ -3367,18 +5622,22 @@ final readonly class MessagesMethods
      */
     public function sendWebViewData(AbstractInputUser|string|int $bot, string $buttonText, string $data, ?int $randomId = null): ?AbstractUpdates
     {
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
+        return $this->sendWebViewDataAsync(bot: $bot, buttonText: $buttonText, data: $data, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @return Future<TranscribedAudio|null>
+     * @see https://core.telegram.org/method/messages.transcribeAudio
+     * @api
+     */
+    public function transcribeAudioAsync(AbstractInputPeer|string|int $peer, int $msgId): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
         }
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new SendWebViewDataRequest(bot: $bot, buttonText: $buttonText, data: $data, randomId: $randomId));
+        return $this->client->call(new TranscribeAudioRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -3390,10 +5649,24 @@ final readonly class MessagesMethods
      */
     public function transcribeAudio(AbstractInputPeer|string|int $peer, int $msgId): ?TranscribedAudio
     {
+        return $this->transcribeAudioAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param int $transcriptionId
+     * @param bool $good
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.rateTranscribedAudio
+     * @api
+     */
+    public function rateTranscribedAudioAsync(AbstractInputPeer|string|int $peer, int $msgId, int $transcriptionId, bool $good): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new TranscribeAudioRequest(peer: $peer, msgId: $msgId));
+        return $this->client->call(new RateTranscribedAudioRequest(peer: $peer, msgId: $msgId, transcriptionId: $transcriptionId, good: $good));
     }
 
     /**
@@ -3407,10 +5680,18 @@ final readonly class MessagesMethods
      */
     public function rateTranscribedAudio(AbstractInputPeer|string|int $peer, int $msgId, int $transcriptionId, bool $good): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new RateTranscribedAudioRequest(peer: $peer, msgId: $msgId, transcriptionId: $transcriptionId, good: $good));
+        return (bool) $this->rateTranscribedAudioAsync(peer: $peer, msgId: $msgId, transcriptionId: $transcriptionId, good: $good)->await();
+    }
+
+    /**
+     * @param list<int> $documentId
+     * @return Future<list<DocumentEmpty|Document>>
+     * @see https://core.telegram.org/method/messages.getCustomEmojiDocuments
+     * @api
+     */
+    public function getCustomEmojiDocumentsAsync(array $documentId): Future
+    {
+        return $this->client->call(new GetCustomEmojiDocumentsRequest(documentId: $documentId));
     }
 
     /**
@@ -3421,7 +5702,18 @@ final readonly class MessagesMethods
      */
     public function getCustomEmojiDocuments(array $documentId): array
     {
-        return $this->client->callSync(new GetCustomEmojiDocumentsRequest(documentId: $documentId));
+        return $this->getCustomEmojiDocumentsAsync(documentId: $documentId)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<AllStickersNotModified|AllStickers|null>
+     * @see https://core.telegram.org/method/messages.getEmojiStickers
+     * @api
+     */
+    public function getEmojiStickersAsync(int $hash): Future
+    {
+        return $this->client->call(new GetEmojiStickersRequest(hash: $hash));
     }
 
     /**
@@ -3432,7 +5724,18 @@ final readonly class MessagesMethods
      */
     public function getEmojiStickers(int $hash): ?AbstractAllStickers
     {
-        return $this->client->callSync(new GetEmojiStickersRequest(hash: $hash));
+        return $this->getEmojiStickersAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<FeaturedStickersNotModified|FeaturedStickers|null>
+     * @see https://core.telegram.org/method/messages.getFeaturedEmojiStickers
+     * @api
+     */
+    public function getFeaturedEmojiStickersAsync(int $hash): Future
+    {
+        return $this->client->call(new GetFeaturedEmojiStickersRequest(hash: $hash));
     }
 
     /**
@@ -3443,7 +5746,26 @@ final readonly class MessagesMethods
      */
     public function getFeaturedEmojiStickers(int $hash): ?AbstractFeaturedStickers
     {
-        return $this->client->callSync(new GetFeaturedEmojiStickersRequest(hash: $hash));
+        return $this->getFeaturedEmojiStickersAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $id
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $reactionPeer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.reportReaction
+     * @api
+     */
+    public function reportReactionAsync(AbstractInputPeer|string|int $peer, int $id, AbstractInputPeer|string|int $reactionPeer): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if (is_string($reactionPeer) || is_int($reactionPeer)) {
+            $reactionPeer = $this->client->peerManager->resolve($reactionPeer);
+        }
+        return $this->client->call(new ReportReactionRequest(peer: $peer, id: $id, reactionPeer: $reactionPeer));
     }
 
     /**
@@ -3456,13 +5778,19 @@ final readonly class MessagesMethods
      */
     public function reportReaction(AbstractInputPeer|string|int $peer, int $id, AbstractInputPeer|string|int $reactionPeer): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        if (is_string($reactionPeer) || is_int($reactionPeer)) {
-            $reactionPeer = $this->client->peerManager->resolve($reactionPeer);
-        }
-        return (bool) $this->client->callSync(new ReportReactionRequest(peer: $peer, id: $id, reactionPeer: $reactionPeer));
+        return (bool) $this->reportReactionAsync(peer: $peer, id: $id, reactionPeer: $reactionPeer)->await();
+    }
+
+    /**
+     * @param int $limit
+     * @param int $hash
+     * @return Future<ReactionsNotModified|Reactions|null>
+     * @see https://core.telegram.org/method/messages.getTopReactions
+     * @api
+     */
+    public function getTopReactionsAsync(int $limit, int $hash): Future
+    {
+        return $this->client->call(new GetTopReactionsRequest(limit: $limit, hash: $hash));
     }
 
     /**
@@ -3474,7 +5802,19 @@ final readonly class MessagesMethods
      */
     public function getTopReactions(int $limit, int $hash): ?AbstractReactions
     {
-        return $this->client->callSync(new GetTopReactionsRequest(limit: $limit, hash: $hash));
+        return $this->getTopReactionsAsync(limit: $limit, hash: $hash)->await();
+    }
+
+    /**
+     * @param int $limit
+     * @param int $hash
+     * @return Future<ReactionsNotModified|Reactions|null>
+     * @see https://core.telegram.org/method/messages.getRecentReactions
+     * @api
+     */
+    public function getRecentReactionsAsync(int $limit, int $hash): Future
+    {
+        return $this->client->call(new GetRecentReactionsRequest(limit: $limit, hash: $hash));
     }
 
     /**
@@ -3486,7 +5826,17 @@ final readonly class MessagesMethods
      */
     public function getRecentReactions(int $limit, int $hash): ?AbstractReactions
     {
-        return $this->client->callSync(new GetRecentReactionsRequest(limit: $limit, hash: $hash));
+        return $this->getRecentReactionsAsync(limit: $limit, hash: $hash)->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.clearRecentReactions
+     * @api
+     */
+    public function clearRecentReactionsAsync(): Future
+    {
+        return $this->client->call(new ClearRecentReactionsRequest());
     }
 
     /**
@@ -3496,7 +5846,22 @@ final readonly class MessagesMethods
      */
     public function clearRecentReactions(): bool
     {
-        return (bool) $this->client->callSync(new ClearRecentReactionsRequest());
+        return (bool) $this->clearRecentReactionsAsync()->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $id
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.getExtendedMedia
+     * @api
+     */
+    public function getExtendedMediaAsync(AbstractInputPeer|string|int $peer, array $id): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetExtendedMediaRequest(peer: $peer, id: $id));
     }
 
     /**
@@ -3508,10 +5873,18 @@ final readonly class MessagesMethods
      */
     public function getExtendedMedia(AbstractInputPeer|string|int $peer, array $id): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetExtendedMediaRequest(peer: $peer, id: $id));
+        return $this->getExtendedMediaAsync(peer: $peer, id: $id)->await();
+    }
+
+    /**
+     * @param int $period
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.setDefaultHistoryTTL
+     * @api
+     */
+    public function setDefaultHistoryTTLAsync(int $period): Future
+    {
+        return $this->client->call(new SetDefaultHistoryTTLRequest(period: $period));
     }
 
     /**
@@ -3522,7 +5895,17 @@ final readonly class MessagesMethods
      */
     public function setDefaultHistoryTTL(int $period): bool
     {
-        return (bool) $this->client->callSync(new SetDefaultHistoryTTLRequest(period: $period));
+        return (bool) $this->setDefaultHistoryTTLAsync(period: $period)->await();
+    }
+
+    /**
+     * @return Future<DefaultHistoryTTL|null>
+     * @see https://core.telegram.org/method/messages.getDefaultHistoryTTL
+     * @api
+     */
+    public function getDefaultHistoryTTLAsync(): Future
+    {
+        return $this->client->call(new GetDefaultHistoryTTLRequest());
     }
 
     /**
@@ -3532,7 +5915,24 @@ final readonly class MessagesMethods
      */
     public function getDefaultHistoryTTL(): ?DefaultHistoryTTL
     {
-        return $this->client->callSync(new GetDefaultHistoryTTLRequest());
+        return $this->getDefaultHistoryTTLAsync()->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param int $buttonId
+     * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $requestedPeers
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendBotRequestedPeer
+     * @api
+     */
+    public function sendBotRequestedPeerAsync(AbstractInputPeer|string|int $peer, int $msgId, int $buttonId, array $requestedPeers): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new SendBotRequestedPeerRequest(peer: $peer, msgId: $msgId, buttonId: $buttonId, requestedPeers: $requestedPeers));
     }
 
     /**
@@ -3546,10 +5946,18 @@ final readonly class MessagesMethods
      */
     public function sendBotRequestedPeer(AbstractInputPeer|string|int $peer, int $msgId, int $buttonId, array $requestedPeers): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new SendBotRequestedPeerRequest(peer: $peer, msgId: $msgId, buttonId: $buttonId, requestedPeers: $requestedPeers));
+        return $this->sendBotRequestedPeerAsync(peer: $peer, msgId: $msgId, buttonId: $buttonId, requestedPeers: $requestedPeers)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiGroupsNotModified|EmojiGroups|null>
+     * @see https://core.telegram.org/method/messages.getEmojiGroups
+     * @api
+     */
+    public function getEmojiGroupsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetEmojiGroupsRequest(hash: $hash));
     }
 
     /**
@@ -3560,7 +5968,18 @@ final readonly class MessagesMethods
      */
     public function getEmojiGroups(int $hash): ?AbstractEmojiGroups
     {
-        return $this->client->callSync(new GetEmojiGroupsRequest(hash: $hash));
+        return $this->getEmojiGroupsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiGroupsNotModified|EmojiGroups|null>
+     * @see https://core.telegram.org/method/messages.getEmojiStatusGroups
+     * @api
+     */
+    public function getEmojiStatusGroupsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetEmojiStatusGroupsRequest(hash: $hash));
     }
 
     /**
@@ -3571,7 +5990,18 @@ final readonly class MessagesMethods
      */
     public function getEmojiStatusGroups(int $hash): ?AbstractEmojiGroups
     {
-        return $this->client->callSync(new GetEmojiStatusGroupsRequest(hash: $hash));
+        return $this->getEmojiStatusGroupsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiGroupsNotModified|EmojiGroups|null>
+     * @see https://core.telegram.org/method/messages.getEmojiProfilePhotoGroups
+     * @api
+     */
+    public function getEmojiProfilePhotoGroupsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetEmojiProfilePhotoGroupsRequest(hash: $hash));
     }
 
     /**
@@ -3582,7 +6012,19 @@ final readonly class MessagesMethods
      */
     public function getEmojiProfilePhotoGroups(int $hash): ?AbstractEmojiGroups
     {
-        return $this->client->callSync(new GetEmojiProfilePhotoGroupsRequest(hash: $hash));
+        return $this->getEmojiProfilePhotoGroupsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param string $emoticon
+     * @param int $hash
+     * @return Future<EmojiListNotModified|EmojiList|null>
+     * @see https://core.telegram.org/method/messages.searchCustomEmoji
+     * @api
+     */
+    public function searchCustomEmojiAsync(string $emoticon, int $hash): Future
+    {
+        return $this->client->call(new SearchCustomEmojiRequest(emoticon: $emoticon, hash: $hash));
     }
 
     /**
@@ -3594,7 +6036,22 @@ final readonly class MessagesMethods
      */
     public function searchCustomEmoji(string $emoticon, int $hash): ?AbstractEmojiList
     {
-        return $this->client->callSync(new SearchCustomEmojiRequest(emoticon: $emoticon, hash: $hash));
+        return $this->searchCustomEmojiAsync(emoticon: $emoticon, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool|null $disabled
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.togglePeerTranslations
+     * @api
+     */
+    public function togglePeerTranslationsAsync(AbstractInputPeer|string|int $peer, ?bool $disabled = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new TogglePeerTranslationsRequest(peer: $peer, disabled: $disabled));
     }
 
     /**
@@ -3606,10 +6063,19 @@ final readonly class MessagesMethods
      */
     public function togglePeerTranslations(AbstractInputPeer|string|int $peer, ?bool $disabled = null): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new TogglePeerTranslationsRequest(peer: $peer, disabled: $disabled));
+        return (bool) $this->togglePeerTranslationsAsync(peer: $peer, disabled: $disabled)->await();
+    }
+
+    /**
+     * @param InputBotAppID|InputBotAppShortName $app
+     * @param int $hash
+     * @return Future<BotApp|null>
+     * @see https://core.telegram.org/method/messages.getBotApp
+     * @api
+     */
+    public function getBotAppAsync(AbstractInputBotApp $app, int $hash): Future
+    {
+        return $this->client->call(new GetBotAppRequest(app: $app, hash: $hash));
     }
 
     /**
@@ -3621,7 +6087,28 @@ final readonly class MessagesMethods
      */
     public function getBotApp(AbstractInputBotApp $app, int $hash): ?BotApp
     {
-        return $this->client->callSync(new GetBotAppRequest(app: $app, hash: $hash));
+        return $this->getBotAppAsync(app: $app, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputBotAppID|InputBotAppShortName $app
+     * @param string $platform
+     * @param bool|null $writeAllowed
+     * @param bool|null $compact
+     * @param bool|null $fullscreen
+     * @param string|null $startParam
+     * @param array|null $themeParams
+     * @return Future<WebViewResult|null>
+     * @see https://core.telegram.org/method/messages.requestAppWebView
+     * @api
+     */
+    public function requestAppWebViewAsync(AbstractInputPeer|string|int $peer, AbstractInputBotApp $app, string $platform, ?bool $writeAllowed = null, ?bool $compact = null, ?bool $fullscreen = null, ?string $startParam = null, ?array $themeParams = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new RequestAppWebViewRequest(peer: $peer, app: $app, platform: $platform, writeAllowed: $writeAllowed, compact: $compact, fullscreen: $fullscreen, startParam: $startParam, themeParams: $themeParams));
     }
 
     /**
@@ -3639,10 +6126,26 @@ final readonly class MessagesMethods
      */
     public function requestAppWebView(AbstractInputPeer|string|int $peer, AbstractInputBotApp $app, string $platform, ?bool $writeAllowed = null, ?bool $compact = null, ?bool $fullscreen = null, ?string $startParam = null, ?array $themeParams = null): ?WebViewResult
     {
+        return $this->requestAppWebViewAsync(peer: $peer, app: $app, platform: $platform, writeAllowed: $writeAllowed, compact: $compact, fullscreen: $fullscreen, startParam: $startParam, themeParams: $themeParams)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool|null $forBoth
+     * @param bool|null $revert
+     * @param InputWallPaper|InputWallPaperSlug|InputWallPaperNoFile|null $wallpaper
+     * @param WallPaperSettings|null $settings
+     * @param int|null $id
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.setChatWallPaper
+     * @api
+     */
+    public function setChatWallPaperAsync(AbstractInputPeer|string|int $peer, ?bool $forBoth = null, ?bool $revert = null, ?AbstractInputWallPaper $wallpaper = null, ?WallPaperSettings $settings = null, ?int $id = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new RequestAppWebViewRequest(peer: $peer, app: $app, platform: $platform, writeAllowed: $writeAllowed, compact: $compact, fullscreen: $fullscreen, startParam: $startParam, themeParams: $themeParams));
+        return $this->client->call(new SetChatWallPaperRequest(peer: $peer, forBoth: $forBoth, revert: $revert, wallpaper: $wallpaper, settings: $settings, id: $id));
     }
 
     /**
@@ -3658,10 +6161,20 @@ final readonly class MessagesMethods
      */
     public function setChatWallPaper(AbstractInputPeer|string|int $peer, ?bool $forBoth = null, ?bool $revert = null, ?AbstractInputWallPaper $wallpaper = null, ?WallPaperSettings $settings = null, ?int $id = null): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new SetChatWallPaperRequest(peer: $peer, forBoth: $forBoth, revert: $revert, wallpaper: $wallpaper, settings: $settings, id: $id));
+        return $this->setChatWallPaperAsync(peer: $peer, forBoth: $forBoth, revert: $revert, wallpaper: $wallpaper, settings: $settings, id: $id)->await();
+    }
+
+    /**
+     * @param string $q
+     * @param int $hash
+     * @param bool|null $excludeFeatured
+     * @return Future<FoundStickerSetsNotModified|FoundStickerSets|null>
+     * @see https://core.telegram.org/method/messages.searchEmojiStickerSets
+     * @api
+     */
+    public function searchEmojiStickerSetsAsync(string $q, int $hash, ?bool $excludeFeatured = null): Future
+    {
+        return $this->client->call(new SearchEmojiStickerSetsRequest(q: $q, hash: $hash, excludeFeatured: $excludeFeatured));
     }
 
     /**
@@ -3674,7 +6187,30 @@ final readonly class MessagesMethods
      */
     public function searchEmojiStickerSets(string $q, int $hash, ?bool $excludeFeatured = null): ?AbstractFoundStickerSets
     {
-        return $this->client->callSync(new SearchEmojiStickerSetsRequest(q: $q, hash: $hash, excludeFeatured: $excludeFeatured));
+        return $this->searchEmojiStickerSetsAsync(q: $q, hash: $hash, excludeFeatured: $excludeFeatured)->await();
+    }
+
+    /**
+     * @param int $offsetDate
+     * @param int $offsetId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $offsetPeer
+     * @param int $limit
+     * @param int $hash
+     * @param bool|null $excludePinned
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
+     * @return Future<SavedDialogs|SavedDialogsSlice|SavedDialogsNotModified|null>
+     * @see https://core.telegram.org/method/messages.getSavedDialogs
+     * @api
+     */
+    public function getSavedDialogsAsync(int $offsetDate, int $offsetId, AbstractInputPeer|string|int $offsetPeer, int $limit, int $hash, ?bool $excludePinned = null, AbstractInputPeer|string|int|null $parentPeer = null): Future
+    {
+        if (is_string($parentPeer) || is_int($parentPeer)) {
+            $parentPeer = $this->client->peerManager->resolve($parentPeer);
+        }
+        if (is_string($offsetPeer) || is_int($offsetPeer)) {
+            $offsetPeer = $this->client->peerManager->resolve($offsetPeer);
+        }
+        return $this->client->call(new GetSavedDialogsRequest(offsetDate: $offsetDate, offsetId: $offsetId, offsetPeer: $offsetPeer, limit: $limit, hash: $hash, excludePinned: $excludePinned, parentPeer: $parentPeer));
     }
 
     /**
@@ -3691,13 +6227,32 @@ final readonly class MessagesMethods
      */
     public function getSavedDialogs(int $offsetDate, int $offsetId, AbstractInputPeer|string|int $offsetPeer, int $limit, int $hash, ?bool $excludePinned = null, AbstractInputPeer|string|int|null $parentPeer = null): ?AbstractSavedDialogs
     {
+        return $this->getSavedDialogsAsync(offsetDate: $offsetDate, offsetId: $offsetId, offsetPeer: $offsetPeer, limit: $limit, hash: $hash, excludePinned: $excludePinned, parentPeer: $parentPeer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $offsetId
+     * @param int $offsetDate
+     * @param int $addOffset
+     * @param int $limit
+     * @param int $maxId
+     * @param int $minId
+     * @param int $hash
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getSavedHistory
+     * @api
+     */
+    public function getSavedHistoryAsync(AbstractInputPeer|string|int $peer, int $offsetId, int $offsetDate, int $addOffset, int $limit, int $maxId, int $minId, int $hash, AbstractInputPeer|string|int|null $parentPeer = null): Future
+    {
         if (is_string($parentPeer) || is_int($parentPeer)) {
             $parentPeer = $this->client->peerManager->resolve($parentPeer);
         }
-        if (is_string($offsetPeer) || is_int($offsetPeer)) {
-            $offsetPeer = $this->client->peerManager->resolve($offsetPeer);
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetSavedDialogsRequest(offsetDate: $offsetDate, offsetId: $offsetId, offsetPeer: $offsetPeer, limit: $limit, hash: $hash, excludePinned: $excludePinned, parentPeer: $parentPeer));
+        return $this->client->call(new GetSavedHistoryRequest(peer: $peer, offsetId: $offsetId, offsetDate: $offsetDate, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash, parentPeer: $parentPeer));
     }
 
     /**
@@ -3716,13 +6271,28 @@ final readonly class MessagesMethods
      */
     public function getSavedHistory(AbstractInputPeer|string|int $peer, int $offsetId, int $offsetDate, int $addOffset, int $limit, int $maxId, int $minId, int $hash, AbstractInputPeer|string|int|null $parentPeer = null): ?AbstractMessages
     {
+        return $this->getSavedHistoryAsync(peer: $peer, offsetId: $offsetId, offsetDate: $offsetDate, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash, parentPeer: $parentPeer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $maxId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
+     * @param int|null $minDate
+     * @param int|null $maxDate
+     * @return Future<AffectedHistory|null>
+     * @see https://core.telegram.org/method/messages.deleteSavedHistory
+     * @api
+     */
+    public function deleteSavedHistoryAsync(AbstractInputPeer|string|int $peer, int $maxId, AbstractInputPeer|string|int|null $parentPeer = null, ?int $minDate = null, ?int $maxDate = null): Future
+    {
         if (is_string($parentPeer) || is_int($parentPeer)) {
             $parentPeer = $this->client->peerManager->resolve($parentPeer);
         }
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetSavedHistoryRequest(peer: $peer, offsetId: $offsetId, offsetDate: $offsetDate, addOffset: $addOffset, limit: $limit, maxId: $maxId, minId: $minId, hash: $hash, parentPeer: $parentPeer));
+        return $this->client->call(new DeleteSavedHistoryRequest(peer: $peer, maxId: $maxId, parentPeer: $parentPeer, minDate: $minDate, maxDate: $maxDate));
     }
 
     /**
@@ -3737,13 +6307,17 @@ final readonly class MessagesMethods
      */
     public function deleteSavedHistory(AbstractInputPeer|string|int $peer, int $maxId, AbstractInputPeer|string|int|null $parentPeer = null, ?int $minDate = null, ?int $maxDate = null): ?AffectedHistory
     {
-        if (is_string($parentPeer) || is_int($parentPeer)) {
-            $parentPeer = $this->client->peerManager->resolve($parentPeer);
-        }
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new DeleteSavedHistoryRequest(peer: $peer, maxId: $maxId, parentPeer: $parentPeer, minDate: $minDate, maxDate: $maxDate));
+        return $this->deleteSavedHistoryAsync(peer: $peer, maxId: $maxId, parentPeer: $parentPeer, minDate: $minDate, maxDate: $maxDate)->await();
+    }
+
+    /**
+     * @return Future<SavedDialogs|SavedDialogsSlice|SavedDialogsNotModified|null>
+     * @see https://core.telegram.org/method/messages.getPinnedSavedDialogs
+     * @api
+     */
+    public function getPinnedSavedDialogsAsync(): Future
+    {
+        return $this->client->call(new GetPinnedSavedDialogsRequest());
     }
 
     /**
@@ -3753,7 +6327,19 @@ final readonly class MessagesMethods
      */
     public function getPinnedSavedDialogs(): ?AbstractSavedDialogs
     {
-        return $this->client->callSync(new GetPinnedSavedDialogsRequest());
+        return $this->getPinnedSavedDialogsAsync()->await();
+    }
+
+    /**
+     * @param InputDialogPeer|InputDialogPeerFolder $peer
+     * @param bool|null $pinned
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.toggleSavedDialogPin
+     * @api
+     */
+    public function toggleSavedDialogPinAsync(AbstractInputDialogPeer $peer, ?bool $pinned = null): Future
+    {
+        return $this->client->call(new ToggleSavedDialogPinRequest(peer: $peer, pinned: $pinned));
     }
 
     /**
@@ -3765,7 +6351,19 @@ final readonly class MessagesMethods
      */
     public function toggleSavedDialogPin(AbstractInputDialogPeer $peer, ?bool $pinned = null): bool
     {
-        return (bool) $this->client->callSync(new ToggleSavedDialogPinRequest(peer: $peer, pinned: $pinned));
+        return (bool) $this->toggleSavedDialogPinAsync(peer: $peer, pinned: $pinned)->await();
+    }
+
+    /**
+     * @param list<InputDialogPeer|InputDialogPeerFolder> $order
+     * @param bool|null $force
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.reorderPinnedSavedDialogs
+     * @api
+     */
+    public function reorderPinnedSavedDialogsAsync(array $order, ?bool $force = null): Future
+    {
+        return $this->client->call(new ReorderPinnedSavedDialogsRequest(order: $order, force: $force));
     }
 
     /**
@@ -3777,7 +6375,22 @@ final readonly class MessagesMethods
      */
     public function reorderPinnedSavedDialogs(array $order, ?bool $force = null): bool
     {
-        return (bool) $this->client->callSync(new ReorderPinnedSavedDialogsRequest(order: $order, force: $force));
+        return (bool) $this->reorderPinnedSavedDialogsAsync(order: $order, force: $force)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $peer
+     * @return Future<SavedReactionTagsNotModified|SavedReactionTags|null>
+     * @see https://core.telegram.org/method/messages.getSavedReactionTags
+     * @api
+     */
+    public function getSavedReactionTagsAsync(int $hash, AbstractInputPeer|string|int|null $peer = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetSavedReactionTagsRequest(hash: $hash, peer: $peer));
     }
 
     /**
@@ -3789,10 +6402,19 @@ final readonly class MessagesMethods
      */
     public function getSavedReactionTags(int $hash, AbstractInputPeer|string|int|null $peer = null): ?AbstractSavedReactionTags
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetSavedReactionTagsRequest(hash: $hash, peer: $peer));
+        return $this->getSavedReactionTagsAsync(hash: $hash, peer: $peer)->await();
+    }
+
+    /**
+     * @param ReactionEmpty|ReactionEmoji|ReactionCustomEmoji|ReactionPaid $reaction
+     * @param string|null $title
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.updateSavedReactionTag
+     * @api
+     */
+    public function updateSavedReactionTagAsync(AbstractReaction $reaction, ?string $title = null): Future
+    {
+        return $this->client->call(new UpdateSavedReactionTagRequest(reaction: $reaction, title: $title));
     }
 
     /**
@@ -3804,7 +6426,18 @@ final readonly class MessagesMethods
      */
     public function updateSavedReactionTag(AbstractReaction $reaction, ?string $title = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateSavedReactionTagRequest(reaction: $reaction, title: $title));
+        return (bool) $this->updateSavedReactionTagAsync(reaction: $reaction, title: $title)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<ReactionsNotModified|Reactions|null>
+     * @see https://core.telegram.org/method/messages.getDefaultTagReactions
+     * @api
+     */
+    public function getDefaultTagReactionsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetDefaultTagReactionsRequest(hash: $hash));
     }
 
     /**
@@ -3815,7 +6448,22 @@ final readonly class MessagesMethods
      */
     public function getDefaultTagReactions(int $hash): ?AbstractReactions
     {
-        return $this->client->callSync(new GetDefaultTagReactionsRequest(hash: $hash));
+        return $this->getDefaultTagReactionsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @return Future<OutboxReadDate|null>
+     * @see https://core.telegram.org/method/messages.getOutboxReadDate
+     * @api
+     */
+    public function getOutboxReadDateAsync(AbstractInputPeer|string|int $peer, int $msgId): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetOutboxReadDateRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -3827,10 +6475,18 @@ final readonly class MessagesMethods
      */
     public function getOutboxReadDate(AbstractInputPeer|string|int $peer, int $msgId): ?OutboxReadDate
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetOutboxReadDateRequest(peer: $peer, msgId: $msgId));
+        return $this->getOutboxReadDateAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<QuickReplies|QuickRepliesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getQuickReplies
+     * @api
+     */
+    public function getQuickRepliesAsync(int $hash): Future
+    {
+        return $this->client->call(new GetQuickRepliesRequest(hash: $hash));
     }
 
     /**
@@ -3841,7 +6497,18 @@ final readonly class MessagesMethods
      */
     public function getQuickReplies(int $hash): ?AbstractQuickReplies
     {
-        return $this->client->callSync(new GetQuickRepliesRequest(hash: $hash));
+        return $this->getQuickRepliesAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param list<int> $order
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.reorderQuickReplies
+     * @api
+     */
+    public function reorderQuickRepliesAsync(array $order): Future
+    {
+        return $this->client->call(new ReorderQuickRepliesRequest(order: $order));
     }
 
     /**
@@ -3852,7 +6519,18 @@ final readonly class MessagesMethods
      */
     public function reorderQuickReplies(array $order): bool
     {
-        return (bool) $this->client->callSync(new ReorderQuickRepliesRequest(order: $order));
+        return (bool) $this->reorderQuickRepliesAsync(order: $order)->await();
+    }
+
+    /**
+     * @param string $shortcut
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.checkQuickReplyShortcut
+     * @api
+     */
+    public function checkQuickReplyShortcutAsync(string $shortcut): Future
+    {
+        return $this->client->call(new CheckQuickReplyShortcutRequest(shortcut: $shortcut));
     }
 
     /**
@@ -3863,7 +6541,19 @@ final readonly class MessagesMethods
      */
     public function checkQuickReplyShortcut(string $shortcut): bool
     {
-        return (bool) $this->client->callSync(new CheckQuickReplyShortcutRequest(shortcut: $shortcut));
+        return (bool) $this->checkQuickReplyShortcutAsync(shortcut: $shortcut)->await();
+    }
+
+    /**
+     * @param int $shortcutId
+     * @param string $shortcut
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.editQuickReplyShortcut
+     * @api
+     */
+    public function editQuickReplyShortcutAsync(int $shortcutId, string $shortcut): Future
+    {
+        return $this->client->call(new EditQuickReplyShortcutRequest(shortcutId: $shortcutId, shortcut: $shortcut));
     }
 
     /**
@@ -3875,7 +6565,18 @@ final readonly class MessagesMethods
      */
     public function editQuickReplyShortcut(int $shortcutId, string $shortcut): bool
     {
-        return (bool) $this->client->callSync(new EditQuickReplyShortcutRequest(shortcutId: $shortcutId, shortcut: $shortcut));
+        return (bool) $this->editQuickReplyShortcutAsync(shortcutId: $shortcutId, shortcut: $shortcut)->await();
+    }
+
+    /**
+     * @param int $shortcutId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.deleteQuickReplyShortcut
+     * @api
+     */
+    public function deleteQuickReplyShortcutAsync(int $shortcutId): Future
+    {
+        return $this->client->call(new DeleteQuickReplyShortcutRequest(shortcutId: $shortcutId));
     }
 
     /**
@@ -3886,7 +6587,20 @@ final readonly class MessagesMethods
      */
     public function deleteQuickReplyShortcut(int $shortcutId): bool
     {
-        return (bool) $this->client->callSync(new DeleteQuickReplyShortcutRequest(shortcutId: $shortcutId));
+        return (bool) $this->deleteQuickReplyShortcutAsync(shortcutId: $shortcutId)->await();
+    }
+
+    /**
+     * @param int $shortcutId
+     * @param int $hash
+     * @param list<int>|null $id
+     * @return Future<Messages|MessagesSlice|ChannelMessages|MessagesNotModified|null>
+     * @see https://core.telegram.org/method/messages.getQuickReplyMessages
+     * @api
+     */
+    public function getQuickReplyMessagesAsync(int $shortcutId, int $hash, ?array $id = null): Future
+    {
+        return $this->client->call(new GetQuickReplyMessagesRequest(shortcutId: $shortcutId, hash: $hash, id: $id));
     }
 
     /**
@@ -3899,7 +6613,27 @@ final readonly class MessagesMethods
      */
     public function getQuickReplyMessages(int $shortcutId, int $hash, ?array $id = null): ?AbstractMessages
     {
-        return $this->client->callSync(new GetQuickReplyMessagesRequest(shortcutId: $shortcutId, hash: $hash, id: $id));
+        return $this->getQuickReplyMessagesAsync(shortcutId: $shortcutId, hash: $hash, id: $id)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $shortcutId
+     * @param list<int> $id
+     * @param list<int>|null $randomId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendQuickReplyMessages
+     * @api
+     */
+    public function sendQuickReplyMessagesAsync(AbstractInputPeer|string|int $peer, int $shortcutId, array $id, ?array $randomId = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->call(new SendQuickReplyMessagesRequest(peer: $peer, shortcutId: $shortcutId, id: $id, randomId: $randomId));
     }
 
     /**
@@ -3913,13 +6647,19 @@ final readonly class MessagesMethods
      */
     public function sendQuickReplyMessages(AbstractInputPeer|string|int $peer, int $shortcutId, array $id, ?array $randomId = null): ?AbstractUpdates
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new SendQuickReplyMessagesRequest(peer: $peer, shortcutId: $shortcutId, id: $id, randomId: $randomId));
+        return $this->sendQuickReplyMessagesAsync(peer: $peer, shortcutId: $shortcutId, id: $id, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param int $shortcutId
+     * @param list<int> $id
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.deleteQuickReplyMessages
+     * @api
+     */
+    public function deleteQuickReplyMessagesAsync(int $shortcutId, array $id): Future
+    {
+        return $this->client->call(new DeleteQuickReplyMessagesRequest(shortcutId: $shortcutId, id: $id));
     }
 
     /**
@@ -3931,7 +6671,18 @@ final readonly class MessagesMethods
      */
     public function deleteQuickReplyMessages(int $shortcutId, array $id): ?AbstractUpdates
     {
-        return $this->client->callSync(new DeleteQuickReplyMessagesRequest(shortcutId: $shortcutId, id: $id));
+        return $this->deleteQuickReplyMessagesAsync(shortcutId: $shortcutId, id: $id)->await();
+    }
+
+    /**
+     * @param bool $enabled
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.toggleDialogFilterTags
+     * @api
+     */
+    public function toggleDialogFilterTagsAsync(bool $enabled): Future
+    {
+        return $this->client->call(new ToggleDialogFilterTagsRequest(enabled: $enabled));
     }
 
     /**
@@ -3942,7 +6693,19 @@ final readonly class MessagesMethods
      */
     public function toggleDialogFilterTags(bool $enabled): bool
     {
-        return (bool) $this->client->callSync(new ToggleDialogFilterTagsRequest(enabled: $enabled));
+        return (bool) $this->toggleDialogFilterTagsAsync(enabled: $enabled)->await();
+    }
+
+    /**
+     * @param int $offsetId
+     * @param int $limit
+     * @return Future<MyStickers|null>
+     * @see https://core.telegram.org/method/messages.getMyStickers
+     * @api
+     */
+    public function getMyStickersAsync(int $offsetId, int $limit): Future
+    {
+        return $this->client->call(new GetMyStickersRequest(offsetId: $offsetId, limit: $limit));
     }
 
     /**
@@ -3954,7 +6717,18 @@ final readonly class MessagesMethods
      */
     public function getMyStickers(int $offsetId, int $limit): ?MyStickers
     {
-        return $this->client->callSync(new GetMyStickersRequest(offsetId: $offsetId, limit: $limit));
+        return $this->getMyStickersAsync(offsetId: $offsetId, limit: $limit)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiGroupsNotModified|EmojiGroups|null>
+     * @see https://core.telegram.org/method/messages.getEmojiStickerGroups
+     * @api
+     */
+    public function getEmojiStickerGroupsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetEmojiStickerGroupsRequest(hash: $hash));
     }
 
     /**
@@ -3965,7 +6739,18 @@ final readonly class MessagesMethods
      */
     public function getEmojiStickerGroups(int $hash): ?AbstractEmojiGroups
     {
-        return $this->client->callSync(new GetEmojiStickerGroupsRequest(hash: $hash));
+        return $this->getEmojiStickerGroupsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<AvailableEffectsNotModified|AvailableEffects|null>
+     * @see https://core.telegram.org/method/messages.getAvailableEffects
+     * @api
+     */
+    public function getAvailableEffectsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetAvailableEffectsRequest(hash: $hash));
     }
 
     /**
@@ -3976,7 +6761,23 @@ final readonly class MessagesMethods
      */
     public function getAvailableEffects(int $hash): ?AbstractAvailableEffects
     {
-        return $this->client->callSync(new GetAvailableEffectsRequest(hash: $hash));
+        return $this->getAvailableEffectsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param TextWithEntities $text
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.editFactCheck
+     * @api
+     */
+    public function editFactCheckAsync(AbstractInputPeer|string|int $peer, int $msgId, TextWithEntities $text): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new EditFactCheckRequest(peer: $peer, msgId: $msgId, text: $text));
     }
 
     /**
@@ -3989,10 +6790,22 @@ final readonly class MessagesMethods
      */
     public function editFactCheck(AbstractInputPeer|string|int $peer, int $msgId, TextWithEntities $text): ?AbstractUpdates
     {
+        return $this->editFactCheckAsync(peer: $peer, msgId: $msgId, text: $text)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.deleteFactCheck
+     * @api
+     */
+    public function deleteFactCheckAsync(AbstractInputPeer|string|int $peer, int $msgId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new EditFactCheckRequest(peer: $peer, msgId: $msgId, text: $text));
+        return $this->client->call(new DeleteFactCheckRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -4004,10 +6817,22 @@ final readonly class MessagesMethods
      */
     public function deleteFactCheck(AbstractInputPeer|string|int $peer, int $msgId): ?AbstractUpdates
     {
+        return $this->deleteFactCheckAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $msgId
+     * @return Future<list<FactCheck>>
+     * @see https://core.telegram.org/method/messages.getFactCheck
+     * @api
+     */
+    public function getFactCheckAsync(AbstractInputPeer|string|int $peer, array $msgId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new DeleteFactCheckRequest(peer: $peer, msgId: $msgId));
+        return $this->client->call(new GetFactCheckRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -4019,10 +6844,35 @@ final readonly class MessagesMethods
      */
     public function getFactCheck(AbstractInputPeer|string|int $peer, array $msgId): array
     {
+        return $this->getFactCheckAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $platform
+     * @param bool|null $compact
+     * @param bool|null $fullscreen
+     * @param string|null $startParam
+     * @param array|null $themeParams
+     * @return Future<WebViewResult|null>
+     * @see https://core.telegram.org/method/messages.requestMainWebView
+     * @api
+     */
+    public function requestMainWebViewAsync(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot, string $platform, ?bool $compact = null, ?bool $fullscreen = null, ?string $startParam = null, ?array $themeParams = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetFactCheckRequest(peer: $peer, msgId: $msgId));
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $bot = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new RequestMainWebViewRequest(peer: $peer, bot: $bot, platform: $platform, compact: $compact, fullscreen: $fullscreen, startParam: $startParam, themeParams: $themeParams));
     }
 
     /**
@@ -4039,18 +6889,28 @@ final readonly class MessagesMethods
      */
     public function requestMainWebView(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $bot, string $platform, ?bool $compact = null, ?bool $fullscreen = null, ?string $startParam = null, ?array $themeParams = null): ?WebViewResult
     {
+        return $this->requestMainWebViewAsync(peer: $peer, bot: $bot, platform: $platform, compact: $compact, fullscreen: $fullscreen, startParam: $startParam, themeParams: $themeParams)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param int $count
+     * @param int|null $randomId
+     * @param PaidReactionPrivacyDefault|PaidReactionPrivacyAnonymous|PaidReactionPrivacyPeer|null $private
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.sendPaidReaction
+     * @api
+     */
+    public function sendPaidReactionAsync(AbstractInputPeer|string|int $peer, int $msgId, int $count, ?int $randomId = null, ?AbstractPaidReactionPrivacy $private = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
         }
-        return $this->client->callSync(new RequestMainWebViewRequest(peer: $peer, bot: $bot, platform: $platform, compact: $compact, fullscreen: $fullscreen, startParam: $startParam, themeParams: $themeParams));
+        return $this->client->call(new SendPaidReactionRequest(peer: $peer, msgId: $msgId, count: $count, randomId: $randomId, private: $private));
     }
 
     /**
@@ -4065,13 +6925,23 @@ final readonly class MessagesMethods
      */
     public function sendPaidReaction(AbstractInputPeer|string|int $peer, int $msgId, int $count, ?int $randomId = null, ?AbstractPaidReactionPrivacy $private = null): ?AbstractUpdates
     {
+        return $this->sendPaidReactionAsync(peer: $peer, msgId: $msgId, count: $count, randomId: $randomId, private: $private)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param PaidReactionPrivacyDefault|PaidReactionPrivacyAnonymous|PaidReactionPrivacyPeer $private
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.togglePaidReactionPrivacy
+     * @api
+     */
+    public function togglePaidReactionPrivacyAsync(AbstractInputPeer|string|int $peer, int $msgId, AbstractPaidReactionPrivacy $private): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new SendPaidReactionRequest(peer: $peer, msgId: $msgId, count: $count, randomId: $randomId, private: $private));
+        return $this->client->call(new TogglePaidReactionPrivacyRequest(peer: $peer, msgId: $msgId, private: $private));
     }
 
     /**
@@ -4084,10 +6954,17 @@ final readonly class MessagesMethods
      */
     public function togglePaidReactionPrivacy(AbstractInputPeer|string|int $peer, int $msgId, AbstractPaidReactionPrivacy $private): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new TogglePaidReactionPrivacyRequest(peer: $peer, msgId: $msgId, private: $private));
+        return (bool) $this->togglePaidReactionPrivacyAsync(peer: $peer, msgId: $msgId, private: $private)->await();
+    }
+
+    /**
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.getPaidReactionPrivacy
+     * @api
+     */
+    public function getPaidReactionPrivacyAsync(): Future
+    {
+        return $this->client->call(new GetPaidReactionPrivacyRequest());
     }
 
     /**
@@ -4097,7 +6974,21 @@ final readonly class MessagesMethods
      */
     public function getPaidReactionPrivacy(): ?AbstractUpdates
     {
-        return $this->client->callSync(new GetPaidReactionPrivacyRequest());
+        return $this->getPaidReactionPrivacyAsync()->await();
+    }
+
+    /**
+     * @param string|null $randomId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.viewSponsoredMessage
+     * @api
+     */
+    public function viewSponsoredMessageAsync(?string $randomId = null): Future
+    {
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->call(new ViewSponsoredMessageRequest(randomId: $randomId));
     }
 
     /**
@@ -4108,10 +6999,23 @@ final readonly class MessagesMethods
      */
     public function viewSponsoredMessage(?string $randomId = null): bool
     {
+        return (bool) $this->viewSponsoredMessageAsync(randomId: $randomId)->await();
+    }
+
+    /**
+     * @param bool|null $media
+     * @param bool|null $fullscreen
+     * @param string|null $randomId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.clickSponsoredMessage
+     * @api
+     */
+    public function clickSponsoredMessageAsync(?bool $media = null, ?bool $fullscreen = null, ?string $randomId = null): Future
+    {
         if ($randomId === null) {
             $randomId = random_int(0, 9223372036854775807);
         }
-        return (bool) $this->client->callSync(new ViewSponsoredMessageRequest(randomId: $randomId));
+        return $this->client->call(new ClickSponsoredMessageRequest(media: $media, fullscreen: $fullscreen, randomId: $randomId));
     }
 
     /**
@@ -4124,10 +7028,22 @@ final readonly class MessagesMethods
      */
     public function clickSponsoredMessage(?bool $media = null, ?bool $fullscreen = null, ?string $randomId = null): bool
     {
+        return (bool) $this->clickSponsoredMessageAsync(media: $media, fullscreen: $fullscreen, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param string $option
+     * @param string|null $randomId
+     * @return Future<SponsoredMessageReportResultChooseOption|SponsoredMessageReportResultAdsHidden|SponsoredMessageReportResultReported|null>
+     * @see https://core.telegram.org/method/messages.reportSponsoredMessage
+     * @api
+     */
+    public function reportSponsoredMessageAsync(string $option, ?string $randomId = null): Future
+    {
         if ($randomId === null) {
             $randomId = random_int(0, 9223372036854775807);
         }
-        return (bool) $this->client->callSync(new ClickSponsoredMessageRequest(media: $media, fullscreen: $fullscreen, randomId: $randomId));
+        return $this->client->call(new ReportSponsoredMessageRequest(option: $option, randomId: $randomId));
     }
 
     /**
@@ -4139,10 +7055,22 @@ final readonly class MessagesMethods
      */
     public function reportSponsoredMessage(string $option, ?string $randomId = null): ?AbstractSponsoredMessageReportResult
     {
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
+        return $this->reportSponsoredMessageAsync(option: $option, randomId: $randomId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int|null $msgId
+     * @return Future<SponsoredMessages|SponsoredMessagesEmpty|null>
+     * @see https://core.telegram.org/method/messages.getSponsoredMessages
+     * @api
+     */
+    public function getSponsoredMessagesAsync(AbstractInputPeer|string|int $peer, ?int $msgId = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new ReportSponsoredMessageRequest(option: $option, randomId: $randomId));
+        return $this->client->call(new GetSponsoredMessagesRequest(peer: $peer, msgId: $msgId));
     }
 
     /**
@@ -4154,10 +7082,28 @@ final readonly class MessagesMethods
      */
     public function getSponsoredMessages(AbstractInputPeer|string|int $peer, ?int $msgId = null): ?AbstractSponsoredMessages
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
+        return $this->getSponsoredMessagesAsync(peer: $peer, msgId: $msgId)->await();
+    }
+
+    /**
+     * @param InputBotInlineResult|InputBotInlineResultPhoto|InputBotInlineResultDocument|InputBotInlineResultGame $result
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param list<InlineQueryPeerType>|null $peerTypes
+     * @return Future<BotPreparedInlineMessage|null>
+     * @see https://core.telegram.org/method/messages.savePreparedInlineMessage
+     * @api
+     */
+    public function savePreparedInlineMessageAsync(AbstractInputBotInlineResult $result, AbstractInputUser|string|int $userId, ?array $peerTypes = null): Future
+    {
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
         }
-        return $this->client->callSync(new GetSponsoredMessagesRequest(peer: $peer, msgId: $msgId));
+        return $this->client->call(new SavePreparedInlineMessageRequest(result: $result, userId: $userId, peerTypes: $peerTypes));
     }
 
     /**
@@ -4170,15 +7116,27 @@ final readonly class MessagesMethods
      */
     public function savePreparedInlineMessage(AbstractInputBotInlineResult $result, AbstractInputUser|string|int $userId, ?array $peerTypes = null): ?BotPreparedInlineMessage
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
+        return $this->savePreparedInlineMessageAsync(result: $result, userId: $userId, peerTypes: $peerTypes)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $id
+     * @return Future<PreparedInlineMessage|null>
+     * @see https://core.telegram.org/method/messages.getPreparedInlineMessage
+     * @api
+     */
+    public function getPreparedInlineMessageAsync(AbstractInputUser|string|int $bot, string $id): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
             } else {
-                $userId = $__tmpPeer;
+                $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new SavePreparedInlineMessageRequest(result: $result, userId: $userId, peerTypes: $peerTypes));
+        return $this->client->call(new GetPreparedInlineMessageRequest(bot: $bot, id: $id));
     }
 
     /**
@@ -4190,15 +7148,24 @@ final readonly class MessagesMethods
      */
     public function getPreparedInlineMessage(AbstractInputUser|string|int $bot, string $id): ?PreparedInlineMessage
     {
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetPreparedInlineMessageRequest(bot: $bot, id: $id));
+        return $this->getPreparedInlineMessageAsync(bot: $bot, id: $id)->await();
+    }
+
+    /**
+     * @param string $q
+     * @param string $emoticon
+     * @param list<string> $langCode
+     * @param int $offset
+     * @param int $limit
+     * @param int $hash
+     * @param bool|null $emojis
+     * @return Future<FoundStickersNotModified|FoundStickers|null>
+     * @see https://core.telegram.org/method/messages.searchStickers
+     * @api
+     */
+    public function searchStickersAsync(string $q, string $emoticon, array $langCode, int $offset, int $limit, int $hash, ?bool $emojis = null): Future
+    {
+        return $this->client->call(new SearchStickersRequest(q: $q, emoticon: $emoticon, langCode: $langCode, offset: $offset, limit: $limit, hash: $hash, emojis: $emojis));
     }
 
     /**
@@ -4215,7 +7182,23 @@ final readonly class MessagesMethods
      */
     public function searchStickers(string $q, string $emoticon, array $langCode, int $offset, int $limit, int $hash, ?bool $emojis = null): ?AbstractFoundStickers
     {
-        return $this->client->callSync(new SearchStickersRequest(q: $q, emoticon: $emoticon, langCode: $langCode, offset: $offset, limit: $limit, hash: $hash, emojis: $emojis));
+        return $this->searchStickersAsync(q: $q, emoticon: $emoticon, langCode: $langCode, offset: $offset, limit: $limit, hash: $hash, emojis: $emojis)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $id
+     * @param bool|null $push
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.reportMessagesDelivery
+     * @api
+     */
+    public function reportMessagesDeliveryAsync(AbstractInputPeer|string|int $peer, array $id, ?bool $push = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new ReportMessagesDeliveryRequest(peer: $peer, id: $id, push: $push));
     }
 
     /**
@@ -4228,10 +7211,22 @@ final readonly class MessagesMethods
      */
     public function reportMessagesDelivery(AbstractInputPeer|string|int $peer, array $id, ?bool $push = null): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
+        return (bool) $this->reportMessagesDeliveryAsync(peer: $peer, id: $id, push: $push)->await();
+    }
+
+    /**
+     * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $ids
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
+     * @return Future<SavedDialogs|SavedDialogsSlice|SavedDialogsNotModified|null>
+     * @see https://core.telegram.org/method/messages.getSavedDialogsByID
+     * @api
+     */
+    public function getSavedDialogsByIDAsync(array $ids, AbstractInputPeer|string|int|null $parentPeer = null): Future
+    {
+        if (is_string($parentPeer) || is_int($parentPeer)) {
+            $parentPeer = $this->client->peerManager->resolve($parentPeer);
         }
-        return (bool) $this->client->callSync(new ReportMessagesDeliveryRequest(peer: $peer, id: $id, push: $push));
+        return $this->client->call(new GetSavedDialogsByIDRequest(ids: $ids, parentPeer: $parentPeer));
     }
 
     /**
@@ -4243,10 +7238,26 @@ final readonly class MessagesMethods
      */
     public function getSavedDialogsByID(array $ids, AbstractInputPeer|string|int|null $parentPeer = null): ?AbstractSavedDialogs
     {
+        return $this->getSavedDialogsByIDAsync(ids: $ids, parentPeer: $parentPeer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $parentPeer
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $maxId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/messages.readSavedHistory
+     * @api
+     */
+    public function readSavedHistoryAsync(AbstractInputPeer|string|int $parentPeer, AbstractInputPeer|string|int $peer, int $maxId): Future
+    {
         if (is_string($parentPeer) || is_int($parentPeer)) {
             $parentPeer = $this->client->peerManager->resolve($parentPeer);
         }
-        return $this->client->callSync(new GetSavedDialogsByIDRequest(ids: $ids, parentPeer: $parentPeer));
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new ReadSavedHistoryRequest(parentPeer: $parentPeer, peer: $peer, maxId: $maxId));
     }
 
     /**
@@ -4259,13 +7270,24 @@ final readonly class MessagesMethods
      */
     public function readSavedHistory(AbstractInputPeer|string|int $parentPeer, AbstractInputPeer|string|int $peer, int $maxId): bool
     {
-        if (is_string($parentPeer) || is_int($parentPeer)) {
-            $parentPeer = $this->client->peerManager->resolve($parentPeer);
-        }
+        return (bool) $this->readSavedHistoryAsync(parentPeer: $parentPeer, peer: $peer, maxId: $maxId)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param list<int> $completed
+     * @param list<int> $incompleted
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.toggleTodoCompleted
+     * @api
+     */
+    public function toggleTodoCompletedAsync(AbstractInputPeer|string|int $peer, int $msgId, array $completed, array $incompleted): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new ReadSavedHistoryRequest(parentPeer: $parentPeer, peer: $peer, maxId: $maxId));
+        return $this->client->call(new ToggleTodoCompletedRequest(peer: $peer, msgId: $msgId, completed: $completed, incompleted: $incompleted));
     }
 
     /**
@@ -4279,10 +7301,23 @@ final readonly class MessagesMethods
      */
     public function toggleTodoCompleted(AbstractInputPeer|string|int $peer, int $msgId, array $completed, array $incompleted): ?AbstractUpdates
     {
+        return $this->toggleTodoCompletedAsync(peer: $peer, msgId: $msgId, completed: $completed, incompleted: $incompleted)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param list<TodoItem> $list_
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.appendTodoList
+     * @api
+     */
+    public function appendTodoListAsync(AbstractInputPeer|string|int $peer, int $msgId, array $list_): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new ToggleTodoCompletedRequest(peer: $peer, msgId: $msgId, completed: $completed, incompleted: $incompleted));
+        return $this->client->call(new AppendTodoListRequest(peer: $peer, msgId: $msgId, list_: $list_));
     }
 
     /**
@@ -4295,10 +7330,25 @@ final readonly class MessagesMethods
      */
     public function appendTodoList(AbstractInputPeer|string|int $peer, int $msgId, array $list_): ?AbstractUpdates
     {
+        return $this->appendTodoListAsync(peer: $peer, msgId: $msgId, list_: $list_)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $msgId
+     * @param bool|null $reject
+     * @param int|null $scheduleDate
+     * @param string|null $rejectComment
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.toggleSuggestedPostApproval
+     * @api
+     */
+    public function toggleSuggestedPostApprovalAsync(AbstractInputPeer|string|int $peer, int $msgId, ?bool $reject = null, ?int $scheduleDate = null, ?string $rejectComment = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new AppendTodoListRequest(peer: $peer, msgId: $msgId, list_: $list_));
+        return $this->client->call(new ToggleSuggestedPostApprovalRequest(peer: $peer, msgId: $msgId, reject: $reject, scheduleDate: $scheduleDate, rejectComment: $rejectComment));
     }
 
     /**
@@ -4313,10 +7363,26 @@ final readonly class MessagesMethods
      */
     public function toggleSuggestedPostApproval(AbstractInputPeer|string|int $peer, int $msgId, ?bool $reject = null, ?int $scheduleDate = null, ?string $rejectComment = null): ?AbstractUpdates
     {
+        return $this->toggleSuggestedPostApprovalAsync(peer: $peer, msgId: $msgId, reject: $reject, scheduleDate: $scheduleDate, rejectComment: $rejectComment)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $offsetDate
+     * @param int $offsetId
+     * @param int $offsetTopic
+     * @param int $limit
+     * @param string|null $q
+     * @return Future<ForumTopics|null>
+     * @see https://core.telegram.org/method/messages.getForumTopics
+     * @api
+     */
+    public function getForumTopicsAsync(AbstractInputPeer|string|int $peer, int $offsetDate, int $offsetId, int $offsetTopic, int $limit, ?string $q = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new ToggleSuggestedPostApprovalRequest(peer: $peer, msgId: $msgId, reject: $reject, scheduleDate: $scheduleDate, rejectComment: $rejectComment));
+        return $this->client->call(new GetForumTopicsRequest(peer: $peer, offsetDate: $offsetDate, offsetId: $offsetId, offsetTopic: $offsetTopic, limit: $limit, q: $q));
     }
 
     /**
@@ -4332,10 +7398,22 @@ final readonly class MessagesMethods
      */
     public function getForumTopics(AbstractInputPeer|string|int $peer, int $offsetDate, int $offsetId, int $offsetTopic, int $limit, ?string $q = null): ?ForumTopics
     {
+        return $this->getForumTopicsAsync(peer: $peer, offsetDate: $offsetDate, offsetId: $offsetId, offsetTopic: $offsetTopic, limit: $limit, q: $q)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $topics
+     * @return Future<ForumTopics|null>
+     * @see https://core.telegram.org/method/messages.getForumTopicsByID
+     * @api
+     */
+    public function getForumTopicsByIDAsync(AbstractInputPeer|string|int $peer, array $topics): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetForumTopicsRequest(peer: $peer, offsetDate: $offsetDate, offsetId: $offsetId, offsetTopic: $offsetTopic, limit: $limit, q: $q));
+        return $this->client->call(new GetForumTopicsByIDRequest(peer: $peer, topics: $topics));
     }
 
     /**
@@ -4347,10 +7425,26 @@ final readonly class MessagesMethods
      */
     public function getForumTopicsByID(AbstractInputPeer|string|int $peer, array $topics): ?ForumTopics
     {
+        return $this->getForumTopicsByIDAsync(peer: $peer, topics: $topics)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $topicId
+     * @param string|null $title
+     * @param int|null $iconEmojiId
+     * @param bool|null $closed
+     * @param bool|null $hidden
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.editForumTopic
+     * @api
+     */
+    public function editForumTopicAsync(AbstractInputPeer|string|int $peer, int $topicId, ?string $title = null, ?int $iconEmojiId = null, ?bool $closed = null, ?bool $hidden = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new GetForumTopicsByIDRequest(peer: $peer, topics: $topics));
+        return $this->client->call(new EditForumTopicRequest(peer: $peer, topicId: $topicId, title: $title, iconEmojiId: $iconEmojiId, closed: $closed, hidden: $hidden));
     }
 
     /**
@@ -4366,10 +7460,23 @@ final readonly class MessagesMethods
      */
     public function editForumTopic(AbstractInputPeer|string|int $peer, int $topicId, ?string $title = null, ?int $iconEmojiId = null, ?bool $closed = null, ?bool $hidden = null): ?AbstractUpdates
     {
+        return $this->editForumTopicAsync(peer: $peer, topicId: $topicId, title: $title, iconEmojiId: $iconEmojiId, closed: $closed, hidden: $hidden)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $topicId
+     * @param bool $pinned
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.updatePinnedForumTopic
+     * @api
+     */
+    public function updatePinnedForumTopicAsync(AbstractInputPeer|string|int $peer, int $topicId, bool $pinned): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new EditForumTopicRequest(peer: $peer, topicId: $topicId, title: $title, iconEmojiId: $iconEmojiId, closed: $closed, hidden: $hidden));
+        return $this->client->call(new UpdatePinnedForumTopicRequest(peer: $peer, topicId: $topicId, pinned: $pinned));
     }
 
     /**
@@ -4382,10 +7489,23 @@ final readonly class MessagesMethods
      */
     public function updatePinnedForumTopic(AbstractInputPeer|string|int $peer, int $topicId, bool $pinned): ?AbstractUpdates
     {
+        return $this->updatePinnedForumTopicAsync(peer: $peer, topicId: $topicId, pinned: $pinned)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int> $order
+     * @param bool|null $force
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.reorderPinnedForumTopics
+     * @api
+     */
+    public function reorderPinnedForumTopicsAsync(AbstractInputPeer|string|int $peer, array $order, ?bool $force = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new UpdatePinnedForumTopicRequest(peer: $peer, topicId: $topicId, pinned: $pinned));
+        return $this->client->call(new ReorderPinnedForumTopicsRequest(peer: $peer, order: $order, force: $force));
     }
 
     /**
@@ -4398,10 +7518,33 @@ final readonly class MessagesMethods
      */
     public function reorderPinnedForumTopics(AbstractInputPeer|string|int $peer, array $order, ?bool $force = null): ?AbstractUpdates
     {
+        return $this->reorderPinnedForumTopicsAsync(peer: $peer, order: $order, force: $force)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $title
+     * @param bool|null $titleMissing
+     * @param int|null $iconColor
+     * @param int|null $iconEmojiId
+     * @param int|null $randomId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $sendAs
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/messages.createForumTopic
+     * @api
+     */
+    public function createForumTopicAsync(AbstractInputPeer|string|int $peer, string $title, ?bool $titleMissing = null, ?int $iconColor = null, ?int $iconEmojiId = null, ?int $randomId = null, AbstractInputPeer|string|int|null $sendAs = null): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new ReorderPinnedForumTopicsRequest(peer: $peer, order: $order, force: $force));
+        if (is_string($sendAs) || is_int($sendAs)) {
+            $sendAs = $this->client->peerManager->resolve($sendAs);
+        }
+        if ($randomId === null) {
+            $randomId = random_int(0, 9223372036854775807);
+        }
+        return $this->client->call(new CreateForumTopicRequest(peer: $peer, title: $title, titleMissing: $titleMissing, iconColor: $iconColor, iconEmojiId: $iconEmojiId, randomId: $randomId, sendAs: $sendAs));
     }
 
     /**
@@ -4418,16 +7561,22 @@ final readonly class MessagesMethods
      */
     public function createForumTopic(AbstractInputPeer|string|int $peer, string $title, ?bool $titleMissing = null, ?int $iconColor = null, ?int $iconEmojiId = null, ?int $randomId = null, AbstractInputPeer|string|int|null $sendAs = null): ?AbstractUpdates
     {
+        return $this->createForumTopicAsync(peer: $peer, title: $title, titleMissing: $titleMissing, iconColor: $iconColor, iconEmojiId: $iconEmojiId, randomId: $randomId, sendAs: $sendAs)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param int $topMsgId
+     * @return Future<AffectedHistory|null>
+     * @see https://core.telegram.org/method/messages.deleteTopicHistory
+     * @api
+     */
+    public function deleteTopicHistoryAsync(AbstractInputPeer|string|int $peer, int $topMsgId): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        if (is_string($sendAs) || is_int($sendAs)) {
-            $sendAs = $this->client->peerManager->resolve($sendAs);
-        }
-        if ($randomId === null) {
-            $randomId = random_int(0, 9223372036854775807);
-        }
-        return $this->client->callSync(new CreateForumTopicRequest(peer: $peer, title: $title, titleMissing: $titleMissing, iconColor: $iconColor, iconEmojiId: $iconEmojiId, randomId: $randomId, sendAs: $sendAs));
+        return $this->client->call(new DeleteTopicHistoryRequest(peer: $peer, topMsgId: $topMsgId));
     }
 
     /**
@@ -4439,9 +7588,6 @@ final readonly class MessagesMethods
      */
     public function deleteTopicHistory(AbstractInputPeer|string|int $peer, int $topMsgId): ?AffectedHistory
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new DeleteTopicHistoryRequest(peer: $peer, topMsgId: $topMsgId));
+        return $this->deleteTopicHistoryAsync(peer: $peer, topMsgId: $topMsgId)->await();
     }
 }

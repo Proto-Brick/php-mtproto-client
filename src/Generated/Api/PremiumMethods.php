@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Premium\ApplyBoostRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Premium\GetBoostsListRequest;
@@ -39,16 +41,40 @@ final readonly class PremiumMethods
      * @param string $offset
      * @param int $limit
      * @param bool|null $gifts
+     * @return Future<BoostsList|null>
+     * @see https://core.telegram.org/method/premium.getBoostsList
+     * @api
+     */
+    public function getBoostsListAsync(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $gifts = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new GetBoostsListRequest(peer: $peer, offset: $offset, limit: $limit, gifts: $gifts));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $offset
+     * @param int $limit
+     * @param bool|null $gifts
      * @return BoostsList|null
      * @see https://core.telegram.org/method/premium.getBoostsList
      * @api
      */
     public function getBoostsList(AbstractInputPeer|string|int $peer, string $offset, int $limit, ?bool $gifts = null): ?BoostsList
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetBoostsListRequest(peer: $peer, offset: $offset, limit: $limit, gifts: $gifts));
+        return $this->getBoostsListAsync(peer: $peer, offset: $offset, limit: $limit, gifts: $gifts)->await();
+    }
+
+    /**
+     * @return Future<MyBoosts|null>
+     * @see https://core.telegram.org/method/premium.getMyBoosts
+     * @api
+     */
+    public function getMyBoostsAsync(): Future
+    {
+        return $this->client->call(new GetMyBoostsRequest());
     }
 
     /**
@@ -58,7 +84,22 @@ final readonly class PremiumMethods
      */
     public function getMyBoosts(): ?MyBoosts
     {
-        return $this->client->callSync(new GetMyBoostsRequest());
+        return $this->getMyBoostsAsync()->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param list<int>|null $slots
+     * @return Future<MyBoosts|null>
+     * @see https://core.telegram.org/method/premium.applyBoost
+     * @api
+     */
+    public function applyBoostAsync(AbstractInputPeer|string|int $peer, ?array $slots = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new ApplyBoostRequest(peer: $peer, slots: $slots));
     }
 
     /**
@@ -70,10 +111,21 @@ final readonly class PremiumMethods
      */
     public function applyBoost(AbstractInputPeer|string|int $peer, ?array $slots = null): ?MyBoosts
     {
+        return $this->applyBoostAsync(peer: $peer, slots: $slots)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<BoostsStatus|null>
+     * @see https://core.telegram.org/method/premium.getBoostsStatus
+     * @api
+     */
+    public function getBoostsStatusAsync(AbstractInputPeer|string|int $peer): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return $this->client->callSync(new ApplyBoostRequest(peer: $peer, slots: $slots));
+        return $this->client->call(new GetBoostsStatusRequest(peer: $peer));
     }
 
     /**
@@ -84,20 +136,17 @@ final readonly class PremiumMethods
      */
     public function getBoostsStatus(AbstractInputPeer|string|int $peer): ?BoostsStatus
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return $this->client->callSync(new GetBoostsStatusRequest(peer: $peer));
+        return $this->getBoostsStatusAsync(peer: $peer)->await();
     }
 
     /**
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
-     * @return BoostsList|null
+     * @return Future<BoostsList|null>
      * @see https://core.telegram.org/method/premium.getUserBoosts
      * @api
      */
-    public function getUserBoosts(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $userId): ?BoostsList
+    public function getUserBoostsAsync(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $userId): Future
     {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
@@ -110,6 +159,18 @@ final readonly class PremiumMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetUserBoostsRequest(peer: $peer, userId: $userId));
+        return $this->client->call(new GetUserBoostsRequest(peer: $peer, userId: $userId));
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @return BoostsList|null
+     * @see https://core.telegram.org/method/premium.getUserBoosts
+     * @api
+     */
+    public function getUserBoosts(AbstractInputPeer|string|int $peer, AbstractInputUser|string|int $userId): ?BoostsList
+    {
+        return $this->getUserBoostsAsync(peer: $peer, userId: $userId)->await();
     }
 }

@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Help\AcceptTermsOfServiceRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Help\DismissSuggestionRequest;
@@ -113,13 +115,33 @@ final readonly class HelpMethods
     public function __construct(private Client $client) {}
 
     /**
+     * @return Future<Config|null>
+     * @see https://core.telegram.org/method/help.getConfig
+     * @api
+     */
+    public function getConfigAsync(): Future
+    {
+        return $this->client->call(new GetConfigRequest());
+    }
+
+    /**
      * @return Config|null
      * @see https://core.telegram.org/method/help.getConfig
      * @api
      */
     public function getConfig(): ?Config
     {
-        return $this->client->callSync(new GetConfigRequest());
+        return $this->getConfigAsync()->await();
+    }
+
+    /**
+     * @return Future<NearestDc|null>
+     * @see https://core.telegram.org/method/help.getNearestDc
+     * @api
+     */
+    public function getNearestDcAsync(): Future
+    {
+        return $this->client->call(new GetNearestDcRequest());
     }
 
     /**
@@ -129,7 +151,18 @@ final readonly class HelpMethods
      */
     public function getNearestDc(): ?NearestDc
     {
-        return $this->client->callSync(new GetNearestDcRequest());
+        return $this->getNearestDcAsync()->await();
+    }
+
+    /**
+     * @param string $source
+     * @return Future<AppUpdate|NoAppUpdate|null>
+     * @see https://core.telegram.org/method/help.getAppUpdate
+     * @api
+     */
+    public function getAppUpdateAsync(string $source): Future
+    {
+        return $this->client->call(new GetAppUpdateRequest(source: $source));
     }
 
     /**
@@ -140,7 +173,17 @@ final readonly class HelpMethods
      */
     public function getAppUpdate(string $source): ?AbstractAppUpdate
     {
-        return $this->client->callSync(new GetAppUpdateRequest(source: $source));
+        return $this->getAppUpdateAsync(source: $source)->await();
+    }
+
+    /**
+     * @return Future<InviteText|null>
+     * @see https://core.telegram.org/method/help.getInviteText
+     * @api
+     */
+    public function getInviteTextAsync(): Future
+    {
+        return $this->client->call(new GetInviteTextRequest());
     }
 
     /**
@@ -150,7 +193,17 @@ final readonly class HelpMethods
      */
     public function getInviteText(): ?InviteText
     {
-        return $this->client->callSync(new GetInviteTextRequest());
+        return $this->getInviteTextAsync()->await();
+    }
+
+    /**
+     * @return Future<Support|null>
+     * @see https://core.telegram.org/method/help.getSupport
+     * @api
+     */
+    public function getSupportAsync(): Future
+    {
+        return $this->client->call(new GetSupportRequest());
     }
 
     /**
@@ -160,7 +213,19 @@ final readonly class HelpMethods
      */
     public function getSupport(): ?Support
     {
-        return $this->client->callSync(new GetSupportRequest());
+        return $this->getSupportAsync()->await();
+    }
+
+    /**
+     * @param int $pendingUpdatesCount
+     * @param string $message
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/help.setBotUpdatesStatus
+     * @api
+     */
+    public function setBotUpdatesStatusAsync(int $pendingUpdatesCount, string $message): Future
+    {
+        return $this->client->call(new SetBotUpdatesStatusRequest(pendingUpdatesCount: $pendingUpdatesCount, message: $message));
     }
 
     /**
@@ -172,7 +237,17 @@ final readonly class HelpMethods
      */
     public function setBotUpdatesStatus(int $pendingUpdatesCount, string $message): bool
     {
-        return (bool) $this->client->callSync(new SetBotUpdatesStatusRequest(pendingUpdatesCount: $pendingUpdatesCount, message: $message));
+        return (bool) $this->setBotUpdatesStatusAsync(pendingUpdatesCount: $pendingUpdatesCount, message: $message)->await();
+    }
+
+    /**
+     * @return Future<CdnConfig|null>
+     * @see https://core.telegram.org/method/help.getCdnConfig
+     * @api
+     */
+    public function getCdnConfigAsync(): Future
+    {
+        return $this->client->call(new GetCdnConfigRequest());
     }
 
     /**
@@ -182,7 +257,18 @@ final readonly class HelpMethods
      */
     public function getCdnConfig(): ?CdnConfig
     {
-        return $this->client->callSync(new GetCdnConfigRequest());
+        return $this->getCdnConfigAsync()->await();
+    }
+
+    /**
+     * @param string $referer
+     * @return Future<RecentMeUrls|null>
+     * @see https://core.telegram.org/method/help.getRecentMeUrls
+     * @api
+     */
+    public function getRecentMeUrlsAsync(string $referer): Future
+    {
+        return $this->client->call(new GetRecentMeUrlsRequest(referer: $referer));
     }
 
     /**
@@ -193,7 +279,17 @@ final readonly class HelpMethods
      */
     public function getRecentMeUrls(string $referer): ?RecentMeUrls
     {
-        return $this->client->callSync(new GetRecentMeUrlsRequest(referer: $referer));
+        return $this->getRecentMeUrlsAsync(referer: $referer)->await();
+    }
+
+    /**
+     * @return Future<TermsOfServiceUpdateEmpty|TermsOfServiceUpdate|null>
+     * @see https://core.telegram.org/method/help.getTermsOfServiceUpdate
+     * @api
+     */
+    public function getTermsOfServiceUpdateAsync(): Future
+    {
+        return $this->client->call(new GetTermsOfServiceUpdateRequest());
     }
 
     /**
@@ -203,7 +299,18 @@ final readonly class HelpMethods
      */
     public function getTermsOfServiceUpdate(): ?AbstractTermsOfServiceUpdate
     {
-        return $this->client->callSync(new GetTermsOfServiceUpdateRequest());
+        return $this->getTermsOfServiceUpdateAsync()->await();
+    }
+
+    /**
+     * @param array $id
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/help.acceptTermsOfService
+     * @api
+     */
+    public function acceptTermsOfServiceAsync(array $id): Future
+    {
+        return $this->client->call(new AcceptTermsOfServiceRequest(id: $id));
     }
 
     /**
@@ -214,7 +321,18 @@ final readonly class HelpMethods
      */
     public function acceptTermsOfService(array $id): bool
     {
-        return (bool) $this->client->callSync(new AcceptTermsOfServiceRequest(id: $id));
+        return (bool) $this->acceptTermsOfServiceAsync(id: $id)->await();
+    }
+
+    /**
+     * @param string $path
+     * @return Future<DeepLinkInfoEmpty|DeepLinkInfo|null>
+     * @see https://core.telegram.org/method/help.getDeepLinkInfo
+     * @api
+     */
+    public function getDeepLinkInfoAsync(string $path): Future
+    {
+        return $this->client->call(new GetDeepLinkInfoRequest(path: $path));
     }
 
     /**
@@ -225,7 +343,18 @@ final readonly class HelpMethods
      */
     public function getDeepLinkInfo(string $path): ?AbstractDeepLinkInfo
     {
-        return $this->client->callSync(new GetDeepLinkInfoRequest(path: $path));
+        return $this->getDeepLinkInfoAsync(path: $path)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<AppConfigNotModified|AppConfig|null>
+     * @see https://core.telegram.org/method/help.getAppConfig
+     * @api
+     */
+    public function getAppConfigAsync(int $hash): Future
+    {
+        return $this->client->call(new GetAppConfigRequest(hash: $hash));
     }
 
     /**
@@ -236,7 +365,18 @@ final readonly class HelpMethods
      */
     public function getAppConfig(int $hash): ?AbstractAppConfig
     {
-        return $this->client->callSync(new GetAppConfigRequest(hash: $hash));
+        return $this->getAppConfigAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param list<InputAppEvent> $events
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/help.saveAppLog
+     * @api
+     */
+    public function saveAppLogAsync(array $events): Future
+    {
+        return $this->client->call(new SaveAppLogRequest(events: $events));
     }
 
     /**
@@ -247,7 +387,18 @@ final readonly class HelpMethods
      */
     public function saveAppLog(array $events): bool
     {
-        return (bool) $this->client->callSync(new SaveAppLogRequest(events: $events));
+        return (bool) $this->saveAppLogAsync(events: $events)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<PassportConfigNotModified|PassportConfig|null>
+     * @see https://core.telegram.org/method/help.getPassportConfig
+     * @api
+     */
+    public function getPassportConfigAsync(int $hash): Future
+    {
+        return $this->client->call(new GetPassportConfigRequest(hash: $hash));
     }
 
     /**
@@ -258,7 +409,17 @@ final readonly class HelpMethods
      */
     public function getPassportConfig(int $hash): ?AbstractPassportConfig
     {
-        return $this->client->callSync(new GetPassportConfigRequest(hash: $hash));
+        return $this->getPassportConfigAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @return Future<SupportName|null>
+     * @see https://core.telegram.org/method/help.getSupportName
+     * @api
+     */
+    public function getSupportNameAsync(): Future
+    {
+        return $this->client->call(new GetSupportNameRequest());
     }
 
     /**
@@ -268,7 +429,26 @@ final readonly class HelpMethods
      */
     public function getSupportName(): ?SupportName
     {
-        return $this->client->callSync(new GetSupportNameRequest());
+        return $this->getSupportNameAsync()->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @return Future<UserInfoEmpty|UserInfo|null>
+     * @see https://core.telegram.org/method/help.getUserInfo
+     * @api
+     */
+    public function getUserInfoAsync(AbstractInputUser|string|int $userId): Future
+    {
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetUserInfoRequest(userId: $userId));
     }
 
     /**
@@ -279,6 +459,19 @@ final readonly class HelpMethods
      */
     public function getUserInfo(AbstractInputUser|string|int $userId): ?AbstractUserInfo
     {
+        return $this->getUserInfoAsync(userId: $userId)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param string $message
+     * @param list<MessageEntityUnknown|MessageEntityMention|MessageEntityHashtag|MessageEntityBotCommand|MessageEntityUrl|MessageEntityEmail|MessageEntityBold|MessageEntityItalic|MessageEntityCode|MessageEntityPre|MessageEntityTextUrl|MessageEntityMentionName|InputMessageEntityMentionName|MessageEntityPhone|MessageEntityCashtag|MessageEntityUnderline|MessageEntityStrike|MessageEntityBankCard|MessageEntitySpoiler|MessageEntityCustomEmoji|MessageEntityBlockquote> $entities
+     * @return Future<UserInfoEmpty|UserInfo|null>
+     * @see https://core.telegram.org/method/help.editUserInfo
+     * @api
+     */
+    public function editUserInfoAsync(AbstractInputUser|string|int $userId, string $message, array $entities): Future
+    {
         if (is_string($userId) || is_int($userId)) {
             $__tmpPeer = $this->client->peerManager->resolve($userId);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -287,7 +480,7 @@ final readonly class HelpMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetUserInfoRequest(userId: $userId));
+        return $this->client->call(new EditUserInfoRequest(userId: $userId, message: $message, entities: $entities));
     }
 
     /**
@@ -300,15 +493,17 @@ final readonly class HelpMethods
      */
     public function editUserInfo(AbstractInputUser|string|int $userId, string $message, array $entities): ?AbstractUserInfo
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $userId = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new EditUserInfoRequest(userId: $userId, message: $message, entities: $entities));
+        return $this->editUserInfoAsync(userId: $userId, message: $message, entities: $entities)->await();
+    }
+
+    /**
+     * @return Future<PromoDataEmpty|PromoData|null>
+     * @see https://core.telegram.org/method/help.getPromoData
+     * @api
+     */
+    public function getPromoDataAsync(): Future
+    {
+        return $this->client->call(new GetPromoDataRequest());
     }
 
     /**
@@ -318,7 +513,21 @@ final readonly class HelpMethods
      */
     public function getPromoData(): ?AbstractPromoData
     {
-        return $this->client->callSync(new GetPromoDataRequest());
+        return $this->getPromoDataAsync()->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/help.hidePromoData
+     * @api
+     */
+    public function hidePromoDataAsync(AbstractInputPeer|string|int $peer): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new HidePromoDataRequest(peer: $peer));
     }
 
     /**
@@ -329,10 +538,22 @@ final readonly class HelpMethods
      */
     public function hidePromoData(AbstractInputPeer|string|int $peer): bool
     {
+        return (bool) $this->hidePromoDataAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param string $suggestion
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/help.dismissSuggestion
+     * @api
+     */
+    public function dismissSuggestionAsync(AbstractInputPeer|string|int $peer, string $suggestion): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new HidePromoDataRequest(peer: $peer));
+        return $this->client->call(new DismissSuggestionRequest(peer: $peer, suggestion: $suggestion));
     }
 
     /**
@@ -344,10 +565,19 @@ final readonly class HelpMethods
      */
     public function dismissSuggestion(AbstractInputPeer|string|int $peer, string $suggestion): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new DismissSuggestionRequest(peer: $peer, suggestion: $suggestion));
+        return (bool) $this->dismissSuggestionAsync(peer: $peer, suggestion: $suggestion)->await();
+    }
+
+    /**
+     * @param string $langCode
+     * @param int $hash
+     * @return Future<CountriesListNotModified|CountriesList|null>
+     * @see https://core.telegram.org/method/help.getCountriesList
+     * @api
+     */
+    public function getCountriesListAsync(string $langCode, int $hash): Future
+    {
+        return $this->client->call(new GetCountriesListRequest(langCode: $langCode, hash: $hash));
     }
 
     /**
@@ -359,7 +589,17 @@ final readonly class HelpMethods
      */
     public function getCountriesList(string $langCode, int $hash): ?AbstractCountriesList
     {
-        return $this->client->callSync(new GetCountriesListRequest(langCode: $langCode, hash: $hash));
+        return $this->getCountriesListAsync(langCode: $langCode, hash: $hash)->await();
+    }
+
+    /**
+     * @return Future<PremiumPromo|null>
+     * @see https://core.telegram.org/method/help.getPremiumPromo
+     * @api
+     */
+    public function getPremiumPromoAsync(): Future
+    {
+        return $this->client->call(new GetPremiumPromoRequest());
     }
 
     /**
@@ -369,7 +609,18 @@ final readonly class HelpMethods
      */
     public function getPremiumPromo(): ?PremiumPromo
     {
-        return $this->client->callSync(new GetPremiumPromoRequest());
+        return $this->getPremiumPromoAsync()->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<PeerColorsNotModified|PeerColors|null>
+     * @see https://core.telegram.org/method/help.getPeerColors
+     * @api
+     */
+    public function getPeerColorsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetPeerColorsRequest(hash: $hash));
     }
 
     /**
@@ -380,7 +631,18 @@ final readonly class HelpMethods
      */
     public function getPeerColors(int $hash): ?AbstractPeerColors
     {
-        return $this->client->callSync(new GetPeerColorsRequest(hash: $hash));
+        return $this->getPeerColorsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<PeerColorsNotModified|PeerColors|null>
+     * @see https://core.telegram.org/method/help.getPeerProfileColors
+     * @api
+     */
+    public function getPeerProfileColorsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetPeerProfileColorsRequest(hash: $hash));
     }
 
     /**
@@ -391,7 +653,18 @@ final readonly class HelpMethods
      */
     public function getPeerProfileColors(int $hash): ?AbstractPeerColors
     {
-        return $this->client->callSync(new GetPeerProfileColorsRequest(hash: $hash));
+        return $this->getPeerProfileColorsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<TimezonesListNotModified|TimezonesList|null>
+     * @see https://core.telegram.org/method/help.getTimezonesList
+     * @api
+     */
+    public function getTimezonesListAsync(int $hash): Future
+    {
+        return $this->client->call(new GetTimezonesListRequest(hash: $hash));
     }
 
     /**
@@ -402,6 +675,6 @@ final readonly class HelpMethods
      */
     public function getTimezonesList(int $hash): ?AbstractTimezonesList
     {
-        return $this->client->callSync(new GetTimezonesListRequest(hash: $hash));
+        return $this->getTimezonesListAsync(hash: $hash)->await();
     }
 }

@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Bots\AddPreviewMediaRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Bots\AllowSendMessageRequest;
@@ -117,13 +119,37 @@ final readonly class BotsMethods
     /**
      * @param string $customMethod
      * @param array $params
+     * @return Future<array>
+     * @see https://core.telegram.org/method/bots.sendCustomRequest
+     * @api
+     */
+    public function sendCustomRequestAsync(string $customMethod, array $params): Future
+    {
+        return $this->client->call(new SendCustomRequestRequest(customMethod: $customMethod, params: $params));
+    }
+
+    /**
+     * @param string $customMethod
+     * @param array $params
      * @return array
      * @see https://core.telegram.org/method/bots.sendCustomRequest
      * @api
      */
     public function sendCustomRequest(string $customMethod, array $params): array
     {
-        return $this->client->callSync(new SendCustomRequestRequest(customMethod: $customMethod, params: $params));
+        return $this->sendCustomRequestAsync(customMethod: $customMethod, params: $params)->await();
+    }
+
+    /**
+     * @param int $queryId
+     * @param array $data
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.answerWebhookJSONQuery
+     * @api
+     */
+    public function answerWebhookJSONQueryAsync(int $queryId, array $data): Future
+    {
+        return $this->client->call(new AnswerWebhookJSONQueryRequest(queryId: $queryId, data: $data));
     }
 
     /**
@@ -135,7 +161,20 @@ final readonly class BotsMethods
      */
     public function answerWebhookJSONQuery(int $queryId, array $data): bool
     {
-        return (bool) $this->client->callSync(new AnswerWebhookJSONQueryRequest(queryId: $queryId, data: $data));
+        return (bool) $this->answerWebhookJSONQueryAsync(queryId: $queryId, data: $data)->await();
+    }
+
+    /**
+     * @param BotCommandScopeDefault|BotCommandScopeUsers|BotCommandScopeChats|BotCommandScopeChatAdmins|BotCommandScopePeer|BotCommandScopePeerAdmins|BotCommandScopePeerUser $scope
+     * @param string $langCode
+     * @param list<BotCommand> $commands
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.setBotCommands
+     * @api
+     */
+    public function setBotCommandsAsync(AbstractBotCommandScope $scope, string $langCode, array $commands): Future
+    {
+        return $this->client->call(new SetBotCommandsRequest(scope: $scope, langCode: $langCode, commands: $commands));
     }
 
     /**
@@ -148,7 +187,19 @@ final readonly class BotsMethods
      */
     public function setBotCommands(AbstractBotCommandScope $scope, string $langCode, array $commands): bool
     {
-        return (bool) $this->client->callSync(new SetBotCommandsRequest(scope: $scope, langCode: $langCode, commands: $commands));
+        return (bool) $this->setBotCommandsAsync(scope: $scope, langCode: $langCode, commands: $commands)->await();
+    }
+
+    /**
+     * @param BotCommandScopeDefault|BotCommandScopeUsers|BotCommandScopeChats|BotCommandScopeChatAdmins|BotCommandScopePeer|BotCommandScopePeerAdmins|BotCommandScopePeerUser $scope
+     * @param string $langCode
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.resetBotCommands
+     * @api
+     */
+    public function resetBotCommandsAsync(AbstractBotCommandScope $scope, string $langCode): Future
+    {
+        return $this->client->call(new ResetBotCommandsRequest(scope: $scope, langCode: $langCode));
     }
 
     /**
@@ -160,7 +211,19 @@ final readonly class BotsMethods
      */
     public function resetBotCommands(AbstractBotCommandScope $scope, string $langCode): bool
     {
-        return (bool) $this->client->callSync(new ResetBotCommandsRequest(scope: $scope, langCode: $langCode));
+        return (bool) $this->resetBotCommandsAsync(scope: $scope, langCode: $langCode)->await();
+    }
+
+    /**
+     * @param BotCommandScopeDefault|BotCommandScopeUsers|BotCommandScopeChats|BotCommandScopeChatAdmins|BotCommandScopePeer|BotCommandScopePeerAdmins|BotCommandScopePeerUser $scope
+     * @param string $langCode
+     * @return Future<list<BotCommand>>
+     * @see https://core.telegram.org/method/bots.getBotCommands
+     * @api
+     */
+    public function getBotCommandsAsync(AbstractBotCommandScope $scope, string $langCode): Future
+    {
+        return $this->client->call(new GetBotCommandsRequest(scope: $scope, langCode: $langCode));
     }
 
     /**
@@ -172,7 +235,27 @@ final readonly class BotsMethods
      */
     public function getBotCommands(AbstractBotCommandScope $scope, string $langCode): array
     {
-        return $this->client->callSync(new GetBotCommandsRequest(scope: $scope, langCode: $langCode));
+        return $this->getBotCommandsAsync(scope: $scope, langCode: $langCode)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param BotMenuButtonDefault|BotMenuButtonCommands|BotMenuButton $button
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.setBotMenuButton
+     * @api
+     */
+    public function setBotMenuButtonAsync(AbstractInputUser|string|int $userId, AbstractBotMenuButton $button): Future
+    {
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new SetBotMenuButtonRequest(userId: $userId, button: $button));
     }
 
     /**
@@ -184,6 +267,17 @@ final readonly class BotsMethods
      */
     public function setBotMenuButton(AbstractInputUser|string|int $userId, AbstractBotMenuButton $button): bool
     {
+        return (bool) $this->setBotMenuButtonAsync(userId: $userId, button: $button)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @return Future<BotMenuButtonDefault|BotMenuButtonCommands|BotMenuButton|null>
+     * @see https://core.telegram.org/method/bots.getBotMenuButton
+     * @api
+     */
+    public function getBotMenuButtonAsync(AbstractInputUser|string|int $userId): Future
+    {
         if (is_string($userId) || is_int($userId)) {
             $__tmpPeer = $this->client->peerManager->resolve($userId);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -192,7 +286,7 @@ final readonly class BotsMethods
                 $userId = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new SetBotMenuButtonRequest(userId: $userId, button: $button));
+        return $this->client->call(new GetBotMenuButtonRequest(userId: $userId));
     }
 
     /**
@@ -203,15 +297,18 @@ final readonly class BotsMethods
      */
     public function getBotMenuButton(AbstractInputUser|string|int $userId): ?AbstractBotMenuButton
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $userId = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetBotMenuButtonRequest(userId: $userId));
+        return $this->getBotMenuButtonAsync(userId: $userId)->await();
+    }
+
+    /**
+     * @param ChatAdminRights $adminRights
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.setBotBroadcastDefaultAdminRights
+     * @api
+     */
+    public function setBotBroadcastDefaultAdminRightsAsync(ChatAdminRights $adminRights): Future
+    {
+        return $this->client->call(new SetBotBroadcastDefaultAdminRightsRequest(adminRights: $adminRights));
     }
 
     /**
@@ -222,7 +319,18 @@ final readonly class BotsMethods
      */
     public function setBotBroadcastDefaultAdminRights(ChatAdminRights $adminRights): bool
     {
-        return (bool) $this->client->callSync(new SetBotBroadcastDefaultAdminRightsRequest(adminRights: $adminRights));
+        return (bool) $this->setBotBroadcastDefaultAdminRightsAsync(adminRights: $adminRights)->await();
+    }
+
+    /**
+     * @param ChatAdminRights $adminRights
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.setBotGroupDefaultAdminRights
+     * @api
+     */
+    public function setBotGroupDefaultAdminRightsAsync(ChatAdminRights $adminRights): Future
+    {
+        return $this->client->call(new SetBotGroupDefaultAdminRightsRequest(adminRights: $adminRights));
     }
 
     /**
@@ -233,7 +341,30 @@ final readonly class BotsMethods
      */
     public function setBotGroupDefaultAdminRights(ChatAdminRights $adminRights): bool
     {
-        return (bool) $this->client->callSync(new SetBotGroupDefaultAdminRightsRequest(adminRights: $adminRights));
+        return (bool) $this->setBotGroupDefaultAdminRightsAsync(adminRights: $adminRights)->await();
+    }
+
+    /**
+     * @param string $langCode
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int|null $bot
+     * @param string|null $name
+     * @param string|null $about
+     * @param string|null $description
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.setBotInfo
+     * @api
+     */
+    public function setBotInfoAsync(string $langCode, AbstractInputUser|string|int|null $bot = null, ?string $name = null, ?string $about = null, ?string $description = null): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $bot = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new SetBotInfoRequest(langCode: $langCode, bot: $bot, name: $name, about: $about, description: $description));
     }
 
     /**
@@ -248,6 +379,18 @@ final readonly class BotsMethods
      */
     public function setBotInfo(string $langCode, AbstractInputUser|string|int|null $bot = null, ?string $name = null, ?string $about = null, ?string $description = null): bool
     {
+        return (bool) $this->setBotInfoAsync(langCode: $langCode, bot: $bot, name: $name, about: $about, description: $description)->await();
+    }
+
+    /**
+     * @param string $langCode
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int|null $bot
+     * @return Future<BotInfo|null>
+     * @see https://core.telegram.org/method/bots.getBotInfo
+     * @api
+     */
+    public function getBotInfoAsync(string $langCode, AbstractInputUser|string|int|null $bot = null): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -256,7 +399,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new SetBotInfoRequest(langCode: $langCode, bot: $bot, name: $name, about: $about, description: $description));
+        return $this->client->call(new GetBotInfoRequest(langCode: $langCode, bot: $bot));
     }
 
     /**
@@ -268,6 +411,18 @@ final readonly class BotsMethods
      */
     public function getBotInfo(string $langCode, AbstractInputUser|string|int|null $bot = null): ?BotInfo
     {
+        return $this->getBotInfoAsync(langCode: $langCode, bot: $bot)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param list<string> $order
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.reorderUsernames
+     * @api
+     */
+    public function reorderUsernamesAsync(AbstractInputUser|string|int $bot, array $order): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -276,7 +431,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetBotInfoRequest(langCode: $langCode, bot: $bot));
+        return $this->client->call(new ReorderUsernamesRequest(bot: $bot, order: $order));
     }
 
     /**
@@ -288,6 +443,19 @@ final readonly class BotsMethods
      */
     public function reorderUsernames(AbstractInputUser|string|int $bot, array $order): bool
     {
+        return (bool) $this->reorderUsernamesAsync(bot: $bot, order: $order)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $username
+     * @param bool $active
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.toggleUsername
+     * @api
+     */
+    public function toggleUsernameAsync(AbstractInputUser|string|int $bot, string $username, bool $active): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -296,7 +464,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ReorderUsernamesRequest(bot: $bot, order: $order));
+        return $this->client->call(new ToggleUsernameRequest(bot: $bot, username: $username, active: $active));
     }
 
     /**
@@ -309,6 +477,17 @@ final readonly class BotsMethods
      */
     public function toggleUsername(AbstractInputUser|string|int $bot, string $username, bool $active): bool
     {
+        return (bool) $this->toggleUsernameAsync(bot: $bot, username: $username, active: $active)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.canSendMessage
+     * @api
+     */
+    public function canSendMessageAsync(AbstractInputUser|string|int $bot): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -317,7 +496,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ToggleUsernameRequest(bot: $bot, username: $username, active: $active));
+        return $this->client->call(new CanSendMessageRequest(bot: $bot));
     }
 
     /**
@@ -328,6 +507,17 @@ final readonly class BotsMethods
      */
     public function canSendMessage(AbstractInputUser|string|int $bot): bool
     {
+        return (bool) $this->canSendMessageAsync(bot: $bot)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/bots.allowSendMessage
+     * @api
+     */
+    public function allowSendMessageAsync(AbstractInputUser|string|int $bot): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -336,7 +526,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new CanSendMessageRequest(bot: $bot));
+        return $this->client->call(new AllowSendMessageRequest(bot: $bot));
     }
 
     /**
@@ -347,6 +537,19 @@ final readonly class BotsMethods
      */
     public function allowSendMessage(AbstractInputUser|string|int $bot): ?AbstractUpdates
     {
+        return $this->allowSendMessageAsync(bot: $bot)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $customMethod
+     * @param array $params
+     * @return Future<array>
+     * @see https://core.telegram.org/method/bots.invokeWebViewCustomMethod
+     * @api
+     */
+    public function invokeWebViewCustomMethodAsync(AbstractInputUser|string|int $bot, string $customMethod, array $params): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -355,7 +558,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new AllowSendMessageRequest(bot: $bot));
+        return $this->client->call(new InvokeWebViewCustomMethodRequest(bot: $bot, customMethod: $customMethod, params: $params));
     }
 
     /**
@@ -368,15 +571,19 @@ final readonly class BotsMethods
      */
     public function invokeWebViewCustomMethod(AbstractInputUser|string|int $bot, string $customMethod, array $params): array
     {
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new InvokeWebViewCustomMethodRequest(bot: $bot, customMethod: $customMethod, params: $params));
+        return $this->invokeWebViewCustomMethodAsync(bot: $bot, customMethod: $customMethod, params: $params)->await();
+    }
+
+    /**
+     * @param string $offset
+     * @param int $limit
+     * @return Future<PopularAppBots|null>
+     * @see https://core.telegram.org/method/bots.getPopularAppBots
+     * @api
+     */
+    public function getPopularAppBotsAsync(string $offset, int $limit): Future
+    {
+        return $this->client->call(new GetPopularAppBotsRequest(offset: $offset, limit: $limit));
     }
 
     /**
@@ -388,7 +595,28 @@ final readonly class BotsMethods
      */
     public function getPopularAppBots(string $offset, int $limit): ?PopularAppBots
     {
-        return $this->client->callSync(new GetPopularAppBotsRequest(offset: $offset, limit: $limit));
+        return $this->getPopularAppBotsAsync(offset: $offset, limit: $limit)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $langCode
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
+     * @return Future<BotPreviewMedia|null>
+     * @see https://core.telegram.org/method/bots.addPreviewMedia
+     * @api
+     */
+    public function addPreviewMediaAsync(AbstractInputUser|string|int $bot, string $langCode, AbstractInputMedia $media): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $bot = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new AddPreviewMediaRequest(bot: $bot, langCode: $langCode, media: $media));
     }
 
     /**
@@ -401,6 +629,20 @@ final readonly class BotsMethods
      */
     public function addPreviewMedia(AbstractInputUser|string|int $bot, string $langCode, AbstractInputMedia $media): ?BotPreviewMedia
     {
+        return $this->addPreviewMediaAsync(bot: $bot, langCode: $langCode, media: $media)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $langCode
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $media
+     * @param InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo $newMedia
+     * @return Future<BotPreviewMedia|null>
+     * @see https://core.telegram.org/method/bots.editPreviewMedia
+     * @api
+     */
+    public function editPreviewMediaAsync(AbstractInputUser|string|int $bot, string $langCode, AbstractInputMedia $media, AbstractInputMedia $newMedia): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -409,7 +651,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new AddPreviewMediaRequest(bot: $bot, langCode: $langCode, media: $media));
+        return $this->client->call(new EditPreviewMediaRequest(bot: $bot, langCode: $langCode, media: $media, newMedia: $newMedia));
     }
 
     /**
@@ -423,6 +665,19 @@ final readonly class BotsMethods
      */
     public function editPreviewMedia(AbstractInputUser|string|int $bot, string $langCode, AbstractInputMedia $media, AbstractInputMedia $newMedia): ?BotPreviewMedia
     {
+        return $this->editPreviewMediaAsync(bot: $bot, langCode: $langCode, media: $media, newMedia: $newMedia)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $langCode
+     * @param list<InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo> $media
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.deletePreviewMedia
+     * @api
+     */
+    public function deletePreviewMediaAsync(AbstractInputUser|string|int $bot, string $langCode, array $media): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -431,7 +686,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new EditPreviewMediaRequest(bot: $bot, langCode: $langCode, media: $media, newMedia: $newMedia));
+        return $this->client->call(new DeletePreviewMediaRequest(bot: $bot, langCode: $langCode, media: $media));
     }
 
     /**
@@ -444,6 +699,19 @@ final readonly class BotsMethods
      */
     public function deletePreviewMedia(AbstractInputUser|string|int $bot, string $langCode, array $media): bool
     {
+        return (bool) $this->deletePreviewMediaAsync(bot: $bot, langCode: $langCode, media: $media)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $langCode
+     * @param list<InputMediaEmpty|InputMediaUploadedPhoto|InputMediaPhoto|InputMediaGeoPoint|InputMediaContact|InputMediaUploadedDocument|InputMediaDocument|InputMediaVenue|InputMediaPhotoExternal|InputMediaDocumentExternal|InputMediaGame|InputMediaInvoice|InputMediaGeoLive|InputMediaPoll|InputMediaDice|InputMediaStory|InputMediaWebPage|InputMediaPaidMedia|InputMediaTodo> $order
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.reorderPreviewMedias
+     * @api
+     */
+    public function reorderPreviewMediasAsync(AbstractInputUser|string|int $bot, string $langCode, array $order): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -452,7 +720,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new DeletePreviewMediaRequest(bot: $bot, langCode: $langCode, media: $media));
+        return $this->client->call(new ReorderPreviewMediasRequest(bot: $bot, langCode: $langCode, order: $order));
     }
 
     /**
@@ -465,6 +733,18 @@ final readonly class BotsMethods
      */
     public function reorderPreviewMedias(AbstractInputUser|string|int $bot, string $langCode, array $order): bool
     {
+        return (bool) $this->reorderPreviewMediasAsync(bot: $bot, langCode: $langCode, order: $order)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $langCode
+     * @return Future<PreviewInfo|null>
+     * @see https://core.telegram.org/method/bots.getPreviewInfo
+     * @api
+     */
+    public function getPreviewInfoAsync(AbstractInputUser|string|int $bot, string $langCode): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -473,7 +753,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ReorderPreviewMediasRequest(bot: $bot, langCode: $langCode, order: $order));
+        return $this->client->call(new GetPreviewInfoRequest(bot: $bot, langCode: $langCode));
     }
 
     /**
@@ -485,6 +765,17 @@ final readonly class BotsMethods
      */
     public function getPreviewInfo(AbstractInputUser|string|int $bot, string $langCode): ?PreviewInfo
     {
+        return $this->getPreviewInfoAsync(bot: $bot, langCode: $langCode)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @return Future<list<BotPreviewMedia>>
+     * @see https://core.telegram.org/method/bots.getPreviewMedias
+     * @api
+     */
+    public function getPreviewMediasAsync(AbstractInputUser|string|int $bot): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -493,7 +784,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetPreviewInfoRequest(bot: $bot, langCode: $langCode));
+        return $this->client->call(new GetPreviewMediasRequest(bot: $bot));
     }
 
     /**
@@ -504,15 +795,27 @@ final readonly class BotsMethods
      */
     public function getPreviewMedias(AbstractInputUser|string|int $bot): array
     {
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
+        return $this->getPreviewMediasAsync(bot: $bot)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusCollectible|InputEmojiStatusCollectible $emojiStatus
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.updateUserEmojiStatus
+     * @api
+     */
+    public function updateUserEmojiStatusAsync(AbstractInputUser|string|int $userId, AbstractEmojiStatus $emojiStatus): Future
+    {
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
             if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
             } else {
-                $bot = $__tmpPeer;
+                $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetPreviewMediasRequest(bot: $bot));
+        return $this->client->call(new UpdateUserEmojiStatusRequest(userId: $userId, emojiStatus: $emojiStatus));
     }
 
     /**
@@ -524,15 +827,27 @@ final readonly class BotsMethods
      */
     public function updateUserEmojiStatus(AbstractInputUser|string|int $userId, AbstractEmojiStatus $emojiStatus): bool
     {
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
+        return (bool) $this->updateUserEmojiStatusAsync(userId: $userId, emojiStatus: $emojiStatus)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param bool $enabled
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.toggleUserEmojiStatusPermission
+     * @api
+     */
+    public function toggleUserEmojiStatusPermissionAsync(AbstractInputUser|string|int $bot, bool $enabled): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
             } else {
-                $userId = $__tmpPeer;
+                $bot = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new UpdateUserEmojiStatusRequest(userId: $userId, emojiStatus: $emojiStatus));
+        return $this->client->call(new ToggleUserEmojiStatusPermissionRequest(bot: $bot, enabled: $enabled));
     }
 
     /**
@@ -544,6 +859,19 @@ final readonly class BotsMethods
      */
     public function toggleUserEmojiStatusPermission(AbstractInputUser|string|int $bot, bool $enabled): bool
     {
+        return (bool) $this->toggleUserEmojiStatusPermissionAsync(bot: $bot, enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param string $fileName
+     * @param string $url
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.checkDownloadFileParams
+     * @api
+     */
+    public function checkDownloadFileParamsAsync(AbstractInputUser|string|int $bot, string $fileName, string $url): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -552,7 +880,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return (bool) $this->client->callSync(new ToggleUserEmojiStatusPermissionRequest(bot: $bot, enabled: $enabled));
+        return $this->client->call(new CheckDownloadFileParamsRequest(bot: $bot, fileName: $fileName, url: $url));
     }
 
     /**
@@ -565,15 +893,17 @@ final readonly class BotsMethods
      */
     public function checkDownloadFileParams(AbstractInputUser|string|int $bot, string $fileName, string $url): bool
     {
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
-        }
-        return (bool) $this->client->callSync(new CheckDownloadFileParamsRequest(bot: $bot, fileName: $fileName, url: $url));
+        return (bool) $this->checkDownloadFileParamsAsync(bot: $bot, fileName: $fileName, url: $url)->await();
+    }
+
+    /**
+     * @return Future<list<UserEmpty|User>>
+     * @see https://core.telegram.org/method/bots.getAdminedBots
+     * @api
+     */
+    public function getAdminedBotsAsync(): Future
+    {
+        return $this->client->call(new GetAdminedBotsRequest());
     }
 
     /**
@@ -583,7 +913,28 @@ final readonly class BotsMethods
      */
     public function getAdminedBots(): array
     {
-        return $this->client->callSync(new GetAdminedBotsRequest());
+        return $this->getAdminedBotsAsync()->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param int $commissionPermille
+     * @param int|null $durationMonths
+     * @return Future<StarRefProgram|null>
+     * @see https://core.telegram.org/method/bots.updateStarRefProgram
+     * @api
+     */
+    public function updateStarRefProgramAsync(AbstractInputUser|string|int $bot, int $commissionPermille, ?int $durationMonths = null): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $bot = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new UpdateStarRefProgramRequest(bot: $bot, commissionPermille: $commissionPermille, durationMonths: $durationMonths));
     }
 
     /**
@@ -596,6 +947,20 @@ final readonly class BotsMethods
      */
     public function updateStarRefProgram(AbstractInputUser|string|int $bot, int $commissionPermille, ?int $durationMonths = null): ?StarRefProgram
     {
+        return $this->updateStarRefProgramAsync(bot: $bot, commissionPermille: $commissionPermille, durationMonths: $durationMonths)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool|null $enabled
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int|null $bot
+     * @param string|null $customDescription
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/bots.setCustomVerification
+     * @api
+     */
+    public function setCustomVerificationAsync(AbstractInputPeer|string|int $peer, ?bool $enabled = null, AbstractInputUser|string|int|null $bot = null, ?string $customDescription = null): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -604,7 +969,10 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new UpdateStarRefProgramRequest(bot: $bot, commissionPermille: $commissionPermille, durationMonths: $durationMonths));
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new SetCustomVerificationRequest(peer: $peer, enabled: $enabled, bot: $bot, customDescription: $customDescription));
     }
 
     /**
@@ -618,6 +986,17 @@ final readonly class BotsMethods
      */
     public function setCustomVerification(AbstractInputPeer|string|int $peer, ?bool $enabled = null, AbstractInputUser|string|int|null $bot = null, ?string $customDescription = null): bool
     {
+        return (bool) $this->setCustomVerificationAsync(peer: $peer, enabled: $enabled, bot: $bot, customDescription: $customDescription)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @return Future<Users|UsersSlice|null>
+     * @see https://core.telegram.org/method/bots.getBotRecommendations
+     * @api
+     */
+    public function getBotRecommendationsAsync(AbstractInputUser|string|int $bot): Future
+    {
         if (is_string($bot) || is_int($bot)) {
             $__tmpPeer = $this->client->peerManager->resolve($bot);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -626,10 +1005,7 @@ final readonly class BotsMethods
                 $bot = $__tmpPeer;
             }
         }
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new SetCustomVerificationRequest(peer: $peer, enabled: $enabled, bot: $bot, customDescription: $customDescription));
+        return $this->client->call(new GetBotRecommendationsRequest(bot: $bot));
     }
 
     /**
@@ -640,14 +1016,6 @@ final readonly class BotsMethods
      */
     public function getBotRecommendations(AbstractInputUser|string|int $bot): ?AbstractUsers
     {
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new GetBotRecommendationsRequest(bot: $bot));
+        return $this->getBotRecommendationsAsync(bot: $bot)->await();
     }
 }

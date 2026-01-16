@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Users\GetFullUserRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Users\GetRequirementsToContactRequest;
@@ -61,13 +63,43 @@ final readonly class UsersMethods
 
     /**
      * @param list<InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage> $id
+     * @return Future<list<UserEmpty|User>>
+     * @see https://core.telegram.org/method/users.getUsers
+     * @api
+     */
+    public function getUsersAsync(array $id): Future
+    {
+        return $this->client->call(new GetUsersRequest(id: $id));
+    }
+
+    /**
+     * @param list<InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage> $id
      * @return list<UserEmpty|User>
      * @see https://core.telegram.org/method/users.getUsers
      * @api
      */
     public function getUsers(array $id): array
     {
-        return $this->client->callSync(new GetUsersRequest(id: $id));
+        return $this->getUsersAsync(id: $id)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
+     * @return Future<UserFull|null>
+     * @see https://core.telegram.org/method/users.getFullUser
+     * @api
+     */
+    public function getFullUserAsync(AbstractInputUser|string|int $id): Future
+    {
+        if (is_string($id) || is_int($id)) {
+            $__tmpPeer = $this->client->peerManager->resolve($id);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $id = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $id = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetFullUserRequest(id: $id));
     }
 
     /**
@@ -78,6 +110,18 @@ final readonly class UsersMethods
      */
     public function getFullUser(AbstractInputUser|string|int $id): ?UserFull
     {
+        return $this->getFullUserAsync(id: $id)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
+     * @param list<SecureValueErrorData|SecureValueErrorFrontSide|SecureValueErrorReverseSide|SecureValueErrorSelfie|SecureValueErrorFile|SecureValueErrorFiles|SecureValueError|SecureValueErrorTranslationFile|SecureValueErrorTranslationFiles> $errors
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/users.setSecureValueErrors
+     * @api
+     */
+    public function setSecureValueErrorsAsync(AbstractInputUser|string|int $id, array $errors): Future
+    {
         if (is_string($id) || is_int($id)) {
             $__tmpPeer = $this->client->peerManager->resolve($id);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -86,7 +130,7 @@ final readonly class UsersMethods
                 $id = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetFullUserRequest(id: $id));
+        return $this->client->call(new SetSecureValueErrorsRequest(id: $id, errors: $errors));
     }
 
     /**
@@ -98,15 +142,18 @@ final readonly class UsersMethods
      */
     public function setSecureValueErrors(AbstractInputUser|string|int $id, array $errors): bool
     {
-        if (is_string($id) || is_int($id)) {
-            $__tmpPeer = $this->client->peerManager->resolve($id);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $id = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $id = $__tmpPeer;
-            }
-        }
-        return (bool) $this->client->callSync(new SetSecureValueErrorsRequest(id: $id, errors: $errors));
+        return (bool) $this->setSecureValueErrorsAsync(id: $id, errors: $errors)->await();
+    }
+
+    /**
+     * @param list<InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage> $id
+     * @return Future<list<RequirementToContactEmpty|RequirementToContactPremium|RequirementToContactPaidMessages>>
+     * @see https://core.telegram.org/method/users.getRequirementsToContact
+     * @api
+     */
+    public function getRequirementsToContactAsync(array $id): Future
+    {
+        return $this->client->call(new GetRequirementsToContactRequest(id: $id));
     }
 
     /**
@@ -117,7 +164,29 @@ final readonly class UsersMethods
      */
     public function getRequirementsToContact(array $id): array
     {
-        return $this->client->callSync(new GetRequirementsToContactRequest(id: $id));
+        return $this->getRequirementsToContactAsync(id: $id)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
+     * @param int $offset
+     * @param int $limit
+     * @param int $hash
+     * @return Future<SavedMusicNotModified|SavedMusic|null>
+     * @see https://core.telegram.org/method/users.getSavedMusic
+     * @api
+     */
+    public function getSavedMusicAsync(AbstractInputUser|string|int $id, int $offset, int $limit, int $hash): Future
+    {
+        if (is_string($id) || is_int($id)) {
+            $__tmpPeer = $this->client->peerManager->resolve($id);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $id = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $id = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new GetSavedMusicRequest(id: $id, offset: $offset, limit: $limit, hash: $hash));
     }
 
     /**
@@ -131,6 +200,18 @@ final readonly class UsersMethods
      */
     public function getSavedMusic(AbstractInputUser|string|int $id, int $offset, int $limit, int $hash): ?AbstractSavedMusic
     {
+        return $this->getSavedMusicAsync(id: $id, offset: $offset, limit: $limit, hash: $hash)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
+     * @param list<InputDocumentEmpty|InputDocument> $documents
+     * @return Future<SavedMusicNotModified|SavedMusic|null>
+     * @see https://core.telegram.org/method/users.getSavedMusicByID
+     * @api
+     */
+    public function getSavedMusicByIDAsync(AbstractInputUser|string|int $id, array $documents): Future
+    {
         if (is_string($id) || is_int($id)) {
             $__tmpPeer = $this->client->peerManager->resolve($id);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -139,7 +220,7 @@ final readonly class UsersMethods
                 $id = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetSavedMusicRequest(id: $id, offset: $offset, limit: $limit, hash: $hash));
+        return $this->client->call(new GetSavedMusicByIDRequest(id: $id, documents: $documents));
     }
 
     /**
@@ -151,6 +232,18 @@ final readonly class UsersMethods
      */
     public function getSavedMusicByID(AbstractInputUser|string|int $id, array $documents): ?AbstractSavedMusic
     {
+        return $this->getSavedMusicByIDAsync(id: $id, documents: $documents)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
+     * @param Birthday $birthday
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/users.suggestBirthday
+     * @api
+     */
+    public function suggestBirthdayAsync(AbstractInputUser|string|int $id, Birthday $birthday): Future
+    {
         if (is_string($id) || is_int($id)) {
             $__tmpPeer = $this->client->peerManager->resolve($id);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -159,7 +252,7 @@ final readonly class UsersMethods
                 $id = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetSavedMusicByIDRequest(id: $id, documents: $documents));
+        return $this->client->call(new SuggestBirthdayRequest(id: $id, birthday: $birthday));
     }
 
     /**
@@ -171,14 +264,6 @@ final readonly class UsersMethods
      */
     public function suggestBirthday(AbstractInputUser|string|int $id, Birthday $birthday): ?AbstractUpdates
     {
-        if (is_string($id) || is_int($id)) {
-            $__tmpPeer = $this->client->peerManager->resolve($id);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $id = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $id = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new SuggestBirthdayRequest(id: $id, birthday: $birthday));
+        return $this->suggestBirthdayAsync(id: $id, birthday: $birthday)->await();
     }
 }

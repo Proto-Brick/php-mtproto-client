@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\AcceptLoginTokenRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Auth\BindTempAuthKeyRequest;
@@ -70,13 +72,42 @@ final readonly class AuthMethods
      * @param int $apiId
      * @param string $apiHash
      * @param CodeSettings $settings
+     * @return Future<SentCode|SentCodeSuccess|SentCodePaymentRequired|null>
+     * @see https://core.telegram.org/method/auth.sendCode
+     * @api
+     */
+    public function sendCodeAsync(string $phoneNumber, int $apiId, string $apiHash, CodeSettings $settings): Future
+    {
+        return $this->client->call(new SendCodeRequest(phoneNumber: $phoneNumber, apiId: $apiId, apiHash: $apiHash, settings: $settings));
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param int $apiId
+     * @param string $apiHash
+     * @param CodeSettings $settings
      * @return SentCode|SentCodeSuccess|SentCodePaymentRequired|null
      * @see https://core.telegram.org/method/auth.sendCode
      * @api
      */
     public function sendCode(string $phoneNumber, int $apiId, string $apiHash, CodeSettings $settings): ?AbstractSentCode
     {
-        return $this->client->callSync(new SendCodeRequest(phoneNumber: $phoneNumber, apiId: $apiId, apiHash: $apiHash, settings: $settings));
+        return $this->sendCodeAsync(phoneNumber: $phoneNumber, apiId: $apiId, apiHash: $apiHash, settings: $settings)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param string $firstName
+     * @param string $lastName
+     * @param bool|null $noJoinedNotifications
+     * @return Future<Authorization|AuthorizationSignUpRequired|null>
+     * @see https://core.telegram.org/method/auth.signUp
+     * @api
+     */
+    public function signUpAsync(string $phoneNumber, string $phoneCodeHash, string $firstName, string $lastName, ?bool $noJoinedNotifications = null): Future
+    {
+        return $this->client->call(new SignUpRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, firstName: $firstName, lastName: $lastName, noJoinedNotifications: $noJoinedNotifications));
     }
 
     /**
@@ -91,7 +122,21 @@ final readonly class AuthMethods
      */
     public function signUp(string $phoneNumber, string $phoneCodeHash, string $firstName, string $lastName, ?bool $noJoinedNotifications = null): ?AbstractAuthorization
     {
-        return $this->client->callSync(new SignUpRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, firstName: $firstName, lastName: $lastName, noJoinedNotifications: $noJoinedNotifications));
+        return $this->signUpAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, firstName: $firstName, lastName: $lastName, noJoinedNotifications: $noJoinedNotifications)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param string|null $phoneCode
+     * @param EmailVerificationCode|EmailVerificationGoogle|EmailVerificationApple|null $emailVerification
+     * @return Future<Authorization|AuthorizationSignUpRequired|null>
+     * @see https://core.telegram.org/method/auth.signIn
+     * @api
+     */
+    public function signInAsync(string $phoneNumber, string $phoneCodeHash, ?string $phoneCode = null, ?AbstractEmailVerification $emailVerification = null): Future
+    {
+        return $this->client->call(new SignInRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode, emailVerification: $emailVerification));
     }
 
     /**
@@ -105,7 +150,17 @@ final readonly class AuthMethods
      */
     public function signIn(string $phoneNumber, string $phoneCodeHash, ?string $phoneCode = null, ?AbstractEmailVerification $emailVerification = null): ?AbstractAuthorization
     {
-        return $this->client->callSync(new SignInRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode, emailVerification: $emailVerification));
+        return $this->signInAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode, emailVerification: $emailVerification)->await();
+    }
+
+    /**
+     * @return Future<LoggedOut|null>
+     * @see https://core.telegram.org/method/auth.logOut
+     * @api
+     */
+    public function logOutAsync(): Future
+    {
+        return $this->client->call(new LogOutRequest());
     }
 
     /**
@@ -115,7 +170,17 @@ final readonly class AuthMethods
      */
     public function logOut(): ?LoggedOut
     {
-        return $this->client->callSync(new LogOutRequest());
+        return $this->logOutAsync()->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/auth.resetAuthorizations
+     * @api
+     */
+    public function resetAuthorizationsAsync(): Future
+    {
+        return $this->client->call(new ResetAuthorizationsRequest());
     }
 
     /**
@@ -125,7 +190,18 @@ final readonly class AuthMethods
      */
     public function resetAuthorizations(): bool
     {
-        return (bool) $this->client->callSync(new ResetAuthorizationsRequest());
+        return (bool) $this->resetAuthorizationsAsync()->await();
+    }
+
+    /**
+     * @param int $dcId
+     * @return Future<ExportedAuthorization|null>
+     * @see https://core.telegram.org/method/auth.exportAuthorization
+     * @api
+     */
+    public function exportAuthorizationAsync(int $dcId): Future
+    {
+        return $this->client->call(new ExportAuthorizationRequest(dcId: $dcId));
     }
 
     /**
@@ -136,7 +212,19 @@ final readonly class AuthMethods
      */
     public function exportAuthorization(int $dcId): ?ExportedAuthorization
     {
-        return $this->client->callSync(new ExportAuthorizationRequest(dcId: $dcId));
+        return $this->exportAuthorizationAsync(dcId: $dcId)->await();
+    }
+
+    /**
+     * @param int $id
+     * @param string $bytes
+     * @return Future<Authorization|AuthorizationSignUpRequired|null>
+     * @see https://core.telegram.org/method/auth.importAuthorization
+     * @api
+     */
+    public function importAuthorizationAsync(int $id, string $bytes): Future
+    {
+        return $this->client->call(new ImportAuthorizationRequest(id: $id, bytes: $bytes));
     }
 
     /**
@@ -148,7 +236,21 @@ final readonly class AuthMethods
      */
     public function importAuthorization(int $id, string $bytes): ?AbstractAuthorization
     {
-        return $this->client->callSync(new ImportAuthorizationRequest(id: $id, bytes: $bytes));
+        return $this->importAuthorizationAsync(id: $id, bytes: $bytes)->await();
+    }
+
+    /**
+     * @param int $permAuthKeyId
+     * @param int $nonce
+     * @param int $expiresAt
+     * @param string $encryptedMessage
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/auth.bindTempAuthKey
+     * @api
+     */
+    public function bindTempAuthKeyAsync(int $permAuthKeyId, int $nonce, int $expiresAt, string $encryptedMessage): Future
+    {
+        return $this->client->call(new BindTempAuthKeyRequest(permAuthKeyId: $permAuthKeyId, nonce: $nonce, expiresAt: $expiresAt, encryptedMessage: $encryptedMessage));
     }
 
     /**
@@ -162,7 +264,21 @@ final readonly class AuthMethods
      */
     public function bindTempAuthKey(int $permAuthKeyId, int $nonce, int $expiresAt, string $encryptedMessage): bool
     {
-        return (bool) $this->client->callSync(new BindTempAuthKeyRequest(permAuthKeyId: $permAuthKeyId, nonce: $nonce, expiresAt: $expiresAt, encryptedMessage: $encryptedMessage));
+        return (bool) $this->bindTempAuthKeyAsync(permAuthKeyId: $permAuthKeyId, nonce: $nonce, expiresAt: $expiresAt, encryptedMessage: $encryptedMessage)->await();
+    }
+
+    /**
+     * @param int $flags
+     * @param int $apiId
+     * @param string $apiHash
+     * @param string $botAuthToken
+     * @return Future<Authorization|AuthorizationSignUpRequired|null>
+     * @see https://core.telegram.org/method/auth.importBotAuthorization
+     * @api
+     */
+    public function importBotAuthorizationAsync(int $flags, int $apiId, string $apiHash, string $botAuthToken): Future
+    {
+        return $this->client->call(new ImportBotAuthorizationRequest(flags: $flags, apiId: $apiId, apiHash: $apiHash, botAuthToken: $botAuthToken));
     }
 
     /**
@@ -176,7 +292,18 @@ final readonly class AuthMethods
      */
     public function importBotAuthorization(int $flags, int $apiId, string $apiHash, string $botAuthToken): ?AbstractAuthorization
     {
-        return $this->client->callSync(new ImportBotAuthorizationRequest(flags: $flags, apiId: $apiId, apiHash: $apiHash, botAuthToken: $botAuthToken));
+        return $this->importBotAuthorizationAsync(flags: $flags, apiId: $apiId, apiHash: $apiHash, botAuthToken: $botAuthToken)->await();
+    }
+
+    /**
+     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP $password
+     * @return Future<Authorization|AuthorizationSignUpRequired|null>
+     * @see https://core.telegram.org/method/auth.checkPassword
+     * @api
+     */
+    public function checkPasswordAsync(AbstractInputCheckPasswordSRP $password): Future
+    {
+        return $this->client->call(new CheckPasswordRequest(password: $password));
     }
 
     /**
@@ -187,7 +314,17 @@ final readonly class AuthMethods
      */
     public function checkPassword(AbstractInputCheckPasswordSRP $password): ?AbstractAuthorization
     {
-        return $this->client->callSync(new CheckPasswordRequest(password: $password));
+        return $this->checkPasswordAsync(password: $password)->await();
+    }
+
+    /**
+     * @return Future<PasswordRecovery|null>
+     * @see https://core.telegram.org/method/auth.requestPasswordRecovery
+     * @api
+     */
+    public function requestPasswordRecoveryAsync(): Future
+    {
+        return $this->client->call(new RequestPasswordRecoveryRequest());
     }
 
     /**
@@ -197,7 +334,19 @@ final readonly class AuthMethods
      */
     public function requestPasswordRecovery(): ?PasswordRecovery
     {
-        return $this->client->callSync(new RequestPasswordRecoveryRequest());
+        return $this->requestPasswordRecoveryAsync()->await();
+    }
+
+    /**
+     * @param string $code
+     * @param PasswordInputSettings|null $newSettings
+     * @return Future<Authorization|AuthorizationSignUpRequired|null>
+     * @see https://core.telegram.org/method/auth.recoverPassword
+     * @api
+     */
+    public function recoverPasswordAsync(string $code, ?PasswordInputSettings $newSettings = null): Future
+    {
+        return $this->client->call(new RecoverPasswordRequest(code: $code, newSettings: $newSettings));
     }
 
     /**
@@ -209,7 +358,20 @@ final readonly class AuthMethods
      */
     public function recoverPassword(string $code, ?PasswordInputSettings $newSettings = null): ?AbstractAuthorization
     {
-        return $this->client->callSync(new RecoverPasswordRequest(code: $code, newSettings: $newSettings));
+        return $this->recoverPasswordAsync(code: $code, newSettings: $newSettings)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param string|null $reason
+     * @return Future<SentCode|SentCodeSuccess|SentCodePaymentRequired|null>
+     * @see https://core.telegram.org/method/auth.resendCode
+     * @api
+     */
+    public function resendCodeAsync(string $phoneNumber, string $phoneCodeHash, ?string $reason = null): Future
+    {
+        return $this->client->call(new ResendCodeRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, reason: $reason));
     }
 
     /**
@@ -222,7 +384,19 @@ final readonly class AuthMethods
      */
     public function resendCode(string $phoneNumber, string $phoneCodeHash, ?string $reason = null): ?AbstractSentCode
     {
-        return $this->client->callSync(new ResendCodeRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, reason: $reason));
+        return $this->resendCodeAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, reason: $reason)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/auth.cancelCode
+     * @api
+     */
+    public function cancelCodeAsync(string $phoneNumber, string $phoneCodeHash): Future
+    {
+        return $this->client->call(new CancelCodeRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash));
     }
 
     /**
@@ -234,7 +408,18 @@ final readonly class AuthMethods
      */
     public function cancelCode(string $phoneNumber, string $phoneCodeHash): bool
     {
-        return (bool) $this->client->callSync(new CancelCodeRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash));
+        return (bool) $this->cancelCodeAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash)->await();
+    }
+
+    /**
+     * @param list<int> $exceptAuthKeys
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/auth.dropTempAuthKeys
+     * @api
+     */
+    public function dropTempAuthKeysAsync(array $exceptAuthKeys): Future
+    {
+        return $this->client->call(new DropTempAuthKeysRequest(exceptAuthKeys: $exceptAuthKeys));
     }
 
     /**
@@ -245,7 +430,20 @@ final readonly class AuthMethods
      */
     public function dropTempAuthKeys(array $exceptAuthKeys): bool
     {
-        return (bool) $this->client->callSync(new DropTempAuthKeysRequest(exceptAuthKeys: $exceptAuthKeys));
+        return (bool) $this->dropTempAuthKeysAsync(exceptAuthKeys: $exceptAuthKeys)->await();
+    }
+
+    /**
+     * @param int $apiId
+     * @param string $apiHash
+     * @param list<int> $exceptIds
+     * @return Future<LoginToken|LoginTokenMigrateTo|LoginTokenSuccess|null>
+     * @see https://core.telegram.org/method/auth.exportLoginToken
+     * @api
+     */
+    public function exportLoginTokenAsync(int $apiId, string $apiHash, array $exceptIds): Future
+    {
+        return $this->client->call(new ExportLoginTokenRequest(apiId: $apiId, apiHash: $apiHash, exceptIds: $exceptIds));
     }
 
     /**
@@ -258,7 +456,18 @@ final readonly class AuthMethods
      */
     public function exportLoginToken(int $apiId, string $apiHash, array $exceptIds): ?AbstractLoginToken
     {
-        return $this->client->callSync(new ExportLoginTokenRequest(apiId: $apiId, apiHash: $apiHash, exceptIds: $exceptIds));
+        return $this->exportLoginTokenAsync(apiId: $apiId, apiHash: $apiHash, exceptIds: $exceptIds)->await();
+    }
+
+    /**
+     * @param string $token
+     * @return Future<LoginToken|LoginTokenMigrateTo|LoginTokenSuccess|null>
+     * @see https://core.telegram.org/method/auth.importLoginToken
+     * @api
+     */
+    public function importLoginTokenAsync(string $token): Future
+    {
+        return $this->client->call(new ImportLoginTokenRequest(token: $token));
     }
 
     /**
@@ -269,7 +478,18 @@ final readonly class AuthMethods
      */
     public function importLoginToken(string $token): ?AbstractLoginToken
     {
-        return $this->client->callSync(new ImportLoginTokenRequest(token: $token));
+        return $this->importLoginTokenAsync(token: $token)->await();
+    }
+
+    /**
+     * @param string $token
+     * @return Future<BaseAuthorization|null>
+     * @see https://core.telegram.org/method/auth.acceptLoginToken
+     * @api
+     */
+    public function acceptLoginTokenAsync(string $token): Future
+    {
+        return $this->client->call(new AcceptLoginTokenRequest(token: $token));
     }
 
     /**
@@ -280,7 +500,18 @@ final readonly class AuthMethods
      */
     public function acceptLoginToken(string $token): ?BaseAuthorization
     {
-        return $this->client->callSync(new AcceptLoginTokenRequest(token: $token));
+        return $this->acceptLoginTokenAsync(token: $token)->await();
+    }
+
+    /**
+     * @param string $code
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/auth.checkRecoveryPassword
+     * @api
+     */
+    public function checkRecoveryPasswordAsync(string $code): Future
+    {
+        return $this->client->call(new CheckRecoveryPasswordRequest(code: $code));
     }
 
     /**
@@ -291,7 +522,20 @@ final readonly class AuthMethods
      */
     public function checkRecoveryPassword(string $code): bool
     {
-        return (bool) $this->client->callSync(new CheckRecoveryPasswordRequest(code: $code));
+        return (bool) $this->checkRecoveryPasswordAsync(code: $code)->await();
+    }
+
+    /**
+     * @param int $apiId
+     * @param string $apiHash
+     * @param string $webAuthToken
+     * @return Future<Authorization|AuthorizationSignUpRequired|null>
+     * @see https://core.telegram.org/method/auth.importWebTokenAuthorization
+     * @api
+     */
+    public function importWebTokenAuthorizationAsync(int $apiId, string $apiHash, string $webAuthToken): Future
+    {
+        return $this->client->call(new ImportWebTokenAuthorizationRequest(apiId: $apiId, apiHash: $apiHash, webAuthToken: $webAuthToken));
     }
 
     /**
@@ -304,7 +548,22 @@ final readonly class AuthMethods
      */
     public function importWebTokenAuthorization(int $apiId, string $apiHash, string $webAuthToken): ?AbstractAuthorization
     {
-        return $this->client->callSync(new ImportWebTokenAuthorizationRequest(apiId: $apiId, apiHash: $apiHash, webAuthToken: $webAuthToken));
+        return $this->importWebTokenAuthorizationAsync(apiId: $apiId, apiHash: $apiHash, webAuthToken: $webAuthToken)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param string|null $safetyNetToken
+     * @param string|null $playIntegrityToken
+     * @param string|null $iosPushSecret
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/auth.requestFirebaseSms
+     * @api
+     */
+    public function requestFirebaseSmsAsync(string $phoneNumber, string $phoneCodeHash, ?string $safetyNetToken = null, ?string $playIntegrityToken = null, ?string $iosPushSecret = null): Future
+    {
+        return $this->client->call(new RequestFirebaseSmsRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, safetyNetToken: $safetyNetToken, playIntegrityToken: $playIntegrityToken, iosPushSecret: $iosPushSecret));
     }
 
     /**
@@ -319,7 +578,19 @@ final readonly class AuthMethods
      */
     public function requestFirebaseSms(string $phoneNumber, string $phoneCodeHash, ?string $safetyNetToken = null, ?string $playIntegrityToken = null, ?string $iosPushSecret = null): bool
     {
-        return (bool) $this->client->callSync(new RequestFirebaseSmsRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, safetyNetToken: $safetyNetToken, playIntegrityToken: $playIntegrityToken, iosPushSecret: $iosPushSecret));
+        return (bool) $this->requestFirebaseSmsAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, safetyNetToken: $safetyNetToken, playIntegrityToken: $playIntegrityToken, iosPushSecret: $iosPushSecret)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @return Future<SentCode|SentCodeSuccess|SentCodePaymentRequired|null>
+     * @see https://core.telegram.org/method/auth.resetLoginEmail
+     * @api
+     */
+    public function resetLoginEmailAsync(string $phoneNumber, string $phoneCodeHash): Future
+    {
+        return $this->client->call(new ResetLoginEmailRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash));
     }
 
     /**
@@ -331,7 +602,20 @@ final readonly class AuthMethods
      */
     public function resetLoginEmail(string $phoneNumber, string $phoneCodeHash): ?AbstractSentCode
     {
-        return $this->client->callSync(new ResetLoginEmailRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash));
+        return $this->resetLoginEmailAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param string $mnc
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/auth.reportMissingCode
+     * @api
+     */
+    public function reportMissingCodeAsync(string $phoneNumber, string $phoneCodeHash, string $mnc): Future
+    {
+        return $this->client->call(new ReportMissingCodeRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, mnc: $mnc));
     }
 
     /**
@@ -344,7 +628,20 @@ final readonly class AuthMethods
      */
     public function reportMissingCode(string $phoneNumber, string $phoneCodeHash, string $mnc): bool
     {
-        return (bool) $this->client->callSync(new ReportMissingCodeRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, mnc: $mnc));
+        return (bool) $this->reportMissingCodeAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, mnc: $mnc)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param int $formId
+     * @return Future<SentCode|SentCodeSuccess|SentCodePaymentRequired|null>
+     * @see https://core.telegram.org/method/auth.checkPaidAuth
+     * @api
+     */
+    public function checkPaidAuthAsync(string $phoneNumber, string $phoneCodeHash, int $formId): Future
+    {
+        return $this->client->call(new CheckPaidAuthRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, formId: $formId));
     }
 
     /**
@@ -357,7 +654,19 @@ final readonly class AuthMethods
      */
     public function checkPaidAuth(string $phoneNumber, string $phoneCodeHash, int $formId): ?AbstractSentCode
     {
-        return $this->client->callSync(new CheckPaidAuthRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, formId: $formId));
+        return $this->checkPaidAuthAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, formId: $formId)->await();
+    }
+
+    /**
+     * @param int $apiId
+     * @param string $apiHash
+     * @return Future<PasskeyLoginOptions|null>
+     * @see https://core.telegram.org/method/auth.initPasskeyLogin
+     * @api
+     */
+    public function initPasskeyLoginAsync(int $apiId, string $apiHash): Future
+    {
+        return $this->client->call(new InitPasskeyLoginRequest(apiId: $apiId, apiHash: $apiHash));
     }
 
     /**
@@ -369,7 +678,20 @@ final readonly class AuthMethods
      */
     public function initPasskeyLogin(int $apiId, string $apiHash): ?PasskeyLoginOptions
     {
-        return $this->client->callSync(new InitPasskeyLoginRequest(apiId: $apiId, apiHash: $apiHash));
+        return $this->initPasskeyLoginAsync(apiId: $apiId, apiHash: $apiHash)->await();
+    }
+
+    /**
+     * @param InputPasskeyCredential $credential
+     * @param int|null $fromDcId
+     * @param int|null $fromAuthKeyId
+     * @return Future<Authorization|AuthorizationSignUpRequired|null>
+     * @see https://core.telegram.org/method/auth.finishPasskeyLogin
+     * @api
+     */
+    public function finishPasskeyLoginAsync(InputPasskeyCredential $credential, ?int $fromDcId = null, ?int $fromAuthKeyId = null): Future
+    {
+        return $this->client->call(new FinishPasskeyLoginRequest(credential: $credential, fromDcId: $fromDcId, fromAuthKeyId: $fromAuthKeyId));
     }
 
     /**
@@ -382,6 +704,6 @@ final readonly class AuthMethods
      */
     public function finishPasskeyLogin(InputPasskeyCredential $credential, ?int $fromDcId = null, ?int $fromAuthKeyId = null): ?AbstractAuthorization
     {
-        return $this->client->callSync(new FinishPasskeyLoginRequest(credential: $credential, fromDcId: $fromDcId, fromAuthKeyId: $fromAuthKeyId));
+        return $this->finishPasskeyLoginAsync(credential: $credential, fromDcId: $fromDcId, fromAuthKeyId: $fromAuthKeyId)->await();
     }
 }

@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Contacts\AcceptContactRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Contacts\AddContactRequest;
@@ -93,13 +95,34 @@ final readonly class ContactsMethods
 
     /**
      * @param int $hash
+     * @return Future<list<int>>
+     * @see https://core.telegram.org/method/contacts.getContactIDs
+     * @api
+     */
+    public function getContactIDsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetContactIDsRequest(hash: $hash));
+    }
+
+    /**
+     * @param int $hash
      * @return list<int>
      * @see https://core.telegram.org/method/contacts.getContactIDs
      * @api
      */
     public function getContactIDs(int $hash): array
     {
-        return $this->client->callSync(new GetContactIDsRequest(hash: $hash));
+        return $this->getContactIDsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @return Future<list<ContactStatus>>
+     * @see https://core.telegram.org/method/contacts.getStatuses
+     * @api
+     */
+    public function getStatusesAsync(): Future
+    {
+        return $this->client->call(new GetStatusesRequest());
     }
 
     /**
@@ -109,7 +132,18 @@ final readonly class ContactsMethods
      */
     public function getStatuses(): array
     {
-        return $this->client->callSync(new GetStatusesRequest());
+        return $this->getStatusesAsync()->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<ContactsNotModified|Contacts|null>
+     * @see https://core.telegram.org/method/contacts.getContacts
+     * @api
+     */
+    public function getContactsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetContactsRequest(hash: $hash));
     }
 
     /**
@@ -120,7 +154,18 @@ final readonly class ContactsMethods
      */
     public function getContacts(int $hash): ?AbstractContacts
     {
-        return $this->client->callSync(new GetContactsRequest(hash: $hash));
+        return $this->getContactsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param list<InputContact> $contacts
+     * @return Future<ImportedContacts|null>
+     * @see https://core.telegram.org/method/contacts.importContacts
+     * @api
+     */
+    public function importContactsAsync(array $contacts): Future
+    {
+        return $this->client->call(new ImportContactsRequest(contacts: $contacts));
     }
 
     /**
@@ -131,7 +176,18 @@ final readonly class ContactsMethods
      */
     public function importContacts(array $contacts): ?ImportedContacts
     {
-        return $this->client->callSync(new ImportContactsRequest(contacts: $contacts));
+        return $this->importContactsAsync(contacts: $contacts)->await();
+    }
+
+    /**
+     * @param list<InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage> $id
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/contacts.deleteContacts
+     * @api
+     */
+    public function deleteContactsAsync(array $id): Future
+    {
+        return $this->client->call(new DeleteContactsRequest(id: $id));
     }
 
     /**
@@ -142,7 +198,18 @@ final readonly class ContactsMethods
      */
     public function deleteContacts(array $id): ?AbstractUpdates
     {
-        return $this->client->callSync(new DeleteContactsRequest(id: $id));
+        return $this->deleteContactsAsync(id: $id)->await();
+    }
+
+    /**
+     * @param list<string> $phones
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/contacts.deleteByPhones
+     * @api
+     */
+    public function deleteByPhonesAsync(array $phones): Future
+    {
+        return $this->client->call(new DeleteByPhonesRequest(phones: $phones));
     }
 
     /**
@@ -153,7 +220,22 @@ final readonly class ContactsMethods
      */
     public function deleteByPhones(array $phones): bool
     {
-        return (bool) $this->client->callSync(new DeleteByPhonesRequest(phones: $phones));
+        return (bool) $this->deleteByPhonesAsync(phones: $phones)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $id
+     * @param bool|null $myStoriesFrom
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/contacts.block
+     * @api
+     */
+    public function blockAsync(AbstractInputPeer|string|int $id, ?bool $myStoriesFrom = null): Future
+    {
+        if (is_string($id) || is_int($id)) {
+            $id = $this->client->peerManager->resolve($id);
+        }
+        return $this->client->call(new BlockRequest(id: $id, myStoriesFrom: $myStoriesFrom));
     }
 
     /**
@@ -165,10 +247,22 @@ final readonly class ContactsMethods
      */
     public function block(AbstractInputPeer|string|int $id, ?bool $myStoriesFrom = null): bool
     {
+        return (bool) $this->blockAsync(id: $id, myStoriesFrom: $myStoriesFrom)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $id
+     * @param bool|null $myStoriesFrom
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/contacts.unblock
+     * @api
+     */
+    public function unblockAsync(AbstractInputPeer|string|int $id, ?bool $myStoriesFrom = null): Future
+    {
         if (is_string($id) || is_int($id)) {
             $id = $this->client->peerManager->resolve($id);
         }
-        return (bool) $this->client->callSync(new BlockRequest(id: $id, myStoriesFrom: $myStoriesFrom));
+        return $this->client->call(new UnblockRequest(id: $id, myStoriesFrom: $myStoriesFrom));
     }
 
     /**
@@ -180,10 +274,20 @@ final readonly class ContactsMethods
      */
     public function unblock(AbstractInputPeer|string|int $id, ?bool $myStoriesFrom = null): bool
     {
-        if (is_string($id) || is_int($id)) {
-            $id = $this->client->peerManager->resolve($id);
-        }
-        return (bool) $this->client->callSync(new UnblockRequest(id: $id, myStoriesFrom: $myStoriesFrom));
+        return (bool) $this->unblockAsync(id: $id, myStoriesFrom: $myStoriesFrom)->await();
+    }
+
+    /**
+     * @param int $offset
+     * @param int $limit
+     * @param bool|null $myStoriesFrom
+     * @return Future<Blocked|BlockedSlice|null>
+     * @see https://core.telegram.org/method/contacts.getBlocked
+     * @api
+     */
+    public function getBlockedAsync(int $offset, int $limit, ?bool $myStoriesFrom = null): Future
+    {
+        return $this->client->call(new GetBlockedRequest(offset: $offset, limit: $limit, myStoriesFrom: $myStoriesFrom));
     }
 
     /**
@@ -196,7 +300,19 @@ final readonly class ContactsMethods
      */
     public function getBlocked(int $offset, int $limit, ?bool $myStoriesFrom = null): ?AbstractBlocked
     {
-        return $this->client->callSync(new GetBlockedRequest(offset: $offset, limit: $limit, myStoriesFrom: $myStoriesFrom));
+        return $this->getBlockedAsync(offset: $offset, limit: $limit, myStoriesFrom: $myStoriesFrom)->await();
+    }
+
+    /**
+     * @param string $q
+     * @param int $limit
+     * @return Future<Found|null>
+     * @see https://core.telegram.org/method/contacts.search
+     * @api
+     */
+    public function searchAsync(string $q, int $limit): Future
+    {
+        return $this->client->call(new SearchRequest(q: $q, limit: $limit));
     }
 
     /**
@@ -208,7 +324,19 @@ final readonly class ContactsMethods
      */
     public function search(string $q, int $limit): ?Found
     {
-        return $this->client->callSync(new SearchRequest(q: $q, limit: $limit));
+        return $this->searchAsync(q: $q, limit: $limit)->await();
+    }
+
+    /**
+     * @param string $username
+     * @param string|null $referer
+     * @return Future<ResolvedPeer|null>
+     * @see https://core.telegram.org/method/contacts.resolveUsername
+     * @api
+     */
+    public function resolveUsernameAsync(string $username, ?string $referer = null): Future
+    {
+        return $this->client->call(new ResolveUsernameRequest(username: $username, referer: $referer));
     }
 
     /**
@@ -220,7 +348,29 @@ final readonly class ContactsMethods
      */
     public function resolveUsername(string $username, ?string $referer = null): ?ResolvedPeer
     {
-        return $this->client->callSync(new ResolveUsernameRequest(username: $username, referer: $referer));
+        return $this->resolveUsernameAsync(username: $username, referer: $referer)->await();
+    }
+
+    /**
+     * @param int $offset
+     * @param int $limit
+     * @param int $hash
+     * @param bool|null $correspondents
+     * @param bool|null $botsPm
+     * @param bool|null $botsInline
+     * @param bool|null $phoneCalls
+     * @param bool|null $forwardUsers
+     * @param bool|null $forwardChats
+     * @param bool|null $groups
+     * @param bool|null $channels
+     * @param bool|null $botsApp
+     * @return Future<TopPeersNotModified|TopPeers|TopPeersDisabled|null>
+     * @see https://core.telegram.org/method/contacts.getTopPeers
+     * @api
+     */
+    public function getTopPeersAsync(int $offset, int $limit, int $hash, ?bool $correspondents = null, ?bool $botsPm = null, ?bool $botsInline = null, ?bool $phoneCalls = null, ?bool $forwardUsers = null, ?bool $forwardChats = null, ?bool $groups = null, ?bool $channels = null, ?bool $botsApp = null): Future
+    {
+        return $this->client->call(new GetTopPeersRequest(offset: $offset, limit: $limit, hash: $hash, correspondents: $correspondents, botsPm: $botsPm, botsInline: $botsInline, phoneCalls: $phoneCalls, forwardUsers: $forwardUsers, forwardChats: $forwardChats, groups: $groups, channels: $channels, botsApp: $botsApp));
     }
 
     /**
@@ -242,7 +392,22 @@ final readonly class ContactsMethods
      */
     public function getTopPeers(int $offset, int $limit, int $hash, ?bool $correspondents = null, ?bool $botsPm = null, ?bool $botsInline = null, ?bool $phoneCalls = null, ?bool $forwardUsers = null, ?bool $forwardChats = null, ?bool $groups = null, ?bool $channels = null, ?bool $botsApp = null): ?AbstractTopPeers
     {
-        return $this->client->callSync(new GetTopPeersRequest(offset: $offset, limit: $limit, hash: $hash, correspondents: $correspondents, botsPm: $botsPm, botsInline: $botsInline, phoneCalls: $phoneCalls, forwardUsers: $forwardUsers, forwardChats: $forwardChats, groups: $groups, channels: $channels, botsApp: $botsApp));
+        return $this->getTopPeersAsync(offset: $offset, limit: $limit, hash: $hash, correspondents: $correspondents, botsPm: $botsPm, botsInline: $botsInline, phoneCalls: $phoneCalls, forwardUsers: $forwardUsers, forwardChats: $forwardChats, groups: $groups, channels: $channels, botsApp: $botsApp)->await();
+    }
+
+    /**
+     * @param TopPeerCategory $category
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/contacts.resetTopPeerRating
+     * @api
+     */
+    public function resetTopPeerRatingAsync(TopPeerCategory $category, AbstractInputPeer|string|int $peer): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new ResetTopPeerRatingRequest(category: $category, peer: $peer));
     }
 
     /**
@@ -254,10 +419,17 @@ final readonly class ContactsMethods
      */
     public function resetTopPeerRating(TopPeerCategory $category, AbstractInputPeer|string|int $peer): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new ResetTopPeerRatingRequest(category: $category, peer: $peer));
+        return (bool) $this->resetTopPeerRatingAsync(category: $category, peer: $peer)->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/contacts.resetSaved
+     * @api
+     */
+    public function resetSavedAsync(): Future
+    {
+        return $this->client->call(new ResetSavedRequest());
     }
 
     /**
@@ -267,7 +439,17 @@ final readonly class ContactsMethods
      */
     public function resetSaved(): bool
     {
-        return (bool) $this->client->callSync(new ResetSavedRequest());
+        return (bool) $this->resetSavedAsync()->await();
+    }
+
+    /**
+     * @return Future<list<SavedContact>>
+     * @see https://core.telegram.org/method/contacts.getSaved
+     * @api
+     */
+    public function getSavedAsync(): Future
+    {
+        return $this->client->call(new GetSavedRequest());
     }
 
     /**
@@ -277,7 +459,18 @@ final readonly class ContactsMethods
      */
     public function getSaved(): array
     {
-        return $this->client->callSync(new GetSavedRequest());
+        return $this->getSavedAsync()->await();
+    }
+
+    /**
+     * @param bool $enabled
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/contacts.toggleTopPeers
+     * @api
+     */
+    public function toggleTopPeersAsync(bool $enabled): Future
+    {
+        return $this->client->call(new ToggleTopPeersRequest(enabled: $enabled));
     }
 
     /**
@@ -288,7 +481,31 @@ final readonly class ContactsMethods
      */
     public function toggleTopPeers(bool $enabled): bool
     {
-        return (bool) $this->client->callSync(new ToggleTopPeersRequest(enabled: $enabled));
+        return (bool) $this->toggleTopPeersAsync(enabled: $enabled)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
+     * @param string $firstName
+     * @param string $lastName
+     * @param string $phone
+     * @param bool|null $addPhonePrivacyException
+     * @param TextWithEntities|null $note
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/contacts.addContact
+     * @api
+     */
+    public function addContactAsync(AbstractInputUser|string|int $id, string $firstName, string $lastName, string $phone, ?bool $addPhonePrivacyException = null, ?TextWithEntities $note = null): Future
+    {
+        if (is_string($id) || is_int($id)) {
+            $__tmpPeer = $this->client->peerManager->resolve($id);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $id = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $id = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new AddContactRequest(id: $id, firstName: $firstName, lastName: $lastName, phone: $phone, addPhonePrivacyException: $addPhonePrivacyException, note: $note));
     }
 
     /**
@@ -304,6 +521,17 @@ final readonly class ContactsMethods
      */
     public function addContact(AbstractInputUser|string|int $id, string $firstName, string $lastName, string $phone, ?bool $addPhonePrivacyException = null, ?TextWithEntities $note = null): ?AbstractUpdates
     {
+        return $this->addContactAsync(id: $id, firstName: $firstName, lastName: $lastName, phone: $phone, addPhonePrivacyException: $addPhonePrivacyException, note: $note)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/contacts.acceptContact
+     * @api
+     */
+    public function acceptContactAsync(AbstractInputUser|string|int $id): Future
+    {
         if (is_string($id) || is_int($id)) {
             $__tmpPeer = $this->client->peerManager->resolve($id);
             if ($__tmpPeer instanceof InputPeerUser) {
@@ -312,7 +540,7 @@ final readonly class ContactsMethods
                 $id = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new AddContactRequest(id: $id, firstName: $firstName, lastName: $lastName, phone: $phone, addPhonePrivacyException: $addPhonePrivacyException, note: $note));
+        return $this->client->call(new AcceptContactRequest(id: $id));
     }
 
     /**
@@ -323,15 +551,20 @@ final readonly class ContactsMethods
      */
     public function acceptContact(AbstractInputUser|string|int $id): ?AbstractUpdates
     {
-        if (is_string($id) || is_int($id)) {
-            $__tmpPeer = $this->client->peerManager->resolve($id);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $id = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $id = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new AcceptContactRequest(id: $id));
+        return $this->acceptContactAsync(id: $id)->await();
+    }
+
+    /**
+     * @param InputGeoPointEmpty|InputGeoPoint $geoPoint
+     * @param bool|null $background
+     * @param int|null $selfExpires
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/contacts.getLocated
+     * @api
+     */
+    public function getLocatedAsync(AbstractInputGeoPoint $geoPoint, ?bool $background = null, ?int $selfExpires = null): Future
+    {
+        return $this->client->call(new GetLocatedRequest(geoPoint: $geoPoint, background: $background, selfExpires: $selfExpires));
     }
 
     /**
@@ -344,7 +577,21 @@ final readonly class ContactsMethods
      */
     public function getLocated(AbstractInputGeoPoint $geoPoint, ?bool $background = null, ?int $selfExpires = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new GetLocatedRequest(geoPoint: $geoPoint, background: $background, selfExpires: $selfExpires));
+        return $this->getLocatedAsync(geoPoint: $geoPoint, background: $background, selfExpires: $selfExpires)->await();
+    }
+
+    /**
+     * @param int $msgId
+     * @param bool|null $deleteMessage
+     * @param bool|null $deleteHistory
+     * @param bool|null $reportSpam
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/contacts.blockFromReplies
+     * @api
+     */
+    public function blockFromRepliesAsync(int $msgId, ?bool $deleteMessage = null, ?bool $deleteHistory = null, ?bool $reportSpam = null): Future
+    {
+        return $this->client->call(new BlockFromRepliesRequest(msgId: $msgId, deleteMessage: $deleteMessage, deleteHistory: $deleteHistory, reportSpam: $reportSpam));
     }
 
     /**
@@ -358,7 +605,18 @@ final readonly class ContactsMethods
      */
     public function blockFromReplies(int $msgId, ?bool $deleteMessage = null, ?bool $deleteHistory = null, ?bool $reportSpam = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new BlockFromRepliesRequest(msgId: $msgId, deleteMessage: $deleteMessage, deleteHistory: $deleteHistory, reportSpam: $reportSpam));
+        return $this->blockFromRepliesAsync(msgId: $msgId, deleteMessage: $deleteMessage, deleteHistory: $deleteHistory, reportSpam: $reportSpam)->await();
+    }
+
+    /**
+     * @param string $phone
+     * @return Future<ResolvedPeer|null>
+     * @see https://core.telegram.org/method/contacts.resolvePhone
+     * @api
+     */
+    public function resolvePhoneAsync(string $phone): Future
+    {
+        return $this->client->call(new ResolvePhoneRequest(phone: $phone));
     }
 
     /**
@@ -369,7 +627,17 @@ final readonly class ContactsMethods
      */
     public function resolvePhone(string $phone): ?ResolvedPeer
     {
-        return $this->client->callSync(new ResolvePhoneRequest(phone: $phone));
+        return $this->resolvePhoneAsync(phone: $phone)->await();
+    }
+
+    /**
+     * @return Future<ExportedContactToken|null>
+     * @see https://core.telegram.org/method/contacts.exportContactToken
+     * @api
+     */
+    public function exportContactTokenAsync(): Future
+    {
+        return $this->client->call(new ExportContactTokenRequest());
     }
 
     /**
@@ -379,7 +647,18 @@ final readonly class ContactsMethods
      */
     public function exportContactToken(): ?ExportedContactToken
     {
-        return $this->client->callSync(new ExportContactTokenRequest());
+        return $this->exportContactTokenAsync()->await();
+    }
+
+    /**
+     * @param string $token
+     * @return Future<UserEmpty|User|null>
+     * @see https://core.telegram.org/method/contacts.importContactToken
+     * @api
+     */
+    public function importContactTokenAsync(string $token): Future
+    {
+        return $this->client->call(new ImportContactTokenRequest(token: $token));
     }
 
     /**
@@ -390,7 +669,18 @@ final readonly class ContactsMethods
      */
     public function importContactToken(string $token): ?AbstractUser
     {
-        return $this->client->callSync(new ImportContactTokenRequest(token: $token));
+        return $this->importContactTokenAsync(token: $token)->await();
+    }
+
+    /**
+     * @param list<int> $id
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/contacts.editCloseFriends
+     * @api
+     */
+    public function editCloseFriendsAsync(array $id): Future
+    {
+        return $this->client->call(new EditCloseFriendsRequest(id: $id));
     }
 
     /**
@@ -401,7 +691,20 @@ final readonly class ContactsMethods
      */
     public function editCloseFriends(array $id): bool
     {
-        return (bool) $this->client->callSync(new EditCloseFriendsRequest(id: $id));
+        return (bool) $this->editCloseFriendsAsync(id: $id)->await();
+    }
+
+    /**
+     * @param list<InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage> $id
+     * @param int $limit
+     * @param bool|null $myStoriesFrom
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/contacts.setBlocked
+     * @api
+     */
+    public function setBlockedAsync(array $id, int $limit, ?bool $myStoriesFrom = null): Future
+    {
+        return $this->client->call(new SetBlockedRequest(id: $id, limit: $limit, myStoriesFrom: $myStoriesFrom));
     }
 
     /**
@@ -414,7 +717,17 @@ final readonly class ContactsMethods
      */
     public function setBlocked(array $id, int $limit, ?bool $myStoriesFrom = null): bool
     {
-        return (bool) $this->client->callSync(new SetBlockedRequest(id: $id, limit: $limit, myStoriesFrom: $myStoriesFrom));
+        return (bool) $this->setBlockedAsync(id: $id, limit: $limit, myStoriesFrom: $myStoriesFrom)->await();
+    }
+
+    /**
+     * @return Future<ContactBirthdays|null>
+     * @see https://core.telegram.org/method/contacts.getBirthdays
+     * @api
+     */
+    public function getBirthdaysAsync(): Future
+    {
+        return $this->client->call(new GetBirthdaysRequest());
     }
 
     /**
@@ -424,7 +737,18 @@ final readonly class ContactsMethods
      */
     public function getBirthdays(): ?ContactBirthdays
     {
-        return $this->client->callSync(new GetBirthdaysRequest());
+        return $this->getBirthdaysAsync()->await();
+    }
+
+    /**
+     * @param string $q
+     * @return Future<SponsoredPeersEmpty|SponsoredPeers|null>
+     * @see https://core.telegram.org/method/contacts.getSponsoredPeers
+     * @api
+     */
+    public function getSponsoredPeersAsync(string $q): Future
+    {
+        return $this->client->call(new GetSponsoredPeersRequest(q: $q));
     }
 
     /**
@@ -435,7 +759,27 @@ final readonly class ContactsMethods
      */
     public function getSponsoredPeers(string $q): ?AbstractSponsoredPeers
     {
-        return $this->client->callSync(new GetSponsoredPeersRequest(q: $q));
+        return $this->getSponsoredPeersAsync(q: $q)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $id
+     * @param TextWithEntities $note
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/contacts.updateContactNote
+     * @api
+     */
+    public function updateContactNoteAsync(AbstractInputUser|string|int $id, TextWithEntities $note): Future
+    {
+        if (is_string($id) || is_int($id)) {
+            $__tmpPeer = $this->client->peerManager->resolve($id);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $id = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $id = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new UpdateContactNoteRequest(id: $id, note: $note));
     }
 
     /**
@@ -447,14 +791,6 @@ final readonly class ContactsMethods
      */
     public function updateContactNote(AbstractInputUser|string|int $id, TextWithEntities $note): bool
     {
-        if (is_string($id) || is_int($id)) {
-            $__tmpPeer = $this->client->peerManager->resolve($id);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $id = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $id = $__tmpPeer;
-            }
-        }
-        return (bool) $this->client->callSync(new UpdateContactNoteRequest(id: $id, note: $note));
+        return (bool) $this->updateContactNoteAsync(id: $id, note: $note)->await();
     }
 }

@@ -1,6 +1,8 @@
 <?php declare(strict_types=1);
+
 namespace ProtoBrick\MTProtoClient\Generated\Api;
 
+use Amp\Future;
 use ProtoBrick\MTProtoClient\Client;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\AcceptAuthorizationRequest;
 use ProtoBrick\MTProtoClient\Generated\Methods\Account\CancelPasswordEmailRequest;
@@ -321,13 +323,42 @@ final readonly class AccountMethods
      * @param string $secret
      * @param list<int> $otherUids
      * @param bool|null $noMuted
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.registerDevice
+     * @api
+     */
+    public function registerDeviceAsync(int $tokenType, string $token, bool $appSandbox, string $secret, array $otherUids, ?bool $noMuted = null): Future
+    {
+        return $this->client->call(new RegisterDeviceRequest(tokenType: $tokenType, token: $token, appSandbox: $appSandbox, secret: $secret, otherUids: $otherUids, noMuted: $noMuted));
+    }
+
+    /**
+     * @param int $tokenType
+     * @param string $token
+     * @param bool $appSandbox
+     * @param string $secret
+     * @param list<int> $otherUids
+     * @param bool|null $noMuted
      * @return bool
      * @see https://core.telegram.org/method/account.registerDevice
      * @api
      */
     public function registerDevice(int $tokenType, string $token, bool $appSandbox, string $secret, array $otherUids, ?bool $noMuted = null): bool
     {
-        return (bool) $this->client->callSync(new RegisterDeviceRequest(tokenType: $tokenType, token: $token, appSandbox: $appSandbox, secret: $secret, otherUids: $otherUids, noMuted: $noMuted));
+        return (bool) $this->registerDeviceAsync(tokenType: $tokenType, token: $token, appSandbox: $appSandbox, secret: $secret, otherUids: $otherUids, noMuted: $noMuted)->await();
+    }
+
+    /**
+     * @param int $tokenType
+     * @param string $token
+     * @param list<int> $otherUids
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.unregisterDevice
+     * @api
+     */
+    public function unregisterDeviceAsync(int $tokenType, string $token, array $otherUids): Future
+    {
+        return $this->client->call(new UnregisterDeviceRequest(tokenType: $tokenType, token: $token, otherUids: $otherUids));
     }
 
     /**
@@ -340,7 +371,19 @@ final readonly class AccountMethods
      */
     public function unregisterDevice(int $tokenType, string $token, array $otherUids): bool
     {
-        return (bool) $this->client->callSync(new UnregisterDeviceRequest(tokenType: $tokenType, token: $token, otherUids: $otherUids));
+        return (bool) $this->unregisterDeviceAsync(tokenType: $tokenType, token: $token, otherUids: $otherUids)->await();
+    }
+
+    /**
+     * @param InputNotifyPeer|InputNotifyUsers|InputNotifyChats|InputNotifyBroadcasts|InputNotifyForumTopic $peer
+     * @param InputPeerNotifySettings $settings
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateNotifySettings
+     * @api
+     */
+    public function updateNotifySettingsAsync(AbstractInputNotifyPeer $peer, InputPeerNotifySettings $settings): Future
+    {
+        return $this->client->call(new UpdateNotifySettingsRequest(peer: $peer, settings: $settings));
     }
 
     /**
@@ -352,7 +395,18 @@ final readonly class AccountMethods
      */
     public function updateNotifySettings(AbstractInputNotifyPeer $peer, InputPeerNotifySettings $settings): bool
     {
-        return (bool) $this->client->callSync(new UpdateNotifySettingsRequest(peer: $peer, settings: $settings));
+        return (bool) $this->updateNotifySettingsAsync(peer: $peer, settings: $settings)->await();
+    }
+
+    /**
+     * @param InputNotifyPeer|InputNotifyUsers|InputNotifyChats|InputNotifyBroadcasts|InputNotifyForumTopic $peer
+     * @return Future<PeerNotifySettings|null>
+     * @see https://core.telegram.org/method/account.getNotifySettings
+     * @api
+     */
+    public function getNotifySettingsAsync(AbstractInputNotifyPeer $peer): Future
+    {
+        return $this->client->call(new GetNotifySettingsRequest(peer: $peer));
     }
 
     /**
@@ -363,7 +417,17 @@ final readonly class AccountMethods
      */
     public function getNotifySettings(AbstractInputNotifyPeer $peer): ?PeerNotifySettings
     {
-        return $this->client->callSync(new GetNotifySettingsRequest(peer: $peer));
+        return $this->getNotifySettingsAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.resetNotifySettings
+     * @api
+     */
+    public function resetNotifySettingsAsync(): Future
+    {
+        return $this->client->call(new ResetNotifySettingsRequest());
     }
 
     /**
@@ -373,7 +437,20 @@ final readonly class AccountMethods
      */
     public function resetNotifySettings(): bool
     {
-        return (bool) $this->client->callSync(new ResetNotifySettingsRequest());
+        return (bool) $this->resetNotifySettingsAsync()->await();
+    }
+
+    /**
+     * @param string|null $firstName
+     * @param string|null $lastName
+     * @param string|null $about
+     * @return Future<UserEmpty|User|null>
+     * @see https://core.telegram.org/method/account.updateProfile
+     * @api
+     */
+    public function updateProfileAsync(?string $firstName = null, ?string $lastName = null, ?string $about = null): Future
+    {
+        return $this->client->call(new UpdateProfileRequest(firstName: $firstName, lastName: $lastName, about: $about));
     }
 
     /**
@@ -386,7 +463,18 @@ final readonly class AccountMethods
      */
     public function updateProfile(?string $firstName = null, ?string $lastName = null, ?string $about = null): ?AbstractUser
     {
-        return $this->client->callSync(new UpdateProfileRequest(firstName: $firstName, lastName: $lastName, about: $about));
+        return $this->updateProfileAsync(firstName: $firstName, lastName: $lastName, about: $about)->await();
+    }
+
+    /**
+     * @param bool $offline
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateStatus
+     * @api
+     */
+    public function updateStatusAsync(bool $offline): Future
+    {
+        return $this->client->call(new UpdateStatusRequest(offline: $offline));
     }
 
     /**
@@ -397,7 +485,18 @@ final readonly class AccountMethods
      */
     public function updateStatus(bool $offline): bool
     {
-        return (bool) $this->client->callSync(new UpdateStatusRequest(offline: $offline));
+        return (bool) $this->updateStatusAsync(offline: $offline)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<WallPapersNotModified|WallPapers|null>
+     * @see https://core.telegram.org/method/account.getWallPapers
+     * @api
+     */
+    public function getWallPapersAsync(int $hash): Future
+    {
+        return $this->client->call(new GetWallPapersRequest(hash: $hash));
     }
 
     /**
@@ -408,7 +507,23 @@ final readonly class AccountMethods
      */
     public function getWallPapers(int $hash): ?AbstractWallPapers
     {
-        return $this->client->callSync(new GetWallPapersRequest(hash: $hash));
+        return $this->getWallPapersAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param ReportReason $reason
+     * @param string $message
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.reportPeer
+     * @api
+     */
+    public function reportPeerAsync(AbstractInputPeer|string|int $peer, ReportReason $reason, string $message): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new ReportPeerRequest(peer: $peer, reason: $reason, message: $message));
     }
 
     /**
@@ -421,10 +536,18 @@ final readonly class AccountMethods
      */
     public function reportPeer(AbstractInputPeer|string|int $peer, ReportReason $reason, string $message): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new ReportPeerRequest(peer: $peer, reason: $reason, message: $message));
+        return (bool) $this->reportPeerAsync(peer: $peer, reason: $reason, message: $message)->await();
+    }
+
+    /**
+     * @param string $username
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.checkUsername
+     * @api
+     */
+    public function checkUsernameAsync(string $username): Future
+    {
+        return $this->client->call(new CheckUsernameRequest(username: $username));
     }
 
     /**
@@ -435,7 +558,18 @@ final readonly class AccountMethods
      */
     public function checkUsername(string $username): bool
     {
-        return (bool) $this->client->callSync(new CheckUsernameRequest(username: $username));
+        return (bool) $this->checkUsernameAsync(username: $username)->await();
+    }
+
+    /**
+     * @param string $username
+     * @return Future<UserEmpty|User|null>
+     * @see https://core.telegram.org/method/account.updateUsername
+     * @api
+     */
+    public function updateUsernameAsync(string $username): Future
+    {
+        return $this->client->call(new UpdateUsernameRequest(username: $username));
     }
 
     /**
@@ -446,7 +580,18 @@ final readonly class AccountMethods
      */
     public function updateUsername(string $username): ?AbstractUser
     {
-        return $this->client->callSync(new UpdateUsernameRequest(username: $username));
+        return $this->updateUsernameAsync(username: $username)->await();
+    }
+
+    /**
+     * @param InputPrivacyKey $key
+     * @return Future<PrivacyRules|null>
+     * @see https://core.telegram.org/method/account.getPrivacy
+     * @api
+     */
+    public function getPrivacyAsync(InputPrivacyKey $key): Future
+    {
+        return $this->client->call(new GetPrivacyRequest(key: $key));
     }
 
     /**
@@ -457,7 +602,19 @@ final readonly class AccountMethods
      */
     public function getPrivacy(InputPrivacyKey $key): ?PrivacyRules
     {
-        return $this->client->callSync(new GetPrivacyRequest(key: $key));
+        return $this->getPrivacyAsync(key: $key)->await();
+    }
+
+    /**
+     * @param InputPrivacyKey $key
+     * @param list<InputPrivacyValueAllowContacts|InputPrivacyValueAllowAll|InputPrivacyValueAllowUsers|InputPrivacyValueDisallowContacts|InputPrivacyValueDisallowAll|InputPrivacyValueDisallowUsers|InputPrivacyValueAllowChatParticipants|InputPrivacyValueDisallowChatParticipants|InputPrivacyValueAllowCloseFriends|InputPrivacyValueAllowPremium|InputPrivacyValueAllowBots|InputPrivacyValueDisallowBots> $rules
+     * @return Future<PrivacyRules|null>
+     * @see https://core.telegram.org/method/account.setPrivacy
+     * @api
+     */
+    public function setPrivacyAsync(InputPrivacyKey $key, array $rules): Future
+    {
+        return $this->client->call(new SetPrivacyRequest(key: $key, rules: $rules));
     }
 
     /**
@@ -469,7 +626,19 @@ final readonly class AccountMethods
      */
     public function setPrivacy(InputPrivacyKey $key, array $rules): ?PrivacyRules
     {
-        return $this->client->callSync(new SetPrivacyRequest(key: $key, rules: $rules));
+        return $this->setPrivacyAsync(key: $key, rules: $rules)->await();
+    }
+
+    /**
+     * @param string $reason
+     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP|null $password
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.deleteAccount
+     * @api
+     */
+    public function deleteAccountAsync(string $reason, ?AbstractInputCheckPasswordSRP $password = null): Future
+    {
+        return $this->client->call(new DeleteAccountRequest(reason: $reason, password: $password));
     }
 
     /**
@@ -481,7 +650,17 @@ final readonly class AccountMethods
      */
     public function deleteAccount(string $reason, ?AbstractInputCheckPasswordSRP $password = null): bool
     {
-        return (bool) $this->client->callSync(new DeleteAccountRequest(reason: $reason, password: $password));
+        return (bool) $this->deleteAccountAsync(reason: $reason, password: $password)->await();
+    }
+
+    /**
+     * @return Future<AccountDaysTTL|null>
+     * @see https://core.telegram.org/method/account.getAccountTTL
+     * @api
+     */
+    public function getAccountTTLAsync(): Future
+    {
+        return $this->client->call(new GetAccountTTLRequest());
     }
 
     /**
@@ -491,7 +670,18 @@ final readonly class AccountMethods
      */
     public function getAccountTTL(): ?AccountDaysTTL
     {
-        return $this->client->callSync(new GetAccountTTLRequest());
+        return $this->getAccountTTLAsync()->await();
+    }
+
+    /**
+     * @param AccountDaysTTL $ttl
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.setAccountTTL
+     * @api
+     */
+    public function setAccountTTLAsync(AccountDaysTTL $ttl): Future
+    {
+        return $this->client->call(new SetAccountTTLRequest(ttl: $ttl));
     }
 
     /**
@@ -502,7 +692,19 @@ final readonly class AccountMethods
      */
     public function setAccountTTL(AccountDaysTTL $ttl): bool
     {
-        return (bool) $this->client->callSync(new SetAccountTTLRequest(ttl: $ttl));
+        return (bool) $this->setAccountTTLAsync(ttl: $ttl)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param CodeSettings $settings
+     * @return Future<SentCode|SentCodeSuccess|SentCodePaymentRequired|null>
+     * @see https://core.telegram.org/method/account.sendChangePhoneCode
+     * @api
+     */
+    public function sendChangePhoneCodeAsync(string $phoneNumber, CodeSettings $settings): Future
+    {
+        return $this->client->call(new SendChangePhoneCodeRequest(phoneNumber: $phoneNumber, settings: $settings));
     }
 
     /**
@@ -514,7 +716,20 @@ final readonly class AccountMethods
      */
     public function sendChangePhoneCode(string $phoneNumber, CodeSettings $settings): ?AbstractSentCode
     {
-        return $this->client->callSync(new SendChangePhoneCodeRequest(phoneNumber: $phoneNumber, settings: $settings));
+        return $this->sendChangePhoneCodeAsync(phoneNumber: $phoneNumber, settings: $settings)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param string $phoneCode
+     * @return Future<UserEmpty|User|null>
+     * @see https://core.telegram.org/method/account.changePhone
+     * @api
+     */
+    public function changePhoneAsync(string $phoneNumber, string $phoneCodeHash, string $phoneCode): Future
+    {
+        return $this->client->call(new ChangePhoneRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode));
     }
 
     /**
@@ -527,7 +742,18 @@ final readonly class AccountMethods
      */
     public function changePhone(string $phoneNumber, string $phoneCodeHash, string $phoneCode): ?AbstractUser
     {
-        return $this->client->callSync(new ChangePhoneRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode));
+        return $this->changePhoneAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode)->await();
+    }
+
+    /**
+     * @param int $period
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateDeviceLocked
+     * @api
+     */
+    public function updateDeviceLockedAsync(int $period): Future
+    {
+        return $this->client->call(new UpdateDeviceLockedRequest(period: $period));
     }
 
     /**
@@ -538,7 +764,17 @@ final readonly class AccountMethods
      */
     public function updateDeviceLocked(int $period): bool
     {
-        return (bool) $this->client->callSync(new UpdateDeviceLockedRequest(period: $period));
+        return (bool) $this->updateDeviceLockedAsync(period: $period)->await();
+    }
+
+    /**
+     * @return Future<Authorizations|null>
+     * @see https://core.telegram.org/method/account.getAuthorizations
+     * @api
+     */
+    public function getAuthorizationsAsync(): Future
+    {
+        return $this->client->call(new GetAuthorizationsRequest());
     }
 
     /**
@@ -548,7 +784,18 @@ final readonly class AccountMethods
      */
     public function getAuthorizations(): ?Authorizations
     {
-        return $this->client->callSync(new GetAuthorizationsRequest());
+        return $this->getAuthorizationsAsync()->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.resetAuthorization
+     * @api
+     */
+    public function resetAuthorizationAsync(int $hash): Future
+    {
+        return $this->client->call(new ResetAuthorizationRequest(hash: $hash));
     }
 
     /**
@@ -559,7 +806,17 @@ final readonly class AccountMethods
      */
     public function resetAuthorization(int $hash): bool
     {
-        return (bool) $this->client->callSync(new ResetAuthorizationRequest(hash: $hash));
+        return (bool) $this->resetAuthorizationAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @return Future<Password|null>
+     * @see https://core.telegram.org/method/account.getPassword
+     * @api
+     */
+    public function getPasswordAsync(): Future
+    {
+        return $this->client->call(new GetPasswordRequest());
     }
 
     /**
@@ -569,7 +826,18 @@ final readonly class AccountMethods
      */
     public function getPassword(): ?Password
     {
-        return $this->client->callSync(new GetPasswordRequest());
+        return $this->getPasswordAsync()->await();
+    }
+
+    /**
+     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP $password
+     * @return Future<PasswordSettings|null>
+     * @see https://core.telegram.org/method/account.getPasswordSettings
+     * @api
+     */
+    public function getPasswordSettingsAsync(AbstractInputCheckPasswordSRP $password): Future
+    {
+        return $this->client->call(new GetPasswordSettingsRequest(password: $password));
     }
 
     /**
@@ -580,7 +848,19 @@ final readonly class AccountMethods
      */
     public function getPasswordSettings(AbstractInputCheckPasswordSRP $password): ?PasswordSettings
     {
-        return $this->client->callSync(new GetPasswordSettingsRequest(password: $password));
+        return $this->getPasswordSettingsAsync(password: $password)->await();
+    }
+
+    /**
+     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP $password
+     * @param PasswordInputSettings $newSettings
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updatePasswordSettings
+     * @api
+     */
+    public function updatePasswordSettingsAsync(AbstractInputCheckPasswordSRP $password, PasswordInputSettings $newSettings): Future
+    {
+        return $this->client->call(new UpdatePasswordSettingsRequest(password: $password, newSettings: $newSettings));
     }
 
     /**
@@ -592,7 +872,19 @@ final readonly class AccountMethods
      */
     public function updatePasswordSettings(AbstractInputCheckPasswordSRP $password, PasswordInputSettings $newSettings): bool
     {
-        return (bool) $this->client->callSync(new UpdatePasswordSettingsRequest(password: $password, newSettings: $newSettings));
+        return (bool) $this->updatePasswordSettingsAsync(password: $password, newSettings: $newSettings)->await();
+    }
+
+    /**
+     * @param string $hash
+     * @param CodeSettings $settings
+     * @return Future<SentCode|SentCodeSuccess|SentCodePaymentRequired|null>
+     * @see https://core.telegram.org/method/account.sendConfirmPhoneCode
+     * @api
+     */
+    public function sendConfirmPhoneCodeAsync(string $hash, CodeSettings $settings): Future
+    {
+        return $this->client->call(new SendConfirmPhoneCodeRequest(hash: $hash, settings: $settings));
     }
 
     /**
@@ -604,7 +896,19 @@ final readonly class AccountMethods
      */
     public function sendConfirmPhoneCode(string $hash, CodeSettings $settings): ?AbstractSentCode
     {
-        return $this->client->callSync(new SendConfirmPhoneCodeRequest(hash: $hash, settings: $settings));
+        return $this->sendConfirmPhoneCodeAsync(hash: $hash, settings: $settings)->await();
+    }
+
+    /**
+     * @param string $phoneCodeHash
+     * @param string $phoneCode
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.confirmPhone
+     * @api
+     */
+    public function confirmPhoneAsync(string $phoneCodeHash, string $phoneCode): Future
+    {
+        return $this->client->call(new ConfirmPhoneRequest(phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode));
     }
 
     /**
@@ -616,7 +920,19 @@ final readonly class AccountMethods
      */
     public function confirmPhone(string $phoneCodeHash, string $phoneCode): bool
     {
-        return (bool) $this->client->callSync(new ConfirmPhoneRequest(phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode));
+        return (bool) $this->confirmPhoneAsync(phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode)->await();
+    }
+
+    /**
+     * @param InputCheckPasswordEmpty|InputCheckPasswordSRP $password
+     * @param int $period
+     * @return Future<TmpPassword|null>
+     * @see https://core.telegram.org/method/account.getTmpPassword
+     * @api
+     */
+    public function getTmpPasswordAsync(AbstractInputCheckPasswordSRP $password, int $period): Future
+    {
+        return $this->client->call(new GetTmpPasswordRequest(password: $password, period: $period));
     }
 
     /**
@@ -628,7 +944,17 @@ final readonly class AccountMethods
      */
     public function getTmpPassword(AbstractInputCheckPasswordSRP $password, int $period): ?TmpPassword
     {
-        return $this->client->callSync(new GetTmpPasswordRequest(password: $password, period: $period));
+        return $this->getTmpPasswordAsync(password: $password, period: $period)->await();
+    }
+
+    /**
+     * @return Future<WebAuthorizations|null>
+     * @see https://core.telegram.org/method/account.getWebAuthorizations
+     * @api
+     */
+    public function getWebAuthorizationsAsync(): Future
+    {
+        return $this->client->call(new GetWebAuthorizationsRequest());
     }
 
     /**
@@ -638,7 +964,18 @@ final readonly class AccountMethods
      */
     public function getWebAuthorizations(): ?WebAuthorizations
     {
-        return $this->client->callSync(new GetWebAuthorizationsRequest());
+        return $this->getWebAuthorizationsAsync()->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.resetWebAuthorization
+     * @api
+     */
+    public function resetWebAuthorizationAsync(int $hash): Future
+    {
+        return $this->client->call(new ResetWebAuthorizationRequest(hash: $hash));
     }
 
     /**
@@ -649,7 +986,17 @@ final readonly class AccountMethods
      */
     public function resetWebAuthorization(int $hash): bool
     {
-        return (bool) $this->client->callSync(new ResetWebAuthorizationRequest(hash: $hash));
+        return (bool) $this->resetWebAuthorizationAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.resetWebAuthorizations
+     * @api
+     */
+    public function resetWebAuthorizationsAsync(): Future
+    {
+        return $this->client->call(new ResetWebAuthorizationsRequest());
     }
 
     /**
@@ -659,7 +1006,17 @@ final readonly class AccountMethods
      */
     public function resetWebAuthorizations(): bool
     {
-        return (bool) $this->client->callSync(new ResetWebAuthorizationsRequest());
+        return (bool) $this->resetWebAuthorizationsAsync()->await();
+    }
+
+    /**
+     * @return Future<list<SecureValue>>
+     * @see https://core.telegram.org/method/account.getAllSecureValues
+     * @api
+     */
+    public function getAllSecureValuesAsync(): Future
+    {
+        return $this->client->call(new GetAllSecureValuesRequest());
     }
 
     /**
@@ -669,7 +1026,18 @@ final readonly class AccountMethods
      */
     public function getAllSecureValues(): array
     {
-        return $this->client->callSync(new GetAllSecureValuesRequest());
+        return $this->getAllSecureValuesAsync()->await();
+    }
+
+    /**
+     * @param list<SecureValueType> $types
+     * @return Future<list<SecureValue>>
+     * @see https://core.telegram.org/method/account.getSecureValue
+     * @api
+     */
+    public function getSecureValueAsync(array $types): Future
+    {
+        return $this->client->call(new GetSecureValueRequest(types: $types));
     }
 
     /**
@@ -680,7 +1048,19 @@ final readonly class AccountMethods
      */
     public function getSecureValue(array $types): array
     {
-        return $this->client->callSync(new GetSecureValueRequest(types: $types));
+        return $this->getSecureValueAsync(types: $types)->await();
+    }
+
+    /**
+     * @param InputSecureValue $value
+     * @param int $secureSecretId
+     * @return Future<SecureValue|null>
+     * @see https://core.telegram.org/method/account.saveSecureValue
+     * @api
+     */
+    public function saveSecureValueAsync(InputSecureValue $value, int $secureSecretId): Future
+    {
+        return $this->client->call(new SaveSecureValueRequest(value: $value, secureSecretId: $secureSecretId));
     }
 
     /**
@@ -692,7 +1072,18 @@ final readonly class AccountMethods
      */
     public function saveSecureValue(InputSecureValue $value, int $secureSecretId): ?SecureValue
     {
-        return $this->client->callSync(new SaveSecureValueRequest(value: $value, secureSecretId: $secureSecretId));
+        return $this->saveSecureValueAsync(value: $value, secureSecretId: $secureSecretId)->await();
+    }
+
+    /**
+     * @param list<SecureValueType> $types
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.deleteSecureValue
+     * @api
+     */
+    public function deleteSecureValueAsync(array $types): Future
+    {
+        return $this->client->call(new DeleteSecureValueRequest(types: $types));
     }
 
     /**
@@ -703,7 +1094,20 @@ final readonly class AccountMethods
      */
     public function deleteSecureValue(array $types): bool
     {
-        return (bool) $this->client->callSync(new DeleteSecureValueRequest(types: $types));
+        return (bool) $this->deleteSecureValueAsync(types: $types)->await();
+    }
+
+    /**
+     * @param int $botId
+     * @param string $scope
+     * @param string $publicKey
+     * @return Future<AuthorizationForm|null>
+     * @see https://core.telegram.org/method/account.getAuthorizationForm
+     * @api
+     */
+    public function getAuthorizationFormAsync(int $botId, string $scope, string $publicKey): Future
+    {
+        return $this->client->call(new GetAuthorizationFormRequest(botId: $botId, scope: $scope, publicKey: $publicKey));
     }
 
     /**
@@ -716,7 +1120,22 @@ final readonly class AccountMethods
      */
     public function getAuthorizationForm(int $botId, string $scope, string $publicKey): ?AuthorizationForm
     {
-        return $this->client->callSync(new GetAuthorizationFormRequest(botId: $botId, scope: $scope, publicKey: $publicKey));
+        return $this->getAuthorizationFormAsync(botId: $botId, scope: $scope, publicKey: $publicKey)->await();
+    }
+
+    /**
+     * @param int $botId
+     * @param string $scope
+     * @param string $publicKey
+     * @param list<SecureValueHash> $valueHashes
+     * @param SecureCredentialsEncrypted $credentials
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.acceptAuthorization
+     * @api
+     */
+    public function acceptAuthorizationAsync(int $botId, string $scope, string $publicKey, array $valueHashes, SecureCredentialsEncrypted $credentials): Future
+    {
+        return $this->client->call(new AcceptAuthorizationRequest(botId: $botId, scope: $scope, publicKey: $publicKey, valueHashes: $valueHashes, credentials: $credentials));
     }
 
     /**
@@ -731,7 +1150,19 @@ final readonly class AccountMethods
      */
     public function acceptAuthorization(int $botId, string $scope, string $publicKey, array $valueHashes, SecureCredentialsEncrypted $credentials): bool
     {
-        return (bool) $this->client->callSync(new AcceptAuthorizationRequest(botId: $botId, scope: $scope, publicKey: $publicKey, valueHashes: $valueHashes, credentials: $credentials));
+        return (bool) $this->acceptAuthorizationAsync(botId: $botId, scope: $scope, publicKey: $publicKey, valueHashes: $valueHashes, credentials: $credentials)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param CodeSettings $settings
+     * @return Future<SentCode|SentCodeSuccess|SentCodePaymentRequired|null>
+     * @see https://core.telegram.org/method/account.sendVerifyPhoneCode
+     * @api
+     */
+    public function sendVerifyPhoneCodeAsync(string $phoneNumber, CodeSettings $settings): Future
+    {
+        return $this->client->call(new SendVerifyPhoneCodeRequest(phoneNumber: $phoneNumber, settings: $settings));
     }
 
     /**
@@ -743,7 +1174,20 @@ final readonly class AccountMethods
      */
     public function sendVerifyPhoneCode(string $phoneNumber, CodeSettings $settings): ?AbstractSentCode
     {
-        return $this->client->callSync(new SendVerifyPhoneCodeRequest(phoneNumber: $phoneNumber, settings: $settings));
+        return $this->sendVerifyPhoneCodeAsync(phoneNumber: $phoneNumber, settings: $settings)->await();
+    }
+
+    /**
+     * @param string $phoneNumber
+     * @param string $phoneCodeHash
+     * @param string $phoneCode
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.verifyPhone
+     * @api
+     */
+    public function verifyPhoneAsync(string $phoneNumber, string $phoneCodeHash, string $phoneCode): Future
+    {
+        return $this->client->call(new VerifyPhoneRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode));
     }
 
     /**
@@ -756,7 +1200,19 @@ final readonly class AccountMethods
      */
     public function verifyPhone(string $phoneNumber, string $phoneCodeHash, string $phoneCode): bool
     {
-        return (bool) $this->client->callSync(new VerifyPhoneRequest(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode));
+        return (bool) $this->verifyPhoneAsync(phoneNumber: $phoneNumber, phoneCodeHash: $phoneCodeHash, phoneCode: $phoneCode)->await();
+    }
+
+    /**
+     * @param EmailVerifyPurposeLoginSetup|EmailVerifyPurposeLoginChange|EmailVerifyPurposePassport $purpose
+     * @param string $email
+     * @return Future<SentEmailCode|null>
+     * @see https://core.telegram.org/method/account.sendVerifyEmailCode
+     * @api
+     */
+    public function sendVerifyEmailCodeAsync(AbstractEmailVerifyPurpose $purpose, string $email): Future
+    {
+        return $this->client->call(new SendVerifyEmailCodeRequest(purpose: $purpose, email: $email));
     }
 
     /**
@@ -768,7 +1224,19 @@ final readonly class AccountMethods
      */
     public function sendVerifyEmailCode(AbstractEmailVerifyPurpose $purpose, string $email): ?SentEmailCode
     {
-        return $this->client->callSync(new SendVerifyEmailCodeRequest(purpose: $purpose, email: $email));
+        return $this->sendVerifyEmailCodeAsync(purpose: $purpose, email: $email)->await();
+    }
+
+    /**
+     * @param EmailVerifyPurposeLoginSetup|EmailVerifyPurposeLoginChange|EmailVerifyPurposePassport $purpose
+     * @param EmailVerificationCode|EmailVerificationGoogle|EmailVerificationApple $verification
+     * @return Future<EmailVerified|EmailVerifiedLogin|null>
+     * @see https://core.telegram.org/method/account.verifyEmail
+     * @api
+     */
+    public function verifyEmailAsync(AbstractEmailVerifyPurpose $purpose, AbstractEmailVerification $verification): Future
+    {
+        return $this->client->call(new VerifyEmailRequest(purpose: $purpose, verification: $verification));
     }
 
     /**
@@ -780,7 +1248,24 @@ final readonly class AccountMethods
      */
     public function verifyEmail(AbstractEmailVerifyPurpose $purpose, AbstractEmailVerification $verification): ?AbstractEmailVerified
     {
-        return $this->client->callSync(new VerifyEmailRequest(purpose: $purpose, verification: $verification));
+        return $this->verifyEmailAsync(purpose: $purpose, verification: $verification)->await();
+    }
+
+    /**
+     * @param bool|null $contacts
+     * @param bool|null $messageUsers
+     * @param bool|null $messageChats
+     * @param bool|null $messageMegagroups
+     * @param bool|null $messageChannels
+     * @param bool|null $files
+     * @param int|null $fileMaxSize
+     * @return Future<Takeout|null>
+     * @see https://core.telegram.org/method/account.initTakeoutSession
+     * @api
+     */
+    public function initTakeoutSessionAsync(?bool $contacts = null, ?bool $messageUsers = null, ?bool $messageChats = null, ?bool $messageMegagroups = null, ?bool $messageChannels = null, ?bool $files = null, ?int $fileMaxSize = null): Future
+    {
+        return $this->client->call(new InitTakeoutSessionRequest(contacts: $contacts, messageUsers: $messageUsers, messageChats: $messageChats, messageMegagroups: $messageMegagroups, messageChannels: $messageChannels, files: $files, fileMaxSize: $fileMaxSize));
     }
 
     /**
@@ -797,7 +1282,18 @@ final readonly class AccountMethods
      */
     public function initTakeoutSession(?bool $contacts = null, ?bool $messageUsers = null, ?bool $messageChats = null, ?bool $messageMegagroups = null, ?bool $messageChannels = null, ?bool $files = null, ?int $fileMaxSize = null): ?Takeout
     {
-        return $this->client->callSync(new InitTakeoutSessionRequest(contacts: $contacts, messageUsers: $messageUsers, messageChats: $messageChats, messageMegagroups: $messageMegagroups, messageChannels: $messageChannels, files: $files, fileMaxSize: $fileMaxSize));
+        return $this->initTakeoutSessionAsync(contacts: $contacts, messageUsers: $messageUsers, messageChats: $messageChats, messageMegagroups: $messageMegagroups, messageChannels: $messageChannels, files: $files, fileMaxSize: $fileMaxSize)->await();
+    }
+
+    /**
+     * @param bool|null $success
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.finishTakeoutSession
+     * @api
+     */
+    public function finishTakeoutSessionAsync(?bool $success = null): Future
+    {
+        return $this->client->call(new FinishTakeoutSessionRequest(success: $success));
     }
 
     /**
@@ -808,7 +1304,18 @@ final readonly class AccountMethods
      */
     public function finishTakeoutSession(?bool $success = null): bool
     {
-        return (bool) $this->client->callSync(new FinishTakeoutSessionRequest(success: $success));
+        return (bool) $this->finishTakeoutSessionAsync(success: $success)->await();
+    }
+
+    /**
+     * @param string $code
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.confirmPasswordEmail
+     * @api
+     */
+    public function confirmPasswordEmailAsync(string $code): Future
+    {
+        return $this->client->call(new ConfirmPasswordEmailRequest(code: $code));
     }
 
     /**
@@ -819,7 +1326,17 @@ final readonly class AccountMethods
      */
     public function confirmPasswordEmail(string $code): bool
     {
-        return (bool) $this->client->callSync(new ConfirmPasswordEmailRequest(code: $code));
+        return (bool) $this->confirmPasswordEmailAsync(code: $code)->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.resendPasswordEmail
+     * @api
+     */
+    public function resendPasswordEmailAsync(): Future
+    {
+        return $this->client->call(new ResendPasswordEmailRequest());
     }
 
     /**
@@ -829,7 +1346,17 @@ final readonly class AccountMethods
      */
     public function resendPasswordEmail(): bool
     {
-        return (bool) $this->client->callSync(new ResendPasswordEmailRequest());
+        return (bool) $this->resendPasswordEmailAsync()->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.cancelPasswordEmail
+     * @api
+     */
+    public function cancelPasswordEmailAsync(): Future
+    {
+        return $this->client->call(new CancelPasswordEmailRequest());
     }
 
     /**
@@ -839,7 +1366,17 @@ final readonly class AccountMethods
      */
     public function cancelPasswordEmail(): bool
     {
-        return (bool) $this->client->callSync(new CancelPasswordEmailRequest());
+        return (bool) $this->cancelPasswordEmailAsync()->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.getContactSignUpNotification
+     * @api
+     */
+    public function getContactSignUpNotificationAsync(): Future
+    {
+        return $this->client->call(new GetContactSignUpNotificationRequest());
     }
 
     /**
@@ -849,7 +1386,18 @@ final readonly class AccountMethods
      */
     public function getContactSignUpNotification(): bool
     {
-        return (bool) $this->client->callSync(new GetContactSignUpNotificationRequest());
+        return (bool) $this->getContactSignUpNotificationAsync()->await();
+    }
+
+    /**
+     * @param bool $silent
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.setContactSignUpNotification
+     * @api
+     */
+    public function setContactSignUpNotificationAsync(bool $silent): Future
+    {
+        return $this->client->call(new SetContactSignUpNotificationRequest(silent: $silent));
     }
 
     /**
@@ -860,7 +1408,20 @@ final readonly class AccountMethods
      */
     public function setContactSignUpNotification(bool $silent): bool
     {
-        return (bool) $this->client->callSync(new SetContactSignUpNotificationRequest(silent: $silent));
+        return (bool) $this->setContactSignUpNotificationAsync(silent: $silent)->await();
+    }
+
+    /**
+     * @param bool|null $compareSound
+     * @param bool|null $compareStories
+     * @param InputNotifyPeer|InputNotifyUsers|InputNotifyChats|InputNotifyBroadcasts|InputNotifyForumTopic|null $peer
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/account.getNotifyExceptions
+     * @api
+     */
+    public function getNotifyExceptionsAsync(?bool $compareSound = null, ?bool $compareStories = null, ?AbstractInputNotifyPeer $peer = null): Future
+    {
+        return $this->client->call(new GetNotifyExceptionsRequest(compareSound: $compareSound, compareStories: $compareStories, peer: $peer));
     }
 
     /**
@@ -873,7 +1434,18 @@ final readonly class AccountMethods
      */
     public function getNotifyExceptions(?bool $compareSound = null, ?bool $compareStories = null, ?AbstractInputNotifyPeer $peer = null): ?AbstractUpdates
     {
-        return $this->client->callSync(new GetNotifyExceptionsRequest(compareSound: $compareSound, compareStories: $compareStories, peer: $peer));
+        return $this->getNotifyExceptionsAsync(compareSound: $compareSound, compareStories: $compareStories, peer: $peer)->await();
+    }
+
+    /**
+     * @param InputWallPaper|InputWallPaperSlug|InputWallPaperNoFile $wallpaper
+     * @return Future<WallPaper|WallPaperNoFile|null>
+     * @see https://core.telegram.org/method/account.getWallPaper
+     * @api
+     */
+    public function getWallPaperAsync(AbstractInputWallPaper $wallpaper): Future
+    {
+        return $this->client->call(new GetWallPaperRequest(wallpaper: $wallpaper));
     }
 
     /**
@@ -884,7 +1456,21 @@ final readonly class AccountMethods
      */
     public function getWallPaper(AbstractInputWallPaper $wallpaper): ?AbstractWallPaper
     {
-        return $this->client->callSync(new GetWallPaperRequest(wallpaper: $wallpaper));
+        return $this->getWallPaperAsync(wallpaper: $wallpaper)->await();
+    }
+
+    /**
+     * @param InputFile|InputFileBig|InputFileStoryDocument $file
+     * @param string $mimeType
+     * @param WallPaperSettings $settings
+     * @param bool|null $forChat
+     * @return Future<WallPaper|WallPaperNoFile|null>
+     * @see https://core.telegram.org/method/account.uploadWallPaper
+     * @api
+     */
+    public function uploadWallPaperAsync(AbstractInputFile $file, string $mimeType, WallPaperSettings $settings, ?bool $forChat = null): Future
+    {
+        return $this->client->call(new UploadWallPaperRequest(file: $file, mimeType: $mimeType, settings: $settings, forChat: $forChat));
     }
 
     /**
@@ -898,7 +1484,20 @@ final readonly class AccountMethods
      */
     public function uploadWallPaper(AbstractInputFile $file, string $mimeType, WallPaperSettings $settings, ?bool $forChat = null): ?AbstractWallPaper
     {
-        return $this->client->callSync(new UploadWallPaperRequest(file: $file, mimeType: $mimeType, settings: $settings, forChat: $forChat));
+        return $this->uploadWallPaperAsync(file: $file, mimeType: $mimeType, settings: $settings, forChat: $forChat)->await();
+    }
+
+    /**
+     * @param InputWallPaper|InputWallPaperSlug|InputWallPaperNoFile $wallpaper
+     * @param bool $unsave
+     * @param WallPaperSettings $settings
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.saveWallPaper
+     * @api
+     */
+    public function saveWallPaperAsync(AbstractInputWallPaper $wallpaper, bool $unsave, WallPaperSettings $settings): Future
+    {
+        return $this->client->call(new SaveWallPaperRequest(wallpaper: $wallpaper, unsave: $unsave, settings: $settings));
     }
 
     /**
@@ -911,7 +1510,19 @@ final readonly class AccountMethods
      */
     public function saveWallPaper(AbstractInputWallPaper $wallpaper, bool $unsave, WallPaperSettings $settings): bool
     {
-        return (bool) $this->client->callSync(new SaveWallPaperRequest(wallpaper: $wallpaper, unsave: $unsave, settings: $settings));
+        return (bool) $this->saveWallPaperAsync(wallpaper: $wallpaper, unsave: $unsave, settings: $settings)->await();
+    }
+
+    /**
+     * @param InputWallPaper|InputWallPaperSlug|InputWallPaperNoFile $wallpaper
+     * @param WallPaperSettings $settings
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.installWallPaper
+     * @api
+     */
+    public function installWallPaperAsync(AbstractInputWallPaper $wallpaper, WallPaperSettings $settings): Future
+    {
+        return $this->client->call(new InstallWallPaperRequest(wallpaper: $wallpaper, settings: $settings));
     }
 
     /**
@@ -923,7 +1534,17 @@ final readonly class AccountMethods
      */
     public function installWallPaper(AbstractInputWallPaper $wallpaper, WallPaperSettings $settings): bool
     {
-        return (bool) $this->client->callSync(new InstallWallPaperRequest(wallpaper: $wallpaper, settings: $settings));
+        return (bool) $this->installWallPaperAsync(wallpaper: $wallpaper, settings: $settings)->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.resetWallPapers
+     * @api
+     */
+    public function resetWallPapersAsync(): Future
+    {
+        return $this->client->call(new ResetWallPapersRequest());
     }
 
     /**
@@ -933,7 +1554,17 @@ final readonly class AccountMethods
      */
     public function resetWallPapers(): bool
     {
-        return (bool) $this->client->callSync(new ResetWallPapersRequest());
+        return (bool) $this->resetWallPapersAsync()->await();
+    }
+
+    /**
+     * @return Future<AutoDownloadSettings|null>
+     * @see https://core.telegram.org/method/account.getAutoDownloadSettings
+     * @api
+     */
+    public function getAutoDownloadSettingsAsync(): Future
+    {
+        return $this->client->call(new GetAutoDownloadSettingsRequest());
     }
 
     /**
@@ -943,7 +1574,20 @@ final readonly class AccountMethods
      */
     public function getAutoDownloadSettings(): ?AutoDownloadSettings
     {
-        return $this->client->callSync(new GetAutoDownloadSettingsRequest());
+        return $this->getAutoDownloadSettingsAsync()->await();
+    }
+
+    /**
+     * @param BaseAutoDownloadSettings $settings
+     * @param bool|null $low
+     * @param bool|null $high
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.saveAutoDownloadSettings
+     * @api
+     */
+    public function saveAutoDownloadSettingsAsync(BaseAutoDownloadSettings $settings, ?bool $low = null, ?bool $high = null): Future
+    {
+        return $this->client->call(new SaveAutoDownloadSettingsRequest(settings: $settings, low: $low, high: $high));
     }
 
     /**
@@ -956,7 +1600,21 @@ final readonly class AccountMethods
      */
     public function saveAutoDownloadSettings(BaseAutoDownloadSettings $settings, ?bool $low = null, ?bool $high = null): bool
     {
-        return (bool) $this->client->callSync(new SaveAutoDownloadSettingsRequest(settings: $settings, low: $low, high: $high));
+        return (bool) $this->saveAutoDownloadSettingsAsync(settings: $settings, low: $low, high: $high)->await();
+    }
+
+    /**
+     * @param InputFile|InputFileBig|InputFileStoryDocument $file
+     * @param string $fileName
+     * @param string $mimeType
+     * @param InputFile|InputFileBig|InputFileStoryDocument|null $thumb
+     * @return Future<DocumentEmpty|Document|null>
+     * @see https://core.telegram.org/method/account.uploadTheme
+     * @api
+     */
+    public function uploadThemeAsync(AbstractInputFile $file, string $fileName, string $mimeType, ?AbstractInputFile $thumb = null): Future
+    {
+        return $this->client->call(new UploadThemeRequest(file: $file, fileName: $fileName, mimeType: $mimeType, thumb: $thumb));
     }
 
     /**
@@ -970,7 +1628,21 @@ final readonly class AccountMethods
      */
     public function uploadTheme(AbstractInputFile $file, string $fileName, string $mimeType, ?AbstractInputFile $thumb = null): ?AbstractDocument
     {
-        return $this->client->callSync(new UploadThemeRequest(file: $file, fileName: $fileName, mimeType: $mimeType, thumb: $thumb));
+        return $this->uploadThemeAsync(file: $file, fileName: $fileName, mimeType: $mimeType, thumb: $thumb)->await();
+    }
+
+    /**
+     * @param string $slug
+     * @param string $title
+     * @param InputDocumentEmpty|InputDocument|null $document
+     * @param list<InputThemeSettings>|null $settings
+     * @return Future<Theme|null>
+     * @see https://core.telegram.org/method/account.createTheme
+     * @api
+     */
+    public function createThemeAsync(string $slug, string $title, ?AbstractInputDocument $document = null, ?array $settings = null): Future
+    {
+        return $this->client->call(new CreateThemeRequest(slug: $slug, title: $title, document: $document, settings: $settings));
     }
 
     /**
@@ -984,7 +1656,23 @@ final readonly class AccountMethods
      */
     public function createTheme(string $slug, string $title, ?AbstractInputDocument $document = null, ?array $settings = null): ?Theme
     {
-        return $this->client->callSync(new CreateThemeRequest(slug: $slug, title: $title, document: $document, settings: $settings));
+        return $this->createThemeAsync(slug: $slug, title: $title, document: $document, settings: $settings)->await();
+    }
+
+    /**
+     * @param string $format
+     * @param InputTheme|InputThemeSlug $theme
+     * @param string|null $slug
+     * @param string|null $title
+     * @param InputDocumentEmpty|InputDocument|null $document
+     * @param list<InputThemeSettings>|null $settings
+     * @return Future<Theme|null>
+     * @see https://core.telegram.org/method/account.updateTheme
+     * @api
+     */
+    public function updateThemeAsync(string $format, AbstractInputTheme $theme, ?string $slug = null, ?string $title = null, ?AbstractInputDocument $document = null, ?array $settings = null): Future
+    {
+        return $this->client->call(new UpdateThemeRequest(format: $format, theme: $theme, slug: $slug, title: $title, document: $document, settings: $settings));
     }
 
     /**
@@ -1000,7 +1688,19 @@ final readonly class AccountMethods
      */
     public function updateTheme(string $format, AbstractInputTheme $theme, ?string $slug = null, ?string $title = null, ?AbstractInputDocument $document = null, ?array $settings = null): ?Theme
     {
-        return $this->client->callSync(new UpdateThemeRequest(format: $format, theme: $theme, slug: $slug, title: $title, document: $document, settings: $settings));
+        return $this->updateThemeAsync(format: $format, theme: $theme, slug: $slug, title: $title, document: $document, settings: $settings)->await();
+    }
+
+    /**
+     * @param InputTheme|InputThemeSlug $theme
+     * @param bool $unsave
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.saveTheme
+     * @api
+     */
+    public function saveThemeAsync(AbstractInputTheme $theme, bool $unsave): Future
+    {
+        return $this->client->call(new SaveThemeRequest(theme: $theme, unsave: $unsave));
     }
 
     /**
@@ -1012,7 +1712,21 @@ final readonly class AccountMethods
      */
     public function saveTheme(AbstractInputTheme $theme, bool $unsave): bool
     {
-        return (bool) $this->client->callSync(new SaveThemeRequest(theme: $theme, unsave: $unsave));
+        return (bool) $this->saveThemeAsync(theme: $theme, unsave: $unsave)->await();
+    }
+
+    /**
+     * @param bool|null $dark
+     * @param InputTheme|InputThemeSlug|null $theme
+     * @param string|null $format
+     * @param BaseTheme|null $baseTheme
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.installTheme
+     * @api
+     */
+    public function installThemeAsync(?bool $dark = null, ?AbstractInputTheme $theme = null, ?string $format = null, ?BaseTheme $baseTheme = null): Future
+    {
+        return $this->client->call(new InstallThemeRequest(dark: $dark, theme: $theme, format: $format, baseTheme: $baseTheme));
     }
 
     /**
@@ -1026,7 +1740,19 @@ final readonly class AccountMethods
      */
     public function installTheme(?bool $dark = null, ?AbstractInputTheme $theme = null, ?string $format = null, ?BaseTheme $baseTheme = null): bool
     {
-        return (bool) $this->client->callSync(new InstallThemeRequest(dark: $dark, theme: $theme, format: $format, baseTheme: $baseTheme));
+        return (bool) $this->installThemeAsync(dark: $dark, theme: $theme, format: $format, baseTheme: $baseTheme)->await();
+    }
+
+    /**
+     * @param string $format
+     * @param InputTheme|InputThemeSlug $theme
+     * @return Future<Theme|null>
+     * @see https://core.telegram.org/method/account.getTheme
+     * @api
+     */
+    public function getThemeAsync(string $format, AbstractInputTheme $theme): Future
+    {
+        return $this->client->call(new GetThemeRequest(format: $format, theme: $theme));
     }
 
     /**
@@ -1038,7 +1764,19 @@ final readonly class AccountMethods
      */
     public function getTheme(string $format, AbstractInputTheme $theme): ?Theme
     {
-        return $this->client->callSync(new GetThemeRequest(format: $format, theme: $theme));
+        return $this->getThemeAsync(format: $format, theme: $theme)->await();
+    }
+
+    /**
+     * @param string $format
+     * @param int $hash
+     * @return Future<ThemesNotModified|Themes|null>
+     * @see https://core.telegram.org/method/account.getThemes
+     * @api
+     */
+    public function getThemesAsync(string $format, int $hash): Future
+    {
+        return $this->client->call(new GetThemesRequest(format: $format, hash: $hash));
     }
 
     /**
@@ -1050,7 +1788,18 @@ final readonly class AccountMethods
      */
     public function getThemes(string $format, int $hash): ?AbstractThemes
     {
-        return $this->client->callSync(new GetThemesRequest(format: $format, hash: $hash));
+        return $this->getThemesAsync(format: $format, hash: $hash)->await();
+    }
+
+    /**
+     * @param bool|null $sensitiveEnabled
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.setContentSettings
+     * @api
+     */
+    public function setContentSettingsAsync(?bool $sensitiveEnabled = null): Future
+    {
+        return $this->client->call(new SetContentSettingsRequest(sensitiveEnabled: $sensitiveEnabled));
     }
 
     /**
@@ -1061,7 +1810,17 @@ final readonly class AccountMethods
      */
     public function setContentSettings(?bool $sensitiveEnabled = null): bool
     {
-        return (bool) $this->client->callSync(new SetContentSettingsRequest(sensitiveEnabled: $sensitiveEnabled));
+        return (bool) $this->setContentSettingsAsync(sensitiveEnabled: $sensitiveEnabled)->await();
+    }
+
+    /**
+     * @return Future<ContentSettings|null>
+     * @see https://core.telegram.org/method/account.getContentSettings
+     * @api
+     */
+    public function getContentSettingsAsync(): Future
+    {
+        return $this->client->call(new GetContentSettingsRequest());
     }
 
     /**
@@ -1071,7 +1830,18 @@ final readonly class AccountMethods
      */
     public function getContentSettings(): ?ContentSettings
     {
-        return $this->client->callSync(new GetContentSettingsRequest());
+        return $this->getContentSettingsAsync()->await();
+    }
+
+    /**
+     * @param list<InputWallPaper|InputWallPaperSlug|InputWallPaperNoFile> $wallpapers
+     * @return Future<list<WallPaper|WallPaperNoFile>>
+     * @see https://core.telegram.org/method/account.getMultiWallPapers
+     * @api
+     */
+    public function getMultiWallPapersAsync(array $wallpapers): Future
+    {
+        return $this->client->call(new GetMultiWallPapersRequest(wallpapers: $wallpapers));
     }
 
     /**
@@ -1082,7 +1852,17 @@ final readonly class AccountMethods
      */
     public function getMultiWallPapers(array $wallpapers): array
     {
-        return $this->client->callSync(new GetMultiWallPapersRequest(wallpapers: $wallpapers));
+        return $this->getMultiWallPapersAsync(wallpapers: $wallpapers)->await();
+    }
+
+    /**
+     * @return Future<GlobalPrivacySettings|null>
+     * @see https://core.telegram.org/method/account.getGlobalPrivacySettings
+     * @api
+     */
+    public function getGlobalPrivacySettingsAsync(): Future
+    {
+        return $this->client->call(new GetGlobalPrivacySettingsRequest());
     }
 
     /**
@@ -1092,7 +1872,18 @@ final readonly class AccountMethods
      */
     public function getGlobalPrivacySettings(): ?GlobalPrivacySettings
     {
-        return $this->client->callSync(new GetGlobalPrivacySettingsRequest());
+        return $this->getGlobalPrivacySettingsAsync()->await();
+    }
+
+    /**
+     * @param GlobalPrivacySettings $settings
+     * @return Future<GlobalPrivacySettings|null>
+     * @see https://core.telegram.org/method/account.setGlobalPrivacySettings
+     * @api
+     */
+    public function setGlobalPrivacySettingsAsync(GlobalPrivacySettings $settings): Future
+    {
+        return $this->client->call(new SetGlobalPrivacySettingsRequest(settings: $settings));
     }
 
     /**
@@ -1103,7 +1894,24 @@ final readonly class AccountMethods
      */
     public function setGlobalPrivacySettings(GlobalPrivacySettings $settings): ?GlobalPrivacySettings
     {
-        return $this->client->callSync(new SetGlobalPrivacySettingsRequest(settings: $settings));
+        return $this->setGlobalPrivacySettingsAsync(settings: $settings)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param InputPhotoEmpty|InputPhoto $photoId
+     * @param ReportReason $reason
+     * @param string $message
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.reportProfilePhoto
+     * @api
+     */
+    public function reportProfilePhotoAsync(AbstractInputPeer|string|int $peer, AbstractInputPhoto $photoId, ReportReason $reason, string $message): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new ReportProfilePhotoRequest(peer: $peer, photoId: $photoId, reason: $reason, message: $message));
     }
 
     /**
@@ -1117,10 +1925,17 @@ final readonly class AccountMethods
      */
     public function reportProfilePhoto(AbstractInputPeer|string|int $peer, AbstractInputPhoto $photoId, ReportReason $reason, string $message): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new ReportProfilePhotoRequest(peer: $peer, photoId: $photoId, reason: $reason, message: $message));
+        return (bool) $this->reportProfilePhotoAsync(peer: $peer, photoId: $photoId, reason: $reason, message: $message)->await();
+    }
+
+    /**
+     * @return Future<ResetPasswordFailedWait|ResetPasswordRequestedWait|ResetPasswordOk|null>
+     * @see https://core.telegram.org/method/account.resetPassword
+     * @api
+     */
+    public function resetPasswordAsync(): Future
+    {
+        return $this->client->call(new ResetPasswordRequest());
     }
 
     /**
@@ -1130,7 +1945,17 @@ final readonly class AccountMethods
      */
     public function resetPassword(): ?AbstractResetPasswordResult
     {
-        return $this->client->callSync(new ResetPasswordRequest());
+        return $this->resetPasswordAsync()->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.declinePasswordReset
+     * @api
+     */
+    public function declinePasswordResetAsync(): Future
+    {
+        return $this->client->call(new DeclinePasswordResetRequest());
     }
 
     /**
@@ -1140,7 +1965,18 @@ final readonly class AccountMethods
      */
     public function declinePasswordReset(): bool
     {
-        return (bool) $this->client->callSync(new DeclinePasswordResetRequest());
+        return (bool) $this->declinePasswordResetAsync()->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<ThemesNotModified|Themes|null>
+     * @see https://core.telegram.org/method/account.getChatThemes
+     * @api
+     */
+    public function getChatThemesAsync(int $hash): Future
+    {
+        return $this->client->call(new GetChatThemesRequest(hash: $hash));
     }
 
     /**
@@ -1151,7 +1987,18 @@ final readonly class AccountMethods
      */
     public function getChatThemes(int $hash): ?AbstractThemes
     {
-        return $this->client->callSync(new GetChatThemesRequest(hash: $hash));
+        return $this->getChatThemesAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $authorizationTtlDays
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.setAuthorizationTTL
+     * @api
+     */
+    public function setAuthorizationTTLAsync(int $authorizationTtlDays): Future
+    {
+        return $this->client->call(new SetAuthorizationTTLRequest(authorizationTtlDays: $authorizationTtlDays));
     }
 
     /**
@@ -1162,7 +2009,21 @@ final readonly class AccountMethods
      */
     public function setAuthorizationTTL(int $authorizationTtlDays): bool
     {
-        return (bool) $this->client->callSync(new SetAuthorizationTTLRequest(authorizationTtlDays: $authorizationTtlDays));
+        return (bool) $this->setAuthorizationTTLAsync(authorizationTtlDays: $authorizationTtlDays)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @param bool|null $confirmed
+     * @param bool|null $encryptedRequestsDisabled
+     * @param bool|null $callRequestsDisabled
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.changeAuthorizationSettings
+     * @api
+     */
+    public function changeAuthorizationSettingsAsync(int $hash, ?bool $confirmed = null, ?bool $encryptedRequestsDisabled = null, ?bool $callRequestsDisabled = null): Future
+    {
+        return $this->client->call(new ChangeAuthorizationSettingsRequest(hash: $hash, confirmed: $confirmed, encryptedRequestsDisabled: $encryptedRequestsDisabled, callRequestsDisabled: $callRequestsDisabled));
     }
 
     /**
@@ -1176,7 +2037,18 @@ final readonly class AccountMethods
      */
     public function changeAuthorizationSettings(int $hash, ?bool $confirmed = null, ?bool $encryptedRequestsDisabled = null, ?bool $callRequestsDisabled = null): bool
     {
-        return (bool) $this->client->callSync(new ChangeAuthorizationSettingsRequest(hash: $hash, confirmed: $confirmed, encryptedRequestsDisabled: $encryptedRequestsDisabled, callRequestsDisabled: $callRequestsDisabled));
+        return (bool) $this->changeAuthorizationSettingsAsync(hash: $hash, confirmed: $confirmed, encryptedRequestsDisabled: $encryptedRequestsDisabled, callRequestsDisabled: $callRequestsDisabled)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<SavedRingtonesNotModified|SavedRingtones|null>
+     * @see https://core.telegram.org/method/account.getSavedRingtones
+     * @api
+     */
+    public function getSavedRingtonesAsync(int $hash): Future
+    {
+        return $this->client->call(new GetSavedRingtonesRequest(hash: $hash));
     }
 
     /**
@@ -1187,7 +2059,19 @@ final readonly class AccountMethods
      */
     public function getSavedRingtones(int $hash): ?AbstractSavedRingtones
     {
-        return $this->client->callSync(new GetSavedRingtonesRequest(hash: $hash));
+        return $this->getSavedRingtonesAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param InputDocumentEmpty|InputDocument $id
+     * @param bool $unsave
+     * @return Future<SavedRingtone|SavedRingtoneConverted|null>
+     * @see https://core.telegram.org/method/account.saveRingtone
+     * @api
+     */
+    public function saveRingtoneAsync(AbstractInputDocument $id, bool $unsave): Future
+    {
+        return $this->client->call(new SaveRingtoneRequest(id: $id, unsave: $unsave));
     }
 
     /**
@@ -1199,7 +2083,20 @@ final readonly class AccountMethods
      */
     public function saveRingtone(AbstractInputDocument $id, bool $unsave): ?AbstractSavedRingtone
     {
-        return $this->client->callSync(new SaveRingtoneRequest(id: $id, unsave: $unsave));
+        return $this->saveRingtoneAsync(id: $id, unsave: $unsave)->await();
+    }
+
+    /**
+     * @param InputFile|InputFileBig|InputFileStoryDocument $file
+     * @param string $fileName
+     * @param string $mimeType
+     * @return Future<DocumentEmpty|Document|null>
+     * @see https://core.telegram.org/method/account.uploadRingtone
+     * @api
+     */
+    public function uploadRingtoneAsync(AbstractInputFile $file, string $fileName, string $mimeType): Future
+    {
+        return $this->client->call(new UploadRingtoneRequest(file: $file, fileName: $fileName, mimeType: $mimeType));
     }
 
     /**
@@ -1212,7 +2109,18 @@ final readonly class AccountMethods
      */
     public function uploadRingtone(AbstractInputFile $file, string $fileName, string $mimeType): ?AbstractDocument
     {
-        return $this->client->callSync(new UploadRingtoneRequest(file: $file, fileName: $fileName, mimeType: $mimeType));
+        return $this->uploadRingtoneAsync(file: $file, fileName: $fileName, mimeType: $mimeType)->await();
+    }
+
+    /**
+     * @param EmojiStatusEmpty|EmojiStatus|EmojiStatusCollectible|InputEmojiStatusCollectible $emojiStatus
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateEmojiStatus
+     * @api
+     */
+    public function updateEmojiStatusAsync(AbstractEmojiStatus $emojiStatus): Future
+    {
+        return $this->client->call(new UpdateEmojiStatusRequest(emojiStatus: $emojiStatus));
     }
 
     /**
@@ -1223,7 +2131,18 @@ final readonly class AccountMethods
      */
     public function updateEmojiStatus(AbstractEmojiStatus $emojiStatus): bool
     {
-        return (bool) $this->client->callSync(new UpdateEmojiStatusRequest(emojiStatus: $emojiStatus));
+        return (bool) $this->updateEmojiStatusAsync(emojiStatus: $emojiStatus)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiStatusesNotModified|EmojiStatuses|null>
+     * @see https://core.telegram.org/method/account.getDefaultEmojiStatuses
+     * @api
+     */
+    public function getDefaultEmojiStatusesAsync(int $hash): Future
+    {
+        return $this->client->call(new GetDefaultEmojiStatusesRequest(hash: $hash));
     }
 
     /**
@@ -1234,7 +2153,18 @@ final readonly class AccountMethods
      */
     public function getDefaultEmojiStatuses(int $hash): ?AbstractEmojiStatuses
     {
-        return $this->client->callSync(new GetDefaultEmojiStatusesRequest(hash: $hash));
+        return $this->getDefaultEmojiStatusesAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiStatusesNotModified|EmojiStatuses|null>
+     * @see https://core.telegram.org/method/account.getRecentEmojiStatuses
+     * @api
+     */
+    public function getRecentEmojiStatusesAsync(int $hash): Future
+    {
+        return $this->client->call(new GetRecentEmojiStatusesRequest(hash: $hash));
     }
 
     /**
@@ -1245,7 +2175,17 @@ final readonly class AccountMethods
      */
     public function getRecentEmojiStatuses(int $hash): ?AbstractEmojiStatuses
     {
-        return $this->client->callSync(new GetRecentEmojiStatusesRequest(hash: $hash));
+        return $this->getRecentEmojiStatusesAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.clearRecentEmojiStatuses
+     * @api
+     */
+    public function clearRecentEmojiStatusesAsync(): Future
+    {
+        return $this->client->call(new ClearRecentEmojiStatusesRequest());
     }
 
     /**
@@ -1255,7 +2195,18 @@ final readonly class AccountMethods
      */
     public function clearRecentEmojiStatuses(): bool
     {
-        return (bool) $this->client->callSync(new ClearRecentEmojiStatusesRequest());
+        return (bool) $this->clearRecentEmojiStatusesAsync()->await();
+    }
+
+    /**
+     * @param list<string> $order
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.reorderUsernames
+     * @api
+     */
+    public function reorderUsernamesAsync(array $order): Future
+    {
+        return $this->client->call(new ReorderUsernamesRequest(order: $order));
     }
 
     /**
@@ -1266,7 +2217,19 @@ final readonly class AccountMethods
      */
     public function reorderUsernames(array $order): bool
     {
-        return (bool) $this->client->callSync(new ReorderUsernamesRequest(order: $order));
+        return (bool) $this->reorderUsernamesAsync(order: $order)->await();
+    }
+
+    /**
+     * @param string $username
+     * @param bool $active
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.toggleUsername
+     * @api
+     */
+    public function toggleUsernameAsync(string $username, bool $active): Future
+    {
+        return $this->client->call(new ToggleUsernameRequest(username: $username, active: $active));
     }
 
     /**
@@ -1278,7 +2241,18 @@ final readonly class AccountMethods
      */
     public function toggleUsername(string $username, bool $active): bool
     {
-        return (bool) $this->client->callSync(new ToggleUsernameRequest(username: $username, active: $active));
+        return (bool) $this->toggleUsernameAsync(username: $username, active: $active)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiListNotModified|EmojiList|null>
+     * @see https://core.telegram.org/method/account.getDefaultProfilePhotoEmojis
+     * @api
+     */
+    public function getDefaultProfilePhotoEmojisAsync(int $hash): Future
+    {
+        return $this->client->call(new GetDefaultProfilePhotoEmojisRequest(hash: $hash));
     }
 
     /**
@@ -1289,7 +2263,18 @@ final readonly class AccountMethods
      */
     public function getDefaultProfilePhotoEmojis(int $hash): ?AbstractEmojiList
     {
-        return $this->client->callSync(new GetDefaultProfilePhotoEmojisRequest(hash: $hash));
+        return $this->getDefaultProfilePhotoEmojisAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiListNotModified|EmojiList|null>
+     * @see https://core.telegram.org/method/account.getDefaultGroupPhotoEmojis
+     * @api
+     */
+    public function getDefaultGroupPhotoEmojisAsync(int $hash): Future
+    {
+        return $this->client->call(new GetDefaultGroupPhotoEmojisRequest(hash: $hash));
     }
 
     /**
@@ -1300,7 +2285,17 @@ final readonly class AccountMethods
      */
     public function getDefaultGroupPhotoEmojis(int $hash): ?AbstractEmojiList
     {
-        return $this->client->callSync(new GetDefaultGroupPhotoEmojisRequest(hash: $hash));
+        return $this->getDefaultGroupPhotoEmojisAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @return Future<AutoSaveSettings|null>
+     * @see https://core.telegram.org/method/account.getAutoSaveSettings
+     * @api
+     */
+    public function getAutoSaveSettingsAsync(): Future
+    {
+        return $this->client->call(new GetAutoSaveSettingsRequest());
     }
 
     /**
@@ -1310,7 +2305,25 @@ final readonly class AccountMethods
      */
     public function getAutoSaveSettings(): ?AutoSaveSettings
     {
-        return $this->client->callSync(new GetAutoSaveSettingsRequest());
+        return $this->getAutoSaveSettingsAsync()->await();
+    }
+
+    /**
+     * @param BaseAutoSaveSettings $settings
+     * @param bool|null $users
+     * @param bool|null $chats
+     * @param bool|null $broadcasts
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $peer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.saveAutoSaveSettings
+     * @api
+     */
+    public function saveAutoSaveSettingsAsync(BaseAutoSaveSettings $settings, ?bool $users = null, ?bool $chats = null, ?bool $broadcasts = null, AbstractInputPeer|string|int|null $peer = null): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new SaveAutoSaveSettingsRequest(settings: $settings, users: $users, chats: $chats, broadcasts: $broadcasts, peer: $peer));
     }
 
     /**
@@ -1325,10 +2338,17 @@ final readonly class AccountMethods
      */
     public function saveAutoSaveSettings(BaseAutoSaveSettings $settings, ?bool $users = null, ?bool $chats = null, ?bool $broadcasts = null, AbstractInputPeer|string|int|null $peer = null): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new SaveAutoSaveSettingsRequest(settings: $settings, users: $users, chats: $chats, broadcasts: $broadcasts, peer: $peer));
+        return (bool) $this->saveAutoSaveSettingsAsync(settings: $settings, users: $users, chats: $chats, broadcasts: $broadcasts, peer: $peer)->await();
+    }
+
+    /**
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.deleteAutoSaveExceptions
+     * @api
+     */
+    public function deleteAutoSaveExceptionsAsync(): Future
+    {
+        return $this->client->call(new DeleteAutoSaveExceptionsRequest());
     }
 
     /**
@@ -1338,7 +2358,18 @@ final readonly class AccountMethods
      */
     public function deleteAutoSaveExceptions(): bool
     {
-        return (bool) $this->client->callSync(new DeleteAutoSaveExceptionsRequest());
+        return (bool) $this->deleteAutoSaveExceptionsAsync()->await();
+    }
+
+    /**
+     * @param list<string> $codes
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.invalidateSignInCodes
+     * @api
+     */
+    public function invalidateSignInCodesAsync(array $codes): Future
+    {
+        return $this->client->call(new InvalidateSignInCodesRequest(codes: $codes));
     }
 
     /**
@@ -1349,7 +2380,19 @@ final readonly class AccountMethods
      */
     public function invalidateSignInCodes(array $codes): bool
     {
-        return (bool) $this->client->callSync(new InvalidateSignInCodesRequest(codes: $codes));
+        return (bool) $this->invalidateSignInCodesAsync(codes: $codes)->await();
+    }
+
+    /**
+     * @param bool|null $forProfile
+     * @param PeerColor|PeerColorCollectible|InputPeerColorCollectible|null $color
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateColor
+     * @api
+     */
+    public function updateColorAsync(?bool $forProfile = null, ?AbstractPeerColor $color = null): Future
+    {
+        return $this->client->call(new UpdateColorRequest(forProfile: $forProfile, color: $color));
     }
 
     /**
@@ -1361,7 +2404,18 @@ final readonly class AccountMethods
      */
     public function updateColor(?bool $forProfile = null, ?AbstractPeerColor $color = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateColorRequest(forProfile: $forProfile, color: $color));
+        return (bool) $this->updateColorAsync(forProfile: $forProfile, color: $color)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiListNotModified|EmojiList|null>
+     * @see https://core.telegram.org/method/account.getDefaultBackgroundEmojis
+     * @api
+     */
+    public function getDefaultBackgroundEmojisAsync(int $hash): Future
+    {
+        return $this->client->call(new GetDefaultBackgroundEmojisRequest(hash: $hash));
     }
 
     /**
@@ -1372,7 +2426,18 @@ final readonly class AccountMethods
      */
     public function getDefaultBackgroundEmojis(int $hash): ?AbstractEmojiList
     {
-        return $this->client->callSync(new GetDefaultBackgroundEmojisRequest(hash: $hash));
+        return $this->getDefaultBackgroundEmojisAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiStatusesNotModified|EmojiStatuses|null>
+     * @see https://core.telegram.org/method/account.getChannelDefaultEmojiStatuses
+     * @api
+     */
+    public function getChannelDefaultEmojiStatusesAsync(int $hash): Future
+    {
+        return $this->client->call(new GetChannelDefaultEmojiStatusesRequest(hash: $hash));
     }
 
     /**
@@ -1383,7 +2448,18 @@ final readonly class AccountMethods
      */
     public function getChannelDefaultEmojiStatuses(int $hash): ?AbstractEmojiStatuses
     {
-        return $this->client->callSync(new GetChannelDefaultEmojiStatusesRequest(hash: $hash));
+        return $this->getChannelDefaultEmojiStatusesAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiListNotModified|EmojiList|null>
+     * @see https://core.telegram.org/method/account.getChannelRestrictedStatusEmojis
+     * @api
+     */
+    public function getChannelRestrictedStatusEmojisAsync(int $hash): Future
+    {
+        return $this->client->call(new GetChannelRestrictedStatusEmojisRequest(hash: $hash));
     }
 
     /**
@@ -1394,7 +2470,18 @@ final readonly class AccountMethods
      */
     public function getChannelRestrictedStatusEmojis(int $hash): ?AbstractEmojiList
     {
-        return $this->client->callSync(new GetChannelRestrictedStatusEmojisRequest(hash: $hash));
+        return $this->getChannelRestrictedStatusEmojisAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param BusinessWorkHours|null $businessWorkHours
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateBusinessWorkHours
+     * @api
+     */
+    public function updateBusinessWorkHoursAsync(?BusinessWorkHours $businessWorkHours = null): Future
+    {
+        return $this->client->call(new UpdateBusinessWorkHoursRequest(businessWorkHours: $businessWorkHours));
     }
 
     /**
@@ -1405,7 +2492,19 @@ final readonly class AccountMethods
      */
     public function updateBusinessWorkHours(?BusinessWorkHours $businessWorkHours = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateBusinessWorkHoursRequest(businessWorkHours: $businessWorkHours));
+        return (bool) $this->updateBusinessWorkHoursAsync(businessWorkHours: $businessWorkHours)->await();
+    }
+
+    /**
+     * @param InputGeoPointEmpty|InputGeoPoint|null $geoPoint
+     * @param string|null $address
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateBusinessLocation
+     * @api
+     */
+    public function updateBusinessLocationAsync(?AbstractInputGeoPoint $geoPoint = null, ?string $address = null): Future
+    {
+        return $this->client->call(new UpdateBusinessLocationRequest(geoPoint: $geoPoint, address: $address));
     }
 
     /**
@@ -1417,7 +2516,18 @@ final readonly class AccountMethods
      */
     public function updateBusinessLocation(?AbstractInputGeoPoint $geoPoint = null, ?string $address = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateBusinessLocationRequest(geoPoint: $geoPoint, address: $address));
+        return (bool) $this->updateBusinessLocationAsync(geoPoint: $geoPoint, address: $address)->await();
+    }
+
+    /**
+     * @param InputBusinessGreetingMessage|null $message
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateBusinessGreetingMessage
+     * @api
+     */
+    public function updateBusinessGreetingMessageAsync(?InputBusinessGreetingMessage $message = null): Future
+    {
+        return $this->client->call(new UpdateBusinessGreetingMessageRequest(message: $message));
     }
 
     /**
@@ -1428,7 +2538,18 @@ final readonly class AccountMethods
      */
     public function updateBusinessGreetingMessage(?InputBusinessGreetingMessage $message = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateBusinessGreetingMessageRequest(message: $message));
+        return (bool) $this->updateBusinessGreetingMessageAsync(message: $message)->await();
+    }
+
+    /**
+     * @param InputBusinessAwayMessage|null $message
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateBusinessAwayMessage
+     * @api
+     */
+    public function updateBusinessAwayMessageAsync(?InputBusinessAwayMessage $message = null): Future
+    {
+        return $this->client->call(new UpdateBusinessAwayMessageRequest(message: $message));
     }
 
     /**
@@ -1439,7 +2560,29 @@ final readonly class AccountMethods
      */
     public function updateBusinessAwayMessage(?InputBusinessAwayMessage $message = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateBusinessAwayMessageRequest(message: $message));
+        return (bool) $this->updateBusinessAwayMessageAsync(message: $message)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $bot
+     * @param InputBusinessBotRecipients $recipients
+     * @param bool|null $deleted
+     * @param BusinessBotRights|null $rights
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/account.updateConnectedBot
+     * @api
+     */
+    public function updateConnectedBotAsync(AbstractInputUser|string|int $bot, InputBusinessBotRecipients $recipients, ?bool $deleted = null, ?BusinessBotRights $rights = null): Future
+    {
+        if (is_string($bot) || is_int($bot)) {
+            $__tmpPeer = $this->client->peerManager->resolve($bot);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $bot = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new UpdateConnectedBotRequest(bot: $bot, recipients: $recipients, deleted: $deleted, rights: $rights));
     }
 
     /**
@@ -1453,15 +2596,17 @@ final readonly class AccountMethods
      */
     public function updateConnectedBot(AbstractInputUser|string|int $bot, InputBusinessBotRecipients $recipients, ?bool $deleted = null, ?BusinessBotRights $rights = null): ?AbstractUpdates
     {
-        if (is_string($bot) || is_int($bot)) {
-            $__tmpPeer = $this->client->peerManager->resolve($bot);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $bot = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $bot = $__tmpPeer;
-            }
-        }
-        return $this->client->callSync(new UpdateConnectedBotRequest(bot: $bot, recipients: $recipients, deleted: $deleted, rights: $rights));
+        return $this->updateConnectedBotAsync(bot: $bot, recipients: $recipients, deleted: $deleted, rights: $rights)->await();
+    }
+
+    /**
+     * @return Future<ConnectedBots|null>
+     * @see https://core.telegram.org/method/account.getConnectedBots
+     * @api
+     */
+    public function getConnectedBotsAsync(): Future
+    {
+        return $this->client->call(new GetConnectedBotsRequest());
     }
 
     /**
@@ -1471,7 +2616,18 @@ final readonly class AccountMethods
      */
     public function getConnectedBots(): ?ConnectedBots
     {
-        return $this->client->callSync(new GetConnectedBotsRequest());
+        return $this->getConnectedBotsAsync()->await();
+    }
+
+    /**
+     * @param string $connectionId
+     * @return Future<UpdatesTooLong|UpdateShortMessage|UpdateShortChatMessage|UpdateShort|UpdatesCombined|Updates|UpdateShortSentMessage|null>
+     * @see https://core.telegram.org/method/account.getBotBusinessConnection
+     * @api
+     */
+    public function getBotBusinessConnectionAsync(string $connectionId): Future
+    {
+        return $this->client->call(new GetBotBusinessConnectionRequest(connectionId: $connectionId));
     }
 
     /**
@@ -1482,7 +2638,18 @@ final readonly class AccountMethods
      */
     public function getBotBusinessConnection(string $connectionId): ?AbstractUpdates
     {
-        return $this->client->callSync(new GetBotBusinessConnectionRequest(connectionId: $connectionId));
+        return $this->getBotBusinessConnectionAsync(connectionId: $connectionId)->await();
+    }
+
+    /**
+     * @param InputBusinessIntro|null $intro
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateBusinessIntro
+     * @api
+     */
+    public function updateBusinessIntroAsync(?InputBusinessIntro $intro = null): Future
+    {
+        return $this->client->call(new UpdateBusinessIntroRequest(intro: $intro));
     }
 
     /**
@@ -1493,7 +2660,22 @@ final readonly class AccountMethods
      */
     public function updateBusinessIntro(?InputBusinessIntro $intro = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateBusinessIntroRequest(intro: $intro));
+        return (bool) $this->updateBusinessIntroAsync(intro: $intro)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @param bool $paused
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.toggleConnectedBotPaused
+     * @api
+     */
+    public function toggleConnectedBotPausedAsync(AbstractInputPeer|string|int $peer, bool $paused): Future
+    {
+        if (is_string($peer) || is_int($peer)) {
+            $peer = $this->client->peerManager->resolve($peer);
+        }
+        return $this->client->call(new ToggleConnectedBotPausedRequest(peer: $peer, paused: $paused));
     }
 
     /**
@@ -1505,10 +2687,21 @@ final readonly class AccountMethods
      */
     public function toggleConnectedBotPaused(AbstractInputPeer|string|int $peer, bool $paused): bool
     {
+        return (bool) $this->toggleConnectedBotPausedAsync(peer: $peer, paused: $paused)->await();
+    }
+
+    /**
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int $peer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.disablePeerConnectedBot
+     * @api
+     */
+    public function disablePeerConnectedBotAsync(AbstractInputPeer|string|int $peer): Future
+    {
         if (is_string($peer) || is_int($peer)) {
             $peer = $this->client->peerManager->resolve($peer);
         }
-        return (bool) $this->client->callSync(new ToggleConnectedBotPausedRequest(peer: $peer, paused: $paused));
+        return $this->client->call(new DisablePeerConnectedBotRequest(peer: $peer));
     }
 
     /**
@@ -1519,10 +2712,18 @@ final readonly class AccountMethods
      */
     public function disablePeerConnectedBot(AbstractInputPeer|string|int $peer): bool
     {
-        if (is_string($peer) || is_int($peer)) {
-            $peer = $this->client->peerManager->resolve($peer);
-        }
-        return (bool) $this->client->callSync(new DisablePeerConnectedBotRequest(peer: $peer));
+        return (bool) $this->disablePeerConnectedBotAsync(peer: $peer)->await();
+    }
+
+    /**
+     * @param Birthday|null $birthday
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updateBirthday
+     * @api
+     */
+    public function updateBirthdayAsync(?Birthday $birthday = null): Future
+    {
+        return $this->client->call(new UpdateBirthdayRequest(birthday: $birthday));
     }
 
     /**
@@ -1533,7 +2734,18 @@ final readonly class AccountMethods
      */
     public function updateBirthday(?Birthday $birthday = null): bool
     {
-        return (bool) $this->client->callSync(new UpdateBirthdayRequest(birthday: $birthday));
+        return (bool) $this->updateBirthdayAsync(birthday: $birthday)->await();
+    }
+
+    /**
+     * @param InputBusinessChatLink $link
+     * @return Future<BusinessChatLink|null>
+     * @see https://core.telegram.org/method/account.createBusinessChatLink
+     * @api
+     */
+    public function createBusinessChatLinkAsync(InputBusinessChatLink $link): Future
+    {
+        return $this->client->call(new CreateBusinessChatLinkRequest(link: $link));
     }
 
     /**
@@ -1544,7 +2756,19 @@ final readonly class AccountMethods
      */
     public function createBusinessChatLink(InputBusinessChatLink $link): ?BusinessChatLink
     {
-        return $this->client->callSync(new CreateBusinessChatLinkRequest(link: $link));
+        return $this->createBusinessChatLinkAsync(link: $link)->await();
+    }
+
+    /**
+     * @param string $slug
+     * @param InputBusinessChatLink $link
+     * @return Future<BusinessChatLink|null>
+     * @see https://core.telegram.org/method/account.editBusinessChatLink
+     * @api
+     */
+    public function editBusinessChatLinkAsync(string $slug, InputBusinessChatLink $link): Future
+    {
+        return $this->client->call(new EditBusinessChatLinkRequest(slug: $slug, link: $link));
     }
 
     /**
@@ -1556,7 +2780,18 @@ final readonly class AccountMethods
      */
     public function editBusinessChatLink(string $slug, InputBusinessChatLink $link): ?BusinessChatLink
     {
-        return $this->client->callSync(new EditBusinessChatLinkRequest(slug: $slug, link: $link));
+        return $this->editBusinessChatLinkAsync(slug: $slug, link: $link)->await();
+    }
+
+    /**
+     * @param string $slug
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.deleteBusinessChatLink
+     * @api
+     */
+    public function deleteBusinessChatLinkAsync(string $slug): Future
+    {
+        return $this->client->call(new DeleteBusinessChatLinkRequest(slug: $slug));
     }
 
     /**
@@ -1567,7 +2802,17 @@ final readonly class AccountMethods
      */
     public function deleteBusinessChatLink(string $slug): bool
     {
-        return (bool) $this->client->callSync(new DeleteBusinessChatLinkRequest(slug: $slug));
+        return (bool) $this->deleteBusinessChatLinkAsync(slug: $slug)->await();
+    }
+
+    /**
+     * @return Future<BusinessChatLinks|null>
+     * @see https://core.telegram.org/method/account.getBusinessChatLinks
+     * @api
+     */
+    public function getBusinessChatLinksAsync(): Future
+    {
+        return $this->client->call(new GetBusinessChatLinksRequest());
     }
 
     /**
@@ -1577,7 +2822,18 @@ final readonly class AccountMethods
      */
     public function getBusinessChatLinks(): ?BusinessChatLinks
     {
-        return $this->client->callSync(new GetBusinessChatLinksRequest());
+        return $this->getBusinessChatLinksAsync()->await();
+    }
+
+    /**
+     * @param string $slug
+     * @return Future<ResolvedBusinessChatLinks|null>
+     * @see https://core.telegram.org/method/account.resolveBusinessChatLink
+     * @api
+     */
+    public function resolveBusinessChatLinkAsync(string $slug): Future
+    {
+        return $this->client->call(new ResolveBusinessChatLinkRequest(slug: $slug));
     }
 
     /**
@@ -1588,7 +2844,26 @@ final readonly class AccountMethods
      */
     public function resolveBusinessChatLink(string $slug): ?ResolvedBusinessChatLinks
     {
-        return $this->client->callSync(new ResolveBusinessChatLinkRequest(slug: $slug));
+        return $this->resolveBusinessChatLinkAsync(slug: $slug)->await();
+    }
+
+    /**
+     * @param InputChannelEmpty|InputChannel|InputChannelFromMessage|string|int $channel
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.updatePersonalChannel
+     * @api
+     */
+    public function updatePersonalChannelAsync(AbstractInputChannel|string|int $channel): Future
+    {
+        if (is_string($channel) || is_int($channel)) {
+            $__tmpPeer = $this->client->peerManager->resolve($channel);
+            if ($__tmpPeer instanceof InputPeerChannel) {
+                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $channel = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new UpdatePersonalChannelRequest(channel: $channel));
     }
 
     /**
@@ -1599,15 +2874,18 @@ final readonly class AccountMethods
      */
     public function updatePersonalChannel(AbstractInputChannel|string|int $channel): bool
     {
-        if (is_string($channel) || is_int($channel)) {
-            $__tmpPeer = $this->client->peerManager->resolve($channel);
-            if ($__tmpPeer instanceof InputPeerChannel) {
-                $channel = new InputChannel(channelId: $__tmpPeer->channelId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $channel = $__tmpPeer;
-            }
-        }
-        return (bool) $this->client->callSync(new UpdatePersonalChannelRequest(channel: $channel));
+        return (bool) $this->updatePersonalChannelAsync(channel: $channel)->await();
+    }
+
+    /**
+     * @param bool $enabled
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.toggleSponsoredMessages
+     * @api
+     */
+    public function toggleSponsoredMessagesAsync(bool $enabled): Future
+    {
+        return $this->client->call(new ToggleSponsoredMessagesRequest(enabled: $enabled));
     }
 
     /**
@@ -1618,7 +2896,17 @@ final readonly class AccountMethods
      */
     public function toggleSponsoredMessages(bool $enabled): bool
     {
-        return (bool) $this->client->callSync(new ToggleSponsoredMessagesRequest(enabled: $enabled));
+        return (bool) $this->toggleSponsoredMessagesAsync(enabled: $enabled)->await();
+    }
+
+    /**
+     * @return Future<ReactionsNotifySettings|null>
+     * @see https://core.telegram.org/method/account.getReactionsNotifySettings
+     * @api
+     */
+    public function getReactionsNotifySettingsAsync(): Future
+    {
+        return $this->client->call(new GetReactionsNotifySettingsRequest());
     }
 
     /**
@@ -1628,7 +2916,18 @@ final readonly class AccountMethods
      */
     public function getReactionsNotifySettings(): ?ReactionsNotifySettings
     {
-        return $this->client->callSync(new GetReactionsNotifySettingsRequest());
+        return $this->getReactionsNotifySettingsAsync()->await();
+    }
+
+    /**
+     * @param ReactionsNotifySettings $settings
+     * @return Future<ReactionsNotifySettings|null>
+     * @see https://core.telegram.org/method/account.setReactionsNotifySettings
+     * @api
+     */
+    public function setReactionsNotifySettingsAsync(ReactionsNotifySettings $settings): Future
+    {
+        return $this->client->call(new SetReactionsNotifySettingsRequest(settings: $settings));
     }
 
     /**
@@ -1639,7 +2938,18 @@ final readonly class AccountMethods
      */
     public function setReactionsNotifySettings(ReactionsNotifySettings $settings): ?ReactionsNotifySettings
     {
-        return $this->client->callSync(new SetReactionsNotifySettingsRequest(settings: $settings));
+        return $this->setReactionsNotifySettingsAsync(settings: $settings)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<EmojiStatusesNotModified|EmojiStatuses|null>
+     * @see https://core.telegram.org/method/account.getCollectibleEmojiStatuses
+     * @api
+     */
+    public function getCollectibleEmojiStatusesAsync(int $hash): Future
+    {
+        return $this->client->call(new GetCollectibleEmojiStatusesRequest(hash: $hash));
     }
 
     /**
@@ -1650,17 +2960,17 @@ final readonly class AccountMethods
      */
     public function getCollectibleEmojiStatuses(int $hash): ?AbstractEmojiStatuses
     {
-        return $this->client->callSync(new GetCollectibleEmojiStatusesRequest(hash: $hash));
+        return $this->getCollectibleEmojiStatusesAsync(hash: $hash)->await();
     }
 
     /**
      * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
      * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
-     * @return PaidMessagesRevenue|null
+     * @return Future<PaidMessagesRevenue|null>
      * @see https://core.telegram.org/method/account.getPaidMessagesRevenue
      * @api
      */
-    public function getPaidMessagesRevenue(AbstractInputUser|string|int $userId, AbstractInputPeer|string|int|null $parentPeer = null): ?PaidMessagesRevenue
+    public function getPaidMessagesRevenueAsync(AbstractInputUser|string|int $userId, AbstractInputPeer|string|int|null $parentPeer = null): Future
     {
         if (is_string($parentPeer) || is_int($parentPeer)) {
             $parentPeer = $this->client->peerManager->resolve($parentPeer);
@@ -1673,7 +2983,44 @@ final readonly class AccountMethods
                 $userId = $__tmpPeer;
             }
         }
-        return $this->client->callSync(new GetPaidMessagesRevenueRequest(userId: $userId, parentPeer: $parentPeer));
+        return $this->client->call(new GetPaidMessagesRevenueRequest(userId: $userId, parentPeer: $parentPeer));
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
+     * @return PaidMessagesRevenue|null
+     * @see https://core.telegram.org/method/account.getPaidMessagesRevenue
+     * @api
+     */
+    public function getPaidMessagesRevenue(AbstractInputUser|string|int $userId, AbstractInputPeer|string|int|null $parentPeer = null): ?PaidMessagesRevenue
+    {
+        return $this->getPaidMessagesRevenueAsync(userId: $userId, parentPeer: $parentPeer)->await();
+    }
+
+    /**
+     * @param InputUserEmpty|InputUserSelf|InputUser|InputUserFromMessage|string|int $userId
+     * @param bool|null $refundCharged
+     * @param bool|null $requirePayment
+     * @param InputPeerEmpty|InputPeerSelf|InputPeerChat|InputPeerUser|InputPeerChannel|InputPeerUserFromMessage|InputPeerChannelFromMessage|string|int|null $parentPeer
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.toggleNoPaidMessagesException
+     * @api
+     */
+    public function toggleNoPaidMessagesExceptionAsync(AbstractInputUser|string|int $userId, ?bool $refundCharged = null, ?bool $requirePayment = null, AbstractInputPeer|string|int|null $parentPeer = null): Future
+    {
+        if (is_string($parentPeer) || is_int($parentPeer)) {
+            $parentPeer = $this->client->peerManager->resolve($parentPeer);
+        }
+        if (is_string($userId) || is_int($userId)) {
+            $__tmpPeer = $this->client->peerManager->resolve($userId);
+            if ($__tmpPeer instanceof InputPeerUser) {
+                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
+            } else {
+                $userId = $__tmpPeer;
+            }
+        }
+        return $this->client->call(new ToggleNoPaidMessagesExceptionRequest(userId: $userId, refundCharged: $refundCharged, requirePayment: $requirePayment, parentPeer: $parentPeer));
     }
 
     /**
@@ -1687,18 +3034,18 @@ final readonly class AccountMethods
      */
     public function toggleNoPaidMessagesException(AbstractInputUser|string|int $userId, ?bool $refundCharged = null, ?bool $requirePayment = null, AbstractInputPeer|string|int|null $parentPeer = null): bool
     {
-        if (is_string($parentPeer) || is_int($parentPeer)) {
-            $parentPeer = $this->client->peerManager->resolve($parentPeer);
-        }
-        if (is_string($userId) || is_int($userId)) {
-            $__tmpPeer = $this->client->peerManager->resolve($userId);
-            if ($__tmpPeer instanceof InputPeerUser) {
-                $userId = new InputUser(userId: $__tmpPeer->userId, accessHash: $__tmpPeer->accessHash);
-            } else {
-                $userId = $__tmpPeer;
-            }
-        }
-        return (bool) $this->client->callSync(new ToggleNoPaidMessagesExceptionRequest(userId: $userId, refundCharged: $refundCharged, requirePayment: $requirePayment, parentPeer: $parentPeer));
+        return (bool) $this->toggleNoPaidMessagesExceptionAsync(userId: $userId, refundCharged: $refundCharged, requirePayment: $requirePayment, parentPeer: $parentPeer)->await();
+    }
+
+    /**
+     * @param ProfileTab $tab
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.setMainProfileTab
+     * @api
+     */
+    public function setMainProfileTabAsync(ProfileTab $tab): Future
+    {
+        return $this->client->call(new SetMainProfileTabRequest(tab: $tab));
     }
 
     /**
@@ -1709,7 +3056,20 @@ final readonly class AccountMethods
      */
     public function setMainProfileTab(ProfileTab $tab): bool
     {
-        return (bool) $this->client->callSync(new SetMainProfileTabRequest(tab: $tab));
+        return (bool) $this->setMainProfileTabAsync(tab: $tab)->await();
+    }
+
+    /**
+     * @param InputDocumentEmpty|InputDocument $id
+     * @param bool|null $unsave
+     * @param InputDocumentEmpty|InputDocument|null $afterId
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.saveMusic
+     * @api
+     */
+    public function saveMusicAsync(AbstractInputDocument $id, ?bool $unsave = null, ?AbstractInputDocument $afterId = null): Future
+    {
+        return $this->client->call(new SaveMusicRequest(id: $id, unsave: $unsave, afterId: $afterId));
     }
 
     /**
@@ -1722,7 +3082,18 @@ final readonly class AccountMethods
      */
     public function saveMusic(AbstractInputDocument $id, ?bool $unsave = null, ?AbstractInputDocument $afterId = null): bool
     {
-        return (bool) $this->client->callSync(new SaveMusicRequest(id: $id, unsave: $unsave, afterId: $afterId));
+        return (bool) $this->saveMusicAsync(id: $id, unsave: $unsave, afterId: $afterId)->await();
+    }
+
+    /**
+     * @param int $hash
+     * @return Future<SavedMusicIdsNotModified|SavedMusicIds|null>
+     * @see https://core.telegram.org/method/account.getSavedMusicIds
+     * @api
+     */
+    public function getSavedMusicIdsAsync(int $hash): Future
+    {
+        return $this->client->call(new GetSavedMusicIdsRequest(hash: $hash));
     }
 
     /**
@@ -1733,7 +3104,20 @@ final readonly class AccountMethods
      */
     public function getSavedMusicIds(int $hash): ?AbstractSavedMusicIds
     {
-        return $this->client->callSync(new GetSavedMusicIdsRequest(hash: $hash));
+        return $this->getSavedMusicIdsAsync(hash: $hash)->await();
+    }
+
+    /**
+     * @param string $offset
+     * @param int $limit
+     * @param int $hash
+     * @return Future<ChatThemesNotModified|ChatThemes|null>
+     * @see https://core.telegram.org/method/account.getUniqueGiftChatThemes
+     * @api
+     */
+    public function getUniqueGiftChatThemesAsync(string $offset, int $limit, int $hash): Future
+    {
+        return $this->client->call(new GetUniqueGiftChatThemesRequest(offset: $offset, limit: $limit, hash: $hash));
     }
 
     /**
@@ -1746,7 +3130,17 @@ final readonly class AccountMethods
      */
     public function getUniqueGiftChatThemes(string $offset, int $limit, int $hash): ?AbstractChatThemes
     {
-        return $this->client->callSync(new GetUniqueGiftChatThemesRequest(offset: $offset, limit: $limit, hash: $hash));
+        return $this->getUniqueGiftChatThemesAsync(offset: $offset, limit: $limit, hash: $hash)->await();
+    }
+
+    /**
+     * @return Future<PasskeyRegistrationOptions|null>
+     * @see https://core.telegram.org/method/account.initPasskeyRegistration
+     * @api
+     */
+    public function initPasskeyRegistrationAsync(): Future
+    {
+        return $this->client->call(new InitPasskeyRegistrationRequest());
     }
 
     /**
@@ -1756,7 +3150,18 @@ final readonly class AccountMethods
      */
     public function initPasskeyRegistration(): ?PasskeyRegistrationOptions
     {
-        return $this->client->callSync(new InitPasskeyRegistrationRequest());
+        return $this->initPasskeyRegistrationAsync()->await();
+    }
+
+    /**
+     * @param InputPasskeyCredential $credential
+     * @return Future<Passkey|null>
+     * @see https://core.telegram.org/method/account.registerPasskey
+     * @api
+     */
+    public function registerPasskeyAsync(InputPasskeyCredential $credential): Future
+    {
+        return $this->client->call(new RegisterPasskeyRequest(credential: $credential));
     }
 
     /**
@@ -1767,7 +3172,17 @@ final readonly class AccountMethods
      */
     public function registerPasskey(InputPasskeyCredential $credential): ?Passkey
     {
-        return $this->client->callSync(new RegisterPasskeyRequest(credential: $credential));
+        return $this->registerPasskeyAsync(credential: $credential)->await();
+    }
+
+    /**
+     * @return Future<Passkeys|null>
+     * @see https://core.telegram.org/method/account.getPasskeys
+     * @api
+     */
+    public function getPasskeysAsync(): Future
+    {
+        return $this->client->call(new GetPasskeysRequest());
     }
 
     /**
@@ -1777,7 +3192,18 @@ final readonly class AccountMethods
      */
     public function getPasskeys(): ?Passkeys
     {
-        return $this->client->callSync(new GetPasskeysRequest());
+        return $this->getPasskeysAsync()->await();
+    }
+
+    /**
+     * @param string $id
+     * @return Future<bool>
+     * @see https://core.telegram.org/method/account.deletePasskey
+     * @api
+     */
+    public function deletePasskeyAsync(string $id): Future
+    {
+        return $this->client->call(new DeletePasskeyRequest(id: $id));
     }
 
     /**
@@ -1788,6 +3214,6 @@ final readonly class AccountMethods
      */
     public function deletePasskey(string $id): bool
     {
-        return (bool) $this->client->callSync(new DeletePasskeyRequest(id: $id));
+        return (bool) $this->deletePasskeyAsync(id: $id)->await();
     }
 }
