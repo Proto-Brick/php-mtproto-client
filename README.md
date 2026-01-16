@@ -46,7 +46,7 @@
 ## Installation
 
 ```bash
-composer require protobrick/mtproto-client:^0.1@beta
+composer require "protobrick/mtproto-client:^0.1.0-beta"
 ```
 
 ## Authentication
