@@ -34,18 +34,6 @@ readonly class Authenticator
         ?callable $passwordProvider = null,
         ?callable $signupProvider = null
     ): Authorization {
-        try {
-            $users = $this->client->callSync(new GetUsersRequest(id: [new InputUserSelf()]));
-            if (!empty($users) && $users[0] instanceof User) {
-                $this->client->logger->info("✅ Already logged in.", ['channel' => LogChannel::AUTH]);
-                return new Authorization(user: $users[0]);
-            }
-        } catch (RpcErrorException $e) {
-            if ($e->errorCode !== 401) {
-                throw $e;
-            }
-        }
-
         $this->client->logger->info("Sending verification code to {$phoneNumber}...", ['channel' => LogChannel::AUTH]);
 
         $settings = $this->client->getSettings();

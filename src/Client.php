@@ -31,8 +31,10 @@ use ProtoBrick\MTProtoClient\Generated\Api\UsersMethods;
 
 use ProtoBrick\MTProtoClient\Exception\TransportException;
 use ProtoBrick\MTProtoClient\Event\ServiceMessageContext;
+use ProtoBrick\MTProtoClient\Generated\Methods\Users\GetUsersRequest;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\Message;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\MessageService;
+use ProtoBrick\MTProtoClient\Generated\Types\Base\User;
 use ProtoBrick\MTProtoClient\Logger\ConsoleLogger;
 use ProtoBrick\MTProtoClient\Logger\InternalLogger;
 use ProtoBrick\MTProtoClient\Peer\Storage\FilePeerStorage;
@@ -482,6 +484,18 @@ class Client
         ?callable $signupProvider = null
     ): Authorization {
         $this->connect();
+
+        try {
+            $users = $this->callSync(new GetUsersRequest(id: [new InputUserSelf()]));
+            if (!empty($users) && $users[0] instanceof User) {
+                $this->logger->info("✅ Already logged in.", ['channel' => LogChannel::AUTH]);
+                return new Authorization(user: $users[0]);
+            }
+        } catch (RpcErrorException $e) {
+            if ($e->errorCode !== 401) {
+                throw $e;
+            }
+        }
 
         if ($phoneNumber === null) {
             echo "Enter phone number: ";
