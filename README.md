@@ -101,7 +101,7 @@ $client = Client::create($settings, __DIR__. '/session_name');
 
 $client->channels->joinChannel(channel: "@ProtoBrickChat");
 $client->messages->sendMessage(
-    peer: "@ProtoBrickChat",
+    peer: "@ProtoBrickChat", //auto-resolve peer
     message: 'Hello from ProtoBrick!'
 );
 ```
