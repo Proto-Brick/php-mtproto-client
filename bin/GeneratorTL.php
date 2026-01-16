@@ -38,7 +38,6 @@ class GeneratorTL
         'help.configSimple' => 0x5a592a6c,
 //        'messageReplies' => 0x81834865,
     ];
-    private const API_SCHEMA_PATH = __DIR__ . '/../schema/TL_telegram_v220.json';
     private const OUTPUT_DIR = __DIR__ . '/../src/Generated';
     private const BASE_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated';
     private const GENERATED_METHODS_NAMESPACE = self::BASE_NAMESPACE . '\\Methods';
@@ -61,12 +60,12 @@ class GeneratorTL
      */
     private array $typeContainsPeerEntityCache = [];
 
-    public function __construct()
+    public function __construct(string $schemaPath)
     {
-        if (!file_exists(self::API_SCHEMA_PATH)) {
-            throw new RuntimeException("Schema file not found: " . self::API_SCHEMA_PATH);
+        if (!file_exists($schemaPath)) {
+            throw new RuntimeException("Schema file not found: " . $schemaPath);
         }
-        $this->schema = json_decode(file_get_contents(self::API_SCHEMA_PATH), true);
+        $this->schema = json_decode(file_get_contents($schemaPath), true);
         if (!$this->schema) {
             throw new RuntimeException("Failed to parse JSON schema.");
         }

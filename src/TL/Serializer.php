@@ -14,6 +14,7 @@ use ProtoBrick\MTProtoClient\Generated\Types\Base\JsonObject;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\JSONObjectValue;
 use ProtoBrick\MTProtoClient\Generated\Types\Base\JsonString;
 use ProtoBrick\MTProtoClient\TL\MTProto\Constructors;
+use ProtoBrick\MTProtoClient\Generated\TL_Layer;
 
 class Serializer
 {
@@ -210,6 +211,10 @@ class Serializer
      */
     public static function wrapWithInitConnection(string $query, int $layer, int $apiId): string
     {
+        if ($layer === 0) {
+            $layer = TL_Layer::VERSION;
+        }
+
         // --- Конструкторы из официальной схемы ---
         $invokeWithLayerConstructor = 0xda9b0d0d;
         $initConnectionConstructor = 0xc1cd5ea9;

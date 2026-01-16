@@ -69,7 +69,10 @@ class DataCenterConnection
             if (!$isPing && !$this->sessionState->isInitialized()) {
                 $payload = Serializer::wrapWithInitConnection(
                     query: $payload,
-                    layer: 220,
+                    // We pass 0 here to instruct the Serializer to automatically use the current API Layer version.
+                    // This value is retrieved from the auto-generated constant ProtoBrick\MTProtoClient\Generated\TL_Layer::VERSION,
+                    // which is derived from the schema filename (e.g., TL_telegram_v220.json) during the build process.
+                    layer: 0,
                     apiId: $this->settings->api_id
                 );
                 $this->sessionState->setInitialized(true);

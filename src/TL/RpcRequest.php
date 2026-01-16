@@ -11,6 +11,7 @@ use ProtoBrick\MTProtoClient\TL\Contracts\TlObjectInterface;
 /**
  * Abstract base class for all generated RPC Request classes.
  * These objects are serializable but not deserializable.
+ * @template TResponse
  */
 abstract class RpcRequest implements TlObjectInterface, Serializable, RequestInterface
 {

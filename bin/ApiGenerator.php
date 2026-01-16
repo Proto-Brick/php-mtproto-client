@@ -10,7 +10,6 @@ class ApiGenerator
 {
     use GeneratorHelpers;
 
-    private const API_SCHEMA_PATH = __DIR__ . '/../schema/TL_telegram_v220.json';
     private const OUTPUT_DIR = __DIR__ . '/../src/Generated/Api';
     private const BASE_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Api';
     private const GENERATED_METHODS_NAMESPACE = 'ProtoBrick\\MTProtoClient\\Generated\\Methods';
@@ -31,12 +30,12 @@ class ApiGenerator
     private array $abstractTypes;
     public static array $generatedClasses = [];
 
-    public function __construct(array $typeToConstructorsMap, array $abstractTypes, array $enumTypes)
+    public function __construct(string $schemaPath, array $typeToConstructorsMap, array $abstractTypes, array $enumTypes)
     {
-        if (!file_exists(self::API_SCHEMA_PATH)) {
-            throw new RuntimeException("Schema file not found: " . self::API_SCHEMA_PATH);
+        if (!file_exists($schemaPath)) {
+            throw new RuntimeException("Schema file not found: " . $schemaPath);
         }
-        $this->schema = json_decode(file_get_contents(self::API_SCHEMA_PATH), true);
+        $this->schema = json_decode(file_get_contents($schemaPath), true);
         if (!$this->schema) {
             throw new RuntimeException("Failed to parse JSON schema.");
         }
@@ -98,64 +97,84 @@ class ApiGenerator
         ];
 
         $this->resetUseTracking();
+        $this->registerUse('Amp\\Future', $className, null);
+        $this->registerUse(self::CLIENT_FQN, $className, null);
+
         $methodsContent = [];
 
         foreach ($methods as $method) {
             $methodParts = explode('.', $method['method']);
-            $methodName = lcfirst($this->snakeToCamel(end($methodParts)));
+            $baseMethodName = lcfirst($this->snakeToCamel(end($methodParts)));
 
             $apiMethodParams = $this->buildApiMethodParams($method['params'], $className);
             $paramDefs = $apiMethodParams['definitions'];
-
-            // ВЕРНУЛИСЬ К СТАНДАРТНОМУ ВАРИАНТУ:
-            // Берем строку аргументов, которую сформировал buildApiMethodParams
             $paramVarsStr = $apiMethodParams['call_vars'];
-
             $paramDocs = $apiMethodParams['param_docs'];
 
             $resolveCodeBlock = $this->generateResolveBlock($method['params'], $className);
             $randomIdCodeBlock = $this->generateRandomIdBlock($method['params']);
 
             $returnTypeInfo = $this->resolvePhpTypeInfo($method['type'], $className, null);
-
             $returnDocType = $returnTypeInfo['phpdoc_type'];
+            $nativeReturnType = $returnTypeInfo['native_type'];
+
             if (!str_contains($returnTypeInfo['native_type'], '?')) {
                 $returnDocType = str_replace('|null', '', $returnDocType);
             }
-
-            $phpdoc = "    /**\n";
-            if (!empty($paramDocs)) {
-                $phpdoc .= implode("\n", $paramDocs) . "\n";
-            }
-            $phpdoc .= "     * @return {$returnDocType}\n";
-            $phpdoc .= "     * @see https://core.telegram.org/method/{$method['method']}\n";
-            $phpdoc .= "     * @api\n";
-            $phpdoc .= "     */\n";
 
             [$reqNamespace, $reqClassName] = $this->getNamespaceAndClassName($method['method']);
             $requestClassFqn = self::GENERATED_METHODS_NAMESPACE . '\\' . $reqNamespace . '\\' . $reqClassName . 'Request';
             $requestClassShort = $this->registerUse($requestClassFqn, $className, null);
 
-            $call = "\$this->client->callSync(new {$requestClassShort}({$paramVarsStr}))";
+            // --- 1. Async Method ---
+            $asyncMethodName = $baseMethodName . 'Async';
+
+            $asyncPhpdoc = "    /**\n";
+            if (!empty($paramDocs)) {
+                $asyncPhpdoc .= implode("\n", $paramDocs) . "\n";
+            }
+            $asyncPhpdoc .= "     * @return Future<{$returnDocType}>\n";
+            $asyncPhpdoc .= "     * @see https://core.telegram.org/method/{$method['method']}\n";
+            $asyncPhpdoc .= "     * @api\n";
+            $asyncPhpdoc .= "     */\n";
+
+            $methodsContent[] = $asyncPhpdoc . <<<PHP
+                public function {$asyncMethodName}({$paramDefs}): Future
+                {
+            {$resolveCodeBlock}{$randomIdCodeBlock}        return \$this->client->call(new {$requestClassShort}({$paramVarsStr}));
+                }
+            PHP;
+
+            // --- 2. Sync Wrapper ---
+            $syncMethodName = $baseMethodName;
+
+            $syncPhpdoc = "    /**\n";
+            if (!empty($paramDocs)) {
+                $syncPhpdoc .= implode("\n", $paramDocs) . "\n";
+            }
+            $syncPhpdoc .= "     * @return {$returnDocType}\n";
+            $syncPhpdoc .= "     * @see https://core.telegram.org/method/{$method['method']}\n";
+            $syncPhpdoc .= "     * @api\n";
+            $syncPhpdoc .= "     */\n";
+
+            $call = "\$this->{$asyncMethodName}({$paramVarsStr})->await()";
             if ($returnTypeInfo['native_type'] === 'bool') $call = "(bool) {$call}";
             if ($returnTypeInfo['native_type'] === 'int') $call = "(int) {$call}";
 
-            $nativeReturnType = $returnTypeInfo['native_type'];
-
-            $methodsContent[] = $phpdoc . <<<PHP
-                public function {$methodName}({$paramDefs}): {$nativeReturnType}
+            $methodsContent[] = $syncPhpdoc . <<<PHP
+                public function {$syncMethodName}({$paramDefs}): {$nativeReturnType}
                 {
-            {$resolveCodeBlock}{$randomIdCodeBlock}        return {$call};
+                    return {$call};
                 }
             PHP;
         }
 
-        $this->registerUse(self::CLIENT_FQN, $className, null);
         $methodsContentStr = implode("\n\n", $methodsContent);
         $useBlock = $this->buildUseBlockFromAliasMap(self::BASE_NAMESPACE, null);
 
         $fileContent = <<<PHP
             <?php declare(strict_types=1);
+            
             namespace ProtoBrick\\MTProtoClient\\Generated\\Api;
             {$useBlock}
             /**
