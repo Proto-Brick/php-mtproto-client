@@ -168,15 +168,6 @@ $client->onUpdate(function (TlObject $update) {
 $client->start();
 ```
 
-## Architecture
-
-### Generated Code
-The core of this library is generated automatically:
-*   **`src/Generated/Api/*.php`**: Methods grouped by namespace (`messages`, `users`, etc.).
-*   **`src/Generated/Types/**/*.php`**: DTOs for every TL object (`InputPeer`, `Message`, `User`, etc.).
-
-This ensures that if Telegram updates their API Layer, we can simply regenerate the code to support new features immediately.
-
 ## Async vs Sync Execution
 The client provides generated `*Async` methods for every API call.
 
@@ -234,6 +225,13 @@ $settings = new Settings(
 );
 ```
 
+## Architecture
+
+### Generated Code
+The core of this library is generated automatically:
+*   **`src/Generated/Api/*.php`**: Methods grouped by namespace (`messages`, `users`, etc.).
+*   **`src/Generated/Types/**/*.php`**: DTOs for every TL object (`InputPeer`, `Message`, `User`, etc.).
+
 ### API Layer Updates (Schema)
 You can regenerate the library API for a newer or older API layer yourself, without waiting for a release.
 
@@ -259,7 +257,6 @@ If you find this library useful, please consider giving it a ⭐️ star! It hel
 
 Contributions are welcome!
 *   **Bug Reports:** Open an issue if you encounter crashes or protocol errors.
-*   **Schema Updates:** If a new Layer is released, replace `schema/TL_telegram_vXXX.json` and run `php bin/build.php`.
 
 ## License
 
